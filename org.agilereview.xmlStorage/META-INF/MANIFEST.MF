@@ -1,0 +1,11 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: XmlStorage Plug-In
+Bundle-SymbolicName: org.agilereview.xmlStorage
+Bundle-Version: 0.9.0.qualifier
+Bundle-Activator: org.agilereview.xmlstorage.Activator
+Bundle-Vendor: AgileReview Project
+Require-Bundle: org.eclipse.ui,
+ org.eclipse.core.runtime
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-ActivationPolicy: lazy
