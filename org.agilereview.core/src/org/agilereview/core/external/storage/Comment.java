@@ -14,7 +14,7 @@ public class Comment {
 	
 	private String id;
 	private String author; //TODO maybe seperate author object for sync with color?
-	private String wsAbsfilePath; //TODO think about convention how to name paths!
+	private String wsAbsfilePath; //TODO use IFile object here???
 	private Date creationDate = new Date();
 	private Date modificationDate = new Date();
 	private String recipient;
