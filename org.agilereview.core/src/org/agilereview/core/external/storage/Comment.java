@@ -6,7 +6,7 @@ import java.util.Date;
 import org.eclipse.core.resources.IFile;
 
 /**
- * A class that stores date of comments.
+ * A class that stores data and a list of replies of a comment.
  */
 public class Comment {
 	
