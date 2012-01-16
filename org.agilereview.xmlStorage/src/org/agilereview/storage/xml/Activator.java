@@ -1,4 +1,4 @@
-package org.agilereview.xmlstorage;
+package org.agilereview.storage.xml;
 
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;

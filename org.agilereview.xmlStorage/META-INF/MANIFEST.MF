@@ -1,9 +1,9 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: XmlStorage Plug-In
-Bundle-SymbolicName: org.agilereview.xmlStorage
+Bundle-SymbolicName: org.agilereview.storage.xml
 Bundle-Version: 0.9.0.qualifier
-Bundle-Activator: org.agilereview.xmlstorage.Activator
+Bundle-Activator: org.agilereview.storage.xml.Activator
 Bundle-Vendor: AgileReview Project
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime
