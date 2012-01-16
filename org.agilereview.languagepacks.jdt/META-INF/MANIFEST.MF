@@ -1,0 +1,11 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: JavaLanguagePack Plug-In
+Bundle-SymbolicName: org.agilereview.languagepacks.jdt
+Bundle-Version: 0.9.0.qualifier
+Bundle-Activator: org.agilereview.javalanguagepack.Activator
+Bundle-Vendor: AgileReview Plug-In
+Require-Bundle: org.eclipse.ui,
+ org.eclipse.core.runtime
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-ActivationPolicy: lazy
