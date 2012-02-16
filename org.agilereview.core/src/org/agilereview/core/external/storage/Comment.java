@@ -71,7 +71,8 @@ public class Comment {
 	}
 	
 
-	/** Constructor that should be used if a comment is reconstructed from storage
+	/** 
+	 * Constructor that should be used if a comment is reconstructed from storage
 	 * @param id the ID of the comment retrieved from the current IStorageClient
 	 * @param author the author of the comment
 	 * @param commentedFile the IFile underlying the editor in which the comment was added
