@@ -1,5 +1,7 @@
 package org.agilereview.test.external.storage;
 
+import static org.junit.Assert.fail;
+
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -13,10 +15,17 @@ import org.agilereview.test.utils.HelperClass;
 import org.eclipse.core.resources.IFile;
 import org.junit.Test;
 
+/**
+ * @author Malte
+ *
+ */
 public class CommentTest {
 
+	/**
+	 * Test method for {@link org.agilereview.core.external.storage.Comment#Comment(java.lang.String, org.eclipse.core.resources.IFile)}.
+	 */
 	@Test
-	public void testCommentStringIFile() {
+	public final void testCommentStringIFile() {
 		IFile file = HelperClass.getIFile("resources/Test.txt");
 		
 		//create comment
@@ -29,8 +38,11 @@ public class CommentTest {
 		}
 	}
 
+	/**
+	 * Test method for {@link org.agilereview.core.external.storage.Comment#Comment(java.lang.String, java.lang.String, org.eclipse.core.resources.IFile, org.agilereview.core.external.storage.Review, java.util.Date, java.util.Date, java.lang.String, int, int, java.lang.String, java.util.ArrayList)}.
+	 */
 	@Test
-	public void testCommentStringStringIFileReviewDateDateStringIntIntStringArrayListOfReply() {
+	public final void testCommentStringStringIFileReviewDateDateStringIntIntStringArrayListOfReply() {
 		IFile file = HelperClass.getIFile("resources/Test.txt");
 		
 		Date d = Calendar.getInstance().getTime();
@@ -51,8 +63,35 @@ public class CommentTest {
 		}
 	}
 
+	/**
+	 * Test method for {@link org.agilereview.core.external.storage.Comment#getId()}.
+	 */
 	@Test
-	public void testSetCommentedFile() {
+	public final void testGetId() {
+		fail("Not yet implemented"); // TODO
+	}
+
+	/**
+	 * Test method for {@link org.agilereview.core.external.storage.Comment#getAuthor()}.
+	 */
+	@Test
+	public final void testGetAuthor() {
+		fail("Not yet implemented"); // TODO
+	}
+
+	/**
+	 * Test method for {@link org.agilereview.core.external.storage.Comment#getCommentedFile()}.
+	 */
+	@Test
+	public final void testGetCommentedFile() {
+		fail("Not yet implemented"); // TODO
+	}
+
+	/**
+	 * Test method for {@link org.agilereview.core.external.storage.Comment#setCommentedFile(org.eclipse.core.resources.IFile)}.
+	 */
+	@Test
+	public final void testSetCommentedFile() {
 		Comment comment = createDefaultComment();
 		IFile file = HelperClass.getIFile("resources/Test2.txt");
 		comment.setCommentedFile(file);
@@ -62,8 +101,43 @@ public class CommentTest {
 		}
 	}
 
+	/**
+	 * Test method for {@link org.agilereview.core.external.storage.Comment#getReview()}.
+	 */
 	@Test
-	public void testSetRecipient() {
+	public final void testGetReview() {
+		fail("Not yet implemented"); // TODO
+	}
+
+	/**
+	 * Test method for {@link org.agilereview.core.external.storage.Comment#getCreationDate()}.
+	 */
+	@Test
+	public final void testGetCreationDate() {
+		fail("Not yet implemented"); // TODO
+	}
+
+	/**
+	 * Test method for {@link org.agilereview.core.external.storage.Comment#getModificationDate()}.
+	 */
+	@Test
+	public final void testGetModificationDate() {
+		fail("Not yet implemented"); // TODO
+	}
+
+	/**
+	 * Test method for {@link org.agilereview.core.external.storage.Comment#getRecipient()}.
+	 */
+	@Test
+	public final void testGetRecipient() {
+		fail("Not yet implemented"); // TODO
+	}
+
+	/**
+	 * Test method for {@link org.agilereview.core.external.storage.Comment#setRecipient(java.lang.String)}.
+	 */
+	@Test
+	public final void testSetRecipient() {
 		Comment comment = createDefaultComment();
 		comment.setRecipient("Theo");
 		
@@ -72,8 +146,19 @@ public class CommentTest {
 		}
 	}
 
+	/**
+	 * Test method for {@link org.agilereview.core.external.storage.Comment#getStatus()}.
+	 */
 	@Test
-	public void testSetStatus() {
+	public final void testGetStatus() {
+		fail("Not yet implemented"); // TODO
+	}
+
+	/**
+	 * Test method for {@link org.agilereview.core.external.storage.Comment#setStatus(int)}.
+	 */
+	@Test
+	public final void testSetStatus() {
 		Comment comment = createDefaultComment();
 		comment.setStatus(5);
 		
@@ -82,8 +167,19 @@ public class CommentTest {
 		}
 	}
 
+	/**
+	 * Test method for {@link org.agilereview.core.external.storage.Comment#getPriority()}.
+	 */
 	@Test
-	public void testSetPriority() {
+	public final void testGetPriority() {
+		fail("Not yet implemented"); // TODO
+	}
+
+	/**
+	 * Test method for {@link org.agilereview.core.external.storage.Comment#setPriority(int)}.
+	 */
+	@Test
+	public final void testSetPriority() {
 		Comment comment = createDefaultComment();
 		comment.setPriority(10);
 		
@@ -92,18 +188,40 @@ public class CommentTest {
 		}
 	}
 
+	/**
+	 * Test method for {@link org.agilereview.core.external.storage.Comment#getText()}.
+	 */
 	@Test
-	public void testSetText() {
+	public final void testGetText() {
+		fail("Not yet implemented"); // TODO
+	}
+
+	/**
+	 * Test method for {@link org.agilereview.core.external.storage.Comment#setText(java.lang.String)}.
+	 */
+	@Test
+	public final void testSetText() {
 		Comment comment = createDefaultComment();
-		comment.setText("Dies \n is §)?^´ßäöü");
+		comment.setText("Dies \n is /*3Â´ÃŸ?)?^`^");
 		
-		if(!comment.getText().equals("Dies \n is §)?^´ßäöü")) {
+		if(!comment.getText().equals("Dies \n is /*3Â´ÃŸ?)?^`^")) {
 			throw new AssertionError("Comment text could not be set successfully!");
 		}
 	}
-
+	
+	/**
+	 * Test method for {@link org.agilereview.core.external.storage.Comment#getReplies()}.
+	 */
 	@Test
-	public void testAddReply() {
+	public final void testGetReplies() {
+		// is tested by testCommentStringStringIFileReviewDateDateStringIntIntStringArrayListOfReply()
+	}
+
+	/**
+	 * Test method for {@link org.agilereview.core.external.storage.Comment#addReply(org.agilereview.core.external.storage.Reply)}.
+	 */
+	@Test
+	public final void testAddReply() {
 		Comment comment = createDefaultComment();
 		
 		//create reply
@@ -116,8 +234,11 @@ public class CommentTest {
 		}
 	}
 
+	/**
+	 * Test method for {@link org.agilereview.core.external.storage.Comment#deleteReply(org.agilereview.core.external.storage.Reply)}.
+	 */
 	@Test
-	public void testDeleteReplyReply() {
+	public final void testDeleteReplyReply() {
 		Comment comment = createDefaultComment();
 		
 		//create reply
@@ -131,8 +252,11 @@ public class CommentTest {
 		}
 	}
 
+	/**
+	 * Test method for {@link org.agilereview.core.external.storage.Comment#deleteReply(int)}.
+	 */
 	@Test
-	public void testDeleteReplyInt() {
+	public final void testDeleteReplyInt() {
 		Comment comment = createDefaultComment();
 		
 		//create reply
@@ -146,6 +270,10 @@ public class CommentTest {
 		}
 	}
 
+	/**
+	 * Creates a {@link Comment} with values IFile = "" and id = ""
+	 * @return {@link Comment} as specified above
+	 */
 	private Comment createDefaultComment() {
 		IFile file = HelperClass.getIFile("");
 		
