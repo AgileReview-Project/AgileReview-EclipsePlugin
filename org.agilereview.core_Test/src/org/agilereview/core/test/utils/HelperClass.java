@@ -1,4 +1,4 @@
-package org.agilereview.test.utils;
+package org.agilereview.core.test.utils;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;

@@ -1,4 +1,4 @@
-package org.agilereview.test.external.storage;
+package org.agilereview.core.test.external.storage;
 
 import static org.junit.Assert.fail;
 
@@ -11,7 +11,7 @@ import junit.framework.Assert;
 import org.agilereview.core.external.storage.Comment;
 import org.agilereview.core.external.storage.Reply;
 import org.agilereview.core.external.storage.Review;
-import org.agilereview.test.utils.HelperClass;
+import org.agilereview.core.test.utils.HelperClass;
 import org.eclipse.core.resources.IFile;
 import org.junit.Test;
 

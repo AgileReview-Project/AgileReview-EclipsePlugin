@@ -1,7 +1,7 @@
 /**
  * 
  */
-package org.agilereview.test.external.storage;
+package org.agilereview.core.test.external.storage;
 
 import static org.junit.Assert.*;
 
