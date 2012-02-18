@@ -25,7 +25,7 @@ public class CommentTest {
 		
 		//check integrity
 		if(!comment.getId().equals("r2") || !comment.getCommentedFile().equals(file)) {
-			throw new AssertionError("Comment integrity not valid after creation!", null);
+			throw new AssertionError("Comment integrity not valid after creation!");
 		}
 	}
 
@@ -47,7 +47,7 @@ public class CommentTest {
 				|| !comment.getReview().equals(review) || !comment.getCreationDate().equals(d) || !comment.getModificationDate().equals(d)
 				|| !comment.getRecipient().equals("anyone") || comment.getStatus() != 1 || comment.getPriority() != 2
 				|| !comment.getText().equals("description") || !comment.getReplies().get(0).equals(r)) {
-			throw new AssertionError("Comment integrity not valid after creation!", null);
+			throw new AssertionError("Comment integrity not valid after creation!");
 		}
 	}
 
@@ -58,7 +58,7 @@ public class CommentTest {
 		comment.setCommentedFile(file);
 		
 		if(!comment.getCommentedFile().equals(file)) {
-			throw new AssertionError("CommentFile could not be set successfully!", null);
+			throw new AssertionError("CommentFile could not be set successfully!");
 		}
 	}
 
@@ -68,7 +68,7 @@ public class CommentTest {
 		comment.setRecipient("Theo");
 		
 		if(!comment.getRecipient().equals("Theo")) {
-			throw new AssertionError("Recipient could not be set successfully!", null);
+			throw new AssertionError("Recipient could not be set successfully!");
 		}
 	}
 
@@ -78,7 +78,7 @@ public class CommentTest {
 		comment.setStatus(5);
 		
 		if(comment.getStatus() != 5) {
-			throw new AssertionError("Status could not be set successfully!", null);
+			throw new AssertionError("Status could not be set successfully!");
 		}
 	}
 
@@ -88,7 +88,7 @@ public class CommentTest {
 		comment.setPriority(10);
 		
 		if(comment.getPriority() != 10) {
-			throw new AssertionError("Priority could not be set successfully!", null);
+			throw new AssertionError("Priority could not be set successfully!");
 		}
 	}
 
@@ -98,7 +98,7 @@ public class CommentTest {
 		comment.setText("Dies \n is §)?^´ßäöü");
 		
 		if(!comment.getText().equals("Dies \n is §)?^´ßäöü")) {
-			throw new AssertionError("Comment text could not be set successfully!", null);
+			throw new AssertionError("Comment text could not be set successfully!");
 		}
 	}
 
@@ -112,7 +112,7 @@ public class CommentTest {
 		comment.addReply(r);
 		
 		if(!comment.getReplies().get(0).equals(r)) {
-			throw new AssertionError("Reply could not be added successfully!", null);
+			throw new AssertionError("Reply could not be added successfully!");
 		}
 	}
 
@@ -127,7 +127,7 @@ public class CommentTest {
 		
 		comment.deleteReply(r);
 		if(comment.getReplies().size() != 0) {
-			throw new AssertionError("Reply could not be removed by name successfully!", null);
+			throw new AssertionError("Reply could not be removed by name successfully!");
 		}
 	}
 
@@ -142,7 +142,7 @@ public class CommentTest {
 		
 		comment.deleteReply(0);
 		if(comment.getReplies().size() != 0) {
-			throw new AssertionError("Reply could not be removed by index successfully!", null);
+			throw new AssertionError("Reply could not be removed by index successfully!");
 		}
 	}
 
