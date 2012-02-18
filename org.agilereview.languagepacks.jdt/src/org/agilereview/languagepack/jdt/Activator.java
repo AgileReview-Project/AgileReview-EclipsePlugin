@@ -1,4 +1,4 @@
-package org.agilereview.javalanguagepack;
+package org.agilereview.languagepack.jdt;
 
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
