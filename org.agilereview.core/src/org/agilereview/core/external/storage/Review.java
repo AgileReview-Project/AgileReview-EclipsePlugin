@@ -1,10 +1,18 @@
+/**
+ * Copyright (c) 2011, 2012 AgileReview Development Team and others.
+ * All rights reserved. This program and the accompanying materials are made available under
+ * the terms of the Apache License v2.0 which accompanies this distribution, and is available
+ * at http://www.apache.org/licenses/LICENSE-2.0.html
+ * Contributors: Malte Brunnlieb, Philipp Diebold, Peter Reuter, Thilo Rauch
+ */
 package org.agilereview.core.external.storage;
 
 import java.net.URI;
 import java.util.ArrayList;
 
 /**
- * A class that stores review data and a list of comments belonging to the review.
+ * A class that stores review data and a list of comments belonging to the review. 
+ * @author Peter Reuter (19.02.2012)
  */
 public class Review {
 	
