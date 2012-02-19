@@ -1,8 +1,8 @@
 /**
  * Copyright (c) 2011, 2012 AgileReview Development Team and others.
  * All rights reserved. This program and the accompanying materials are made available under
- * the terms of the Apache License v2.0 which accompanies this distribution, and is available
- * at http://www.apache.org/licenses/LICENSE-2.0.html
+ * the terms of the Eclipse Public License - v 1.0 which accompanies this distribution,
+ * and is available at http://www.eclipse.org/legal/epl-v10.html
  * Contributors: Malte Brunnlieb, Philipp Diebold, Peter Reuter, Thilo Rauch
  */
 package org.agilereview.core.test.external.storage;
@@ -12,6 +12,7 @@ import java.util.Calendar;
 import java.util.Date;
 
 import junit.framework.Assert;
+import junit.framework.AssertionFailedError;
 
 import org.agilereview.core.external.storage.Comment;
 import org.agilereview.core.external.storage.Reply;
@@ -41,7 +42,7 @@ public class CommentTest {
 
 	// check integrity
 	if (!comment.getId().equals("r2") || !comment.getCommentedFile().equals(file)) {
-	    throw new AssertionError("Comment integrity not valid after creation!");
+	    throw new AssertionFailedError("Comment integrity not valid after creation!");
 	}
     }
 
@@ -69,7 +70,7 @@ public class CommentTest {
 		|| !comment.getReview().equals(review) || !comment.getCreationDate().equals(d) || !comment.getModificationDate().equals(d)
 		|| !comment.getRecipient().equals("anyone") || comment.getStatus() != 1 || comment.getPriority() != 2
 		|| !comment.getText().equals("description") || !comment.getReplies().get(0).equals(r)) {
-	    throw new AssertionError("Comment integrity not valid after creation!");
+	    throw new AssertionFailedError("Comment integrity not valid after creation!");
 	}
     }
 
@@ -111,7 +112,7 @@ public class CommentTest {
 	comment.setCommentedFile(file);
 
 	if (!comment.getCommentedFile().equals(file)) {
-	    throw new AssertionError("CommentFile could not be set successfully!");
+	    throw new AssertionFailedError("CommentFile could not be set successfully!");
 	}
     }
 
@@ -161,7 +162,7 @@ public class CommentTest {
 	comment.setRecipient("Theo");
 
 	if (!comment.getRecipient().equals("Theo")) {
-	    throw new AssertionError("Recipient could not be set successfully!");
+	    throw new AssertionFailedError("Recipient could not be set successfully!");
 	}
     }
 
@@ -184,7 +185,7 @@ public class CommentTest {
 	comment.setStatus(5);
 
 	if (comment.getStatus() != 5) {
-	    throw new AssertionError("Status could not be set successfully!");
+	    throw new AssertionFailedError("Status could not be set successfully!");
 	}
     }
 
@@ -207,7 +208,7 @@ public class CommentTest {
 	comment.setPriority(10);
 
 	if (comment.getPriority() != 10) {
-	    throw new AssertionError("Priority could not be set successfully!");
+	    throw new AssertionFailedError("Priority could not be set successfully!");
 	}
     }
 
@@ -230,7 +231,7 @@ public class CommentTest {
 	comment.setText("Dies \n is /*3´ß?)?^`^");
 
 	if (!comment.getText().equals("Dies \n is /*3´ß?)?^`^")) {
-	    throw new AssertionError("Comment text could not be set successfully!");
+	    throw new AssertionFailedError("Comment text could not be set successfully!");
 	}
     }
 
@@ -257,7 +258,7 @@ public class CommentTest {
 	comment.addReply(r);
 
 	if (!comment.getReplies().get(0).equals(r)) {
-	    throw new AssertionError("Reply could not be added successfully!");
+	    throw new AssertionFailedError("Reply could not be added successfully!");
 	}
     }
 
@@ -276,7 +277,7 @@ public class CommentTest {
 
 	comment.deleteReply(r);
 	if (comment.getReplies().size() != 0) {
-	    throw new AssertionError("Reply could not be removed by name successfully!");
+	    throw new AssertionFailedError("Reply could not be removed by name successfully!");
 	}
     }
 
@@ -295,7 +296,7 @@ public class CommentTest {
 
 	comment.deleteReply(0);
 	if (comment.getReplies().size() != 0) {
-	    throw new AssertionError("Reply could not be removed by index successfully!");
+	    throw new AssertionFailedError("Reply could not be removed by index successfully!");
 	}
     }
 
