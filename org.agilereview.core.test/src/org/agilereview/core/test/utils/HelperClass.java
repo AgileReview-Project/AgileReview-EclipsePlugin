@@ -12,7 +12,7 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.ResourcesPlugin;
 
 /**
- * 
+ * HelperClass which delivers elementary functionality for testing methods
  * @author Malte Brunnlieb (19.02.2012)
  */
 public class HelperClass {
