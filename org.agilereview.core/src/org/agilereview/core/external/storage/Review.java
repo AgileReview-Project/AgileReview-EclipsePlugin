@@ -11,33 +11,33 @@ import java.net.URI;
 import java.util.ArrayList;
 
 /**
- * A class that stores review data and a list of comments belonging to the review. 
+ * A class that stores review data and a list of comments belonging to the review.
  * @author Peter Reuter (19.02.2012)
  */
 public class Review {
 	
 	/**
-	 * The unique name of the review entered by the user 
+	 * The unique name of the review entered by the user
 	 */
-	private String id;
+	private final String id;
 	/**
-	 * The status of the review 
+	 * The status of the review
 	 */
 	private int status = 0;
 	/**
-	 * A reference to e.g. a bug tracker 
+	 * A reference to e.g. a bug tracker
 	 */
 	private URI reference = null;
 	/**
-	 * The person that is in charge for the review 
+	 * The person that is in charge for the review
 	 */
 	private String responsibility = "";
 	/**
-	 * A list of comments that belong to this review 
+	 * A list of comments that belong to this review
 	 */
 	ArrayList<Comment> comments = new ArrayList<Comment>(0);
 	/**
-	 * A flag indicating whether the review is closed or open 
+	 * A flag indicating whether the review is closed or open
 	 */
 	private boolean isOpen = true;
 	
@@ -57,15 +57,14 @@ public class Review {
 	 * @param responsibility the person that is in charge for this review
 	 * @param comments the list of comments belonging to this review
 	 */
-	public Review(String id, int status, URI reference, String responsibility,
-			ArrayList<Comment> comments) {
+	public Review(String id, int status, URI reference, String responsibility, ArrayList<Comment> comments) {
 		this.id = id;
 		this.status = status;
 		this.reference = reference;
 		this.responsibility = responsibility;
 		this.comments = comments;
 	}
-
+	
 	/**
 	 * @return the ID of the review
 	 */
@@ -155,6 +154,15 @@ public class Review {
 	 */
 	public void setIsOpen(boolean isOpen) {
 		this.isOpen = isOpen;
+	}
+	
+	/* (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 * @author Malte Brunnlieb (22.03.2012)
+	 */
+	@Override
+	public String toString() {
+		return id;
 	}
 	
 }

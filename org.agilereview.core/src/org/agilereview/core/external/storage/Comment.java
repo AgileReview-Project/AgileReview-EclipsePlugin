@@ -13,29 +13,29 @@ import java.util.Date;
 import org.eclipse.core.resources.IFile;
 
 /**
- * A class that stores data and a list of replies of a comment. 
+ * A class that stores data and a list of replies of a comment.
  * @author Peter Reuter (19.02.2012)
  */
 public class Comment {
 	
 	/**
-	 * The id of the comment that is retrieved from an IStorageClient 
+	 * The id of the comment that is retrieved from an IStorageClient
 	 */
-	private String id;
+	private final String id;
 	/**
 	 * The IFile underlying the editor in which the comment was added
 	 */
 	private IFile commentedFile;
 	/**
-	 * The review which the comment is related to 
+	 * The review which the comment is related to
 	 */
 	private Review review = null;
 	/**
-	 * The author of the comment 
+	 * The author of the comment
 	 */
 	private String author = ""; //TODO maybe seperate author object for sync with color?
 	/**
-	 * The date when the comment was created initially 
+	 * The date when the comment was created initially
 	 */
 	private Date creationDate = new Date();
 	/**
@@ -47,15 +47,15 @@ public class Comment {
 	 */
 	private String recipient = "";
 	/**
-	 * The status of the comment 
+	 * The status of the comment
 	 */
 	private int status = 0;
 	/**
-	 * The priority of the comment 
+	 * The priority of the comment
 	 */
 	private int priority = 0;
 	/**
-	 * The text of the comment 
+	 * The text of the comment
 	 */
 	private String text = "";
 	/**
@@ -67,7 +67,6 @@ public class Comment {
 	 * Constructor that should be used if a new comment is created.
 	 * @param id the ID of the comment retrieved from the current IStorageClient
 	 * @param commentedFile the IFile underlying the editor in which the comment was added
-	 * @param review the currently active review
 	 */
 	public Comment(String id, IFile commentedFile) {
 		this.id = id;
@@ -78,8 +77,7 @@ public class Comment {
 		this.review = null;
 	}
 	
-
-	/** 
+	/**
 	 * Constructor that should be used if a comment is reconstructed from storage
 	 * @param id the ID of the comment retrieved from the current IStorageClient
 	 * @param author the author of the comment
@@ -93,10 +91,8 @@ public class Comment {
 	 * @param text the text of the comment
 	 * @param replies a list of replies that were made to the comment
 	 */
-	public Comment(String id, String author, IFile commentedFile,
-			Review review, Date creationDate, Date modificationDate,
-			String recipient, int status, int priority, String text,
-			ArrayList<Reply> replies) {
+	public Comment(String id, String author, IFile commentedFile, Review review, Date creationDate, Date modificationDate, String recipient,
+			int status, int priority, String text, ArrayList<Reply> replies) {
 		this.id = id;
 		this.author = author;
 		this.commentedFile = commentedFile;
@@ -162,8 +158,7 @@ public class Comment {
 	}
 	
 	/**
-	 * Resets the modification date. Should be used if an attribute was changed
-	 * e.g. in setters. 
+	 * Resets the modification date. Should be used if an attribute was changed e.g. in setters.
 	 */
 	private void resetModificationDate() {
 		this.modificationDate = new Date();
@@ -262,5 +257,5 @@ public class Comment {
 		this.replies.remove(index);
 		resetModificationDate();
 	}
-
+	
 }

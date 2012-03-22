@@ -6,6 +6,8 @@ Bundle-Version: 0.9.0.qualifier
 Bundle-Activator: org.agilereview.ui.basic.Activator
 Bundle-Vendor: AgileReview Project
 Require-Bundle: org.eclipse.ui,
- org.eclipse.core.runtime
+ org.eclipse.core.runtime,
+ org.eclipse.core.resources;bundle-version="3.7.101"
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ActivationPolicy: lazy
+Import-Package: org.agilereview.core.external.storage

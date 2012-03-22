@@ -7,11 +7,21 @@
  */
 package org.agilereview.core.external.definition;
 
+import java.util.List;
+
+import org.agilereview.core.external.storage.Comment;
+
 /**
- * Interface that has to be implemeted by AgileReview storage clients. 
+ * Interface that has to be implemeted by AgileReview storage clients.
  * @author Peter Reuter (19.02.2012)
  */
 public interface IStorageClient {
 	
+	/**
+	 * This method returns all comments currently loaded
+	 * @return a list of comments
+	 * @author Malte Brunnlieb (22.03.2012)
+	 */
+	public List<Comment> getAllComments();
 	
 }
