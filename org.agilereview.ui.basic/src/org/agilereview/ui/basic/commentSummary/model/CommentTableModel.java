@@ -42,6 +42,10 @@ public class CommentTableModel implements TableModel {
 	 */
 	private final ArrayList<TableModelListener> listeners = new ArrayList<TableModelListener>();
 	
+	public CommentTableModel() {
+		// TODO load comments
+	}
+	
 	/* (non-Javadoc)
 	 * @see javax.swing.table.TableModel#addTableModelListener(javax.swing.event.TableModelListener)
 	 * @author Malte Brunnlieb (22.03.2012)
