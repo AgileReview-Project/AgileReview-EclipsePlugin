@@ -9,10 +9,12 @@ package org.agilereview.ui.basic.commentSummary.model;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import javax.swing.event.TableModelListener;
 import javax.swing.table.TableModel;
 
+import org.agilereview.core.external.controller.StorageController;
 import org.agilereview.core.external.storage.Comment;
 import org.agilereview.core.external.storage.Review;
 import org.agilereview.ui.basic.commentSummary.CommentSummaryView;
@@ -36,14 +38,22 @@ public class CommentTableModel implements TableModel {
 	/**
 	 * The comments to be displayed
 	 */
-	private final ArrayList<Comment> comments = new ArrayList<Comment>();
+	private final List<Comment> comments;
 	/**
 	 * List of added {@link TableModelListener}
 	 */
 	private final ArrayList<TableModelListener> listeners = new ArrayList<TableModelListener>();
+	/**
+	 * Unique instance of StorageController
+	 */
+	private final StorageController storage = StorageController.getInstance();
 	
+	/**
+	 * Creates a new model for the {@link CommentSummaryView} and loads all comments
+	 * @author Malte Brunnlieb (24.03.2012)
+	 */
 	public CommentTableModel() {
-		// TODO load comments
+		comments = storage.getAllComments();
 	}
 	
 	/* (non-Javadoc)

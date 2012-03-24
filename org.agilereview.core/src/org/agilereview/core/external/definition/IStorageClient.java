@@ -18,6 +18,13 @@ import org.agilereview.core.external.storage.Comment;
 public interface IStorageClient {
 	
 	/**
+	 * Returns the name of the StorageClient (should not be null)
+	 * @return the name of the StorageClient
+	 * @author Malte Brunnlieb (24.03.2012)
+	 */
+	public String getName();
+	
+	/**
 	 * This method returns all comments currently loaded
 	 * @return a list of comments
 	 * @author Malte Brunnlieb (22.03.2012)

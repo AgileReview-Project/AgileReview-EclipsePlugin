@@ -10,4 +10,6 @@ Require-Bundle: org.eclipse.ui,
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-Vendor: AgileReview Project
-Export-Package: org.agilereview.core.external.storage
+Export-Package: org.agilereview.core.external.controller,
+ org.agilereview.core.external.definition,
+ org.agilereview.core.external.storage
