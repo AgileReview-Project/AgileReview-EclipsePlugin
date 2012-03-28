@@ -7,7 +7,6 @@
  */
 package org.agilereview.ui.basic.commentSummary;
 
-import org.agilereview.core.external.controller.StorageController;
 import org.agilereview.ui.basic.Activator;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
@@ -26,10 +25,6 @@ public class CommentSummaryView extends ViewPart {
 	 * Current instance used by the ViewPart
 	 */
 	private static CommentSummaryView instance = new CommentSummaryView();
-	/**
-	 * Instance of ReviewAccess
-	 */
-	private final StorageController ra = StorageController.getInstance();
 	
 	/**
 	 * Provides the current used instance of the CommentSummaryView

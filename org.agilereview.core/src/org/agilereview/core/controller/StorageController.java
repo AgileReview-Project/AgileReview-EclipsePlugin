@@ -19,19 +19,21 @@ import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.Platform;
 
 /**
- * 
+ * The {@link StorageController} manages the {@link IStorageClient}s for the org.agilereview.core.StorageClient ExtensionPoint and provides
+ * functionalities of the {@link IStorageClient} interface for the currently active {@link IStorageClient}.
  * @author Malte Brunnlieb (22.03.2012)
  */
 public class StorageController implements IStorageClient {
 	
 	/**
+	 * ExtensionPoint id for extensions implementing {@link IStorageClient}
+	 */
+	public static final String ISTORAGECLIENT_ID = "org.agilereview.core.StorageClient";
+	
+	/**
 	 * Singleton instance of {@link StorageController}
 	 */
 	private static final StorageController instance = new StorageController();
-	/**
-	 * ExtensionPoint id for extensions implementing {@link IStorageClient}
-	 */
-	private static final String ISTORAGECLIENT_ID = "org.agilereview.core.external.definition.StorageClient";
 	/**
 	 * Mapping of names to objects of registered {@link IStorageClient}s
 	 */
@@ -46,7 +48,7 @@ public class StorageController implements IStorageClient {
 	 * @author Malte Brunnlieb (22.03.2012)
 	 */
 	private StorageController() {
-		checkForClients();
+		checkForNewClients();
 	}
 	
 	/**
@@ -62,13 +64,14 @@ public class StorageController implements IStorageClient {
 	 * Performs a check for new StorageClients registered at the ExtensionPoint
 	 * @author Malte Brunnlieb (24.03.2012)
 	 */
-	private void checkForClients() { //TODO check for new clients whenever a new plugin was installed
+	private void checkForNewClients() { //TODO check for new clients whenever a new plugin was installed
 		IConfigurationElement[] config = Platform.getExtensionRegistry().getConfigurationElementsFor(ISTORAGECLIENT_ID);
 		if (config.length == 0) {
 			ExceptionHandler.notifyUser(new NoStorageClientDefinedException("No StorageClient available")); //TODO perhaps offer some help
 			registeredClients.clear();
 			return;
 		}
+		
 		try {
 			for (IConfigurationElement e : config) {
 				final Object o = e.createExecutableExtension("class");
