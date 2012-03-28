@@ -7,6 +7,10 @@
  */
 package org.agilereview.core;
 
+import org.agilereview.core.controller.RDRController;
+import org.agilereview.core.controller.RegistryListener;
+import org.agilereview.core.controller.StorageController;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 
@@ -37,6 +41,9 @@ public class Activator extends AbstractUIPlugin {
 	 */
 	public void start(BundleContext context) throws Exception {
 		super.start(context);
+		RegistryListener listener = new RegistryListener();
+		Platform.getExtensionRegistry().addListener(listener, StorageController.ISTORAGECLIENT_ID);
+		Platform.getExtensionRegistry().addListener(listener, RDRController.IREVIEWDATARECEIVER_ID);
 		plugin = this;
 	}
 	

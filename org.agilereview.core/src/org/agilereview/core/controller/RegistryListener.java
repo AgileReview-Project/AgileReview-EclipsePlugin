@@ -9,7 +9,6 @@ package org.agilereview.core.controller;
 
 import org.agilereview.core.Activator;
 import org.agilereview.core.external.definition.IReviewDataReceiver;
-import org.agilereview.core.external.definition.IStorageClient;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExtension;
@@ -23,7 +22,13 @@ import org.eclipse.core.runtime.Status;
  */
 public class RegistryListener implements IRegistryEventListener {
 	
-	private StorageController sc = StorageController.getInstance();
+	/**
+	 * Instance of {@link StorageController}
+	 */
+	private StorageController sC = StorageController.getInstance();
+	/**
+	 * Instance of {@link RDRController}
+	 */
 	private RDRController rdrC = RDRController.getInstance();
 	
 	/* (non-Javadoc)
@@ -39,28 +44,15 @@ public class RegistryListener implements IRegistryEventListener {
 		//check for new clients and provide latest data
 		for (IExtension e : extensions) {
 			if (e.getExtensionPointUniqueIdentifier().equals(StorageController.ISTORAGECLIENT_ID)) {
-				for (IConfigurationElement ce : e.getConfigurationElements()) {
-					try {
-						final Object o = ce.createExecutableExtension("class");
-						if (o instanceof IStorageClient) {
-							final IStorageClient isc = (IStorageClient) o;
-							if (sc.isRegistered(isc)) {
-								newStorageClient = true;
-							}
-						}
-					} catch (CoreException e1) {
-						Activator.getDefault().getLog()
-								.log(new Status(Status.WARNING, Activator.PLUGIN_ID, "Exception while creating extension " + ce.getName(), e1));
-					}
-				}
+				newStorageClient = true;
 			} else if (e.getExtensionPointUniqueIdentifier().equals(RDRController.IREVIEWDATARECEIVER_ID)) {
 				for (IConfigurationElement ce : e.getConfigurationElements()) {
 					try {
 						final Object o = ce.createExecutableExtension("class");
 						if (o instanceof IReviewDataReceiver) {
 							final IReviewDataReceiver rdr = (IReviewDataReceiver) o;
-							if (rdrC.isRegistered(rdr)) {
-								rdrC.notifyClient(rdr, sc.getAllReviews());
+							if (!rdrC.isRegistered(rdr)) {
+								rdrC.notifyClient(rdr, sC.getAllReviews());
 								newReviewDataReceiverClient = true;
 							}
 						}
@@ -74,7 +66,7 @@ public class RegistryListener implements IRegistryEventListener {
 		
 		//register all clients if there are new
 		if (newStorageClient) {
-			sc.checkForNewClients();
+			sC.checkForNewClients();
 		}
 		if (newReviewDataReceiverClient) {
 			rdrC.checkForNewClients();
@@ -87,8 +79,26 @@ public class RegistryListener implements IRegistryEventListener {
 	 */
 	@Override
 	public void removed(IExtension[] extensions) {
-		// TODO Auto-generated method stub
 		
+		boolean storageClientRemoved = false;
+		boolean reviewDataReceiverClientRemoved = false;
+		
+		//check for new clients and provide latest data
+		for (IExtension e : extensions) {
+			if (e.getExtensionPointUniqueIdentifier().equals(StorageController.ISTORAGECLIENT_ID)) {
+				storageClientRemoved = true;
+			} else if (e.getExtensionPointUniqueIdentifier().equals(RDRController.IREVIEWDATARECEIVER_ID)) {
+				reviewDataReceiverClientRemoved = true;
+			}
+		}
+		
+		//register all clients if there are removed ones
+		if (storageClientRemoved) {
+			sC.checkForNewClients();
+		}
+		if (reviewDataReceiverClientRemoved) {
+			rdrC.checkForNewClients();
+		}
 	}
 	
 	/* (non-Javadoc)
@@ -97,8 +107,7 @@ public class RegistryListener implements IRegistryEventListener {
 	 */
 	@Override
 	public void added(IExtensionPoint[] extensionPoints) {
-		// TODO Auto-generated method stub
-		
+		// nothing need to be done here
 	}
 	
 	/* (non-Javadoc)
@@ -107,8 +116,6 @@ public class RegistryListener implements IRegistryEventListener {
 	 */
 	@Override
 	public void removed(IExtensionPoint[] extensionPoints) {
-		// TODO Auto-generated method stub
-		
+		// nothing need to be done here
 	}
-	
 }
