@@ -23,7 +23,7 @@ import org.agilereview.core.external.storage.Review;
  * Table model for the {@link CommentSummaryView} which contents are {@link Comment} objects
  * @author Malte Brunnlieb (22.03.2012)
  */
-public class CommentTableModel implements TableModel, IReviewDataReceiver {
+public class CSTableModel implements TableModel, IReviewDataReceiver {
 	
 	/**
 	 * The titles of the table's columns, also used to fill the filter menu

@@ -30,15 +30,15 @@ import org.eclipse.swt.widgets.ToolItem;
  * ToolBar for {@link CommentSummaryView}
  * @author Malte Brunnlieb (28.03.2012)
  */
-public class CommentSummaryToolBar extends ToolBar {
+public class CSToolBar extends ToolBar {
 	
 	/**
-	 * Creates a new {@link CommentSummaryToolBar} instance
+	 * Creates a new {@link CSToolBar} instance
 	 * @param parent parent {@link Composite} of the ToolBar
 	 * @param style style for the ToolBar
 	 * @author Malte Brunnlieb (28.03.2012)
 	 */
-	public CommentSummaryToolBar(Composite parent, int style) {
+	public CSToolBar(Composite parent, int style) {
 		super(parent, style);
 		// add dropdown box to toolbar to select category to filter
 		final ToolItem itemDropDown = new ToolItem(this, SWT.DROP_DOWN);

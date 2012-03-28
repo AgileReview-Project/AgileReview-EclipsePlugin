@@ -62,7 +62,7 @@ public class CommentSummaryView extends ViewPart {
 		parent.setLayout(layout);
 		
 		// create UI elements (filter, add-/delete-button)
-		new CommentSummaryToolBar(parent, SWT.FLAT | SWT.WRAP | SWT.RIGHT);
+		new CSToolBar(parent, SWT.FLAT | SWT.WRAP | SWT.RIGHT);
 		createViewer(parent, layoutCols);
 		
 		// set comparator (sorting order of columns) and filter
