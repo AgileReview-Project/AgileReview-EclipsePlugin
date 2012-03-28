@@ -5,24 +5,25 @@
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  * Contributors: Malte Brunnlieb, Philipp Diebold, Peter Reuter, Thilo Rauch
  */
-package org.agilereview.ui.basic.commentSummary.model;
+package org.agilereview.ui.basic.commentSummary;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.LinkedList;
 import java.util.List;
 
 import javax.swing.event.TableModelListener;
 import javax.swing.table.TableModel;
 
+import org.agilereview.core.external.definition.IReviewDataReceiver;
 import org.agilereview.core.external.storage.Comment;
 import org.agilereview.core.external.storage.Review;
-import org.agilereview.ui.basic.commentSummary.CommentSummaryView;
 
 /**
  * Table model for the {@link CommentSummaryView} which contents are {@link Comment} objects
  * @author Malte Brunnlieb (22.03.2012)
  */
-public class CommentTableModel implements TableModel {
+public class CommentTableModel implements TableModel, IReviewDataReceiver {
 	
 	/**
 	 * The titles of the table's columns, also used to fill the filter menu
@@ -37,19 +38,11 @@ public class CommentTableModel implements TableModel {
 	/**
 	 * The comments to be displayed
 	 */
-	private final List<Comment> comments;
+	private List<Comment> comments = new LinkedList<Comment>();
 	/**
 	 * List of added {@link TableModelListener}
 	 */
 	private final ArrayList<TableModelListener> listeners = new ArrayList<TableModelListener>();
-	
-	/**
-	 * Creates a new model for the {@link CommentSummaryView} and loads all comments
-	 * @author Malte Brunnlieb (24.03.2012)
-	 */
-	public CommentTableModel() {
-		
-	}
 	
 	/* (non-Javadoc)
 	 * @see javax.swing.table.TableModel#addTableModelListener(javax.swing.event.TableModelListener)
@@ -153,6 +146,18 @@ public class CommentTableModel implements TableModel {
 	 */
 	@Override
 	public void setValueAt(Object aValue, int rowIndex, int columnIndex) {
-		// TODO extend (new feature for v0.9)
+		// TODO extend (new feature for v0.10)
+	}
+	
+	/* (non-Javadoc)
+	 * @see org.agilereview.core.external.definition.IReviewDataReceiver#setReviewData(java.util.List)
+	 * @author Malte Brunnlieb (28.03.2012)
+	 */
+	@Override
+	public void setReviewData(List<Review> reviews) {
+		comments = new LinkedList<Comment>();
+		for (Review r : reviews) {
+			comments.addAll(r.getComments());
+		}
 	}
 }
