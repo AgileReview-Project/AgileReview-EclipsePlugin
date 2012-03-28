@@ -8,7 +8,7 @@
 package org.agilereview.core.external.storage;
 
 import java.util.ArrayList;
-import java.util.Date;
+import java.util.Calendar;
 
 import org.eclipse.core.resources.IFile;
 
@@ -37,11 +37,11 @@ public class Comment {
 	/**
 	 * The date when the comment was created initially
 	 */
-	private Date creationDate = new Date();
+	private Calendar creationDate = Calendar.getInstance();
 	/**
 	 * The date when the comment was created lastly
 	 */
-	private Date modificationDate = creationDate;
+	private Calendar modificationDate = creationDate;
 	/**
 	 * The person the comment is addressed to
 	 */
@@ -91,7 +91,7 @@ public class Comment {
 	 * @param text the text of the comment
 	 * @param replies a list of replies that were made to the comment
 	 */
-	public Comment(String id, String author, IFile commentedFile, Review review, Date creationDate, Date modificationDate, String recipient,
+	public Comment(String id, String author, IFile commentedFile, Review review, Calendar creationDate, Calendar modificationDate, String recipient,
 			int status, int priority, String text, ArrayList<Reply> replies) {
 		this.id = id;
 		this.author = author;
@@ -146,14 +146,14 @@ public class Comment {
 	/**
 	 * @return the date when the comment was created initially
 	 */
-	public Date getCreationDate() {
+	public Calendar getCreationDate() {
 		return creationDate;
 	}
 	
 	/**
 	 * @return the date when the comment was modified lastly
 	 */
-	public Date getModificationDate() {
+	public Calendar getModificationDate() {
 		return modificationDate;
 	}
 	
@@ -161,7 +161,7 @@ public class Comment {
 	 * Resets the modification date. Should be used if an attribute was changed e.g. in setters.
 	 */
 	private void resetModificationDate() {
-		this.modificationDate = new Date();
+		this.modificationDate = Calendar.getInstance();
 	}
 	
 	/**

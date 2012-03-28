@@ -7,7 +7,8 @@
  */
 package org.agilereview.core.external.storage;
 
-import java.util.Date;
+import java.util.ArrayList;
+import java.util.Calendar;
 
 /**
  * A class that is used to store replies that were added to a comment. 
@@ -22,15 +23,19 @@ public class Reply {
 	/**
 	 * The date when the reply was create initially 
 	 */
-	private Date creationDate = new Date();
+	private Calendar creationDate = Calendar.getInstance();
 	/**
 	 * The date when the reply was modified lastly 
 	 */
-	private Date modificationDate = creationDate;
+	private Calendar modificationDate = creationDate;
 	/**
 	 * The text of the reply 
 	 */
 	private String text = "";
+	/**
+	 * A list of replies that were made to the comment
+	 */
+	private ArrayList<Reply> replies = new ArrayList<Reply>(0);
 	
 	/**
 	 * Constructor that should be used if a reply is reconstructed from storage
@@ -39,7 +44,7 @@ public class Reply {
 	 * @param modificationDate date when the reply was create lastly
 	 * @param text the text of the reply
 	 */
-	public Reply(String author, Date creationDate, Date modificationDate,
+	public Reply(String author, Calendar creationDate, Calendar modificationDate,
 			String text) {
 		this.author = author;
 		this.creationDate = creationDate;
@@ -65,14 +70,14 @@ public class Reply {
 	/**
 	 * @return the date when the reply was created initially
 	 */
-	public Date getCreationDate() {
+	public Calendar getCreationDate() {
 		return creationDate;
 	}
 	
 	/**
 	 * @return the date when the reply was modified lastly
 	 */
-	public Date getModificationDate() {
+	public Calendar getModificationDate() {
 		return modificationDate;
 	}
 	
@@ -81,7 +86,7 @@ public class Reply {
 	 * e.g. in setters. 
 	 */
 	private void resetModificationDate() {
-		this.modificationDate = new Date();
+		this.modificationDate = Calendar.getInstance();
 	}
 	
 	/**
@@ -96,6 +101,40 @@ public class Reply {
 	 */
 	public void setText(String text) {
 		this.text = text;
+		resetModificationDate();
+	}
+	
+	/**
+	 * @return a list of replies that were added to this comment
+	 */
+	public ArrayList<Reply> getReplies() {
+		return replies;
+	}
+	
+	/**
+	 * Adds at the end of the list of replies.
+	 * @param reply the reply which is to add
+	 */
+	public void addReply(Reply reply) {
+		this.replies.add(reply);
+		resetModificationDate();
+	}
+	
+	/**
+	 * Deletes the given reply from the list of replies.
+	 * @param reply the reply which is to delete
+	 */
+	public void deleteReply(Reply reply) {
+		this.replies.remove(reply);
+		resetModificationDate();
+	}
+	
+	/**
+	 * Deletes the reply with the given index from the list of replies
+	 * @param index the index of the reply which is to delete
+	 */
+	public void deleteReply(int index) {
+		this.replies.remove(index);
 		resetModificationDate();
 	}
 	

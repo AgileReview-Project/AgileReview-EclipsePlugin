@@ -7,7 +7,6 @@
  */
 package org.agilereview.core.external.storage;
 
-import java.net.URI;
 import java.util.ArrayList;
 
 /**
@@ -27,7 +26,7 @@ public class Review {
 	/**
 	 * A reference to e.g. a bug tracker
 	 */
-	private URI reference = null;
+	private String reference = null;
 	/**
 	 * The person that is in charge for the review
 	 */
@@ -57,7 +56,7 @@ public class Review {
 	 * @param responsibility the person that is in charge for this review
 	 * @param comments the list of comments belonging to this review
 	 */
-	public Review(String id, int status, URI reference, String responsibility, ArrayList<Comment> comments) {
+	public Review(String id, int status, String reference, String responsibility, ArrayList<Comment> comments) {
 		this.id = id;
 		this.status = status;
 		this.reference = reference;
@@ -89,14 +88,14 @@ public class Review {
 	/**
 	 * @return the current reference of the review
 	 */
-	public URI getReference() {
+	public String getReference() {
 		return reference;
 	}
 	
 	/**
 	 * @param reference the new reference of the review
 	 */
-	public void setReference(URI reference) {
+	public void setReference(String reference) {
 		this.reference = reference;
 	}
 	

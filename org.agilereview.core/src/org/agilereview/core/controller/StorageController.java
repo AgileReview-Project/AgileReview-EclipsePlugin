@@ -13,7 +13,7 @@ import java.util.List;
 import org.agilereview.core.exception.ExceptionHandler;
 import org.agilereview.core.exception.NoStorageClientDefinedException;
 import org.agilereview.core.external.definition.IStorageClient;
-import org.agilereview.core.external.storage.Comment;
+import org.agilereview.core.external.storage.Review;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.Platform;
@@ -106,9 +106,9 @@ public class StorageController implements IStorageClient {
 	 * @author Malte Brunnlieb (24.03.2012)
 	 */
 	@Override
-	public List<Comment> getAllComments() {
+	public List<Review> getAllReviews() {
 		try {
-			return registeredClients.get(activeClient).getAllComments();
+			return registeredClients.get(activeClient).getAllReviews();
 		} catch (Throwable ex) {
 			ExceptionHandler.notifyUser("An unknown exception occured in StorageClient '" + activeClient + "' while retrieving all comments", ex);
 		}
