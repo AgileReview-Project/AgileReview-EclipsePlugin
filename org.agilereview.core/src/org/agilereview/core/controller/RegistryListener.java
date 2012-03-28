@@ -7,11 +7,15 @@
  */
 package org.agilereview.core.controller;
 
+import org.agilereview.core.Activator;
+import org.agilereview.core.external.definition.IReviewDataReceiver;
 import org.agilereview.core.external.definition.IStorageClient;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExtension;
 import org.eclipse.core.runtime.IExtensionPoint;
 import org.eclipse.core.runtime.IRegistryEventListener;
+import org.eclipse.core.runtime.Status;
 
 /**
  * 
@@ -19,23 +23,61 @@ import org.eclipse.core.runtime.IRegistryEventListener;
  */
 public class RegistryListener implements IRegistryEventListener {
 	
+	private StorageController sc = StorageController.getInstance();
+	private RDRController rdrC = RDRController.getInstance();
+	
 	/* (non-Javadoc)
 	 * @see org.eclipse.core.runtime.IRegistryEventListener#added(org.eclipse.core.runtime.IExtension[])
 	 * @author Malte Brunnlieb (28.03.2012)
 	 */
 	@Override
 	public void added(IExtension[] extensions) {
+		
+		boolean newStorageClient = false;
+		boolean newReviewDataReceiverClient = false;
+		
+		//check for new clients and provide latest data
 		for (IExtension e : extensions) {
 			if (e.getExtensionPointUniqueIdentifier().equals(StorageController.ISTORAGECLIENT_ID)) {
 				for (IConfigurationElement ce : e.getConfigurationElements()) {
-					final Object o = ce.createExecutableExtension("class");
-					if (o instanceof IStorageClient) {
-						if(!)
-						final IStorageClient sc = (IStorageClient) o;
-						registeredClients.put(sc.getName(), sc);
+					try {
+						final Object o = ce.createExecutableExtension("class");
+						if (o instanceof IStorageClient) {
+							final IStorageClient isc = (IStorageClient) o;
+							if (sc.isRegistered(isc)) {
+								newStorageClient = true;
+							}
+						}
+					} catch (CoreException e1) {
+						Activator.getDefault().getLog()
+								.log(new Status(Status.WARNING, Activator.PLUGIN_ID, "Exception while creating extension " + ce.getName(), e1));
+					}
+				}
+			} else if (e.getExtensionPointUniqueIdentifier().equals(RDRController.IREVIEWDATARECEIVER_ID)) {
+				for (IConfigurationElement ce : e.getConfigurationElements()) {
+					try {
+						final Object o = ce.createExecutableExtension("class");
+						if (o instanceof IReviewDataReceiver) {
+							final IReviewDataReceiver rdr = (IReviewDataReceiver) o;
+							if (rdrC.isRegistered(rdr)) {
+								rdrC.notifyClient(rdr, sc.getAllReviews());
+								newReviewDataReceiverClient = true;
+							}
+						}
+					} catch (CoreException e1) {
+						Activator.getDefault().getLog()
+								.log(new Status(Status.WARNING, Activator.PLUGIN_ID, "Exception while creating extension " + ce.getName(), e1));
 					}
 				}
 			}
+		}
+		
+		//register all clients if there are new
+		if (newStorageClient) {
+			sc.checkForNewClients();
+		}
+		if (newReviewDataReceiverClient) {
+			rdrC.checkForNewClients();
 		}
 	}
 	

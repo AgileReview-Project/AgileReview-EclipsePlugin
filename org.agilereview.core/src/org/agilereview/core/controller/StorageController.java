@@ -64,7 +64,7 @@ public class StorageController implements IStorageClient {
 	 * Performs a check for new StorageClients registered at the ExtensionPoint
 	 * @author Malte Brunnlieb (24.03.2012)
 	 */
-	private void checkForNewClients() { //TODO check for new clients whenever a new plugin was installed
+	public void checkForNewClients() {
 		IConfigurationElement[] config = Platform.getExtensionRegistry().getConfigurationElementsFor(ISTORAGECLIENT_ID);
 		if (config.length == 0) {
 			ExceptionHandler.notifyUser(new NoStorageClientDefinedException("No StorageClient available")); //TODO perhaps offer some help
@@ -86,6 +86,16 @@ public class StorageController implements IStorageClient {
 	}
 	
 	/**
+	 * Checks whether the given {@link IStorageClient} is already registered
+	 * @param sc {@link IStorageClient} to be checked for registration
+	 * @return true, if the given {@link IStorageClient} is already registered<br>false, otherwise
+	 * @author Malte Brunnlieb (28.03.2012)
+	 */
+	public boolean isRegistered(IStorageClient sc) {
+		return registeredClients.containsKey(sc.getName());
+	}
+	
+	/**
 	 * This method calls the {@link IStorageClient#getName()} method for the currently active {@link IStorageClient} in a save way
 	 * @see IStorageClient#getName()
 	 * @author Malte Brunnlieb (24.03.2012)
@@ -101,8 +111,8 @@ public class StorageController implements IStorageClient {
 	}
 	
 	/**
-	 * This method calls the {@link IStorageClient#getAllComments()} method for the currently active {@link IStorageClient} in a save way
-	 * @see org.agilereview.core.external.definition.IStorageClient#getAllComments()
+	 * This method calls the {@link IStorageClient#getAllReviews()} method for the currently active {@link IStorageClient} in a save way
+	 * @see org.agilereview.core.external.definition.IStorageClient#getAllReviews()
 	 * @author Malte Brunnlieb (24.03.2012)
 	 */
 	@Override
