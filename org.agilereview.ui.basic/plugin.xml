@@ -4,8 +4,40 @@
    <extension
          point="org.agilereview.core.ReviewDataReceiver">
       <ReviewDataReceiver
+            class="org.agilereview.ui.basic.reviewExplorer.ReviewExplorerView">
+      </ReviewDataReceiver>
+   </extension>
+   <extension
+         point="org.agilereview.core.ReviewDataReceiver">
+      <ReviewDataReceiver
             class="org.agilereview.ui.basic.commentSummary.CSTableModel">
       </ReviewDataReceiver>
+   </extension>
+   <extension
+         point="org.eclipse.ui.views">
+      <view
+            category="org.agilereview.ui.basic.category"
+            class="org.agilereview.ui.basic.reviewExplorer.ReviewExplorerView"
+            id="org.agilereview.ui.basic.reviewexplorerview"
+            name="ReviewExplorer"
+            restorable="true">
+      </view>
+      <view
+            category="org.agilereview.ui.basic.category"
+            class="org.agilereview.ui.basic.ViewPart2"
+            id="org.agilereview.ui.basic.commentsummaryview"
+            name="Comments Summary"
+            restorable="true">
+      </view>
+      <category
+            id="org.agilereview.ui.basic.category"
+            name="AgileReview Basic UI"
+            parentCategory="org.agilereview.ui.basic.category">
+      </category>
+   </extension>
+   <extension
+         id="commented"
+         point="org.eclipse.core.resources.markers">
    </extension>
 
 </plugin>
