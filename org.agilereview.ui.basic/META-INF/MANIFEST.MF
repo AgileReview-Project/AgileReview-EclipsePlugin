@@ -7,7 +7,7 @@ Bundle-Activator: org.agilereview.ui.basic.Activator
 Bundle-Vendor: AgileReview Project
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
- org.eclipse.core.resources;bundle-version="3.7.101"
+ org.eclipse.core.resources;bundle-version="3.5.2"
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ActivationPolicy: lazy
 Import-Package: org.agilereview.core.external.controller,
