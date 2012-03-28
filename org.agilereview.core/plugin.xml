@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?eclipse version="3.4"?>
 <plugin>
-   <extension-point id="org.agilereview.core.StorageClient" name="StorageClient" schema="schema/org.agilereview.core.external.definition.StorageClient.exsd"/>
+   <extension-point id="org.agilereview.core.StorageClient" name="StorageClient" schema="schema/org.agilereview.core.StorageClient.exsd"/>
    <extension-point id="org.agilereview.core.ReviewDataReceiver" name="ReviewDataReceiver" schema="schema/org.agilereview.core.ReviewDataReceiver.exsd"/>
 
 </plugin>
