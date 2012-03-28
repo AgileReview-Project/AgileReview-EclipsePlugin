@@ -5,7 +5,7 @@
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  * Contributors: Malte Brunnlieb, Philipp Diebold, Peter Reuter, Thilo Rauch
  */
-package org.agilereview.core.external.controller;
+package org.agilereview.core.controller;
 
 import java.util.HashMap;
 import java.util.List;
