@@ -7,14 +7,18 @@
  */
 package org.agilereview.core.external.storage;
 
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeSupport;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.List;
 
 /**
  * A class that is used to store replies that were added to a comment. 
  * @author Peter Reuter (19.02.2012)
  */
-public class Reply {
+public class Reply implements PropertyChangeListener {
 	
 	/**
 	 * The author of the reply 
@@ -33,9 +37,12 @@ public class Reply {
 	 */
 	private String text = "";
 	/**
-	 * A list of replies that were made to the comment
+	 * A {@link List} of replies that were made to the comment
 	 */
-	private ArrayList<Reply> replies = new ArrayList<Reply>(0);
+	private List<Reply> replies = new ArrayList<Reply>(0);
+	
+	private PropertyChangeSupport propertyChangeSupport;
+	
 	
 	/**
 	 * Constructor that should be used if a reply is reconstructed from storage
@@ -86,7 +93,9 @@ public class Reply {
 	 * e.g. in setters. 
 	 */
 	private void resetModificationDate() {
+		Calendar oldValue = this.modificationDate;
 		this.modificationDate = Calendar.getInstance();
+		propertyChangeSupport.firePropertyChange("modificationDate", oldValue, this.modificationDate);
 	}
 	
 	/**
@@ -100,14 +109,16 @@ public class Reply {
 	 * @param text the new text of the reply
 	 */
 	public void setText(String text) {
+		String oldValue = this.text;
 		this.text = text;
 		resetModificationDate();
+		propertyChangeSupport.firePropertyChange("text", oldValue, this.text);
 	}
 	
 	/**
 	 * @return a list of replies that were added to this comment
 	 */
-	public ArrayList<Reply> getReplies() {
+	public List<Reply> getReplies() {
 		return replies;
 	}
 	
@@ -116,8 +127,10 @@ public class Reply {
 	 * @param reply the reply which is to add
 	 */
 	public void addReply(Reply reply) {
+		List<Reply> oldValue = new ArrayList<Reply>(this.replies);
 		this.replies.add(reply);
 		resetModificationDate();
+		propertyChangeSupport.firePropertyChange("replies", oldValue, this.replies);
 	}
 	
 	/**
@@ -125,8 +138,10 @@ public class Reply {
 	 * @param reply the reply which is to delete
 	 */
 	public void deleteReply(Reply reply) {
+		List<Reply> oldValue = new ArrayList<Reply>(this.replies);
 		this.replies.remove(reply);
 		resetModificationDate();
+		propertyChangeSupport.firePropertyChange("replies", oldValue, this.replies);
 	}
 	
 	/**
@@ -134,8 +149,23 @@ public class Reply {
 	 * @param index the index of the reply which is to delete
 	 */
 	public void deleteReply(int index) {
+		List<Reply> oldValue = new ArrayList<Reply>(this.replies);
 		this.replies.remove(index);
 		resetModificationDate();
+		propertyChangeSupport.firePropertyChange("replies", oldValue, this.replies);
+	}
+	
+	public void addPropertyChangeListener(PropertyChangeListener listener) {
+        propertyChangeSupport.addPropertyChangeListener(listener);
+    }
+
+	public void removePropertyChangeListener(PropertyChangeListener listener) {
+        propertyChangeSupport.removePropertyChangeListener(listener);
+    }
+
+	@Override
+	public void propertyChange(PropertyChangeEvent evt) {
+		propertyChangeSupport.firePropertyChange(evt);
 	}
 	
 }

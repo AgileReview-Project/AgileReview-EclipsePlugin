@@ -7,7 +7,10 @@
  */
 package org.agilereview.core.external.storage;
 
+import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeSupport;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * A class that stores review data and a list of comments belonging to the review.
@@ -34,17 +37,20 @@ public class Review {
 	/**
 	 * A list of comments that belong to this review
 	 */
-	ArrayList<Comment> comments = new ArrayList<Comment>(0);
+	private List<Comment> comments = new ArrayList<Comment>(0);
 	/**
 	 * A flag indicating whether the review is closed or open
 	 */
 	private boolean isOpen = true;
+	
+	private PropertyChangeSupport propertyChangeSupport;
 	
 	/**
 	 * Constructor that should be used if a new review is created.
 	 * @param id a unique name for the review entered by the user
 	 */
 	public Review(String id) {
+		propertyChangeSupport = new PropertyChangeSupport(this);
 		this.id = id;
 	}
 	
@@ -56,8 +62,8 @@ public class Review {
 	 * @param responsibility the person that is in charge for this review
 	 * @param comments the list of comments belonging to this review
 	 */
-	public Review(String id, int status, String reference, String responsibility, ArrayList<Comment> comments) {
-		this.id = id;
+	public Review(String id, int status, String reference, String responsibility, List<Comment> comments) {
+		this(id);
 		this.status = status;
 		this.reference = reference;
 		this.responsibility = responsibility;
@@ -82,7 +88,9 @@ public class Review {
 	 * @param status the new status of the review
 	 */
 	public void setStatus(int status) {
+		int oldValue = this.status;
 		this.status = status;
+		propertyChangeSupport.firePropertyChange("status", oldValue, this.status);
 	}
 	
 	/**
@@ -96,7 +104,9 @@ public class Review {
 	 * @param reference the new reference of the review
 	 */
 	public void setReference(String reference) {
+		String oldValue = this.reference;
 		this.reference = reference;
+		propertyChangeSupport.firePropertyChange("reference", oldValue, this.reference);
 	}
 	
 	/**
@@ -110,13 +120,15 @@ public class Review {
 	 * @param responsibility the person that now is in charge for this review
 	 */
 	public void setResponsibility(String responsibility) {
+		String oldValue = responsibility;
 		this.responsibility = responsibility;
+		propertyChangeSupport.firePropertyChange("responsibility", oldValue, this.responsibility);
 	}
 	
 	/**
 	 * @return a list of comments belonging to this review
 	 */
-	public ArrayList<Comment> getComments() {
+	public List<Comment> getComments() {
 		return comments;
 	}
 	
@@ -124,21 +136,27 @@ public class Review {
 	 * @param comment the comment that is to be added to the list of comments
 	 */
 	public void addComment(Comment comment) {
+		ArrayList<Comment> oldValue = new ArrayList<Comment>(this.comments);
 		this.comments.add(comment);
+		propertyChangeSupport.firePropertyChange("comments", oldValue, this.comments);
 	}
 	
 	/**
 	 * @param comment the comment that is to be removed from the list of comments
 	 */
 	public void deleteComment(Comment comment) {
+		ArrayList<Comment> oldValue = new ArrayList<Comment>(this.comments);
 		this.comments.remove(comment);
+		propertyChangeSupport.firePropertyChange("comments", oldValue, this.comments);
 	}
 	
 	/**
 	 * @param index the index of the comment that is to be removed from the list of comments
 	 */
 	public void deleteComment(int index) {
+		ArrayList<Comment> oldValue = new ArrayList<Comment>(this.comments);
 		this.comments.remove(index);
+		propertyChangeSupport.firePropertyChange("comments", oldValue, this.comments);
 	}
 	
 	/**
@@ -152,7 +170,9 @@ public class Review {
 	 * @param isOpen the new state of the review
 	 */
 	public void setIsOpen(boolean isOpen) {
+		boolean oldValue = this.isOpen;
 		this.isOpen = isOpen;
+		propertyChangeSupport.firePropertyChange("isOpen", oldValue, this.isOpen);
 	}
 	
 	/* (non-Javadoc)
@@ -163,5 +183,13 @@ public class Review {
 	public String toString() {
 		return id;
 	}
+	
+	public void addPropertyChangeListener(PropertyChangeListener listener) {
+        propertyChangeSupport.addPropertyChangeListener(listener);
+    }
+
+	public void removePropertyChangeListener(PropertyChangeListener listener) {
+        propertyChangeSupport.removePropertyChangeListener(listener);
+    }
 	
 }

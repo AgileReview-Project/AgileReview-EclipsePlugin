@@ -7,27 +7,32 @@
  */
 package org.agilereview.core.external.storage;
 
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeSupport;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.List;
 
+import org.agilereview.core.external.definition.IStorageClient;
 import org.eclipse.core.resources.IFile;
 
 /**
  * A class that stores data and a list of replies of a comment.
  * @author Peter Reuter (19.02.2012)
  */
-public class Comment {
+public class Comment implements PropertyChangeListener {
 	
 	/**
-	 * The id of the comment that is retrieved from an IStorageClient
+	 * The id of the comment that is retrieved from an {@link IStorageClient}
 	 */
 	private final String id;
 	/**
-	 * The IFile underlying the editor in which the comment was added
+	 * The {@link IFile} underlying the editor in which the comment was added
 	 */
 	private IFile commentedFile;
 	/**
-	 * The review which the comment is related to
+	 * The {@link Review} which the comment is related to
 	 */
 	private Review review = null;
 	/**
@@ -61,12 +66,14 @@ public class Comment {
 	/**
 	 * A list of replies that were made to the comment
 	 */
-	private ArrayList<Reply> replies = new ArrayList<Reply>(0);
+	private List<Reply> replies = new ArrayList<Reply>(0);
+	
+	private PropertyChangeSupport propertyChangeSupport;
 	
 	/**
 	 * Constructor that should be used if a new comment is created.
-	 * @param id the ID of the comment retrieved from the current IStorageClient
-	 * @param commentedFile the IFile underlying the editor in which the comment was added
+	 * @param id the ID of the comment retrieved from the current {@link IStorageClient}
+	 * @param commentedFile the {@link IFile} underlying the editor in which the comment was added
 	 */
 	public Comment(String id, IFile commentedFile) {
 		this.id = id;
@@ -78,11 +85,11 @@ public class Comment {
 	}
 	
 	/**
-	 * Constructor that should be used if a comment is reconstructed from storage
-	 * @param id the ID of the comment retrieved from the current IStorageClient
+	 * Constructor that should be used if a comment is reconstructed from storage.
+	 * @param id the ID of the comment retrieved from the current {@link IStorageClient}
 	 * @param author the author of the comment
-	 * @param commentedFile the IFile underlying the editor in which the comment was added
-	 * @param review the review the comment is related to
+	 * @param commentedFile the {@link IFile} underlying the editor in which the comment was added
+	 * @param review the {@link Review} the comment is related to
 	 * @param creationDate the date when the comment was initially created
 	 * @param modificationDate the date when the comment was lastly modified
 	 * @param recipient the person the comment is addressed to
@@ -92,7 +99,7 @@ public class Comment {
 	 * @param replies a list of replies that were made to the comment
 	 */
 	public Comment(String id, String author, IFile commentedFile, Review review, Calendar creationDate, Calendar modificationDate, String recipient,
-			int status, int priority, String text, ArrayList<Reply> replies) {
+			int status, int priority, String text, List<Reply> replies) {
 		this.id = id;
 		this.author = author;
 		this.commentedFile = commentedFile;
@@ -121,23 +128,25 @@ public class Comment {
 	}
 	
 	/**
-	 * @return the IFile underlying the editor in which the comment was added
+	 * @return the {@link IFile} underlying the editor in which the comment was added
 	 */
 	public IFile getCommentedFile() {
 		return this.commentedFile;
 	}
 	
 	/**
-	 * Reset the reference to the commented file e.g. if the comment was repositioned
-	 * @param commentedFile the new location
+	 * Reset the reference to the commented {@link IFile} e.g. if the comment was repositioned
+	 * @param commentedFile the new {@link IFile}
 	 */
 	public void setCommentedFile(IFile commentedFile) {
+		IFile oldValue = this.commentedFile;
 		this.commentedFile = commentedFile;
 		resetModificationDate();
+		propertyChangeSupport.firePropertyChange("commentedFile", oldValue, this.commentedFile);
 	}
 	
 	/**
-	 * @return the review the comment is related to
+	 * @return the {@link Review} the comment is related to
 	 */
 	public Review getReview() {
 		return this.review;
@@ -161,7 +170,9 @@ public class Comment {
 	 * Resets the modification date. Should be used if an attribute was changed e.g. in setters.
 	 */
 	private void resetModificationDate() {
+		Calendar oldValue = this.modificationDate;
 		this.modificationDate = Calendar.getInstance();
+		propertyChangeSupport.firePropertyChange("modificationDate", oldValue, this.modificationDate);
 	}
 	
 	/**
@@ -175,8 +186,10 @@ public class Comment {
 	 * @param recipient the person this comment is now addressed to
 	 */
 	public void setRecipient(String recipient) {
+		String oldValue = this.recipient;
 		this.recipient = recipient;
 		resetModificationDate();
+		propertyChangeSupport.firePropertyChange("recipient", oldValue, this.recipient);
 	}
 	
 	/**
@@ -190,8 +203,10 @@ public class Comment {
 	 * @param status the new status of the comment
 	 */
 	public void setStatus(int status) {
+		int oldValue = this.status;
 		this.status = status;
 		resetModificationDate();
+		propertyChangeSupport.firePropertyChange("status", oldValue, this.status);
 	}
 	
 	/**
@@ -205,8 +220,10 @@ public class Comment {
 	 * @param priority the new priority of the comment
 	 */
 	public void setPriority(int priority) {
+		int oldValue = this.priority;
 		this.priority = priority;
 		resetModificationDate();
+		propertyChangeSupport.firePropertyChange("priority", oldValue, this.priority);
 	}
 	
 	/**
@@ -220,14 +237,16 @@ public class Comment {
 	 * @param text the new text of the comment
 	 */
 	public void setText(String text) {
+		String oldValue = this.text;
 		this.text = text;
 		resetModificationDate();
+		propertyChangeSupport.firePropertyChange("text", oldValue, this.text);
 	}
 	
 	/**
 	 * @return a list of replies that were added to this comment
 	 */
-	public ArrayList<Reply> getReplies() {
+	public List<Reply> getReplies() {
 		return replies;
 	}
 	
@@ -236,8 +255,10 @@ public class Comment {
 	 * @param reply the reply which is to add
 	 */
 	public void addReply(Reply reply) {
+		List<Reply> oldValue = new ArrayList<Reply>(this.replies);
 		this.replies.add(reply);
 		resetModificationDate();
+		propertyChangeSupport.firePropertyChange("replies", oldValue, this.replies);
 	}
 	
 	/**
@@ -245,8 +266,10 @@ public class Comment {
 	 * @param reply the reply which is to delete
 	 */
 	public void deleteReply(Reply reply) {
+		List<Reply> oldValue = new ArrayList<Reply>(this.replies);
 		this.replies.remove(reply);
 		resetModificationDate();
+		propertyChangeSupport.firePropertyChange("replies", oldValue, this.replies);
 	}
 	
 	/**
@@ -254,8 +277,23 @@ public class Comment {
 	 * @param index the index of the reply which is to delete
 	 */
 	public void deleteReply(int index) {
+		List<Reply> oldValue = new ArrayList<Reply>(this.replies);
 		this.replies.remove(index);
 		resetModificationDate();
+		propertyChangeSupport.firePropertyChange("replies", oldValue, this.replies);
+	}
+
+	public void addPropertyChangeListener(PropertyChangeListener listener) {
+        propertyChangeSupport.addPropertyChangeListener(listener);
+    }
+
+	public void removePropertyChangeListener(PropertyChangeListener listener) {
+        propertyChangeSupport.removePropertyChangeListener(listener);
+    }
+
+	@Override
+	public void propertyChange(PropertyChangeEvent evt) {
+		propertyChangeSupport.firePropertyChange(evt);
 	}
 	
 }
