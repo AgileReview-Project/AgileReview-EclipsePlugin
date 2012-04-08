@@ -1,3 +1,10 @@
+/**
+ * Copyright (c) 2011, 2012 AgileReview Development Team and others.
+ * All rights reserved. This program and the accompanying materials are made available under
+ * the terms of the Eclipse Public License - v 1.0 which accompanies this distribution,
+ * and is available at http://www.eclipse.org/legal/epl-v10.html
+ * Contributors: Malte Brunnlieb, Philipp Diebold, Peter Reuter, Thilo Rauch
+ */
 package org.agilereview.ui.basic.reviewExplorer;
 
 import java.util.ArrayList;
@@ -31,13 +38,12 @@ import org.eclipse.ui.part.ViewPart;
 import org.eclipse.ui.services.ISourceProviderService;
 
 /**
- * The Review Explorer is the view which shows all reviews as well as 
- * the files and folder which are commented in the corresponding reviews.
+ * The Review Explorer is the view which shows all reviews as well as the files and folder which are commented in the corresponding reviews.
  * 
  * @author Thilo Rauch (28.03.2012)
  */
 public class ReviewExplorerView extends ViewPart implements IReviewDataReceiver, IDoubleClickListener {
-
+	
 	/**
 	 * All review data
 	 */
@@ -46,15 +52,15 @@ public class ReviewExplorerView extends ViewPart implements IReviewDataReceiver,
 	/**
 	 * The tree for showing the reviews
 	 */
-	private TreeViewer treeViewer;	
+	private TreeViewer treeViewer;
 	/**
 	 * Action for opening the files displayed in the tree viewer on double-click
 	 */
 	private REOpenAction openFileAction;
 	/**
-	 * Properties manager for repeated access 
+	 * Properties manager for repeated access
 	 */
-	private PropertiesManager props = PropertiesManager.getInstance();	
+	private PropertiesManager props = PropertiesManager.getInstance();
 	/**
 	 * Current Instance used by the ViewPart
 	 */
@@ -67,7 +73,6 @@ public class ReviewExplorerView extends ViewPart implements IReviewDataReceiver,
 	public static ReviewExplorerView getInstance() {
 		return instance;
 	}
-
 	
 	/* (non-Javadoc)
 	 * @see org.agilereview.core.external.definition.IReviewDataReceiver#setReviewData(java.util.List)
@@ -80,12 +85,11 @@ public class ReviewExplorerView extends ViewPart implements IReviewDataReceiver,
 		ResourcesPlugin.getWorkspace().getRoot().deleteMarkers(REContentProvider.AGILE_REVIEW_MARKER_ID, false, IResource.DEPTH_INFINITE);
 		// now prepare the new markers
 		for (Review r : globalData) {
-			for (Comment c: r.getComments()) {
+			for (Comment c : r.getComments()) {
 				c.getCommentedFile().createMarker(REContentProvider.AGILE_REVIEW_MARKER_ID);
 			}
 		}
 	}
-	
 	
 	@Override
 	public void createPartControl(Composite parent) {
@@ -99,11 +103,11 @@ public class ReviewExplorerView extends ViewPart implements IReviewDataReceiver,
 		treeViewer.setInput(globalData);
 		treeViewer.addSelectionChangedListener(ViewControl.getInstance());
 		refreshInput();
-				
+		
 		openFileAction = new REOpenAction(this.getSite().getPage(), treeViewer);
-				
+		
 		treeViewer.addDoubleClickListener(this);
-		PlatformUI.getWorkbench().getHelpSystem().setHelp(parent, Activator.PLUGIN_ID+".ReviewExplorer");
+		PlatformUI.getWorkbench().getHelpSystem().setHelp(parent, Activator.PLUGIN_ID + ".ReviewExplorer");
 		
 		// Create a popup menu
 		MenuManager menuManager = new MenuManager();
@@ -112,7 +116,7 @@ public class ReviewExplorerView extends ViewPart implements IReviewDataReceiver,
 		treeViewer.getControl().setMenu(menu);
 		getSite().registerContextMenu(menuManager, treeViewer);
 		getSite().setSelectionProvider(treeViewer);
-	
+		
 		// register view
 		ViewControl.registerView(this.getClass());
 	}
@@ -120,27 +124,23 @@ public class ReviewExplorerView extends ViewPart implements IReviewDataReceiver,
 	/**
 	 * Refreshes the tree viewer. Also expands all previously expanded nodes afterwards.
 	 */
-	public void refresh()
-	{
+	public void refresh() {
 		PluginLogger.log(this.getClass().toString(), "refresh", "Refreshing the ReviewExplorer viewer (without reloading the input)");
 		this.treeViewer.getControl().setRedraw(false);
 		Object[] expandedElements = this.treeViewer.getExpandedElements();
 		this.treeViewer.refresh();
 		
-		for (Object o : expandedElements)
-		{
+		for (Object o : expandedElements) {
 			this.treeViewer.expandToLevel(o, 1);
 		}
 		this.treeViewer.getControl().setRedraw(true);
 		this.treeViewer.getControl().redraw();
 	}
 	
-	
 	/**
 	 * Sets the input of the ReviewExplorer completely new
 	 */
-	public void refreshInput()
-	{
+	public void refreshInput() {
 		PluginLogger.log(this.getClass().toString(), "refreshInput", "Refreshing the ReviewExplorer viewer (with reloading the input)");
 		// Save previous selection
 		ISelection selection = this.treeViewer.getSelection();
@@ -150,8 +150,7 @@ public class ReviewExplorerView extends ViewPart implements IReviewDataReceiver,
 		
 		// Refresh the input
 		this.root.clear();
-		for (Review r : RA.getAllReviews())
-		{
+		for (Review r : RA.getAllReviews()) {
 			MultipleReviewWrapper currWrap = new MultipleReviewWrapper(r, r.getId());
 			// Check if review is "open"
 			currWrap.setOpen(props.isReviewOpen(r.getId()));
@@ -160,13 +159,12 @@ public class ReviewExplorerView extends ViewPart implements IReviewDataReceiver,
 		
 		// Expand nodes again
 		this.treeViewer.refresh();
-		for (Object o : expandedElements)
-		{
+		for (Object o : expandedElements) {
 			this.treeViewer.expandToLevel(o, 1);
 		}
 		this.treeViewer.getControl().setRedraw(true);
 		this.treeViewer.getControl().redraw();
-
+		
 		//Reset selection
 		this.treeViewer.setSelection(selection, true);
 	}
@@ -199,7 +197,7 @@ public class ReviewExplorerView extends ViewPart implements IReviewDataReceiver,
 	}
 	
 	/**
-	 * Expands all sub nodes of the passed node 
+	 * Expands all sub nodes of the passed node
 	 * @param selection node which should be expanded
 	 */
 	public void expandAllSubNodes(AbstractMultipleWrapper selection) {
@@ -207,13 +205,12 @@ public class ReviewExplorerView extends ViewPart implements IReviewDataReceiver,
 	}
 	
 	/**
-	 * Collapses all sub nodes of the passed node 
+	 * Collapses all sub nodes of the passed node
 	 * @param selection node which should be expanded
 	 */
 	public void collapseAllSubNodes(AbstractMultipleWrapper selection) {
 		treeViewer.collapseToLevel(selection, TreeViewer.ALL_LEVELS);
 	}
-	
 	
 	/*
 	 * (non-Javadoc)
@@ -222,24 +219,21 @@ public class ReviewExplorerView extends ViewPart implements IReviewDataReceiver,
 	@Override
 	public void doubleClick(DoubleClickEvent event) {
 		PluginLogger.log(this.getClass().toString(), "doubleClick", "Doubleclick in ReviewExplorer detected");
-		if(openFileAction.isEnabled()){
+		if (openFileAction.isEnabled()) {
 			openFileAction.run();
 		}
 		ISelection sel = event.getSelection();
-		if (sel instanceof IStructuredSelection)
-		{
-			Object o = ((IStructuredSelection)sel).getFirstElement();
+		if (sel instanceof IStructuredSelection) {
+			Object o = ((IStructuredSelection) sel).getFirstElement();
 			
-			if (o instanceof MultipleReviewWrapper)
-			{
+			if (o instanceof MultipleReviewWrapper) {
 				String command = "";
 				try {
 					// If the review is closed -> open it
-					if (props.isReviewOpen(((MultipleReviewWrapper)o).getReviewId()))
-					{
+					if (props.isReviewOpen(((MultipleReviewWrapper) o).getReviewId())) {
 						// Check if already active, then expand, else activate
 						String activeReview = PropertiesManager.getPreferences().getString(PropertiesManager.EXTERNAL_KEYS.ACTIVE_REVIEW);
-						if (activeReview.equals(((MultipleReviewWrapper)o).getReviewId())) {
+						if (activeReview.equals(((MultipleReviewWrapper) o).getReviewId())) {
 							if (treeViewer.getExpandedState(o)) {
 								treeViewer.collapseToLevel(o, 1);
 							} else {
@@ -249,23 +243,23 @@ public class ReviewExplorerView extends ViewPart implements IReviewDataReceiver,
 							// Review is open -> activate it
 							command = "de.tukl.cs.softech.agilereview.views.reviewexplorer.activate";
 							// Execute activation command
-							IHandlerService handlerService = (IHandlerService)getSite().getService(IHandlerService.class);
-							handlerService.executeCommand(command, null);	
+							IHandlerService handlerService = (IHandlerService) getSite().getService(IHandlerService.class);
+							handlerService.executeCommand(command, null);
 						}
 					} else {
 						command = "de.tukl.cs.softech.agilereview.views.reviewexplorer.openClose";
 						// Execute open/close command
-						IHandlerService handlerService = (IHandlerService)getSite().getService(IHandlerService.class);
+						IHandlerService handlerService = (IHandlerService) getSite().getService(IHandlerService.class);
 						handlerService.executeCommand(command, null);
 					}
 				} catch (ExecutionException e) {
-					PluginLogger.logError(this.getClass().toString(), "doubleClick", "Problems occured executing command \""+command+"\"", e);
+					PluginLogger.logError(this.getClass().toString(), "doubleClick", "Problems occured executing command \"" + command + "\"", e);
 				} catch (NotDefinedException e) {
-					PluginLogger.logError(this.getClass().toString(), "doubleClick", "Command \""+command+"\" is not defined", e);
+					PluginLogger.logError(this.getClass().toString(), "doubleClick", "Command \"" + command + "\" is not defined", e);
 				} catch (NotEnabledException e) {
-					PluginLogger.logError(this.getClass().toString(), "doubleClick", ""+command+"\" is not enabled", e);
+					PluginLogger.logError(this.getClass().toString(), "doubleClick", "" + command + "\" is not enabled", e);
 				} catch (NotHandledException e) {
-					PluginLogger.logError(this.getClass().toString(), "doubleClick", "Command \""+command+"\" is not handled", e);
+					PluginLogger.logError(this.getClass().toString(), "doubleClick", "Command \"" + command + "\" is not handled", e);
 				}
 			} else {
 				// On Double-Click there can only be one item selected
@@ -274,7 +268,7 @@ public class ReviewExplorerView extends ViewPart implements IReviewDataReceiver,
 				} else {
 					treeViewer.expandToLevel(o, 1);
 				}
-			}		
+			}
 		}
 	}
 	
@@ -291,34 +285,36 @@ public class ReviewExplorerView extends ViewPart implements IReviewDataReceiver,
 	 * @see de.tukl.cs.softech.agilereview.views.ViewControl#selectionChanged(org.eclipse.jface.viewers.SelectionChangedEvent)
 	 */
 	public void selectionChanged(SelectionChangedEvent event) {
-		if(event.getSelection() instanceof IStructuredSelection) {
+		if (event.getSelection() instanceof IStructuredSelection) {
 			IStructuredSelection sel = (IStructuredSelection) event.getSelection();
 			Iterator<?> it = sel.iterator();
 			boolean containsClosedReview = false, firstReviewIsActive = false, firstIteration = true;
-			while(it.hasNext() && !containsClosedReview) {
+			while (it.hasNext() && !containsClosedReview) {
 				Object o = it.next();
-				if(o instanceof MultipleReviewWrapper) {
-					if(!((MultipleReviewWrapper)o).isOpen()) {
+				if (o instanceof MultipleReviewWrapper) {
+					if (!((MultipleReviewWrapper) o).isOpen()) {
 						containsClosedReview = true;
 					}
-					if(firstIteration) {
-						if(PropertiesManager.getPreferences().getString(PropertiesManager.EXTERNAL_KEYS.ACTIVE_REVIEW).equals(((MultipleReviewWrapper)o).getReviewId())) {
+					if (firstIteration) {
+						if (PropertiesManager.getPreferences().getString(PropertiesManager.EXTERNAL_KEYS.ACTIVE_REVIEW).equals(
+								((MultipleReviewWrapper) o).getReviewId())) {
 							firstReviewIsActive = true;
 						}
 					}
 				}
 				firstIteration = false;
 			}
-			ISourceProviderService isps = (ISourceProviderService) PlatformUI.getWorkbench().getActiveWorkbenchWindow().getService(ISourceProviderService.class);
+			ISourceProviderService isps = (ISourceProviderService) PlatformUI.getWorkbench().getActiveWorkbenchWindow().getService(
+					ISourceProviderService.class);
 			SourceProvider sp1 = (SourceProvider) isps.getSourceProvider(SourceProvider.CONTAINS_CLOSED_REVIEW);
 			sp1.setVariable(SourceProvider.CONTAINS_CLOSED_REVIEW, containsClosedReview);
 			SourceProvider sp2 = (SourceProvider) isps.getSourceProvider(SourceProvider.IS_ACTIVE_REVIEW);
 			sp2.setVariable(SourceProvider.IS_ACTIVE_REVIEW, firstReviewIsActive);
 		}
 	}
-
+	
 	@Override
-	public void setFocus() {}
-
+	public void setFocus() {
+	}
 	
 }
