@@ -9,14 +9,17 @@ package org.agilereview.ui.basic.commentSummary.filter;
 
 import java.util.regex.Pattern;
 
+import org.agilereview.core.external.properties.PropertyInterface;
 import org.agilereview.core.external.storage.Comment;
+import org.agilereview.ui.basic.Activator;
+import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerFilter;
 
 /**
  * Filters comments by a given searchword (and a given category)
  */
-public class AgileCommentFilter extends ViewerFilter {
+public class CommentFilter extends ViewerFilter {
 	
 	/**
 	 * searchword by which comments should be filtered
@@ -25,14 +28,36 @@ public class AgileCommentFilter extends ViewerFilter {
 	/**
 	 * Category to be searched ('ALL' or the category's name)
 	 */
-	private String restriction;
+	private final String restriction;
+	
+	/**
+	 * Properties value: comment status
+	 */
+	private String[] commentStates;
+	/**
+	 * Properties value: comment properties
+	 */
+	private String[] commentPriorities;
 	
 	/**
 	 * Constructor of the filter, used to set initial restrictions on category
 	 * @param restriction
 	 */
-	public AgileCommentFilter(String restriction) {
+	public CommentFilter(String restriction) {
 		this.restriction = restriction;
+		loadProperties();
+	}
+	
+	/**
+	 * Loads all necessary property values
+	 * @author Malte Brunnlieb (28.04.2012)
+	 */
+	public void loadProperties() {
+		IPreferenceStore store = Activator.getDefault().getPreferenceStore();
+		String value = store.getString(PropertyInterface.COMMENT_STATUS);
+		commentStates = value.split(",");
+		value = store.getString(PropertyInterface.COMMENT_PRIORITIES);
+		commentStates = value.split(",");
 	}
 	
 	/**
@@ -71,13 +96,11 @@ public class AgileCommentFilter extends ViewerFilter {
 				matches = true;
 			}
 			// match in Status and category ALL or Status
-			if (PropertiesManager.getInstance().getCommentStatusByID(c.getStatus()).matches(searchString)
-					&& (restriction.equals("ALL") || restriction.equals("Status"))) {
+			if (getCommentStatusByID(c.getStatus()).matches(searchString) && (restriction.equals("ALL") || restriction.equals("Status"))) {
 				matches = true;
 			}
 			// match in Priority and category ALL or Priority
-			if (PropertiesManager.getInstance().getCommentPriorityByID(c.getPriority()).matches(searchString)
-					&& (restriction.equals("ALL") || restriction.equals("Priority"))) {
+			if (getCommentPriorityByID(c.getPriority()).matches(searchString) && (restriction.equals("ALL") || restriction.equals("Priority"))) {
 				matches = true;
 			}
 			// match in CreationDate and category ALL or 'Date created'
@@ -93,11 +116,42 @@ public class AgileCommentFilter extends ViewerFilter {
 				matches = true;
 			}
 			// match in Path and category ALL or Location
-			if (ReviewAccess.computePath(c).matches(searchString) && (restriction.equals("ALL") || restriction.equals("Location"))) {
+			if (c.getCommentedFile().getFullPath().toOSString().matches(searchString)
+					&& (restriction.equals("ALL") || restriction.equals("Location"))) {
 				matches = true;
 			}
 		}
 		
 		return matches;
+	}
+	
+	/**
+	 * Returns a Comment status value defined in the properties according to its id
+	 * @param ID for the requested Comment status
+	 * @return the String according to the given ID
+	 */
+	private String getCommentStatusByID(int ID) {
+		String status = "Status not found!";
+		if (ID < 0 || ID >= this.commentStates.length) {
+			throw new RuntimeException(ID + " no valid StatusID!");
+		} else {
+			status = this.commentStates[ID];
+		}
+		return status;
+	}
+	
+	/**
+	 * Returns a Comment priority value defined in the properties according to its id
+	 * @param ID for the requested Comment priority
+	 * @return the String according to the given ID
+	 */
+	public String getCommentPriorityByID(int ID) {
+		String prio = "Priority not found!";
+		if (ID < 0 || ID >= this.commentPriorities.length) {
+			throw new RuntimeException(ID + " no valid PrioritiesID!");
+		} else {
+			prio = this.commentPriorities[ID];
+		}
+		return prio;
 	}
 }

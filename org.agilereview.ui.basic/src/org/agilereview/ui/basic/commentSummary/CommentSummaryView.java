@@ -7,7 +7,7 @@
  */
 package org.agilereview.ui.basic.commentSummary;
 
-import org.agilereview.ui.basic.commentSummary.filter.AgileCommentFilter;
+import org.agilereview.ui.basic.commentSummary.filter.CommentFilter;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.layout.GridLayout;
@@ -66,7 +66,7 @@ public class CommentSummaryView extends ViewPart implements Listener, KeyListene
 	public void handleEvent(Event event) {
 		MenuItem item = (MenuItem) event.widget;
 		viewer.removeFilter(commentFilter);
-		commentFilter = new AgileCommentFilter(item.getText());
+		commentFilter = new CommentFilter(item.getText());
 		viewer.addFilter(commentFilter);
 		itemDropDown.setText("Search for " + item.getText());
 		toolBar.pack();
