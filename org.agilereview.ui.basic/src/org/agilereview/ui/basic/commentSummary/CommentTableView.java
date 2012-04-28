@@ -17,6 +17,7 @@ import java.util.Iterator;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Position;
 
+import org.agilereview.ui.basic.commentSummary.filter.ColumnSorter;
 import org.eclipse.core.commands.Command;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.ResourcesPlugin;
@@ -99,7 +100,7 @@ public class CommentTableView extends ViewPart implements IDoubleClickListener {
 	/**
 	 * Comparator of the view, used to sort columns ascending/descending
 	 */
-	private AgileViewerComparator comparator;
+	private ColumnSorter comparator;
 	/**
 	 * Filter of the view, used to filter by a given search string
 	 */
@@ -257,7 +258,7 @@ public class CommentTableView extends ViewPart implements IDoubleClickListener {
 		createViewer(parent);
 		
 		// set comparator (sorting order of columns) and filter
-		comparator = new AgileViewerComparator();
+		comparator = new ColumnSorter();
 		viewer.setComparator(comparator);
 		commentFilter = new AgileCommentFilter("ALL");
 		viewer.addFilter(commentFilter);
