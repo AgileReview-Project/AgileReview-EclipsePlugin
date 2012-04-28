@@ -18,6 +18,7 @@ import javax.swing.text.BadLocationException;
 import javax.swing.text.Position;
 
 import org.agilereview.ui.basic.commentSummary.filter.ColumnSorter;
+import org.agilereview.ui.basic.commentSummary.filter.ExplorerSelectionFilter;
 import org.eclipse.core.commands.Command;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.ResourcesPlugin;
