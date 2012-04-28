@@ -14,7 +14,7 @@ import org.eclipse.jface.viewers.ViewerComparator;
 /**
  * The class compares the comment entries of the comment summary view table
  */
-public class ColumnSorter extends ViewerComparator {
+public class ColumnComparator extends ViewerComparator {
     
     /**
      * index of the column that is to be ordered
@@ -32,7 +32,7 @@ public class ColumnSorter extends ViewerComparator {
     /**
      * constructor of this class
      */
-    public ColumnSorter() {
+    public ColumnComparator() {
         this.propertyIndex = 0;
         direction = DESCENDING;
     }

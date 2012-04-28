@@ -7,7 +7,11 @@
  */
 package org.agilereview.ui.basic.commentSummary;
 
-import org.agilereview.ui.basic.commentSummary.filter.CommentFilter;
+import org.agilereview.ui.basic.commentSummary.filter.SearchFilter;
+import org.eclipse.jface.viewers.DoubleClickEvent;
+import org.eclipse.jface.viewers.IDoubleClickListener;
+import org.eclipse.jface.viewers.ISelectionChangedListener;
+import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.widgets.Event;
@@ -18,7 +22,7 @@ import org.eclipse.swt.widgets.MenuItem;
  * This {@link ViewController} handles all events related to the CommentSummaryView
  * @author Malte Brunnlieb (28.04.2012)
  */
-public class ViewController implements Listener, KeyListener {
+public class ViewController implements Listener, KeyListener, ISelectionChangedListener, IDoubleClickListener {
     
     /**
      * View which should be controlled (normally event source)
@@ -43,7 +47,7 @@ public class ViewController implements Listener, KeyListener {
     public void handleEvent(Event event) {
         MenuItem item = (MenuItem) event.widget;
         viewer.removeFilter(commentFilter);
-        commentFilter = new CommentFilter(item.getText());
+        commentFilter = new SearchFilter(item.getText());
         viewer.addFilter(commentFilter);
         itemDropDown.setText("Search for " + item.getText());
         toolBar.pack();
@@ -68,5 +72,25 @@ public class ViewController implements Listener, KeyListener {
         commentFilter.setSearchText(filterText.getText());
         viewer.refresh();
         filterComments();
+    }
+    
+    /* (non-Javadoc)
+     * @see org.eclipse.jface.viewers.ISelectionChangedListener#selectionChanged(org.eclipse.jface.viewers.SelectionChangedEvent)
+     * @author Malte Brunnlieb (28.04.2012)
+     */
+    @Override
+    public void selectionChanged(SelectionChangedEvent event) {
+        // TODO Auto-generated method stub
+        // for TableViewer
+    }
+    
+    /* (non-Javadoc)
+     * @see org.eclipse.jface.viewers.IDoubleClickListener#doubleClick(org.eclipse.jface.viewers.DoubleClickEvent)
+     * @author Malte Brunnlieb (28.04.2012)
+     */
+    @Override
+    public void doubleClick(DoubleClickEvent event) {
+        // TODO Auto-generated method stub
+        // for TableViewer
     }
 }

@@ -7,8 +7,16 @@
  */
 package org.agilereview.ui.basic.commentSummary;
 
+import java.util.ArrayList;
+
+import org.agilereview.core.external.storage.Comment;
+import org.agilereview.ui.basic.Activator;
+import org.agilereview.ui.basic.commentSummary.filter.ColumnComparator;
+import org.agilereview.ui.basic.commentSummary.filter.SearchFilter;
+import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.part.ViewPart;
 
 /**
@@ -18,27 +26,35 @@ import org.eclipse.ui.part.ViewPart;
 public class CommentSummaryView extends ViewPart {
     
     /**
-     * Current Instance used by the ViewPart
+     * The comments to be displayed (model of TableViewer viewer)
      */
-    private static CommentSummaryView instance;
-    
-    /**
-     * Provides the current used instance of the CommentTableView
-     * @return instance of CommentTableView
-     */
-    public static CommentSummaryView getInstance() {
-        return instance;
-    }
+    private ArrayList<Comment> comments;
     
     /*
-     * (non-Javadoc)
-     * @see org.eclipse.ui.part.WorkbenchPart#createPartControl(org.eclipse.swt.widgets.Composite)
-     * @author Malte Brunnlieb (08.04.2012)
-     */
+    * (non-Javadoc)
+    * @see org.eclipse.ui.part.WorkbenchPart#createPartControl(org.eclipse.swt.widgets.Composite)
+    * @author Malte Brunnlieb (08.04.2012)
+    */
     @Override
     public void createPartControl(Composite parent) {
         parent.setLayout(new GridLayout());
         
+        ViewController viewController = new ViewController(this);
+        new CSToolBar(parent, viewController);
+        
+        CSTableViewer viewer = new CSTableViewer(parent);
+        viewer.setContentProvider(new ArrayContentProvider());
+        viewer.setInput(comments); //TODO set in model
+        viewer.addDoubleClickListener(viewController);
+        getSite().setSelectionProvider(viewer);
+        viewer.addSelectionChangedListener(viewController);
+        ColumnComparator comparator = new ColumnComparator();
+        viewer.setComparator(comparator);
+        SearchFilter commentFilter = new SearchFilter("ALL");
+        viewer.addFilter(commentFilter);
+        
+        //add help context
+        PlatformUI.getWorkbench().getHelpSystem().setHelp(parent, Activator.PLUGIN_ID + ".TableView"); //TODO adapt help context
     }
     
     /*
@@ -50,5 +66,4 @@ public class CommentSummaryView extends ViewPart {
     public void setFocus() {
         // TODO Auto-generated method stub
     }
-    
 }
