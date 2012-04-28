@@ -68,7 +68,7 @@ public class SourceFolderManager implements IPropertyChangeListener {
 					NoReviewSourceProjectWizard dialog = new NoReviewSourceProjectWizard();
 					WizardDialog wDialog = new WizardDialog(Display.getCurrent().getActiveShell(), dialog);
 					wDialog.setBlockOnOpen(true);
-					wDialog.open();	
+					wDialog.open();
 				}
 			});
 		} else {
@@ -76,6 +76,10 @@ public class SourceFolderManager implements IPropertyChangeListener {
 			currentSourceFolder = p;
 			setProjectNatures(currentSourceFolder, new String[]{ AGILEREVIEW_NATURE, AGILEREVIEW_ACTIVE_NATURE });
 		}
+	}
+	
+	public static void deactivateReviewSourceFolder() {
+		
 	}
 	
 	/**
@@ -133,6 +137,10 @@ public class SourceFolderManager implements IPropertyChangeListener {
 			return false;
 		}
 	}
+	
+	///////////////////////////////////////
+	// methods of PropertyChangeListener //
+	///////////////////////////////////////
 
 	@Override
 	public void propertyChange(PropertyChangeEvent event) {
