@@ -17,5 +17,8 @@ public class PropertyInterface {
 	 * Comma separated list of comment status
 	 */
 	public static final String COMMENT_STATUS = "org.agilereview.comment_status";
-	
+	/**
+	 * Comma separated list of comment priorities
+	 */
+	public static final String COMMENT_PRIORITIES = "org.agilereview.comment_priorities";
 }
