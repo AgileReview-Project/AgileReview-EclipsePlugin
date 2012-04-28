@@ -21,6 +21,10 @@ import java.util.List;
 public class Reply implements PropertyChangeListener {
 	
 	/**
+	 * Unique ID of this {@link Reply}
+	 */
+	private String id = "";
+	/**
 	 * The author of the reply 
 	 */
 	private String author = ""; //TODO maybe seperate author object for sync with color?
@@ -40,23 +44,33 @@ public class Reply implements PropertyChangeListener {
 	 * A {@link List} of replies that were made to the comment
 	 */
 	private List<Reply> replies = new ArrayList<Reply>(0);
-	
+	/**
+	 * The parent {@link Object} of this {@link Reply}, either a {@link Comment} or another {@link Reply}
+	 */
+	private Object parent = null;
+	/**
+	 * {@link PropertyChangeSupport} of this POJO, used for firing {@link PropertyChangeEvent}s on changes of fields.
+	 */
 	private PropertyChangeSupport propertyChangeSupport;
 	
 	
 	/**
 	 * Constructor that should be used if a reply is reconstructed from storage
+	 * @param id the ID of the reply
 	 * @param author the author of the reply
 	 * @param creationDate the date when the reply was create initially
 	 * @param modificationDate date when the reply was create lastly
 	 * @param text the text of the reply
+	 * @param parent the parent {@link Object} of this {@link Reply}, either a {@link Comment} or another {@link Reply}
 	 */
-	public Reply(String author, Calendar creationDate, Calendar modificationDate,
-			String text) {
+	public Reply(String id, String author, Calendar creationDate, Calendar modificationDate,
+			String text, Object parent) {
+		this.id = id;
 		this.author = author;
 		this.creationDate = creationDate;
 		this.modificationDate = modificationDate;
 		this.text = text;
+		this.parent = parent;
 	}
 	
 	/**
@@ -65,6 +79,13 @@ public class Reply implements PropertyChangeListener {
 	public Reply() {
 		//TODO take author from properties
 		this.author = "";
+	}
+	
+	/**
+	 * @return the id of the reply
+	 */
+	public String getId() {
+		return id;
 	}
 
 	/**
@@ -123,12 +144,25 @@ public class Reply implements PropertyChangeListener {
 	}
 	
 	/**
+	 * Sets the {@link Reply}s of this {@link Reply}. <strong>Only use while deriving {@link Reply}s from external storage!</strong> 
+	 * @param replies
+	 * @author Peter Reuter (28.04.2012)
+	 */
+	public void setReplies(List<Reply> replies) {
+		this.replies = replies;
+		for (Reply reply: this.replies) {
+			reply.addPropertyChangeListener(this);
+		}
+	}
+	
+	/**
 	 * Adds at the end of the list of replies.
 	 * @param reply the reply which is to add
 	 */
 	public void addReply(Reply reply) {
 		List<Reply> oldValue = new ArrayList<Reply>(this.replies);
 		this.replies.add(reply);
+		reply.addPropertyChangeListener(this);
 		resetModificationDate();
 		propertyChangeSupport.firePropertyChange("replies", oldValue, this.replies);
 	}
@@ -140,6 +174,7 @@ public class Reply implements PropertyChangeListener {
 	public void deleteReply(Reply reply) {
 		List<Reply> oldValue = new ArrayList<Reply>(this.replies);
 		this.replies.remove(reply);
+		reply.removePropertyChangeListener(this);
 		resetModificationDate();
 		propertyChangeSupport.firePropertyChange("replies", oldValue, this.replies);
 	}
@@ -149,16 +184,31 @@ public class Reply implements PropertyChangeListener {
 	 * @param index the index of the reply which is to delete
 	 */
 	public void deleteReply(int index) {
-		List<Reply> oldValue = new ArrayList<Reply>(this.replies);
-		this.replies.remove(index);
-		resetModificationDate();
-		propertyChangeSupport.firePropertyChange("replies", oldValue, this.replies);
+		deleteReply(this.replies.get(index));
+	}
+
+	/**
+	 * @return the parent {@link Object} of this {@link Reply}, either a {@link Comment} or another {@link Reply}
+	 * @author Peter Reuter (28.04.2012)
+	 */
+	public Object getParent() {
+		return this.parent;
 	}
 	
+	/**
+	 * Adds a {@link PropertyChangeListener} to the list of listeners that are notified on {@link PropertyChangeEvent}s
+	 * @param listener
+	 * @author Peter Reuter (28.04.2012)
+	 */
 	public void addPropertyChangeListener(PropertyChangeListener listener) {
         propertyChangeSupport.addPropertyChangeListener(listener);
     }
 
+	/**
+	 * Removes a {@link PropertyChangeListener} from the list of listeners that are notified on {@link PropertyChangeEvent}s
+	 * @param listener
+	 * @author Peter Reuter (28.04.2012)
+	 */
 	public void removePropertyChangeListener(PropertyChangeListener listener) {
         propertyChangeSupport.removePropertyChangeListener(listener);
     }

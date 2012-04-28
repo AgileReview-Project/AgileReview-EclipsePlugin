@@ -9,6 +9,8 @@ package org.agilereview.core.external.definition;
 
 import java.util.List;
 
+import org.agilereview.core.external.storage.Comment;
+import org.agilereview.core.external.storage.Reply;
 import org.agilereview.core.external.storage.Review;
 
 /**
@@ -25,10 +27,21 @@ public interface IStorageClient {
 	public String getName();
 	
 	/**
-	 * This method returns all reviews currently loaded
-	 * @return a list of reviews
+	 * This method returns all {@link Review} objects currently loaded.
+	 * @return a {@link List} of {@link Review} objects.
 	 * @author Malte Brunnlieb (22.03.2012)
 	 */
 	public List<Review> getAllReviews();
+	
+	/**
+	 * This method adds a new {@link Review} object to the list of {@link Review} objects currently loaded.
+	 * @param review
+	 * @author Peter Reuter (04.04.2012)
+	 */
+	public void addReview(Review review);
+	
+	public String getNewId(Review review);
+	public String getNewId(Comment comment);
+	public String getNewId(Reply reply);
 	
 }

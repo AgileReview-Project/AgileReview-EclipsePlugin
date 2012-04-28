@@ -67,7 +67,9 @@ public class Comment implements PropertyChangeListener {
 	 * A list of replies that were made to the comment
 	 */
 	private List<Reply> replies = new ArrayList<Reply>(0);
-	
+	/**
+	 * {@link PropertyChangeSupport} of this POJO, used for firing {@link PropertyChangeEvent}s on changes of fields. 
+	 */
 	private PropertyChangeSupport propertyChangeSupport;
 	
 	/**
@@ -96,10 +98,9 @@ public class Comment implements PropertyChangeListener {
 	 * @param status the current status of the comment
 	 * @param priority the priority of the comment
 	 * @param text the text of the comment
-	 * @param replies a list of replies that were made to the comment
 	 */
 	public Comment(String id, String author, IFile commentedFile, Review review, Calendar creationDate, Calendar modificationDate, String recipient,
-			int status, int priority, String text, List<Reply> replies) {
+			int status, int priority, String text) {
 		this.id = id;
 		this.author = author;
 		this.commentedFile = commentedFile;
@@ -110,7 +111,6 @@ public class Comment implements PropertyChangeListener {
 		this.status = status;
 		this.priority = priority;
 		this.text = text;
-		this.replies = replies;
 	}
 	
 	/**
@@ -251,12 +251,25 @@ public class Comment implements PropertyChangeListener {
 	}
 	
 	/**
+	 * Sets the {@link Reply} of this {@link Comment}. <strong>Only use while deriving {@link Comment}s from external storage!</strong> 
+	 * @param replies
+	 * @author Peter Reuter (28.04.2012)
+	 */
+	public void setReplies(List<Reply> replies) {
+		this.replies = replies;
+		for (Reply reply : this.replies) {
+			reply.addPropertyChangeListener(this);
+		}
+	}
+	
+	/**
 	 * Adds at the end of the list of replies.
 	 * @param reply the reply which is to add
 	 */
 	public void addReply(Reply reply) {
 		List<Reply> oldValue = new ArrayList<Reply>(this.replies);
 		this.replies.add(reply);
+		reply.addPropertyChangeListener(this);
 		resetModificationDate();
 		propertyChangeSupport.firePropertyChange("replies", oldValue, this.replies);
 	}
@@ -268,6 +281,7 @@ public class Comment implements PropertyChangeListener {
 	public void deleteReply(Reply reply) {
 		List<Reply> oldValue = new ArrayList<Reply>(this.replies);
 		this.replies.remove(reply);
+		reply.removePropertyChangeListener(this);
 		resetModificationDate();
 		propertyChangeSupport.firePropertyChange("replies", oldValue, this.replies);
 	}
@@ -277,17 +291,23 @@ public class Comment implements PropertyChangeListener {
 	 * @param index the index of the reply which is to delete
 	 */
 	public void deleteReply(int index) {
-		List<Reply> oldValue = new ArrayList<Reply>(this.replies);
-		this.replies.remove(index);
-		resetModificationDate();
-		propertyChangeSupport.firePropertyChange("replies", oldValue, this.replies);
+		deleteReply(this.replies.get(index));
 	}
 
+	/**
+	 * Adds a {@link PropertyChangeListener} to the list of listeners that are notified on {@link PropertyChangeEvent}s
+	 * @param listener
+	 * @author Peter Reuter (28.04.2012)
+	 */
 	public void addPropertyChangeListener(PropertyChangeListener listener) {
         propertyChangeSupport.addPropertyChangeListener(listener);
     }
 
-	public void removePropertyChangeListener(PropertyChangeListener listener) {
+	/**
+	 * Removes a {@link PropertyChangeListener} from the list of listeners that are notified on {@link PropertyChangeEvent}s
+	 * @param listener
+	 * @author Peter Reuter (28.04.2012)
+	 */public void removePropertyChangeListener(PropertyChangeListener listener) {
         propertyChangeSupport.removePropertyChangeListener(listener);
     }
 
