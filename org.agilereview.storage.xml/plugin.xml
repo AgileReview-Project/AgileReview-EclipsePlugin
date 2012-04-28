@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         id="org.agilereview.storage.xml.XmlStorageClient"
+         name="AgileReview XmlStorageClient"
+         point="org.agilereview.core.StorageClient">
+      <StorageClient
+            class="org.agilereview.storage.xml.XmlStorageClient">
+      </StorageClient>
+   </extension>
+
+</plugin>

@@ -1,24 +1,22 @@
 package org.agilereview.storage.xml;
 
-import org.eclipse.ui.plugin.AbstractUIPlugin;
+import org.eclipse.core.runtime.Plugin;
 import org.osgi.framework.BundleContext;
 
 /**
- * The activator class controls the plug-in life cycle
+ * 
+ * @author Peter Reuter (28.04.2012)
  */
-public class Activator extends AbstractUIPlugin {
+public class Activator extends Plugin {
 
-	// The plug-in ID
-	public static final String PLUGIN_ID = "org.agilereview.XmlStorage"; //$NON-NLS-1$
-
-	// The shared instance
-	private static Activator plugin;
-	
 	/**
-	 * The constructor
+	 * The plug-in ID 
 	 */
-	public Activator() {
-	}
+	public static final String PLUGIN_ID = "org.agilereview.XmlStorage"; //$NON-NLS-1$
+	/**
+	 * The shared instance
+	 */
+	private static Activator plugin;
 
 	/*
 	 * (non-Javadoc)
@@ -39,12 +37,10 @@ public class Activator extends AbstractUIPlugin {
 	}
 
 	/**
-	 * Returns the shared instance
-	 *
 	 * @return the shared instance
 	 */
 	public static Activator getDefault() {
 		return plugin;
 	}
-
+	
 }
