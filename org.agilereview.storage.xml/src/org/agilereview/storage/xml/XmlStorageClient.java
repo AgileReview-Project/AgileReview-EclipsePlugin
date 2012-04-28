@@ -44,6 +44,8 @@ import org.eclipse.jface.util.PropertyChangeEvent;
  */
 public class XmlStorageClient extends Plugin implements IStorageClient, IPropertyChangeListener, PropertyChangeListener {
 	
+	//TODO compatibility to old xml format?
+	
 	/**
 	 * ID of this plugin 
 	 */
