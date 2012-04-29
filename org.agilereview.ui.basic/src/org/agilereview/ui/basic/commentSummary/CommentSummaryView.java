@@ -40,7 +40,6 @@ public class CommentSummaryView extends ViewPart {
         parent.setLayout(new GridLayout());
         
         ViewController viewController = new ViewController(this);
-        new CSToolBar(parent, viewController);
         
         CSTableViewer viewer = new CSTableViewer(parent);
         viewer.setContentProvider(new ArrayContentProvider());
@@ -52,6 +51,8 @@ public class CommentSummaryView extends ViewPart {
         viewer.setComparator(comparator);
         SearchFilter commentFilter = new SearchFilter("ALL");
         viewer.addFilter(commentFilter);
+        
+        new CSToolBar(parent, viewController, viewer);
         
         //add help context
         PlatformUI.getWorkbench().getHelpSystem().setHelp(parent, Activator.PLUGIN_ID + ".TableView"); //TODO adapt help context

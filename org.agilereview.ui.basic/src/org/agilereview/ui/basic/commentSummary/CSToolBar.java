@@ -41,19 +41,21 @@ public class CSToolBar extends ToolBar {
      * Creates a new instance of the {@link CSToolBar}
      * @param parent on which this {@link CSToolBar} should be added
      * @param viewController which handles all UI events
+     * @param viewer {@link CSTableViewer} of the {@link CommentSummaryView}
      * @author Malte Brunnlieb (08.04.2012)
      */
-    public CSToolBar(Composite parent, ViewController viewController) {
+    public CSToolBar(Composite parent, ViewController viewController, CSTableViewer viewer) {
         super(parent, SWT.FLAT | SWT.WRAP | SWT.RIGHT);
-        createToolBar(viewController);
+        createToolBar(viewController, viewer);
     }
     
     /**
      * Creates the ToolBar elements
      * @param viewController which handles all UI events
+     * @param viewer {@link CSTableViewer} of the {@link CommentSummaryView}
      * @author Malte Brunnlieb (08.04.2012)
      */
-    private void createToolBar(ViewController viewController) {
+    private void createToolBar(ViewController viewController, final CSTableViewer viewer) {
         // add dropdown box to toolbar to select category to filter
         final ToolItem itemDropDown = new ToolItem(this, SWT.DROP_DOWN);
         itemDropDown.setText("Search for ALL");
@@ -67,6 +69,7 @@ public class CSToolBar extends ToolBar {
         item.setText("ALL");
         item.addListener(SWT.Selection, viewController);
         item = new MenuItem(menu, SWT.SEPARATOR);
+        String[] titles = viewer.getTitles();
         for (int i = 0; i < titles.length; i++) {
             item = new MenuItem(menu, SWT.PUSH);
             item.setText(titles[i]);
@@ -105,7 +108,7 @@ public class CSToolBar extends ToolBar {
                 } else {
                     viewer.removeFilter(openFilter);
                 }
-                filterComments();
+                //filterComments(); //TODO remove?!
             }
         });
         

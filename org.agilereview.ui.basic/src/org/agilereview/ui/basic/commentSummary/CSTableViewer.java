@@ -234,4 +234,13 @@ public class CSTableViewer extends TableViewer {
         };
         return selectionAdapter;
     }
+    
+    /**
+     * Returns the column titles of the table
+     * @return an Array containing all column titles of the table
+     * @author Malte Brunnlieb (29.04.2012)
+     */
+    public String[] getTitles() {
+        return columnTitles.clone();
+    }
 }
