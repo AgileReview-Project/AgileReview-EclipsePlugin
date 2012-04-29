@@ -39,20 +39,20 @@ public class CommentSummaryView extends ViewPart {
     public void createPartControl(Composite parent) {
         parent.setLayout(new GridLayout());
         
-        ViewController viewController = new ViewController(this);
-        
         CSTableViewer viewer = new CSTableViewer(parent);
         viewer.setContentProvider(new ArrayContentProvider());
         viewer.setInput(comments); //TODO set in model
-        viewer.addDoubleClickListener(viewController);
         getSite().setSelectionProvider(viewer);
-        viewer.addSelectionChangedListener(viewController);
         ColumnComparator comparator = new ColumnComparator();
         viewer.setComparator(comparator);
         SearchFilter commentFilter = new SearchFilter("ALL");
         viewer.addFilter(commentFilter);
         
-        new CSToolBar(parent, viewController, viewer);
+        CSToolBar toolBar = new CSToolBar(parent, viewer);
+        
+        ViewController viewController = new ViewController(this);
+        viewer.addSelectionChangedListener(viewController);
+        viewer.addDoubleClickListener(viewController);
         
         //add help context
         PlatformUI.getWorkbench().getHelpSystem().setHelp(parent, Activator.PLUGIN_ID + ".TableView"); //TODO adapt help context

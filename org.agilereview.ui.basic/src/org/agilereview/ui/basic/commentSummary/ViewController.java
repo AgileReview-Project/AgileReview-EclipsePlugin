@@ -12,8 +12,12 @@ import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.KeyListener;
+import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.graphics.Rectangle;
+import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.MenuItem;
@@ -24,18 +28,19 @@ import org.eclipse.swt.widgets.MenuItem;
  */
 public class ViewController implements Listener, KeyListener, ISelectionChangedListener, IDoubleClickListener {
     
-    /**
-     * View which should be controlled (normally event source)
-     */
-    private final CommentSummaryView view;
+    private final Composite parent;
+    private final CSTableViewer tableViewer;
+    
+    private SearchFilter currentSearchFilter;
     
     /**
      * Creates a new instance of {@link ViewController} for a given {@link CommentSummaryView}
      * @param view {@link CommentSummaryView} which should be controlled
      * @author Malte Brunnlieb (28.04.2012)
      */
-    ViewController(CommentSummaryView view) {
-        this.view = view;
+    ViewController(Composite parent, CSTableViewer tableViewer) {
+        this.parent = parent;
+        this.tableViewer = tableViewer;
     }
     
     /*
@@ -45,13 +50,23 @@ public class ViewController implements Listener, KeyListener, ISelectionChangedL
      */
     @Override
     public void handleEvent(Event event) {
+        // filter selection (DropDown box ToolBar)
         MenuItem item = (MenuItem) event.widget;
-        viewer.removeFilter(commentFilter);
-        commentFilter = new SearchFilter(item.getText());
-        viewer.addFilter(commentFilter);
+        tableViewer.removeFilter(currentSearchFilter);
+        currentSearchFilter = new SearchFilter(item.getText());
+        tableViewer.addFilter(currentSearchFilter);
         itemDropDown.setText("Search for " + item.getText());
         toolBar.pack();
         parent.layout();
+        
+        // filter menu (DropDown box ToolBar)
+        if (event.detail == SWT.ARROW || event.detail == 0) {
+            Rectangle bounds = itemDropDown.getBounds();
+            Point point = toDisplay(bounds.x, bounds.y + bounds.height);
+            menu.setLocation(point);
+            menu.setVisible(true);
+            filterText.setFocus();
+        }
     }
     
     /* (non-Javadoc)

@@ -7,19 +7,14 @@
  */
 package org.agilereview.ui.basic.commentSummary;
 
-import org.agilereview.core.external.storage.Comment;
+import org.agilereview.ui.basic.commentSummary.filter.OpenFilter;
 import org.agilereview.ui.basic.tools.CommentProperties;
-import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerFilter;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.graphics.Point;
-import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Event;
-import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Text;
@@ -40,13 +35,12 @@ public class CSToolBar extends ToolBar {
     /**
      * Creates a new instance of the {@link CSToolBar}
      * @param parent on which this {@link CSToolBar} should be added
-     * @param viewController which handles all UI events
      * @param viewer {@link CSTableViewer} of the {@link CommentSummaryView}
      * @author Malte Brunnlieb (08.04.2012)
      */
-    public CSToolBar(Composite parent, ViewController viewController, CSTableViewer viewer) {
+    public CSToolBar(Composite parent, CSTableViewer viewer) {
         super(parent, SWT.FLAT | SWT.WRAP | SWT.RIGHT);
-        createToolBar(viewController, viewer);
+        createToolBar(viewer);
     }
     
     /**
@@ -55,7 +49,7 @@ public class CSToolBar extends ToolBar {
      * @param viewer {@link CSTableViewer} of the {@link CommentSummaryView}
      * @author Malte Brunnlieb (08.04.2012)
      */
-    private void createToolBar(ViewController viewController, final CSTableViewer viewer) {
+    private void createToolBar(final CSTableViewer viewer) {
         // add dropdown box to toolbar to select category to filter
         final ToolItem itemDropDown = new ToolItem(this, SWT.DROP_DOWN);
         itemDropDown.setText("Search for ALL");
@@ -94,36 +88,20 @@ public class CSToolBar extends ToolBar {
         onlyOpenCommentsCheckbox.setToolTipText("Show only " + statusStr + " comments");
         onlyOpenCommentsCheckbox.addSelectionListener(new SelectionAdapter() {
             
-            private final ViewerFilter openFilter = new ViewerFilter() {
-                @Override
-                public boolean select(Viewer viewer, Object parentElement, Object element) {
-                    return ((Comment) element).getStatus() == filterStatusNumber; // XXX Hack
-                }
-            };
-            
             @Override
             public void widgetSelected(SelectionEvent e) {
+                ViewerFilter openFilter = new OpenFilter();
                 if (onlyOpenCommentsCheckbox.getSelection()) {
                     viewer.addFilter(openFilter);
                 } else {
                     viewer.removeFilter(openFilter);
                 }
-                //filterComments(); //TODO remove?!
+                //filterComments(); //TODO remove?! wird glaub ich nicht mehr gebraucht
             }
         });
         
         // add listener to dropdown box to show menu
-        itemDropDown.addListener(SWT.Selection, new Listener() {
-            public void handleEvent(Event event) {
-                if (event.detail == SWT.ARROW || event.detail == 0) {
-                    Rectangle bounds = itemDropDown.getBounds();
-                    Point point = toDisplay(bounds.x, bounds.y + bounds.height);
-                    menu.setLocation(point);
-                    menu.setVisible(true);
-                    filterText.setFocus();
-                }
-            }
-        });
+        itemDropDown.addListener(SWT.Selection, viewController);
         
         pack();
     }

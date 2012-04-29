@@ -204,7 +204,7 @@ public class CSTableViewer extends TableViewer {
         column.setWidth(bound);
         column.setResizable(true);
         column.setMoveable(true);
-        column.addSelectionListener(getSelectionAdapter(column, colNumber));
+        column.addSelectionListener(createSelectionAdapter(column, colNumber));
         return viewerColumn;
     }
     
@@ -215,7 +215,7 @@ public class CSTableViewer extends TableViewer {
      * @return the columns selection adapter
      * @author Malte Brunnlieb (28.04.2012)
      */
-    private SelectionAdapter getSelectionAdapter(final TableColumn column, final int index) {
+    private SelectionAdapter createSelectionAdapter(final TableColumn column, final int index) {
         SelectionAdapter selectionAdapter = new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
