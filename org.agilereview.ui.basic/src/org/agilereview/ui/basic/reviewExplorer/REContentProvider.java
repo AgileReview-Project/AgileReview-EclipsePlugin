@@ -1,4 +1,4 @@
-package org.agilereview.ui.basic.reviewExplorer.model;
+package org.agilereview.ui.basic.reviewExplorer;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -17,7 +17,7 @@ import org.eclipse.jface.viewers.Viewer;
  * 
  * @author Thilo Rauch (28.03.2012)
  */
-public class REContentProvider implements ITreeContentProvider {
+class REContentProvider implements ITreeContentProvider {
 		
 	/**
 	 * ID of the AgileReview resource marker

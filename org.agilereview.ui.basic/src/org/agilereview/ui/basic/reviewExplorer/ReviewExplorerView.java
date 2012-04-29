@@ -12,15 +12,17 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.agilereview.core.external.definition.IReviewDataReceiver;
+import org.agilereview.core.external.properties.PropertyInterface;
 import org.agilereview.core.external.storage.Comment;
 import org.agilereview.core.external.storage.Review;
-import org.agilereview.ui.basic.reviewExplorer.model.REContentProvider;
+import org.agilereview.ui.basic.Activator;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.commands.NotEnabledException;
 import org.eclipse.core.commands.NotHandledException;
 import org.eclipse.core.commands.common.NotDefinedException;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IDoubleClickListener;
@@ -58,13 +60,13 @@ public class ReviewExplorerView extends ViewPart implements IReviewDataReceiver,
 	 */
 	private REOpenAction openFileAction;
 	/**
-	 * Properties manager for repeated access
+	 * Preference query interface of the core plugin
 	 */
-	private PropertiesManager props = PropertiesManager.getInstance();
+	private PropertyInterface props = new PropertyInterface();
 	/**
 	 * Current Instance used by the ViewPart
 	 */
-	private static ReviewExplorerView instance;
+	private static ReviewExplorerView instance = null;
 	
 	/**
 	 * Returns the current instance of the ReviewExplorer
@@ -81,13 +83,22 @@ public class ReviewExplorerView extends ViewPart implements IReviewDataReceiver,
 	@Override
 	public void setReviewData(List<Review> reviews) {
 		this.globalData = reviews;
-		// delete old resource markers
-		ResourcesPlugin.getWorkspace().getRoot().deleteMarkers(REContentProvider.AGILE_REVIEW_MARKER_ID, false, IResource.DEPTH_INFINITE);
-		// now prepare the new markers
-		for (Review r : globalData) {
-			for (Comment c : r.getComments()) {
-				c.getCommentedFile().createMarker(REContentProvider.AGILE_REVIEW_MARKER_ID);
+		try {
+			// delete old resource markers
+			
+			ResourcesPlugin.getWorkspace().getRoot().deleteMarkers(REContentProvider.AGILE_REVIEW_MARKER_ID, false, IResource.DEPTH_INFINITE);
+			// now prepare the new markers
+			for (Review r : globalData) {
+				for (Comment c : r.getComments()) {
+					c.getCommentedFile().createMarker(REContentProvider.AGILE_REVIEW_MARKER_ID);
+				}
 			}
+		} catch (CoreException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		if (instance != null) {
+			refreshInput();
 		}
 	}
 	
@@ -100,8 +111,9 @@ public class ReviewExplorerView extends ViewPart implements IReviewDataReceiver,
 		treeViewer.setContentProvider(new REContentProvider());
 		treeViewer.setLabelProvider(new RELabelProvider());
 		treeViewer.setComparator(new REViewerComparator());
-		treeViewer.setInput(globalData);
-		treeViewer.addSelectionChangedListener(ViewControl.getInstance());
+		
+		// TODO: Ähnliches Konstrukt in der neuen Architektur?
+		// treeViewer.addSelectionChangedListener(ViewControl.getInstance());
 		refreshInput();
 		
 		openFileAction = new REOpenAction(this.getSite().getPage(), treeViewer);
@@ -118,30 +130,14 @@ public class ReviewExplorerView extends ViewPart implements IReviewDataReceiver,
 		getSite().setSelectionProvider(treeViewer);
 		
 		// register view
-		ViewControl.registerView(this.getClass());
-	}
-	
-	/**
-	 * Refreshes the tree viewer. Also expands all previously expanded nodes afterwards.
-	 */
-	public void refresh() {
-		PluginLogger.log(this.getClass().toString(), "refresh", "Refreshing the ReviewExplorer viewer (without reloading the input)");
-		this.treeViewer.getControl().setRedraw(false);
-		Object[] expandedElements = this.treeViewer.getExpandedElements();
-		this.treeViewer.refresh();
-		
-		for (Object o : expandedElements) {
-			this.treeViewer.expandToLevel(o, 1);
-		}
-		this.treeViewer.getControl().setRedraw(true);
-		this.treeViewer.getControl().redraw();
+		// XXX Ähnliches Konzept? ViewControl.registerView(this.getClass());
 	}
 	
 	/**
 	 * Sets the input of the ReviewExplorer completely new
 	 */
 	public void refreshInput() {
-		PluginLogger.log(this.getClass().toString(), "refreshInput", "Refreshing the ReviewExplorer viewer (with reloading the input)");
+		// PluginLogger.log(this.getClass().toString(), "refreshInput", "Refreshing the ReviewExplorer viewer (with reloading the input)");
 		// Save previous selection
 		ISelection selection = this.treeViewer.getSelection();
 		// Save expansion state
@@ -149,13 +145,8 @@ public class ReviewExplorerView extends ViewPart implements IReviewDataReceiver,
 		TreePath[] expandedElements = this.treeViewer.getExpandedTreePaths();
 		
 		// Refresh the input
-		this.root.clear();
-		for (Review r : RA.getAllReviews()) {
-			MultipleReviewWrapper currWrap = new MultipleReviewWrapper(r, r.getId());
-			// Check if review is "open"
-			currWrap.setOpen(props.isReviewOpen(r.getId()));
-			root.addReview(currWrap);
-		}
+		treeViewer.setInput(globalData); // XXX maybe not necessary
+		treeViewer.refresh();
 		
 		// Expand nodes again
 		this.treeViewer.refresh();
@@ -170,37 +161,10 @@ public class ReviewExplorerView extends ViewPart implements IReviewDataReceiver,
 	}
 	
 	/**
-	 * Adds the given review to the viewer
-	 * @param r the new Review
-	 */
-	public void addReview(Review r) {
-		MultipleReviewWrapper rWrap = new MultipleReviewWrapper(r, r.getId());
-		// When a new review is created this should be open an activated
-		rWrap.setOpen(true);
-		this.props.addToOpenReviews(r.getId());
-		PropertiesManager.getPreferences().setValue(PropertiesManager.EXTERNAL_KEYS.ACTIVE_REVIEW, r.getId());
-		
-		root.addReview(rWrap);
-		this.refresh();
-		this.treeViewer.setSelection(new StructuredSelection(rWrap), true);
-	}
-	
-	/**
-	 * Deletes the given review from the viewer
-	 * @param r
-	 */
-	public void deleteReview(MultipleReviewWrapper r) {
-		treeViewer.getTree().setRedraw(false);
-		root.deleteReview(r);
-		this.refresh();
-		treeViewer.getTree().setRedraw(true);
-	}
-	
-	/**
 	 * Expands all sub nodes of the passed node
 	 * @param selection node which should be expanded
 	 */
-	public void expandAllSubNodes(AbstractMultipleWrapper selection) {
+	public void expandAllSubNodes(Object selection) {
 		treeViewer.expandToLevel(selection, TreeViewer.ALL_LEVELS);
 	}
 	
@@ -208,7 +172,7 @@ public class ReviewExplorerView extends ViewPart implements IReviewDataReceiver,
 	 * Collapses all sub nodes of the passed node
 	 * @param selection node which should be expanded
 	 */
-	public void collapseAllSubNodes(AbstractMultipleWrapper selection) {
+	public void collapseAllSubNodes(Object selection) {
 		treeViewer.collapseToLevel(selection, TreeViewer.ALL_LEVELS);
 	}
 	
@@ -218,7 +182,6 @@ public class ReviewExplorerView extends ViewPart implements IReviewDataReceiver,
 	 */
 	@Override
 	public void doubleClick(DoubleClickEvent event) {
-		PluginLogger.log(this.getClass().toString(), "doubleClick", "Doubleclick in ReviewExplorer detected");
 		if (openFileAction.isEnabled()) {
 			openFileAction.run();
 		}
@@ -226,41 +189,43 @@ public class ReviewExplorerView extends ViewPart implements IReviewDataReceiver,
 		if (sel instanceof IStructuredSelection) {
 			Object o = ((IStructuredSelection) sel).getFirstElement();
 			
-			if (o instanceof MultipleReviewWrapper) {
+			if (o instanceof Review) {
+				Review review = (Review) o;
 				String command = "";
-				try {
+//				try {
 					// If the review is closed -> open it
-					if (props.isReviewOpen(((MultipleReviewWrapper) o).getReviewId())) {
+					if (review.getIsOpen()) {
 						// Check if already active, then expand, else activate
-						String activeReview = PropertiesManager.getPreferences().getString(PropertiesManager.EXTERNAL_KEYS.ACTIVE_REVIEW);
-						if (activeReview.equals(((MultipleReviewWrapper) o).getReviewId())) {
+						String activeReview = props.getPreferenceValue(PropertyInterface.ACTIVE_REVIEW_ID);
+						if (activeReview.equals(review.getId())) {
 							if (treeViewer.getExpandedState(o)) {
 								treeViewer.collapseToLevel(o, 1);
 							} else {
 								treeViewer.expandToLevel(o, 1);
 							}
 						} else {
-							// Review is open -> activate it
-							command = "de.tukl.cs.softech.agilereview.views.reviewexplorer.activate";
-							// Execute activation command
-							IHandlerService handlerService = (IHandlerService) getSite().getService(IHandlerService.class);
-							handlerService.executeCommand(command, null);
+							// Review is open -> activate it TODO: take the right command
+//							command = "de.tukl.cs.softech.agilereview.views.reviewexplorer.activate";
+//							// Execute activation command
+//							IHandlerService handlerService = (IHandlerService) getSite().getService(IHandlerService.class);
+//							handlerService.executeCommand(command, null);
 						}
 					} else {
-						command = "de.tukl.cs.softech.agilereview.views.reviewexplorer.openClose";
-						// Execute open/close command
-						IHandlerService handlerService = (IHandlerService) getSite().getService(IHandlerService.class);
-						handlerService.executeCommand(command, null);
+						// TODO: take the right command
+//						command = "de.tukl.cs.softech.agilereview.views.reviewexplorer.openClose";
+//						// Execute open/close command
+//						IHandlerService handlerService = (IHandlerService) getSite().getService(IHandlerService.class);
+//						handlerService.executeCommand(command, null);
 					}
-				} catch (ExecutionException e) {
-					PluginLogger.logError(this.getClass().toString(), "doubleClick", "Problems occured executing command \"" + command + "\"", e);
-				} catch (NotDefinedException e) {
-					PluginLogger.logError(this.getClass().toString(), "doubleClick", "Command \"" + command + "\" is not defined", e);
-				} catch (NotEnabledException e) {
-					PluginLogger.logError(this.getClass().toString(), "doubleClick", "" + command + "\" is not enabled", e);
-				} catch (NotHandledException e) {
-					PluginLogger.logError(this.getClass().toString(), "doubleClick", "Command \"" + command + "\" is not handled", e);
-				}
+//				} catch (ExecutionException e) {
+//					// XXX logging? PluginLogger.logError(this.getClass().toString(), "doubleClick", "Problems occured executing command \"" + command + "\"", e);
+//				} catch (NotDefinedException e) {
+//					// XXX logging? PluginLogger.logError(this.getClass().toString(), "doubleClick", "Command \"" + command + "\" is not defined", e);
+//				} catch (NotEnabledException e) {
+//					// XXX logging? PluginLogger.logError(this.getClass().toString(), "doubleClick", "" + command + "\" is not enabled", e);
+//				} catch (NotHandledException e) {
+//					// XXX logging? PluginLogger.logError(this.getClass().toString(), "doubleClick", "Command \"" + command + "\" is not handled", e);
+//				}
 			} else {
 				// On Double-Click there can only be one item selected
 				if (treeViewer.getExpandedState(o)) {
@@ -272,46 +237,47 @@ public class ReviewExplorerView extends ViewPart implements IReviewDataReceiver,
 		}
 	}
 	
-	/**
-	 * Validates the ReviewExplorer selection in order to update the CONTAINS_CLOSED_REVIEW variable of the {@link SourceProvider}
-	 */
-	public void validateExplorerSelection() {
-		selectionChanged(new SelectionChangedEvent(this.treeViewer, this.treeViewer.getSelection()));
-	}
-	
-	/**
-	 * Will be called by the {@link ViewControl} when the selection was changed and changes
-	 * @param event
-	 * @see de.tukl.cs.softech.agilereview.views.ViewControl#selectionChanged(org.eclipse.jface.viewers.SelectionChangedEvent)
-	 */
-	public void selectionChanged(SelectionChangedEvent event) {
-		if (event.getSelection() instanceof IStructuredSelection) {
-			IStructuredSelection sel = (IStructuredSelection) event.getSelection();
-			Iterator<?> it = sel.iterator();
-			boolean containsClosedReview = false, firstReviewIsActive = false, firstIteration = true;
-			while (it.hasNext() && !containsClosedReview) {
-				Object o = it.next();
-				if (o instanceof MultipleReviewWrapper) {
-					if (!((MultipleReviewWrapper) o).isOpen()) {
-						containsClosedReview = true;
-					}
-					if (firstIteration) {
-						if (PropertiesManager.getPreferences().getString(PropertiesManager.EXTERNAL_KEYS.ACTIVE_REVIEW).equals(
-								((MultipleReviewWrapper) o).getReviewId())) {
-							firstReviewIsActive = true;
-						}
-					}
-				}
-				firstIteration = false;
-			}
-			ISourceProviderService isps = (ISourceProviderService) PlatformUI.getWorkbench().getActiveWorkbenchWindow().getService(
-					ISourceProviderService.class);
-			SourceProvider sp1 = (SourceProvider) isps.getSourceProvider(SourceProvider.CONTAINS_CLOSED_REVIEW);
-			sp1.setVariable(SourceProvider.CONTAINS_CLOSED_REVIEW, containsClosedReview);
-			SourceProvider sp2 = (SourceProvider) isps.getSourceProvider(SourceProvider.IS_ACTIVE_REVIEW);
-			sp2.setVariable(SourceProvider.IS_ACTIVE_REVIEW, firstReviewIsActive);
-		}
-	}
+// TODO: Überlegen wofür das war...
+//	/**
+//	 * Validates the ReviewExplorer selection in order to update the CONTAINS_CLOSED_REVIEW variable of the {@link SourceProvider}
+//	 */
+//	public void validateExplorerSelection() {
+//		selectionChanged(new SelectionChangedEvent(this.treeViewer, this.treeViewer.getSelection()));
+//	}
+//	
+//	/**
+//	 * Will be called by the {@link ViewControl} when the selection was changed and changes
+//	 * @param event
+//	 * @see de.tukl.cs.softech.agilereview.views.ViewControl#selectionChanged(org.eclipse.jface.viewers.SelectionChangedEvent)
+//	 */
+//	public void selectionChanged(SelectionChangedEvent event) {
+//		if (event.getSelection() instanceof IStructuredSelection) {
+//			IStructuredSelection sel = (IStructuredSelection) event.getSelection();
+//			Iterator<?> it = sel.iterator();
+//			boolean containsClosedReview = false, firstReviewIsActive = false, firstIteration = true;
+//			while (it.hasNext() && !containsClosedReview) {
+//				Object o = it.next();
+//				if (o instanceof MultipleReviewWrapper) {
+//					if (!((MultipleReviewWrapper) o).isOpen()) {
+//						containsClosedReview = true;
+//					}
+//					if (firstIteration) {
+//						if (PropertiesManager.getPreferences().getString(PropertiesManager.EXTERNAL_KEYS.ACTIVE_REVIEW).equals(
+//								((MultipleReviewWrapper) o).getReviewId())) {
+//							firstReviewIsActive = true;
+//						}
+//					}
+//				}
+//				firstIteration = false;
+//			}
+//			ISourceProviderService isps = (ISourceProviderService) PlatformUI.getWorkbench().getActiveWorkbenchWindow().getService(
+//					ISourceProviderService.class);
+//			SourceProvider sp1 = (SourceProvider) isps.getSourceProvider(SourceProvider.CONTAINS_CLOSED_REVIEW);
+//			sp1.setVariable(SourceProvider.CONTAINS_CLOSED_REVIEW, containsClosedReview);
+//			SourceProvider sp2 = (SourceProvider) isps.getSourceProvider(SourceProvider.IS_ACTIVE_REVIEW);
+//			sp2.setVariable(SourceProvider.IS_ACTIVE_REVIEW, firstReviewIsActive);
+//		}
+//	}
 	
 	@Override
 	public void setFocus() {

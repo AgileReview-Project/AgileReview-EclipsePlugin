@@ -7,11 +7,19 @@
  */
 package org.agilereview.core.external.properties;
 
+import org.agilereview.core.Activator;
+import org.eclipse.jface.preference.IPreferenceStore;
+
 /**
  * 
  * @author Malte Brunnlieb (28.04.2012)
  */
 public class PropertyInterface {
+	
+	/**
+	 * The preference store of this plugin, so other plugins can query it
+	 */
+	private IPreferenceStore prefs = null;
 	
 	/**
 	 * Comma separated list of comment status
@@ -21,4 +29,16 @@ public class PropertyInterface {
 	 * Comma separated list of comment priorities
 	 */
 	public static final String COMMENT_PRIORITIES = "org.agilereview.comment_priorities";
+	/**
+	 * id of the currently active review
+	 */
+	public static final String ACTIVE_REVIEW_ID = "org.agilereview.active_review_id";
+	
+	public PropertyInterface () {
+		this.prefs = Activator.getDefault().getPreferenceStore();
+	}
+	
+	public String getPreferenceValue(String key) {
+		return prefs.getString(key);
+	}
 }

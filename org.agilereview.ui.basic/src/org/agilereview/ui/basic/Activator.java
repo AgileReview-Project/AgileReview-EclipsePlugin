@@ -1,5 +1,9 @@
 package org.agilereview.ui.basic;
 
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.util.Properties;
+
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 
@@ -8,6 +12,14 @@ import org.osgi.framework.BundleContext;
  */
 public class Activator extends AbstractUIPlugin {
     
+	public class Keys {
+		/**
+		 * Path of the Active-Review-Icon
+		 */
+		public static final String ACTIVE_REVIEW_ICON = "icon_review_ok";
+		
+	}
+	
     /**
      * The plug-in ID
      */
@@ -19,9 +31,25 @@ public class Activator extends AbstractUIPlugin {
     private static Activator plugin;
     
     /**
+     * Properties for internal access only (e.g. file paths)
+     */
+    private Properties internalProps = new Properties();
+    /**
+     * Filename/path of the property file
+     */
+    private String internalPropFile = "internalUI.properties";
+    
+    /**
      * The constructor
      */
     public Activator() {
+    	try {
+    		FileInputStream inStream = new FileInputStream(internalPropFile);
+			internalProps.load(inStream);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
     }
     
     /*
@@ -51,6 +79,10 @@ public class Activator extends AbstractUIPlugin {
      */
     public static Activator getDefault() {
         return plugin;
+    }
+    
+    public String getInternalProperty(String key) {
+    	return internalProps.getProperty(key);
     }
     
 }
