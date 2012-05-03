@@ -49,8 +49,10 @@ public class CommentSummaryView extends ViewPart {
         viewer.addFilter(commentFilter);
         
         CSToolBar toolBar = new CSToolBar(parent, viewer);
+        FilterController filterController = new FilterController(toolBar, viewer, commentFilter);
+        toolBar.setListeners(filterController);
         
-        ViewController viewController = new ViewController(this);
+        ViewController viewController = new ViewController(viewer);
         viewer.addSelectionChangedListener(viewController);
         viewer.addDoubleClickListener(viewController);
         

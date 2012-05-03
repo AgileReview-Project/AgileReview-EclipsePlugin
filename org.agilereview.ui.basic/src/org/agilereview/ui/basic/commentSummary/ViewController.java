@@ -7,20 +7,14 @@
  */
 package org.agilereview.ui.basic.commentSummary;
 
-import org.agilereview.ui.basic.commentSummary.filter.SearchFilter;
 import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
-import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.KeyListener;
-import org.eclipse.swt.graphics.Point;
-import org.eclipse.swt.graphics.Rectangle;
-import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
-import org.eclipse.swt.widgets.MenuItem;
 
 /**
  * This {@link ViewController} handles all events related to the CommentSummaryView
@@ -28,18 +22,17 @@ import org.eclipse.swt.widgets.MenuItem;
  */
 public class ViewController implements Listener, KeyListener, ISelectionChangedListener, IDoubleClickListener {
     
-    private final Composite parent;
+    /**
+     * TableViewer which events should be handled
+     */
     private final CSTableViewer tableViewer;
-    
-    private SearchFilter currentSearchFilter;
     
     /**
      * Creates a new instance of {@link ViewController} for a given {@link CommentSummaryView}
-     * @param view {@link CommentSummaryView} which should be controlled
+     * @param tableViewer {@link CSTableViewer} which should be controlled by this instance
      * @author Malte Brunnlieb (28.04.2012)
      */
-    ViewController(Composite parent, CSTableViewer tableViewer) {
-        this.parent = parent;
+    ViewController(CSTableViewer tableViewer) {
         this.tableViewer = tableViewer;
     }
     
@@ -50,23 +43,7 @@ public class ViewController implements Listener, KeyListener, ISelectionChangedL
      */
     @Override
     public void handleEvent(Event event) {
-        // filter selection (DropDown box ToolBar)
-        MenuItem item = (MenuItem) event.widget;
-        tableViewer.removeFilter(currentSearchFilter);
-        currentSearchFilter = new SearchFilter(item.getText());
-        tableViewer.addFilter(currentSearchFilter);
-        itemDropDown.setText("Search for " + item.getText());
-        toolBar.pack();
-        parent.layout();
         
-        // filter menu (DropDown box ToolBar)
-        if (event.detail == SWT.ARROW || event.detail == 0) {
-            Rectangle bounds = itemDropDown.getBounds();
-            Point point = toDisplay(bounds.x, bounds.y + bounds.height);
-            menu.setLocation(point);
-            menu.setVisible(true);
-            filterText.setFocus();
-        }
     }
     
     /* (non-Javadoc)
@@ -84,9 +61,7 @@ public class ViewController implements Listener, KeyListener, ISelectionChangedL
      */
     @Override
     public void keyReleased(KeyEvent e) {
-        commentFilter.setSearchText(filterText.getText());
-        viewer.refresh();
-        filterComments();
+        
     }
     
     /* (non-Javadoc)
