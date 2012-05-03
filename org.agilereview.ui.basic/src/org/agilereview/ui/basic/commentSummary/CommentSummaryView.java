@@ -11,6 +11,8 @@ import java.util.ArrayList;
 
 import org.agilereview.core.external.storage.Comment;
 import org.agilereview.ui.basic.Activator;
+import org.agilereview.ui.basic.commentSummary.control.FilterController;
+import org.agilereview.ui.basic.commentSummary.control.ViewController;
 import org.agilereview.ui.basic.commentSummary.filter.ColumnComparator;
 import org.agilereview.ui.basic.commentSummary.filter.SearchFilter;
 import org.eclipse.jface.viewers.ArrayContentProvider;

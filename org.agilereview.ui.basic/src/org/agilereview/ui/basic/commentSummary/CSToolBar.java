@@ -7,6 +7,7 @@
  */
 package org.agilereview.ui.basic.commentSummary;
 
+import org.agilereview.ui.basic.commentSummary.control.FilterController;
 import org.agilereview.ui.basic.tools.CommentProperties;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.KeyListener;

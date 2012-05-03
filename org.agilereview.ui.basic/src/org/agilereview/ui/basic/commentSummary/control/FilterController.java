@@ -5,8 +5,10 @@
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  * Contributors: Malte Brunnlieb, Philipp Diebold, Peter Reuter, Thilo Rauch
  */
-package org.agilereview.ui.basic.commentSummary;
+package org.agilereview.ui.basic.commentSummary.control;
 
+import org.agilereview.ui.basic.commentSummary.CSTableViewer;
+import org.agilereview.ui.basic.commentSummary.CSToolBar;
 import org.agilereview.ui.basic.commentSummary.filter.OpenFilter;
 import org.agilereview.ui.basic.commentSummary.filter.SearchFilter;
 import org.eclipse.swt.SWT;

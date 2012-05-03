@@ -5,8 +5,10 @@
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  * Contributors: Malte Brunnlieb, Philipp Diebold, Peter Reuter, Thilo Rauch
  */
-package org.agilereview.ui.basic.commentSummary;
+package org.agilereview.ui.basic.commentSummary.control;
 
+import org.agilereview.ui.basic.commentSummary.CSTableViewer;
+import org.agilereview.ui.basic.commentSummary.CommentSummaryView;
 import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
@@ -32,7 +34,7 @@ public class ViewController implements Listener, KeyListener, ISelectionChangedL
      * @param tableViewer {@link CSTableViewer} which should be controlled by this instance
      * @author Malte Brunnlieb (28.04.2012)
      */
-    ViewController(CSTableViewer tableViewer) {
+    public ViewController(CSTableViewer tableViewer) {
         this.tableViewer = tableViewer;
     }
     
