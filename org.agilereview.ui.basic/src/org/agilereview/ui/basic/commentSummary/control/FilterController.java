@@ -7,10 +7,20 @@
  */
 package org.agilereview.ui.basic.commentSummary.control;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+
 import org.agilereview.ui.basic.commentSummary.CSTableViewer;
 import org.agilereview.ui.basic.commentSummary.CSToolBar;
+import org.agilereview.ui.basic.commentSummary.filter.ExplorerSelectionFilter;
 import org.agilereview.ui.basic.commentSummary.filter.OpenFilter;
 import org.agilereview.ui.basic.commentSummary.filter.SearchFilter;
+import org.eclipse.core.commands.Command;
+import org.eclipse.jface.viewers.ISelectionChangedListener;
+import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.KeyListener;
@@ -19,12 +29,13 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.MenuItem;
+import org.eclipse.ui.commands.ICommandService;
 
 /**
  * Controller for filter events
  * @author Malte Brunnlieb (03.05.2012)
  */
-public class FilterController extends SelectionAdapter implements Listener, KeyListener {
+public class FilterController extends SelectionAdapter implements Listener, KeyListener, ISelectionChangedListener {
     
     /**
      * ToolBar which sets the filters
@@ -58,8 +69,7 @@ public class FilterController extends SelectionAdapter implements Listener, KeyL
      */
     @Override
     public void keyPressed(KeyEvent e) {
-        // TODO Auto-generated method stub
-        
+        // not needed
     }
     
     /* (non-Javadoc)
@@ -68,8 +78,9 @@ public class FilterController extends SelectionAdapter implements Listener, KeyL
      */
     @Override
     public void keyReleased(KeyEvent e) {
-        // TODO Auto-generated method stub
-        
+        currentSearchFilter.setSearchText(toolBar.getSearchText());
+        tableViewer.refresh();
+        //filterComments(); //TODO perhaps get filtered comments of viewer??
     }
     
     /* (non-Javadoc)
@@ -91,10 +102,6 @@ public class FilterController extends SelectionAdapter implements Listener, KeyL
             if (event.detail == SWT.ARROW || event.detail == 0) {
                 toolBar.showDropDownMenu();
             }
-        } else if (source.equals("setFilterText")) {
-            currentSearchFilter.setSearchText(toolBar.getSearchText());
-            tableViewer.refresh();
-            //filterComments(); //TODO perhaps get filtered comments of viewer??
         }
     }
     
@@ -112,5 +119,58 @@ public class FilterController extends SelectionAdapter implements Listener, KeyL
             tableViewer.removeFilter(openFilter);
         }
         //filterComments(); //TODO remove?! wird glaub ich nicht mehr gebraucht
+    }
+    
+    /**
+     * Selection of ReviewExplorer changed, filter comments
+     * @param event will be forwarded from the {@link ViewControl}
+     * @see org.eclipse.jface.viewers.ISelectionChangedListener#selectionChanged(SelectionChangedEvent)
+     */
+    public void selectionChanged(SelectionChangedEvent event) {
+        if (event.getSelection() instanceof IStructuredSelection && !event.getSelection().isEmpty()) {
+            IStructuredSelection sel = (IStructuredSelection) event.getSelection();
+            if (sel.getFirstElement() instanceof AbstractMultipleWrapper) {
+                // get selection, selection's iterator, initialize reviewIDs and paths
+                Iterator<?> it = sel.iterator();
+                ArrayList<String> reviewIDs = new ArrayList<String>();
+                HashMap<String, HashSet<String>> paths = new HashMap<String, HashSet<String>>();
+                
+                // get all selected reviews and paths
+                while (it.hasNext()) {
+                    Object next = it.next();
+                    if (next instanceof MultipleReviewWrapper) {
+                        String reviewID = ((MultipleReviewWrapper) next).getWrappedReview().getId();
+                        if (!reviewIDs.contains(reviewID)) {
+                            reviewIDs.add(reviewID);
+                        }
+                    } else if (next instanceof AbstractMultipleWrapper) {
+                        String path = ((AbstractMultipleWrapper) next).getPath();
+                        String reviewID = ((AbstractMultipleWrapper) next).getReviewId();
+                        if (paths.containsKey(reviewID)) {
+                            paths.get(reviewID).add(path);
+                        } else {
+                            paths.put(reviewID, new HashSet<String>());
+                            paths.get(reviewID).add(path);
+                        }
+                    }
+                }
+                
+                // Remove the old filter, then create the new filter, 
+                // so it can be applied directly when needed
+                viewer.removeFilter(this.selectionFilter);
+                this.selectionFilter = new ExplorerSelectionFilter(reviewIDs, paths);
+                
+                ICommandService cmdService = (ICommandService) getSite().getService(ICommandService.class);
+                Command linkExplorerCommand = cmdService.getCommand("de.tukl.cs.softech.agilereview.views.reviewexplorer.linkexplorer");
+                Object state = linkExplorerCommand.getState("org.eclipse.ui.commands.toggleState").getValue();
+                // If "Link Editor" is enabled, then filter also
+                if ((Boolean) state) {
+                    PluginLogger.log(this.getClass().toString(), "selectionChanged", "Adding new filter regarding selection of ReviewExplorer");
+                    // refresh annotations, update list of filtered comments
+                    viewer.addFilter(this.selectionFilter);
+                    filterComments();
+                }
+            }
+        }
     }
 }

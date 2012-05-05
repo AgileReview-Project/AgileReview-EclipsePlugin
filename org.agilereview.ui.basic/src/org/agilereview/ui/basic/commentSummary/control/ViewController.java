@@ -13,16 +13,12 @@ import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
-import org.eclipse.swt.events.KeyEvent;
-import org.eclipse.swt.events.KeyListener;
-import org.eclipse.swt.widgets.Event;
-import org.eclipse.swt.widgets.Listener;
 
 /**
  * This {@link ViewController} handles all events related to the CommentSummaryView
  * @author Malte Brunnlieb (28.04.2012)
  */
-public class ViewController implements Listener, KeyListener, ISelectionChangedListener, IDoubleClickListener {
+public class ViewController implements ISelectionChangedListener, IDoubleClickListener {
     
     /**
      * TableViewer which events should be handled
@@ -36,34 +32,6 @@ public class ViewController implements Listener, KeyListener, ISelectionChangedL
      */
     public ViewController(CSTableViewer tableViewer) {
         this.tableViewer = tableViewer;
-    }
-    
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.swt.widgets.Listener#handleEvent(org.eclipse.swt.widgets.Event)
-     * @author Malte Brunnlieb (08.04.2012)
-     */
-    @Override
-    public void handleEvent(Event event) {
-        
-    }
-    
-    /* (non-Javadoc)
-     * @see org.eclipse.swt.events.KeyListener#keyPressed(org.eclipse.swt.events.KeyEvent)
-     * @author Malte Brunnlieb (08.04.2012)
-     */
-    @Override
-    public void keyPressed(KeyEvent e) {
-        // not needed
-    }
-    
-    /* (non-Javadoc)
-     * @see org.eclipse.swt.events.KeyListener#keyReleased(org.eclipse.swt.events.KeyEvent)
-     * @author Malte Brunnlieb (08.04.2012)
-     */
-    @Override
-    public void keyReleased(KeyEvent e) {
-        
     }
     
     /* (non-Javadoc)

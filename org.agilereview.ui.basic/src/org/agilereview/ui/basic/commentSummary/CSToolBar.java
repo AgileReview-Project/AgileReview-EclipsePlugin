@@ -125,7 +125,6 @@ public class CSToolBar extends ToolBar {
             item.setData("chooseFilter");
             item.addListener(SWT.Selection, toolBarController);
         }
-        filterText.setData("setFilterText");
         filterText.addKeyListener(toolBarController);
         onlyOpenCommentsCheckbox.setData("openMenu");
         onlyOpenCommentsCheckbox.addSelectionListener(toolBarController);
