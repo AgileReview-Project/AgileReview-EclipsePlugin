@@ -8,7 +8,6 @@
 package org.agilereview.ui.basic.reviewExplorer;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 import org.agilereview.core.external.definition.IReviewDataReceiver;
@@ -23,13 +22,13 @@ import org.eclipse.core.commands.common.NotDefinedException;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.jface.viewers.SelectionChangedEvent;
-import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TreePath;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.widgets.Composite;
@@ -37,7 +36,6 @@ import org.eclipse.swt.widgets.Menu;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.handlers.IHandlerService;
 import org.eclipse.ui.part.ViewPart;
-import org.eclipse.ui.services.ISourceProviderService;
 
 /**
  * The Review Explorer is the view which shows all reviews as well as the files and folder which are commented in the corresponding reviews.
@@ -71,6 +69,7 @@ public class ReviewExplorerView extends ViewPart implements IReviewDataReceiver,
 	/**
 	 * Returns the current instance of the ReviewExplorer
 	 * @return current instance
+	 * @author Thilo Rauch (06.05.2012)
 	 */
 	public static ReviewExplorerView getInstance() {
 		return instance;
@@ -85,23 +84,33 @@ public class ReviewExplorerView extends ViewPart implements IReviewDataReceiver,
 		this.globalData = reviews;
 		try {
 			// delete old resource markers
-			
 			ResourcesPlugin.getWorkspace().getRoot().deleteMarkers(REContentProvider.AGILE_REVIEW_MARKER_ID, false, IResource.DEPTH_INFINITE);
 			// now prepare the new markers
-			for (Review r : globalData) {
-				for (Comment c : r.getComments()) {
+		} catch (CoreException e) {
+			String msg = "ReviewExplorer: setReviewData(): CoreException while deleting markers. A resource may not be available.";
+			Activator.getDefault().getLog().log(new Status(IStatus.ERROR, Activator.PLUGIN_ID, msg, e));
+		}
+		for (Review r : globalData) {
+			for (Comment c : r.getComments()) {
+				try {
 					c.getCommentedFile().createMarker(REContentProvider.AGILE_REVIEW_MARKER_ID);
+				} catch (CoreException e) {
+					String msg = "ReviewExplorer: setReviewData(): CoreException while adding marker to '"+c.getCommentedFile()+"'." +
+							"The resource may not be available.";
+					Activator.getDefault().getLog().log(new Status(IStatus.ERROR, Activator.PLUGIN_ID, msg, e));
 				}
 			}
-		} catch (CoreException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 		}
 		if (instance != null) {
 			refreshInput();
 		}
 	}
 	
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.ui.part.WorkbenchPart#createPartControl(org.eclipse.swt.widgets.Composite)
+	 * @author Thilo Rauch (06.05.2012)
+	 */
 	@Override
 	public void createPartControl(Composite parent) {
 		instance = this;
@@ -130,14 +139,14 @@ public class ReviewExplorerView extends ViewPart implements IReviewDataReceiver,
 		getSite().setSelectionProvider(treeViewer);
 		
 		// register view
-		// XXX Ähnliches Konzept? ViewControl.registerView(this.getClass());
+		// TODO Ähnliches Konzept? ViewControl.registerView(this.getClass());
 	}
 	
 	/**
 	 * Sets the input of the ReviewExplorer completely new
+	 * @author Thilo Rauch (06.05.2012)
 	 */
 	public void refreshInput() {
-		// PluginLogger.log(this.getClass().toString(), "refreshInput", "Refreshing the ReviewExplorer viewer (with reloading the input)");
 		// Save previous selection
 		ISelection selection = this.treeViewer.getSelection();
 		// Save expansion state
@@ -145,7 +154,7 @@ public class ReviewExplorerView extends ViewPart implements IReviewDataReceiver,
 		TreePath[] expandedElements = this.treeViewer.getExpandedTreePaths();
 		
 		// Refresh the input
-		treeViewer.setInput(globalData); // XXX maybe not necessary
+		treeViewer.setInput(globalData);
 		treeViewer.refresh();
 		
 		// Expand nodes again
@@ -192,7 +201,7 @@ public class ReviewExplorerView extends ViewPart implements IReviewDataReceiver,
 			if (o instanceof Review) {
 				Review review = (Review) o;
 				String command = "";
-//				try {
+				try {
 					// If the review is closed -> open it
 					if (review.getIsOpen()) {
 						// Check if already active, then expand, else activate
@@ -204,28 +213,31 @@ public class ReviewExplorerView extends ViewPart implements IReviewDataReceiver,
 								treeViewer.expandToLevel(o, 1);
 							}
 						} else {
-							// Review is open -> activate it TODO: take the right command
-//							command = "de.tukl.cs.softech.agilereview.views.reviewexplorer.activate";
-//							// Execute activation command
-//							IHandlerService handlerService = (IHandlerService) getSite().getService(IHandlerService.class);
-//							handlerService.executeCommand(command, null);
+							// Review is open -> activate it
+							command = "org.agilereview.activateReview"; // TODO String auslagern?
+							// Execute activation command
+							IHandlerService handlerService = (IHandlerService) getSite().getService(IHandlerService.class);
+							handlerService.executeCommand(command, null);
 						}
 					} else {
-						// TODO: take the right command
-//						command = "de.tukl.cs.softech.agilereview.views.reviewexplorer.openClose";
-//						// Execute open/close command
-//						IHandlerService handlerService = (IHandlerService) getSite().getService(IHandlerService.class);
-//						handlerService.executeCommand(command, null);
+						command = "org.agilereview.openCloseReview"; // TODO String auslagern?
+						// Execute open/close command
+						IHandlerService handlerService = (IHandlerService) getSite().getService(IHandlerService.class);
+						handlerService.executeCommand(command, null);
 					}
-//				} catch (ExecutionException e) {
-//					// XXX logging? PluginLogger.logError(this.getClass().toString(), "doubleClick", "Problems occured executing command \"" + command + "\"", e);
-//				} catch (NotDefinedException e) {
-//					// XXX logging? PluginLogger.logError(this.getClass().toString(), "doubleClick", "Command \"" + command + "\" is not defined", e);
-//				} catch (NotEnabledException e) {
-//					// XXX logging? PluginLogger.logError(this.getClass().toString(), "doubleClick", "" + command + "\" is not enabled", e);
-//				} catch (NotHandledException e) {
-//					// XXX logging? PluginLogger.logError(this.getClass().toString(), "doubleClick", "Command \"" + command + "\" is not handled", e);
-//				}
+				} catch (ExecutionException e) {
+				    String msg = "Problems occured executing command \"" + command + "\", after double-click in ReviewExplorer";
+				    Activator.getDefault().getLog().log(new Status(IStatus.ERROR, Activator.PLUGIN_ID, msg, e));
+				} catch (NotDefinedException e) {
+				    String msg = "Command \"" + command + "\" is not defined, after double-click in ReviewExplorer";
+                    Activator.getDefault().getLog().log(new Status(IStatus.ERROR, Activator.PLUGIN_ID, msg, e));
+				} catch (NotEnabledException e) {
+				    String msg = "Command  \"" + command + "\" is not enabled, after double-click in ReviewExplorer";
+                    Activator.getDefault().getLog().log(new Status(IStatus.ERROR, Activator.PLUGIN_ID, msg, e));
+				} catch (NotHandledException e) {
+				    String msg = "Command  \"" + command + "\" is not handled, after double-click in ReviewExplorer";
+                    Activator.getDefault().getLog().log(new Status(IStatus.ERROR, Activator.PLUGIN_ID, msg, e));
+				}
 			} else {
 				// On Double-Click there can only be one item selected
 				if (treeViewer.getExpandedState(o)) {
@@ -236,7 +248,8 @@ public class ReviewExplorerView extends ViewPart implements IReviewDataReceiver,
 			}
 		}
 	}
-	
+
+
 // TODO: Überlegen wofür das war...
 //	/**
 //	 * Validates the ReviewExplorer selection in order to update the CONTAINS_CLOSED_REVIEW variable of the {@link SourceProvider}

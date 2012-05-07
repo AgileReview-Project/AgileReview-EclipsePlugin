@@ -18,7 +18,7 @@
       <view
             category="org.agilereview.ui.basic.category"
             class="org.agilereview.ui.basic.reviewExplorer.ReviewExplorerView"
-            id="org.agilereview.ui.basic.reviewexplorerview"
+            id="org.agilereview.ui.basic.reviewExplorerView"
             name="ReviewExplorer"
             restorable="true">
       </view>
@@ -38,6 +38,211 @@
    <extension
          id="commented"
          point="org.eclipse.core.resources.markers">
+   </extension>
+   <extension
+         point="org.eclipse.ui.menus">
+      <menuContribution
+         allPopups="false"
+         locationURI="toolbar:org.agilereview.ui.basic.reviewExplorerView">
+      <command
+            commandId="org.agilereview.newReview"
+            icon="icons/review_add.png"
+            label="Create new review"
+            style="push"
+            tooltip="Create a new review">
+      </command>
+      <separator
+            name="org.agilereview.ui.basic.reviewexplorer.toolbar.separator1"
+            visible="true">
+      </separator>
+      <command
+            commandId="org.agilereview.activateReview"
+            icon="icons/review_ok.png"
+            label="Activate selected review"
+            style="push"
+            tooltip="Activate selected review">
+      </command>
+      <command
+            commandId="org.agilereview.openCloseReview"
+            icon="icons/closed_project.gif"
+            label="Open/Close selected reviews"
+            style="push"
+            tooltip="Open/Close reviews">
+      </command>
+      <command
+            commandId="org.eclipse.ui.navigate.expandAll"
+            label="Expand all sub nodes"
+            style="push">
+      </command>
+      <command
+            commandId="org.eclipse.ui.navigate.collapseAll"
+            label="Collapse all sub nodes"
+            style="push">
+      </command>
+      <separator
+            name="org.agilereview.ui.basic.reviewexplorer.toolbar.separator2"
+            visible="true">
+      </separator>
+      <command
+            commandId="org.agilereview.switchReviewSourceProject"
+            icon="icons/switch_source.png"
+            label="Switch AgileReview Source Project"
+            style="push"
+            tooltip="Switch AgileReview Source Project">
+      </command>
+      <separator
+            name="org.agilereview.ui.basic.reviewexplorer.toolbar.separator3"
+            visible="true">
+      </separator>
+      <command
+            commandId="org.eclipse.ui.file.export"
+            label="Export selected review"
+            style="push">
+      </command>
+      <separator
+            name="org.agilereview.ui.basic.reviewexplorer.toolbar.separator4"
+            visible="true">
+      </separator>
+      <command
+            commandId="org.eclipse.ui.navigate.linkWithEditor"
+            label="Link Review Explorer with Comments Summary"
+            style="toggle">
+      </command>
+   </menuContribution>
+   <menuContribution
+         allPopups="true"
+         locationURI="popup:org.agilereview.ui.basic.reviewExplorerView">
+      <command
+            commandId="org.agilereview.newReview"
+            icon="icons/review_add.png"
+            label="Create new review"
+            style="push"
+            tooltip="Create a new review">
+      </command>
+      <separator
+            name="org.agilereview.ui.basic.reviewexplorer.popup.separator1"
+            visible="true">
+      </separator>
+      <command
+            commandId="org.eclipse.ui.file.refresh"
+            label="Refresh all reviews"
+            style="push">
+      </command>
+      <separator
+            name="org.agilereview.ui.basic.reviewexplorer.popup.separator2"
+            visible="true">
+      </separator>
+      <command
+            commandId="org.eclipse.ui.edit.delete"
+            label="Delete"
+            style="push">
+      </command>
+      <command
+            commandId="org.agilereview.activateReview"
+            icon="icons/review_ok.png"
+            label="Activate selected review"
+            style="push"
+            tooltip="Activate selected review">
+      </command>
+      <command
+            commandId="org.agilereview.openCloseReview"
+            icon="icons/closed_project.gif"
+            label="Open/Close selected reviews"
+            style="push"
+            tooltip="Open/Close reviews">
+      </command>
+      <command
+            commandId="org.eclipse.ui.navigate.expandAll"
+            label="Expand all subnodes"
+            style="push">
+      </command>
+      <command
+            commandId="org.eclipse.ui.navigate.collapseAll"
+            label="Collapse all sub nodes"
+            style="push">
+      </command>
+      <separator
+            name="org.agilereview.ui.basic.reviewexplorer.popup.separator3"
+            visible="true">
+      </separator>
+      <command
+            commandId="org.agilereview.switchReviewSourceProject"
+            icon="icons/switch_source.png"
+            label="Switch AgileReview Source Project"
+            style="push"
+            tooltip="Switch AgileReview Source Project">
+      </command>
+      <separator
+            name="org.agilereview.ui.basic.reviewexplorer.popup.separator4"
+            visible="true">
+      </separator>
+      <command
+            commandId="org.eclipse.ui.file.export"
+            label="Export selected review"
+            style="push">
+      </command>
+   </menuContribution>
+   </extension>
+   <extension
+         point="org.eclipse.ui.handlers">
+      <handler
+            class="org.agilereview.ui.basic.reviewExplorer.RECollapseHandler"
+            commandId="org.eclipse.ui.navigate.collapseAll">
+         <enabledWhen>
+            <with
+                  variable="selection">
+               <iterate
+                     ifEmpty="false"
+                     operator="or">
+                  <or>
+                     <instanceof
+                           value="org.agilereview.core.external.storage.Review">
+                     </instanceof>
+                     <instanceof
+                           value="org.eclipse.core.resources.IResource">
+                     </instanceof>
+                  </or>
+               </iterate>
+            </with>
+         </enabledWhen>
+         <activeWhen>
+            <with
+                  variable="activePart">
+               <instanceof
+                     value="org.agilereview.ui.basic.reviewExplorer.ReviewExplorerView">
+               </instanceof>
+            </with>
+         </activeWhen>
+      </handler>
+      <handler
+            class="org.agilereview.ui.basic.reviewExplorer.REExpandHandler"
+            commandId="org.eclipse.ui.navigate.expandAll">
+         <enabledWhen>
+            <with
+                  variable="selection">
+               <iterate
+                     ifEmpty="false"
+                     operator="or">
+                  <or>
+                     <instanceof
+                           value="org.agilereview.core.external.storage.Review">
+                     </instanceof>
+                     <instanceof
+                           value="org.eclipse.core.resources.IResource">
+                     </instanceof>
+                  </or>
+               </iterate>
+            </with>
+         </enabledWhen>
+         <activeWhen>
+            <with
+                  variable="activePart">
+               <instanceof
+                     value="org.agilereview.ui.basic.reviewExplorer.ReviewExplorerView">
+               </instanceof>
+            </with>
+         </activeWhen>
+      </handler>
    </extension>
 
 </plugin>

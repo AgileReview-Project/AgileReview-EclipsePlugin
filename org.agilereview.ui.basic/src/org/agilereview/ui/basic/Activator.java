@@ -1,7 +1,7 @@
 package org.agilereview.ui.basic;
 
-import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Properties;
 
 import org.eclipse.ui.plugin.AbstractUIPlugin;
@@ -44,7 +44,7 @@ public class Activator extends AbstractUIPlugin {
      */
     public Activator() {
     	try {
-    		FileInputStream inStream = new FileInputStream(internalPropFile);
+    		InputStream inStream = Activator.class.getClassLoader().getResourceAsStream(internalPropFile);
 			internalProps.load(inStream);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block

@@ -9,7 +9,6 @@ package org.agilereview.core.test.external.storage;
 
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
 
 import junit.framework.Assert;
 import junit.framework.AssertionFailedError;
@@ -56,13 +55,14 @@ public class CommentTest {
     public final void testCommentStringStringIFileReviewDateDateStringIntIntStringArrayListOfReply() {
 	IFile file = HelperClass.getIFile("resources/Test.txt");
 
-	Date d = Calendar.getInstance().getTime();
+	Calendar d = Calendar.getInstance();
 	Reply r = new Reply();
 	ArrayList<Reply> replies = new ArrayList<Reply>();
 	replies.add(r);
 	Review review = new Review("r2");
 	// create comment
-	Comment comment = new Comment("c4", "klaus", file, review, d, d, "anyone", 1, 2, "description", replies);
+	Comment comment = new Comment("c4", "klaus", file, review, d, d, "anyone", 1, 2, "description");
+	comment.setReplies(replies);
 	Assert.assertNotNull(comment);
 
 	// check integrity
@@ -254,7 +254,7 @@ public class CommentTest {
 
 	// create reply
 	Calendar c = Calendar.getInstance();
-	Reply r = new Reply("Karl", c.getTime(), c.getTime(), "TestTestTest");
+	Reply r = new Reply("id", "Karl", c, c, "TestTestTest", new Object());
 	comment.addReply(r);
 
 	if (!comment.getReplies().get(0).equals(r)) {
@@ -272,7 +272,7 @@ public class CommentTest {
 
 	// create reply
 	Calendar c = Calendar.getInstance();
-	Reply r = new Reply("Karl", c.getTime(), c.getTime(), "TestTestTest");
+	Reply r = new Reply("id", "Karl", c, c, "TestTestTest", new Object());
 	comment.addReply(r);
 
 	comment.deleteReply(r);
@@ -291,7 +291,7 @@ public class CommentTest {
 
 	// create reply
 	Calendar c = Calendar.getInstance();
-	Reply r = new Reply("Karl", c.getTime(), c.getTime(), "TestTestTest");
+	Reply r = new Reply("id", "Karl", c, c, "TestTestTest", new Object());
 	comment.addReply(r);
 
 	comment.deleteReply(0);

@@ -10,7 +10,6 @@ package org.agilereview.core.test.external.storage;
 import static org.junit.Assert.fail;
 
 import java.util.Calendar;
-import java.util.Date;
 
 import junit.framework.AssertionFailedError;
 
@@ -30,14 +29,15 @@ public class ReplyTest {
      */
     @Test
     public final void testReplyStringDateDateString() {
-	Date d = Calendar.getInstance().getTime();
-	Reply r = new Reply("TestAuthor", d, d, "TestDesc");
+	Calendar d = Calendar.getInstance();
+	Object o = new Object();
+	Reply r = new Reply("id","TestAuthor", d, d, "TestDesc", o);
 
 	Assert.isNotNull(r);
 
 	// check consistency
-	if (!r.getAuthor().equals("TestAuthor") || !r.getCreationDate().equals(d) || !r.getModificationDate().equals(d)
-		|| !r.getText().equals("TestDesc")) {
+	if (!r.getId().equals("id") || !r.getAuthor().equals("TestAuthor") || !r.getCreationDate().equals(d) || !r.getModificationDate().equals(d)
+		|| !r.getText().equals("TestDesc") || !r.getParent().equals(o)) {
 	    throw new AssertionFailedError("Reply data not consistent:\n" + "TestAuthor==" + r.getAuthor() + "\n" + d.toString() + "=="
 		    + r.getCreationDate().toString() + "\n" + d.toString() + "==" + r.getModificationDate().toString() + "\nTestDesc==" + r.getText());
 	}

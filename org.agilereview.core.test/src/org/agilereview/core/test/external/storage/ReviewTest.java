@@ -59,10 +59,12 @@ public class ReviewTest {
 	comments.add(c2);
 
 	// check consistency
-	Review review = new Review("testID", 2, uri, "Karl-Hänsél", comments);
-	if (!"testID".equals(review.getId()) || review.getStatus() != 2 || !uri.equals(review.getReference())
-		|| !"Karl-Hänsél".equals(review.getResponsibility()) || comments.size() != review.getComments().size()
-		|| !c1.equals(review.getComments().get(0)) || !c2.equals(review.getComments().get(1))) {
+	Review review = new Review("testID", 2, uri.toString(), "Karl-Hänsél", "test description");
+	review.setComments(comments);
+	if (!"testID".equals(review.getId()) || review.getStatus() != 2 || !uri.toString().equals(review.getReference())
+		|| !"Karl-Hänsél".equals(review.getResponsibility()) || !"test description".equals(review.getDescription()) 
+		|| comments.size() != review.getComments().size() || !c1.equals(review.getComments().get(0)) 
+		|| !c2.equals(review.getComments().get(1))) {
 	    throw new AssertionFailedError("Review not be created consistently:\ntestID==" + review.getId() + "\n2==" + review.getId() + "\n" + uri
 		    + "==" + review.getReference() + "\nKarl-Hänsél==" + review.getResponsibility() + "\n" + comments.size() + "=="
 		    + review.getComments().size() + "\n" + c1 + "==" + review.getComments().get(0) + "\n" + c2 + "==" + review.getComments().get(1));
@@ -123,9 +125,9 @@ public class ReviewTest {
 	} catch (URISyntaxException e) {
 	    throw new AssertionFailedException("Failed on creating an URI for testing purpose");
 	}
-	review.setReference(uri);
+	review.setReference(uri.toString());
 
-	if (!uri.equals(review.getReference())) {
+	if (!uri.toString().equals(review.getReference())) {
 	    throw new AssertionFailedError("Review reference could not be set successfully:\n" + uri + "!=" + review.getReference());
 	}
     }
