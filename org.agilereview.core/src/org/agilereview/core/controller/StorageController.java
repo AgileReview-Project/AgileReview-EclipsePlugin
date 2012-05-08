@@ -70,7 +70,7 @@ public class StorageController implements IStorageClient {
     public void checkForNewClients() {
         IConfigurationElement[] config = Platform.getExtensionRegistry().getConfigurationElementsFor(ISTORAGECLIENT_ID);
         if (config.length == 0) {
-            ExceptionHandler.notifyUser(new NoStorageClientDefinedException("No StorageClient available")); //TODO perhaps offer some help
+            ExceptionHandler.logAndNotifyUser(new NoStorageClientDefinedException("No StorageClient available")); //TODO perhaps offer some help
             registeredClients.clear();
             return;
         }
@@ -84,7 +84,7 @@ public class StorageController implements IStorageClient {
                 }
             }
         } catch (CoreException ex) {
-            ExceptionHandler.notifyUser("An eclipse internal error occurred while determining StorageClients", ex);
+            ExceptionHandler.logAndNotifyUser("An eclipse internal error occurred while determining StorageClients", ex);
         }
     }
     
@@ -110,7 +110,7 @@ public class StorageController implements IStorageClient {
             Assert.isNotNull(result);
             return result;
         } catch (Throwable ex) {
-            ExceptionHandler.notifyUser("An unknown exception occured in StorageClient '" + activeClient + "' while retrieving the its name", ex);
+            ExceptionHandler.logAndNotifyUser("An unknown exception occured in StorageClient '" + activeClient + "' while retrieving the its name", ex);
         }
         return null;
     }
@@ -127,7 +127,7 @@ public class StorageController implements IStorageClient {
             Assert.isNotNull(result);
             return result;
         } catch (Throwable ex) {
-            ExceptionHandler.notifyUser("An unknown exception occured in StorageClient '" + activeClient + "' while retrieving all comments", ex);
+            ExceptionHandler.logAndNotifyUser("An unknown exception occured in StorageClient '" + activeClient + "' while retrieving all comments", ex);
         }
         return null;
     }
@@ -141,7 +141,7 @@ public class StorageController implements IStorageClient {
         try {
             registeredClients.get(activeClient).addReview(review);
         } catch (Throwable ex) {
-            ExceptionHandler.notifyUser("An unknown exception occured in StorageClient '" + activeClient + "' while adding review '" + review.getId()
+            ExceptionHandler.logAndNotifyUser("An unknown exception occured in StorageClient '" + activeClient + "' while adding review '" + review.getId()
                     + "'", ex);
         }
     }
@@ -157,7 +157,7 @@ public class StorageController implements IStorageClient {
             Assert.isNotNull(result);
             return result;
         } catch (Throwable ex) {
-            ExceptionHandler.notifyUser("An unknown exception occured in StorageClient '" + activeClient + "' while retrieving an ID for new review",
+            ExceptionHandler.logAndNotifyUser("An unknown exception occured in StorageClient '" + activeClient + "' while retrieving an ID for new review",
                     ex);
         }
         return null;
@@ -174,7 +174,7 @@ public class StorageController implements IStorageClient {
             Assert.isNotNull(result);
             return result;
         } catch (Throwable ex) {
-            ExceptionHandler.notifyUser(
+            ExceptionHandler.logAndNotifyUser(
                     "An unknown exception occured in StorageClient '" + activeClient + "' while retrieving an ID for new comment", ex);
         }
         return null;
@@ -191,7 +191,7 @@ public class StorageController implements IStorageClient {
             Assert.isNotNull(result);
             return result;
         } catch (Throwable ex) {
-            ExceptionHandler.notifyUser("An unknown exception occured in StorageClient '" + activeClient + "' while retrieving an ID for new reply",
+            ExceptionHandler.logAndNotifyUser("An unknown exception occured in StorageClient '" + activeClient + "' while retrieving an ID for new reply",
                     ex);
         }
         return null;

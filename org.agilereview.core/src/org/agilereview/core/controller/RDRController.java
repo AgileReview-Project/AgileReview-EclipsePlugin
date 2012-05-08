@@ -106,7 +106,7 @@ public class RDRController {
 				}
 			}
 		} catch (CoreException ex) {
-			ExceptionHandler.notifyUser("An eclipse internal error occurred while determining ReviewDataReceiver", ex);
+			ExceptionHandler.logAndNotifyUser("An eclipse internal error occurred while determining ReviewDataReceiver", ex);
 		}
 	}
 }
