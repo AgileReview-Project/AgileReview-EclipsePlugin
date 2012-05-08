@@ -7,9 +7,9 @@
  */
 package org.agilereview.ui.basic.commentSummary.filter;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.regex.Pattern;
 
 import org.agilereview.core.external.storage.Comment;
@@ -24,23 +24,24 @@ public class ExplorerSelectionFilter extends ViewerFilter {
     /**
      * ID's of the selected reviews
      */
-    private final ArrayList<String> reviewIDs;
+    private final List<String> reviewIDs;
     
     /**
      * paths of the selected projects/folders/files
      */
-    private final HashMap<String, HashSet<String>> paths;
+    private final Map<String, Set<String>> paths;
     
     /**
      * @param reviewIDs the reviews
      * @param paths the paths
      */
-    public ExplorerSelectionFilter(ArrayList<String> reviewIDs, HashMap<String, HashSet<String>> paths) {
+    public ExplorerSelectionFilter(List<String> reviewIDs, Map<String, Set<String>> paths) {
         this.reviewIDs = reviewIDs;
         this.paths = paths;
     }
     
-    /* (non-Javadoc)
+    /**
+     * {@inheritDoc}
      * @see org.eclipse.jface.viewers.ViewerFilter#select(org.eclipse.jface.viewers.Viewer, java.lang.Object, java.lang.Object)
      */
     @Override
@@ -50,12 +51,11 @@ public class ExplorerSelectionFilter extends ViewerFilter {
             matches = true;
         } else {
             Comment comment = (Comment) element;
-            
             if (reviewIDs.contains(comment.getReview())) {
                 matches = true;
             }
             
-            HashSet<String> containedPaths = paths.get(comment.getReview().getId());
+            Set<String> containedPaths = paths.get(comment.getReview().getId());
             if (!(containedPaths == null)) {
                 for (String path : containedPaths) {
                     String pathMatcher = ".*" + Pattern.quote(path) + ".*";
@@ -67,5 +67,4 @@ public class ExplorerSelectionFilter extends ViewerFilter {
         }
         return matches;
     }
-    
 }

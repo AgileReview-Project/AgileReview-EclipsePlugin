@@ -11,16 +11,23 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
+import org.agilereview.core.external.storage.Review;
 import org.agilereview.ui.basic.commentSummary.CSTableViewer;
 import org.agilereview.ui.basic.commentSummary.CSToolBar;
 import org.agilereview.ui.basic.commentSummary.filter.ExplorerSelectionFilter;
 import org.agilereview.ui.basic.commentSummary.filter.OpenFilter;
 import org.agilereview.ui.basic.commentSummary.filter.SearchFilter;
+import org.agilereview.ui.basic.tools.ExceptionHandler;
 import org.eclipse.core.commands.Command;
+import org.eclipse.core.resources.IResource;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
-import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.jface.viewers.ITreeSelection;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
+import org.eclipse.jface.viewers.TreePath;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.KeyListener;
@@ -29,6 +36,7 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.MenuItem;
+import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.commands.ICommandService;
 
 /**
@@ -46,9 +54,13 @@ public class FilterController extends SelectionAdapter implements Listener, KeyL
      */
     private CSTableViewer tableViewer;
     /**
-     * The current
+     * The current {@link SearchFilter} set on the {@link CSTableViewer}
      */
     private SearchFilter currentSearchFilter;
+    /**
+     * The current {@link ExplorerSelectionFilter} set on the {@link CSTableViewer}
+     */
+    private ExplorerSelectionFilter currentExplorerSelectionFilter;
     
     /**
      * Creates a new instance of the {@link FilterController} controlling the given {@link CSToolBar}
@@ -123,54 +135,82 @@ public class FilterController extends SelectionAdapter implements Listener, KeyL
     
     /**
      * Selection of ReviewExplorer changed, filter comments
-     * @param event will be forwarded from the {@link ViewControl}
+     * @param event provided by the SelectionProvider
      * @see org.eclipse.jface.viewers.ISelectionChangedListener#selectionChanged(SelectionChangedEvent)
      */
     public void selectionChanged(SelectionChangedEvent event) {
-        if (event.getSelection() instanceof IStructuredSelection && !event.getSelection().isEmpty()) {
-            IStructuredSelection sel = (IStructuredSelection) event.getSelection();
-            if (sel.getFirstElement() instanceof AbstractMultipleWrapper) {
-                // get selection, selection's iterator, initialize reviewIDs and paths
-                Iterator<?> it = sel.iterator();
-                ArrayList<String> reviewIDs = new ArrayList<String>();
-                HashMap<String, HashSet<String>> paths = new HashMap<String, HashSet<String>>();
+        if (event.getSelection() instanceof ITreeSelection && !event.getSelection().isEmpty()) { //TODO check for source??
+        
+            ICommandService cmdService = (ICommandService) PlatformUI.getWorkbench().getService(ICommandService.class);
+            if (cmdService == null) {
+                ExceptionHandler.notifyUser("The Service ICommandService could not be determined.");
+                return;
+            }
+            
+            Command linkExplorerCommand = cmdService.getCommand("org.eclipse.ui.navigate.linkWithEditor"); // TODO check command ID
+            Object state = linkExplorerCommand.getState("org.eclipse.ui.commands.toggleState").getValue();
+            
+            if ((Boolean) state) {
+                ITreeSelection sel = (ITreeSelection) event.getSelection();
+                List<String> reviewIDs = getReviewIDs(sel);
+                Map<String, Set<String>> paths = getPaths(sel);
                 
-                // get all selected reviews and paths
-                while (it.hasNext()) {
-                    Object next = it.next();
-                    if (next instanceof MultipleReviewWrapper) {
-                        String reviewID = ((MultipleReviewWrapper) next).getWrappedReview().getId();
-                        if (!reviewIDs.contains(reviewID)) {
-                            reviewIDs.add(reviewID);
-                        }
-                    } else if (next instanceof AbstractMultipleWrapper) {
-                        String path = ((AbstractMultipleWrapper) next).getPath();
-                        String reviewID = ((AbstractMultipleWrapper) next).getReviewId();
-                        if (paths.containsKey(reviewID)) {
-                            paths.get(reviewID).add(path);
-                        } else {
-                            paths.put(reviewID, new HashSet<String>());
-                            paths.get(reviewID).add(path);
-                        }
-                    }
-                }
-                
-                // Remove the old filter, then create the new filter, 
-                // so it can be applied directly when needed
-                viewer.removeFilter(this.selectionFilter);
-                this.selectionFilter = new ExplorerSelectionFilter(reviewIDs, paths);
-                
-                ICommandService cmdService = (ICommandService) getSite().getService(ICommandService.class);
-                Command linkExplorerCommand = cmdService.getCommand("de.tukl.cs.softech.agilereview.views.reviewexplorer.linkexplorer");
-                Object state = linkExplorerCommand.getState("org.eclipse.ui.commands.toggleState").getValue();
-                // If "Link Editor" is enabled, then filter also
-                if ((Boolean) state) {
-                    PluginLogger.log(this.getClass().toString(), "selectionChanged", "Adding new filter regarding selection of ReviewExplorer");
-                    // refresh annotations, update list of filtered comments
-                    viewer.addFilter(this.selectionFilter);
-                    filterComments();
+                currentExplorerSelectionFilter = new ExplorerSelectionFilter(reviewIDs, paths);
+                tableViewer.addFilter(currentExplorerSelectionFilter);
+                //filterComments(); //TODO check this (Parser filtering)
+            }
+        } else {
+            if (currentExplorerSelectionFilter != null) {
+                tableViewer.removeFilter(currentExplorerSelectionFilter);
+            }
+        }
+    }
+    
+    /**
+     * Picks all {@link Review}s contained in the given {@link ITreeSelection} and returns all review IDs
+     * @param sel {@link ITreeSelection} in which will be searched for {@link Review}s
+     * @return A {@link List} of contained the found review IDs
+     * @author Malte Brunnlieb (08.05.2012)
+     */
+    private List<String> getReviewIDs(ITreeSelection sel) {
+        ArrayList<String> reviewIDs = new ArrayList<String>();
+        Iterator<?> it = sel.iterator();
+        
+        while (it.hasNext()) {
+            Object next = it.next();
+            if (next instanceof Review) {
+                String reviewID = ((Review) next).getId();
+                if (!reviewIDs.contains(reviewID)) {
+                    reviewIDs.add(reviewID);
                 }
             }
         }
+        
+        return reviewIDs;
+    }
+    
+    /**
+     * Searches for {@link IResource}s in the given {@link ITreeSelection}. All {@link IResource}s will be mapped by their origin review ID.
+     * @param sel {@link ITreeSelection} which will be the bases of the search
+     * @return A {@link Map} of review IDs to a {@link Set} of paths of the underlying {@link IResource}s
+     * @author Malte Brunnlieb (08.05.2012)
+     */
+    private Map<String, Set<String>> getPaths(ITreeSelection sel) {
+        HashMap<String, Set<String>> paths = new HashMap<String, Set<String>>();
+        
+        for (TreePath tp : sel.getPaths()) {
+            if (tp.getLastSegment() instanceof IResource) {
+                String path = ((IResource) tp.getLastSegment()).getLocation().toOSString();
+                String reviewID = ((Review) tp.getFirstSegment()).getId();
+                if (paths.containsKey(reviewID)) {
+                    paths.get(reviewID).add(path);
+                } else {
+                    paths.put(reviewID, new HashSet<String>());
+                    paths.get(reviewID).add(path);
+                }
+            }
+        }
+        
+        return paths;
     }
 }
