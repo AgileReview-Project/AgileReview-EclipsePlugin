@@ -11,14 +11,12 @@ import org.agilereview.ui.basic.commentSummary.CSTableViewer;
 import org.agilereview.ui.basic.commentSummary.CommentSummaryView;
 import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IDoubleClickListener;
-import org.eclipse.jface.viewers.ISelectionChangedListener;
-import org.eclipse.jface.viewers.SelectionChangedEvent;
 
 /**
- * This {@link ViewController} handles all events related to the CommentSummaryView
+ * This {@link ViewController} handles elementary events of the {@link CommentSummaryView}
  * @author Malte Brunnlieb (28.04.2012)
  */
-public class ViewController implements ISelectionChangedListener, IDoubleClickListener {
+public class ViewController implements IDoubleClickListener {
     
     /**
      * TableViewer which events should be handled
@@ -34,23 +32,13 @@ public class ViewController implements ISelectionChangedListener, IDoubleClickLi
         this.tableViewer = tableViewer;
     }
     
-    /* (non-Javadoc)
-     * @see org.eclipse.jface.viewers.ISelectionChangedListener#selectionChanged(org.eclipse.jface.viewers.SelectionChangedEvent)
-     * @author Malte Brunnlieb (28.04.2012)
-     */
-    @Override
-    public void selectionChanged(SelectionChangedEvent event) {
-        // TODO Auto-generated method stub
-        // for TableViewer
-    }
-    
-    /* (non-Javadoc)
+    /**
+     * {@inheritDoc}
      * @see org.eclipse.jface.viewers.IDoubleClickListener#doubleClick(org.eclipse.jface.viewers.DoubleClickEvent)
      * @author Malte Brunnlieb (28.04.2012)
      */
     @Override
     public void doubleClick(DoubleClickEvent event) {
-        // TODO Auto-generated method stub
-        // for TableViewer
+        // TODO Open Editor and Jump to Position
     }
 }

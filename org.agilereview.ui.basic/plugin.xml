@@ -6,11 +6,8 @@
       <ReviewDataReceiver
             class="org.agilereview.ui.basic.reviewExplorer.ReviewExplorerView">
       </ReviewDataReceiver>
-   </extension>
-   <extension
-         point="org.agilereview.core.ReviewDataReceiver">
       <ReviewDataReceiver
-            class="org.agilereview.ui.basic.commentSummary.CSTableModel">
+            class="org.agilereview.ui.basic.commentSummary.CommentSummaryView">
       </ReviewDataReceiver>
    </extension>
    <extension

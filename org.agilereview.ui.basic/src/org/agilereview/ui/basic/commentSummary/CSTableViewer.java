@@ -9,6 +9,8 @@ package org.agilereview.ui.basic.commentSummary;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.LinkedList;
+import java.util.List;
 
 import org.agilereview.core.external.storage.Comment;
 import org.agilereview.ui.basic.commentSummary.filter.ColumnComparator;
@@ -23,6 +25,7 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
+import org.eclipse.swt.widgets.TableItem;
 
 /**
  * {@link TableViewer} for the {@link CommentSummaryView}
@@ -242,5 +245,18 @@ public class CSTableViewer extends TableViewer {
      */
     public String[] getTitles() {
         return columnTitles.clone();
+    }
+    
+    /**
+     * Lists all currently visible {@link Comment}s after applying filters
+     * @return the currently visible {@link List} of {@link Comment}s
+     * @author Malte Brunnlieb (10.05.2012)
+     */
+    public List<Comment> getVisibleComments() {
+        List<Comment> comments = new LinkedList<Comment>();
+        for (TableItem item : getTable().getItems()) {
+            comments.add((Comment) item.getData());
+        }
+        return comments;
     }
 }

@@ -146,7 +146,7 @@ public class CSToolBar extends ToolBar {
     public void setFilterText(String text) {
         dropDownBox.setText(text);
         pack();
-        parent.layout(); //TODO check if necessary!
+        parent.layout(); //TODO check if necessary! else delete parent attribute!
     }
     
     /**
@@ -167,5 +167,15 @@ public class CSToolBar extends ToolBar {
      */
     public String getSearchText() {
         return filterText.getText();
+    }
+    
+    /**
+     * {@inheritDoc}
+     * @see org.eclipse.swt.widgets.Composite#setFocus()
+     * @author Malte Brunnlieb (10.05.2012)
+     */
+    @Override
+    public boolean setFocus() {
+        return filterText.setFocus();
     }
 }

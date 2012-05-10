@@ -21,12 +21,12 @@ import org.agilereview.ui.basic.commentSummary.CSToolBar;
 import org.agilereview.ui.basic.commentSummary.filter.ExplorerSelectionFilter;
 import org.agilereview.ui.basic.commentSummary.filter.OpenFilter;
 import org.agilereview.ui.basic.commentSummary.filter.SearchFilter;
+import org.agilereview.ui.basic.reviewExplorer.ReviewExplorerView;
 import org.agilereview.ui.basic.tools.ExceptionHandler;
 import org.eclipse.core.commands.Command;
 import org.eclipse.core.resources.IResource;
-import org.eclipse.jface.viewers.ISelectionChangedListener;
+import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ITreeSelection;
-import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.TreePath;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.KeyEvent;
@@ -36,6 +36,8 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.MenuItem;
+import org.eclipse.ui.ISelectionListener;
+import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.commands.ICommandService;
 
@@ -43,7 +45,7 @@ import org.eclipse.ui.commands.ICommandService;
  * Controller for filter events
  * @author Malte Brunnlieb (03.05.2012)
  */
-public class FilterController extends SelectionAdapter implements Listener, KeyListener, ISelectionChangedListener {
+public class FilterController extends SelectionAdapter implements Listener, KeyListener, ISelectionListener {
     
     /**
      * ToolBar which sets the filters
@@ -135,12 +137,12 @@ public class FilterController extends SelectionAdapter implements Listener, KeyL
     
     /**
      * Selection of ReviewExplorer changed, filter comments
-     * @param event provided by the SelectionProvider
-     * @see org.eclipse.jface.viewers.ISelectionChangedListener#selectionChanged(SelectionChangedEvent)
+     * @see org.eclipse.ui.ISelectionListener#selectionChanged(org.eclipse.ui.IWorkbenchPart, org.eclipse.jface.viewers.ISelection)
+     * @author Malte Brunnlieb (10.05.2012)
      */
-    public void selectionChanged(SelectionChangedEvent event) {
-        if (event.getSelection() instanceof ITreeSelection && !event.getSelection().isEmpty()) { //TODO check for source??
-        
+    public void selectionChanged(IWorkbenchPart part, ISelection selection) {
+        if (part.getClass().equals(ReviewExplorerView.class) && selection instanceof ITreeSelection && !selection.isEmpty()) {
+            
             ICommandService cmdService = (ICommandService) PlatformUI.getWorkbench().getService(ICommandService.class);
             if (cmdService == null) {
                 ExceptionHandler.notifyUser("The Service ICommandService could not be determined.");
@@ -151,7 +153,7 @@ public class FilterController extends SelectionAdapter implements Listener, KeyL
             Object state = linkExplorerCommand.getState("org.eclipse.ui.commands.toggleState").getValue();
             
             if ((Boolean) state) {
-                ITreeSelection sel = (ITreeSelection) event.getSelection();
+                ITreeSelection sel = (ITreeSelection) selection;
                 List<String> reviewIDs = getReviewIDs(sel);
                 Map<String, Set<String>> paths = getPaths(sel);
                 
