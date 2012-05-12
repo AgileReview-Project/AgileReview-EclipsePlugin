@@ -7,15 +7,11 @@
  */
 package org.agilereview.ui.basic.commentSummary;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.LinkedList;
 import java.util.List;
 
 import org.agilereview.core.external.storage.Comment;
 import org.agilereview.ui.basic.commentSummary.filter.ColumnComparator;
-import org.agilereview.ui.basic.tools.CommentProperties;
-import org.eclipse.jface.viewers.ColumnLabelProvider;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TableViewerColumn;
 import org.eclipse.swt.SWT;
@@ -34,6 +30,14 @@ import org.eclipse.swt.widgets.TableItem;
 public class CSTableViewer extends TableViewer {
     
     /**
+     * Columns of the comment table
+     * @author Malte Brunnlieb (11.05.2012)
+     */
+    public static enum Column {
+        REVIEW_ID, COMMENT_ID, AUTHOR, RECIPIENT, STATUS, PRIORITY, DATE_CREATED, DATE_MODIFIED, NO_REPLIES, LOCATION
+    }
+    
+    /**
      * The titles of the table's columns, also used to fill the filter menu
      */
     private final String[] columnTitles = { "ReviewName", "CommentID", "Author", "Recipient", "Status", "Priority", "Date created", "Date modified",
@@ -41,7 +45,7 @@ public class CSTableViewer extends TableViewer {
     /**
      * The width of the table's columns
      */
-    private final int[] columnBounds = { 60, 70, 70, 70, 70, 70, 120, 120, 50, 100 };
+    private final int[] columnBounds = { 60, 70, 70, 70, 70, 70, 120, 120, 50, 200 };
     
     /**
      * Creates a new {@link CSTableViewer} for the {@link CommentSummaryView}
@@ -59,8 +63,13 @@ public class CSTableViewer extends TableViewer {
      * @author Malte Brunnlieb (28.04.2012)
      */
     private void createUI(Composite parent) {
-        // create viewer
-        createColumns();
+        Column[] columns = Column.values();
+        TableViewerColumn col;
+        
+        for (int i = 0; i < columns.length; i++) {
+            col = createColumn(columnTitles[i], columnBounds[i], i);
+            col.setLabelProvider(new CSColumnLabelProvider(columns[i]));
+        }
         
         // set attributes of viewer's table
         Table table = getTable();
@@ -74,122 +83,6 @@ public class CSTableViewer extends TableViewer {
         gridData.grabExcessVerticalSpace = true;
         gridData.horizontalAlignment = GridData.FILL;
         getControl().setLayoutData(gridData);
-        
-        // set properties of columns to titles
-        setColumnProperties(columnTitles);
-    }
-    
-    /**
-     * Creates the columns of the viewer and adds label providers to fill cells
-     * @author Malte Brunnlieb (28.04.2012)
-     */
-    private void createColumns() {
-        final CommentProperties commentProperties = new CommentProperties();
-        
-        // ReviewID
-        TableViewerColumn col = createColumn(columnTitles[0], columnBounds[0], 0);
-        col.setLabelProvider(new ColumnLabelProvider() {
-            @Override
-            public String getText(Object element) {
-                Comment c = (Comment) element;
-                return c.getReview().getId();
-            }
-        });
-        
-        // CommentID
-        col = createColumn(columnTitles[1], columnBounds[1], 1);
-        col.setLabelProvider(new ColumnLabelProvider() {
-            @Override
-            public String getText(Object element) {
-                Comment c = (Comment) element;
-                return c.getId();
-            }
-        });
-        
-        // Author
-        col = createColumn(columnTitles[2], columnBounds[2], 2);
-        col.setLabelProvider(new ColumnLabelProvider() {
-            @Override
-            public String getText(Object element) {
-                Comment c = (Comment) element;
-                return c.getAuthor();
-            }
-        });
-        
-        // Recipient
-        col = createColumn(columnTitles[3], columnBounds[3], 3);
-        col.setLabelProvider(new ColumnLabelProvider() {
-            @Override
-            public String getText(Object element) {
-                Comment c = (Comment) element;
-                return c.getRecipient();
-            }
-        });
-        
-        // Status
-        col = createColumn(columnTitles[4], columnBounds[4], 4);
-        col.setLabelProvider(new ColumnLabelProvider() {
-            @Override
-            public String getText(Object element) {
-                Comment c = (Comment) element;
-                String status = commentProperties.getStatusByID(c.getStatus());
-                return status;
-            }
-        });
-        
-        // Priority
-        col = createColumn(columnTitles[5], columnBounds[5], 5);
-        col.setLabelProvider(new ColumnLabelProvider() {
-            @Override
-            public String getText(Object element) {
-                Comment c = (Comment) element;
-                String prio = commentProperties.getPriorityByID(c.getPriority());
-                return prio;
-            }
-        });
-        
-        // Date created
-        col = createColumn(columnTitles[6], columnBounds[6], 6);
-        col.setLabelProvider(new ColumnLabelProvider() {
-            @Override
-            public String getText(Object element) {
-                Comment c = (Comment) element;
-                DateFormat df = new SimpleDateFormat("dd.M.yyyy', 'HH:mm:ss");
-                return df.format(c.getCreationDate().getTime());
-            }
-        });
-        
-        // Date modified
-        col = createColumn(columnTitles[7], columnBounds[7], 7);
-        col.setLabelProvider(new ColumnLabelProvider() {
-            @Override
-            public String getText(Object element) {
-                Comment c = (Comment) element;
-                if (c.getModificationDate() == null) return "";
-                DateFormat df = new SimpleDateFormat("dd.M.yyyy', 'HH:mm:ss");
-                return df.format(c.getModificationDate().getTime());
-            }
-        });
-        
-        // Number of relplies
-        col = createColumn(columnTitles[8], columnBounds[8], 8);
-        col.setLabelProvider(new ColumnLabelProvider() {
-            @Override
-            public String getText(Object element) {
-                Comment c = (Comment) element;
-                return String.valueOf(c.getReplies().size());
-            }
-        });
-        
-        // Location
-        col = createColumn(columnTitles[9], columnBounds[9], 9);
-        col.setLabelProvider(new ColumnLabelProvider() {
-            @Override
-            public String getText(Object element) {
-                Comment c = (Comment) element;
-                return c.getCommentedFile().getFullPath().toOSString();
-            }
-        });
     }
     
     /**
@@ -227,7 +120,6 @@ public class CSTableViewer extends TableViewer {
                 if (getTable().getSortColumn() == column) {
                     dir = dir == SWT.UP ? SWT.DOWN : SWT.UP;
                 } else {
-                    
                     dir = SWT.DOWN;
                 }
                 getTable().setSortDirection(dir);

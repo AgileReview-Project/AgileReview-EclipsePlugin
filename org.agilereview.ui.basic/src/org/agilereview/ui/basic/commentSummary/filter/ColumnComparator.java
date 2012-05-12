@@ -8,6 +8,7 @@
 package org.agilereview.ui.basic.commentSummary.filter;
 
 import org.agilereview.core.external.storage.Comment;
+import org.agilereview.ui.basic.commentSummary.CSTableViewer.Column;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerComparator;
 
@@ -17,9 +18,9 @@ import org.eclipse.jface.viewers.ViewerComparator;
 public class ColumnComparator extends ViewerComparator {
     
     /**
-     * index of the column that is to be ordered
+     * {@link Column} that should be ordered
      */
-    private int propertyIndex;
+    private Column sortColumn = Column.REVIEW_ID;
     /**
      * descending is defined as "1"
      */
@@ -30,24 +31,16 @@ public class ColumnComparator extends ViewerComparator {
     private int direction = DESCENDING;
     
     /**
-     * constructor of this class
-     */
-    public ColumnComparator() {
-        this.propertyIndex = 0;
-        direction = DESCENDING;
-    }
-    
-    /**
      * Set's the column to be ordered
      * @param column the column's index
      */
-    public void setColumn(int column) {
-        if (column == this.propertyIndex) {
+    public void setColumn(Column column) {
+        if (column == sortColumn) {
             // Same column as last sort; toggle the direction
             direction = 1 - direction;
         } else {
             // New column; do an ascending sort
-            this.propertyIndex = column;
+            sortColumn = column;
             direction = DESCENDING;
         }
     }
@@ -63,35 +56,35 @@ public class ColumnComparator extends ViewerComparator {
         // a value < 0 is returned if c1<c2
         // a value = 0 is returned if c1=c2
         // a value > 0 is returned if c1>c2
-        switch (propertyIndex) {
-        case 0:
+        switch (sortColumn) {
+        case REVIEW_ID:
             rc = c1.getReview().getId().compareTo(c2.getReview().getId());
             break;
-        case 1:
+        case COMMENT_ID:
             rc = c1.getId().compareTo(c2.getId());
             break;
-        case 2:
+        case AUTHOR:
             rc = c1.getAuthor().compareTo(c2.getAuthor());
             break;
-        case 3:
+        case RECIPIENT:
             rc = c1.getRecipient().compareTo(c2.getRecipient());
             break;
-        case 4:
-            rc = c1.getStatus() == c2.getStatus() ? 0 : (c1.getStatus() < c2.getStatus() ? -1 : 1);
+        case STATUS:
+            rc = c1.getStatus() - c2.getStatus();
             break;
-        case 5:
-            rc = c1.getPriority() == c2.getPriority() ? 0 : (c1.getPriority() < c2.getPriority() ? -1 : 1);
+        case PRIORITY:
+            rc = c1.getPriority() - c2.getPriority();
             break;
-        case 6:
+        case DATE_CREATED:
             rc = c1.getCreationDate().compareTo(c2.getCreationDate());
             break;
-        case 7:
+        case DATE_MODIFIED:
             rc = c1.getModificationDate().compareTo(c2.getModificationDate());
             break;
-        case 8:
-            rc = c1.getReplies().size() == c2.getReplies().size() ? 0 : (c1.getReplies().size() < c2.getReplies().size() ? -1 : 1);
+        case NO_REPLIES:
+            rc = c1.getReplies().size() - c2.getReplies().size();
             break;
-        case 10:
+        case LOCATION:
             rc = c1.getCommentedFile().getFullPath().toOSString().compareTo(c2.getCommentedFile().getFullPath().toOSString());
             break;
         default:
@@ -103,5 +96,4 @@ public class ColumnComparator extends ViewerComparator {
         }
         return rc;
     }
-    
 }
