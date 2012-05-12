@@ -5,13 +5,12 @@
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  * Contributors: Malte Brunnlieb, Philipp Diebold, Peter Reuter, Thilo Rauch
  */
-package org.agilereview.ui.basic.commentSummary;
+package org.agilereview.ui.basic.commentSummary.table;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 
 import org.agilereview.core.external.storage.Comment;
-import org.agilereview.ui.basic.commentSummary.CSTableViewer.Column;
 import org.agilereview.ui.basic.tools.CommentProperties;
 import org.eclipse.jface.viewers.ColumnLabelProvider;
 
@@ -25,7 +24,7 @@ public class CSColumnLabelProvider extends ColumnLabelProvider {
     /**
      * Column this instance will render
      */
-    private Column column;
+    private final Column column;
     /**
      * {@link CommentProperties} which will be instantiated if needed in the constructor
      */

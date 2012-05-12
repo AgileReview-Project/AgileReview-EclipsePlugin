@@ -8,7 +8,7 @@
 package org.agilereview.ui.basic.commentSummary.filter;
 
 import org.agilereview.core.external.storage.Comment;
-import org.agilereview.ui.basic.commentSummary.CSTableViewer.Column;
+import org.agilereview.ui.basic.commentSummary.table.Column;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerComparator;
 

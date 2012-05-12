@@ -8,6 +8,7 @@
 package org.agilereview.ui.basic.commentSummary;
 
 import org.agilereview.ui.basic.commentSummary.control.FilterController;
+import org.agilereview.ui.basic.commentSummary.table.Column;
 import org.agilereview.ui.basic.tools.CommentProperties;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.KeyListener;
@@ -79,7 +80,7 @@ public class CSToolBar extends ToolBar {
         // create menu for dropdown box
         menu = new Menu(getShell(), SWT.POP_UP);
         
-        String[] tableColums = viewer.getTitles();
+        String[] tableColums = Column.valuesToString();
         menuItems = new MenuItem[tableColums.length + 1];
         
         // add menu items

@@ -8,9 +8,9 @@
 package org.agilereview.ui.basic.commentSummary.control;
 
 import org.agilereview.ui.basic.commentSummary.CSTableViewer;
-import org.agilereview.ui.basic.commentSummary.CSTableViewer.Column;
 import org.agilereview.ui.basic.commentSummary.CommentSummaryView;
 import org.agilereview.ui.basic.commentSummary.filter.ColumnComparator;
+import org.agilereview.ui.basic.commentSummary.table.Column;
 import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.swt.SWT;
