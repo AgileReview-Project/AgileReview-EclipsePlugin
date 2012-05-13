@@ -25,6 +25,7 @@ import org.agilereview.ui.basic.reviewExplorer.ReviewExplorerView;
 import org.agilereview.ui.basic.tools.ExceptionHandler;
 import org.eclipse.core.commands.Command;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ITreeSelection;
 import org.eclipse.jface.viewers.TreePath;
@@ -145,7 +146,7 @@ public class FilterController extends SelectionAdapter implements Listener, KeyL
             
             ICommandService cmdService = (ICommandService) PlatformUI.getWorkbench().getService(ICommandService.class);
             if (cmdService == null) {
-                ExceptionHandler.notifyUser("The Service ICommandService could not be determined.");
+                ExceptionHandler.notifyUser(MessageDialog.WARNING, "The Service ICommandService could not be determined.");
                 return;
             }
             

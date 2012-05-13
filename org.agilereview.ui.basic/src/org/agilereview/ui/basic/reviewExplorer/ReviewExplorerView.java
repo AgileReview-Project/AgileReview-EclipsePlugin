@@ -11,30 +11,21 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.agilereview.core.external.definition.IReviewDataReceiver;
-import org.agilereview.core.external.properties.PropertyInterface;
 import org.agilereview.core.external.storage.Comment;
 import org.agilereview.core.external.storage.Review;
 import org.agilereview.ui.basic.Activator;
-import org.eclipse.core.commands.ExecutionException;
-import org.eclipse.core.commands.NotEnabledException;
-import org.eclipse.core.commands.NotHandledException;
-import org.eclipse.core.commands.common.NotDefinedException;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.action.MenuManager;
-import org.eclipse.jface.viewers.DoubleClickEvent;
-import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.ISelection;
-import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.TreePath;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.ui.PlatformUI;
-import org.eclipse.ui.handlers.IHandlerService;
 import org.eclipse.ui.part.ViewPart;
 
 /**
@@ -42,25 +33,16 @@ import org.eclipse.ui.part.ViewPart;
  * 
  * @author Thilo Rauch (28.03.2012)
  */
-public class ReviewExplorerView extends ViewPart implements IReviewDataReceiver, IDoubleClickListener {
+public class ReviewExplorerView extends ViewPart implements IReviewDataReceiver {
 	
 	/**
 	 * All review data
 	 */
 	private List<Review> globalData = new ArrayList<Review>();
-	
 	/**
 	 * The tree for showing the reviews
 	 */
 	private TreeViewer treeViewer;
-	/**
-	 * Action for opening the files displayed in the tree viewer on double-click
-	 */
-	private REOpenAction openFileAction;
-	/**
-	 * Preference query interface of the core plugin
-	 */
-	private PropertyInterface props = new PropertyInterface();
 	/**
 	 * Current Instance used by the ViewPart
 	 */
@@ -101,7 +83,7 @@ public class ReviewExplorerView extends ViewPart implements IReviewDataReceiver,
 				}
 			}
 		}
-		if (instance != null) {
+		if (instance != null && treeViewer!=null) {
 			refreshInput();
 		}
 	}
@@ -114,20 +96,22 @@ public class ReviewExplorerView extends ViewPart implements IReviewDataReceiver,
 	@Override
 	public void createPartControl(Composite parent) {
 		instance = this;
-		
+	      
 		// Create the treeview MULTI, H_SCROLL, V_SCROLL, and BORDER
 		treeViewer = new TreeViewer(parent);
 		treeViewer.setContentProvider(new REContentProvider());
 		treeViewer.setLabelProvider(new RELabelProvider());
 		treeViewer.setComparator(new REViewerComparator());
+		// Needed so expanding/collapsing of IResources which are displayed multiple times works
+		treeViewer.setUseHashlookup(true);
+
 		
 		// TODO: Ähnliches Konstrukt in der neuen Architektur?
 		// treeViewer.addSelectionChangedListener(ViewControl.getInstance());
 		refreshInput();
 		
-		openFileAction = new REOpenAction(this.getSite().getPage(), treeViewer);
-		
-		treeViewer.addDoubleClickListener(this);
+		treeViewer.addDoubleClickListener(new REDoubleClickListener());
+		// TODO: Still supported? 
 		PlatformUI.getWorkbench().getHelpSystem().setHelp(parent, Activator.PLUGIN_ID + ".ReviewExplorer");
 		
 		// Create a popup menu
@@ -185,70 +169,6 @@ public class ReviewExplorerView extends ViewPart implements IReviewDataReceiver,
 		treeViewer.collapseToLevel(selection, TreeViewer.ALL_LEVELS);
 	}
 	
-	/*
-	 * (non-Javadoc)
-	 * @see org.eclipse.jface.viewers.IDoubleClickListener#doubleClick(org.eclipse.jface.viewers.DoubleClickEvent)
-	 */
-	@Override
-	public void doubleClick(DoubleClickEvent event) {
-		if (openFileAction.isEnabled()) {
-			openFileAction.run();
-		}
-		ISelection sel = event.getSelection();
-		if (sel instanceof IStructuredSelection) {
-			Object o = ((IStructuredSelection) sel).getFirstElement();
-			
-			if (o instanceof Review) {
-				Review review = (Review) o;
-				String command = "";
-				try {
-					// If the review is closed -> open it
-					if (review.getIsOpen()) {
-						// Check if already active, then expand, else activate
-						String activeReview = props.getPreferenceValue(PropertyInterface.ACTIVE_REVIEW_ID);
-						if (activeReview.equals(review.getId())) {
-							if (treeViewer.getExpandedState(o)) {
-								treeViewer.collapseToLevel(o, 1);
-							} else {
-								treeViewer.expandToLevel(o, 1);
-							}
-						} else {
-							// Review is open -> activate it
-							command = "org.agilereview.activateReview"; // TODO String auslagern?
-							// Execute activation command
-							IHandlerService handlerService = (IHandlerService) getSite().getService(IHandlerService.class);
-							handlerService.executeCommand(command, null);
-						}
-					} else {
-						command = "org.agilereview.openCloseReview"; // TODO String auslagern?
-						// Execute open/close command
-						IHandlerService handlerService = (IHandlerService) getSite().getService(IHandlerService.class);
-						handlerService.executeCommand(command, null);
-					}
-				} catch (ExecutionException e) {
-				    String msg = "Problems occured executing command \"" + command + "\", after double-click in ReviewExplorer";
-				    Activator.getDefault().getLog().log(new Status(IStatus.ERROR, Activator.PLUGIN_ID, msg, e));
-				} catch (NotDefinedException e) {
-				    String msg = "Command \"" + command + "\" is not defined, after double-click in ReviewExplorer";
-                    Activator.getDefault().getLog().log(new Status(IStatus.ERROR, Activator.PLUGIN_ID, msg, e));
-				} catch (NotEnabledException e) {
-				    String msg = "Command  \"" + command + "\" is not enabled, after double-click in ReviewExplorer";
-                    Activator.getDefault().getLog().log(new Status(IStatus.ERROR, Activator.PLUGIN_ID, msg, e));
-				} catch (NotHandledException e) {
-				    String msg = "Command  \"" + command + "\" is not handled, after double-click in ReviewExplorer";
-                    Activator.getDefault().getLog().log(new Status(IStatus.ERROR, Activator.PLUGIN_ID, msg, e));
-				}
-			} else {
-				// On Double-Click there can only be one item selected
-				if (treeViewer.getExpandedState(o)) {
-					treeViewer.collapseToLevel(o, 1);
-				} else {
-					treeViewer.expandToLevel(o, 1);
-				}
-			}
-		}
-	}
-
 
 // TODO: Überlegen wofür das war...
 //	/**

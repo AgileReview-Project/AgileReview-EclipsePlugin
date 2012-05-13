@@ -10,6 +10,7 @@ package org.agilereview.ui.basic.tools;
 import org.agilereview.ui.basic.Activator;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Display;
 
 /**
@@ -55,15 +56,15 @@ public class ExceptionHandler {
     
     /**
      * Notifies the user displaying the given message
+     * @param messageType type of the message (use static field in {@link MessageDialog})
      * @param msg message which will be displayed for the user
      * @author Malte Brunnlieb (08.05.2012)
      */
-    public static void notifyUser(final String msg) {
-        Display.getDefault().asyncExec(new Runnable() {
-            
+    public static void notifyUser(final int messageType, final String msg) {
+        Display.getDefault().asyncExec(new Runnable() {            
             @Override
-            public void run() {
-                MessageDialog.openWarning(Display.getCurrent().getActiveShell(), "Warning", msg);
+            public void run() { 
+                MessageDialog.open(messageType, Display.getCurrent().getActiveShell(), "Warning", msg, SWT.NONE);
             }
         });
     }
