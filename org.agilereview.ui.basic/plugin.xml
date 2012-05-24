@@ -21,7 +21,7 @@
       </view>
       <view
             category="org.agilereview.ui.basic.category"
-            class="org.agilereview.ui.basic.ViewPart2"
+            class="org.agilereview.ui.basic.commentSummary.CommentSummaryView"
             id="org.agilereview.ui.basic.commentsummaryview"
             name="Comments Summary"
             restorable="true">

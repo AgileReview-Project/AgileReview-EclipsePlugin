@@ -104,15 +104,17 @@ public class FilterController extends SelectionAdapter implements Listener, KeyL
      */
     @Override
     public void handleEvent(Event event) {
-        Object source = event.item.getData();
-        if (source.equals("chooseFilterType")) {
+        if (event.widget == null || event.widget.getData() == null) return;
+        
+        Object command = event.widget.getData();
+        if (command.equals("selectFilter") && event.widget instanceof MenuItem) {
             // filter selection (DropDown box ToolBar)
             MenuItem item = (MenuItem) event.widget;
             tableViewer.removeFilter(currentSearchFilter);
             currentSearchFilter = new SearchFilter(item.getText());
             tableViewer.addFilter(currentSearchFilter);
             toolBar.setFilterText("Search for " + item.getText());
-        } else if (source.equals("openMenu")) {
+        } else if (command.equals("openFilterMenu")) {
             // filter menu (DropDownBox ToolBar)
             if (event.detail == SWT.ARROW || event.detail == 0) {
                 toolBar.showDropDownMenu();

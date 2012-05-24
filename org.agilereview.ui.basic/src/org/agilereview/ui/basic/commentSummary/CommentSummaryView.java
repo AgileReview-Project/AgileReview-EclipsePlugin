@@ -54,23 +54,22 @@ public class CommentSummaryView extends ViewPart implements IReviewDataReceiver 
     public void createPartControl(Composite parent) {
         parent.setLayout(new GridLayout());
         
+        toolBar = new CSToolBar(parent);
+        
         CSTableViewer viewer = new CSTableViewer(parent);
         viewer.setContentProvider(new ArrayContentProvider());
         viewer.setInput(comments);
-        getSite().setSelectionProvider(viewer);
-        
         ColumnComparator comparator = new ColumnComparator();
         viewer.setComparator(comparator);
-        
         SearchFilter commentFilter = new SearchFilter("ALL");
         viewer.addFilter(commentFilter);
         
-        toolBar = new CSToolBar(parent, viewer);
+        viewer.addDoubleClickListener(new ViewController(viewer));
+        getSite().setSelectionProvider(viewer);
+        
         FilterController filterController = new FilterController(toolBar, viewer, commentFilter);
         toolBar.setListeners(filterController);
         getSite().getWorkbenchWindow().getSelectionService().addSelectionListener("org.agilereview.ui.basic.reviewExplorerView", filterController);
-        
-        viewer.addDoubleClickListener(new ViewController(viewer));
         
         //add help context
         PlatformUI.getWorkbench().getHelpSystem().setHelp(parent, Activator.PLUGIN_ID + ".TableView"); //TODO adapt help context

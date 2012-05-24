@@ -25,6 +25,9 @@ public class ExceptionHandler {
      * @author Malte Brunnlieb (24.03.2012)
      */
     public static void logAndNotifyUser(final Throwable ex) {
+        System.out.println(Activator.getDefault());
+        System.out.println(Activator.getDefault().getLog());
+        System.out.println(ex.getMessage());
         Activator.getDefault().getLog().log(new Status(Status.ERROR, Activator.PLUGIN_ID, ex.getMessage(), ex));
         Display.getDefault().asyncExec(new Runnable() {
             

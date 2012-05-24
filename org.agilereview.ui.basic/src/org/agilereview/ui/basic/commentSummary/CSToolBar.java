@@ -15,6 +15,7 @@ import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
+import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Listener;
@@ -47,10 +48,6 @@ public class CSToolBar extends ToolBar {
      */
     private Button onlyOpenCommentsCheckbox;
     /**
-     * Parent {@link Composite} of this instance
-     */
-    private Composite parent;
-    /**
      * PopUp menu for the filter DropDownBox
      */
     private Menu menu;
@@ -58,20 +55,21 @@ public class CSToolBar extends ToolBar {
     /**
      * Creates a new instance of the {@link CSToolBar}
      * @param parent on which this {@link CSToolBar} should be added
-     * @param viewer {@link CSTableViewer} of the {@link CommentSummaryView}
      * @author Malte Brunnlieb (08.04.2012)
      */
-    CSToolBar(Composite parent, CSTableViewer viewer) {
+    CSToolBar(Composite parent) {
         super(parent, SWT.FLAT | SWT.WRAP | SWT.RIGHT);
-        createToolBar(viewer);
+        createToolBar();
     }
     
     /**
      * Creates the ToolBar elements
-     * @param viewer {@link CSTableViewer} of the {@link CommentSummaryView}
      * @author Malte Brunnlieb (08.04.2012)
      */
-    private void createToolBar(final CSTableViewer viewer) {
+    private void createToolBar() {
+        
+        setLayout(new GridLayout());
+        
         // add dropdown box to toolbar to select category to filter
         dropDownBox = new ToolItem(this, SWT.DROP_DOWN);
         dropDownBox.setText("Search for ALL");
@@ -96,7 +94,6 @@ public class CSToolBar extends ToolBar {
         
         // add text field for filter to toolbar
         filterText = new Text(this, SWT.BORDER | SWT.SINGLE);
-        filterText.pack();
         
         // add seperator to toolbar
         ToolItem itemSeparator = new ToolItem(this, SWT.SEPARATOR);
@@ -120,14 +117,14 @@ public class CSToolBar extends ToolBar {
      * @author Malte Brunnlieb (03.05.2012)
      */
     void setListeners(FilterController toolBarController) {
-        dropDownBox.setData("chooseFilterType");
+        dropDownBox.setData("openFilterMenu");
         dropDownBox.addListener(SWT.Selection, toolBarController);
         for (MenuItem item : menuItems) {
-            item.setData("chooseFilter");
+            item.setData("selectFilter");
             item.addListener(SWT.Selection, toolBarController);
         }
         filterText.addKeyListener(toolBarController);
-        onlyOpenCommentsCheckbox.setData("openMenu");
+        onlyOpenCommentsCheckbox.setData("setOnlyOpenFilter");
         onlyOpenCommentsCheckbox.addSelectionListener(toolBarController);
     }
     
@@ -147,7 +144,7 @@ public class CSToolBar extends ToolBar {
     public void setFilterText(String text) {
         dropDownBox.setText(text);
         pack();
-        parent.layout(); //TODO check if necessary! else delete parent attribute!
+        //        layout(); //TODO check if necessary! else delete parent attribute!
     }
     
     /**
@@ -178,5 +175,13 @@ public class CSToolBar extends ToolBar {
     @Override
     public boolean setFocus() {
         return filterText.setFocus();
+    }
+    
+    /**
+     * Disable SWTException: Subclassing not allowed
+     * @author Malte Brunnlieb (24.05.2012)
+     */
+    @Override
+    protected void checkSubclass() {
     }
 }
