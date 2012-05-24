@@ -78,10 +78,6 @@ public class SourceFolderManager implements IPropertyChangeListener {
 		}
 	}
 	
-	public static void deactivateReviewSourceFolder() {
-		
-	}
-	
 	/**
 	 * Creates and opens the given AgileReview Source Project (if not existent or closed)
 	 * @param projectName project name
@@ -138,6 +134,13 @@ public class SourceFolderManager implements IPropertyChangeListener {
 		}
 	}
 	
+	/**
+	 * 
+	 * @author Peter Reuter (24.05.2012)
+	 */
+	public static void prepareCurrentSourceProjectForClosing() {
+		setProjectNatures(currentSourceFolder, new String[]{ AGILEREVIEW_NATURE });
+	}
 	///////////////////////////////////////
 	// methods of PropertyChangeListener //
 	///////////////////////////////////////
