@@ -7,6 +7,10 @@
  */
 package org.agilereview.ui.basic.commentSummary;
 
+import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.List;
+
 import org.agilereview.ui.basic.commentSummary.control.FilterController;
 import org.agilereview.ui.basic.commentSummary.table.Column;
 import org.agilereview.ui.basic.tools.CommentProperties;
@@ -15,34 +19,31 @@ import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
+import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
+import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
-import org.eclipse.swt.widgets.MenuItem;
+import org.eclipse.swt.widgets.Sash;
 import org.eclipse.swt.widgets.Text;
-import org.eclipse.swt.widgets.ToolBar;
-import org.eclipse.swt.widgets.ToolItem;
 
 /**
  * ToolBar for the {@link CommentSummaryView}
  * @author Malte Brunnlieb (08.04.2012)
  */
-public class CSToolBar extends ToolBar {
+public class CSToolBar extends Composite {
     
     /**
      * Filter text field
      */
     private Text filterText;
     /**
-     * Menu items for the filter menu
-     */
-    private MenuItem[] menuItems;
-    /**
      * Drop down box item where the current filter value is displayed
      */
-    private ToolItem dropDownBox;
+    private Combo dropDownBox;
     /**
      * CheckBox for the "show only open comments" filter functionality
      */
@@ -58,7 +59,7 @@ public class CSToolBar extends ToolBar {
      * @author Malte Brunnlieb (08.04.2012)
      */
     CSToolBar(Composite parent) {
-        super(parent, SWT.FLAT | SWT.WRAP | SWT.RIGHT);
+        super(parent, SWT.NONE);
         createToolBar();
     }
     
@@ -67,43 +68,33 @@ public class CSToolBar extends ToolBar {
      * @author Malte Brunnlieb (08.04.2012)
      */
     private void createToolBar() {
+        setLayout(new GridLayout(10, false));
         
-        setLayout(new GridLayout());
+        Label label = new Label(this, SWT.NONE);
+        label.setText("Search in");
         
         // add dropdown box to toolbar to select category to filter
-        dropDownBox = new ToolItem(this, SWT.DROP_DOWN);
+        dropDownBox = new Combo(this, SWT.READ_ONLY);
         dropDownBox.setText("Search for ALL");
         dropDownBox.setToolTipText("Click here to select the filter option");
+        List<String> filterList = new LinkedList<String>(Arrays.asList(Column.valuesToString()));
+        String all = "All Columns";
+        filterList.add(0, all);
+        dropDownBox.setItems(filterList.toArray(new String[0]));
+        dropDownBox.setText(all);
         
-        // create menu for dropdown box
-        menu = new Menu(getShell(), SWT.POP_UP);
-        
-        String[] tableColums = Column.valuesToString();
-        menuItems = new MenuItem[tableColums.length + 1];
-        
-        // add menu items
-        MenuItem item = new MenuItem(menu, SWT.PUSH);
-        item.setText("ALL");
-        menuItems[tableColums.length] = item;
-        item = new MenuItem(menu, SWT.SEPARATOR);
-        for (int i = 0; i < tableColums.length; i++) {
-            item = new MenuItem(menu, SWT.PUSH);
-            item.setText(tableColums[i]);
-            menuItems[i] = item;
-        }
-        
-        // add text field for filter to toolbar
         filterText = new Text(this, SWT.BORDER | SWT.SINGLE);
+        GridData gd = new GridData();
+        gd.widthHint = 100;
+        filterText.setLayoutData(gd);
         
-        // add seperator to toolbar
-        ToolItem itemSeparator = new ToolItem(this, SWT.SEPARATOR);
-        itemSeparator.setWidth(filterText.getBounds().width);
-        itemSeparator.setControl(filterText);
+        Sash sash = new Sash(this, SWT.NONE);
+        gd = new GridData();
+        gd.widthHint = 20;
+        sash.setLayoutData(gd);
         
-        // add show open comments only checkbox
-        int filterStatusNumber = 0;
         onlyOpenCommentsCheckbox = new Button(this, SWT.CHECK);
-        String statusStr = new CommentProperties().getStatusByID(filterStatusNumber);
+        String statusStr = new CommentProperties().getStatusByID(0);
         onlyOpenCommentsCheckbox.setText("Only show " + statusStr + " comments");
         onlyOpenCommentsCheckbox.setToolTipText("Show only " + statusStr + " comments");
         
@@ -117,12 +108,8 @@ public class CSToolBar extends ToolBar {
      * @author Malte Brunnlieb (03.05.2012)
      */
     void setListeners(FilterController toolBarController) {
-        dropDownBox.setData("openFilterMenu");
+        dropDownBox.setData("setSearchFilter");
         dropDownBox.addListener(SWT.Selection, toolBarController);
-        for (MenuItem item : menuItems) {
-            item.setData("selectFilter");
-            item.addListener(SWT.Selection, toolBarController);
-        }
         filterText.addKeyListener(toolBarController);
         onlyOpenCommentsCheckbox.setData("setOnlyOpenFilter");
         onlyOpenCommentsCheckbox.addSelectionListener(toolBarController);
@@ -175,13 +162,5 @@ public class CSToolBar extends ToolBar {
     @Override
     public boolean setFocus() {
         return filterText.setFocus();
-    }
-    
-    /**
-     * Disable SWTException: Subclassing not allowed
-     * @author Malte Brunnlieb (24.05.2012)
-     */
-    @Override
-    protected void checkSubclass() {
     }
 }

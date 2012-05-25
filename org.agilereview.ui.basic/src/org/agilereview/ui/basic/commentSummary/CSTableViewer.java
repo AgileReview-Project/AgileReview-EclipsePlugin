@@ -32,7 +32,7 @@ public class CSTableViewer extends TableViewer {
     /**
      * The width of the table's columns
      */
-    private final int[] columnBounds = { 60, 70, 70, 70, 70, 70, 120, 120, 50, 200 };
+    private final int[] columnBounds = { 90, 80, 70, 70, 70, 70, 120, 120, 50, 500 };
     
     /**
      * Creates a new {@link CSTableViewer} for the {@link CommentSummaryView}
