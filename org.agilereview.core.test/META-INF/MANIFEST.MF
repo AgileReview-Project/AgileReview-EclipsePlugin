@@ -1,8 +1,10 @@
 Manifest-Version: 1.0
-Bundle-ManifestVersion: 2
-Bundle-Name: Core_Test
-Bundle-SymbolicName: org.agilereview.core.test
-Bundle-Version: 1.0.0.qualifier
+Require-Bundle: org.junit4;bundle-version="4.5.0",org.agilereview.test
+ .common
 Fragment-Host: org.agilereview.core;bundle-version="0.9.0"
+Bundle-Version: 1.0.0.qualifier
+Bundle-Name: org.agilereview.core.test
+Bundle-ManifestVersion: 2
+Bundle-SymbolicName: org.agilereview.core.test
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
-Require-Bundle: org.junit4;bundle-version="4.5.0"
+
