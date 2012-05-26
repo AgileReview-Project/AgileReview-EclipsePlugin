@@ -5,3 +5,7 @@ Bundle-SymbolicName: org.agilereview.ui.basic.test
 Bundle-Version: 1.0.0.qualifier
 Fragment-Host: org.agilereview.ui.basic;bundle-version="0.9.0"
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Require-Bundle: org.junit4;bundle-version="4.8.1",
+ org.agilereview.test.common;bundle-version="1.0.0",
+ org.eclipse.swtbot.eclipse.finder;bundle-version="2.0.5",
+ org.eclipse.swtbot.forms.finder;bundle-version="2.0.5"

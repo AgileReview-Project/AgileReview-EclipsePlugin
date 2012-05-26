@@ -87,6 +87,7 @@ public class CSToolBar extends Composite {
         GridData gd = new GridData();
         gd.widthHint = 100;
         filterText.setLayoutData(gd);
+        filterText.setData("testKey", "filterText");
         
         Sash sash = new Sash(this, SWT.NONE);
         gd = new GridData();

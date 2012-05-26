@@ -22,13 +22,13 @@
       <view
             category="org.agilereview.ui.basic.category"
             class="org.agilereview.ui.basic.commentSummary.CommentSummaryView"
-            id="org.agilereview.ui.basic.commentsummaryview"
+            id="org.agilereview.ui.basic.commentSummaryView"
             name="Comments Summary"
             restorable="true">
       </view>
       <category
             id="org.agilereview.ui.basic.category"
-            name="AgileReview Basic UI"
+            name="AgileReview BasicUI"
             parentCategory="org.agilereview.ui.basic.category">
       </category>
    </extension>
@@ -240,6 +240,34 @@
             </with>
          </activeWhen>
       </handler>
+   </extension>
+   <extension
+         point="org.eclipse.ui.perspectives">
+      <perspective
+            class="org.agilereview.ui.basic.AgileReviewPerspective"
+            id="org.agilereview.ui.basic.perspective"
+            name="AgileReview BasicUI">
+      </perspective>
+   </extension>
+   <extension
+         point="org.eclipse.ui.perspectiveExtensions">
+      <perspectiveExtension
+            targetID="org.agilereview.ui.basic.perspective">
+         <view
+               id="org.agilereview.ui.basic.reviewExplorerView"
+               minimized="false"
+               ratio="0.2f"
+               relationship="left"
+               relative="org.eclipse.ui.editorss">
+         </view>
+         <view
+               id="org.agilereview.ui.basic.commentSummaryView"
+               minimized="false"
+               ratio="0.7f"
+               relationship="bottom"
+               relative="org.eclipse.ui.editorss">
+         </view>
+      </perspectiveExtension>
    </extension>
 
 </plugin>
