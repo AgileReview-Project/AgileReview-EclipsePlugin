@@ -60,6 +60,7 @@ public class CSTableViewer extends TableViewer {
         
         // set attributes of viewer's table
         Table table = getTable();
+        table.setData("org.eclipse.swtbot.widget.key", "csTable");
         table.setHeaderVisible(true);
         table.setLinesVisible(true);
         

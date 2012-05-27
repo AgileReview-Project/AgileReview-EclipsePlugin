@@ -82,12 +82,13 @@ public class CSToolBar extends Composite {
         filterList.add(0, all);
         dropDownBox.setItems(filterList.toArray(new String[0]));
         dropDownBox.setText(all);
+        dropDownBox.setData("org.eclipse.swtbot.widget.key", "csFilterType");
         
         filterText = new Text(this, SWT.BORDER | SWT.SINGLE);
         GridData gd = new GridData();
         gd.widthHint = 100;
         filterText.setLayoutData(gd);
-        filterText.setData("testKey", "filterText");
+        filterText.setData("org.eclipse.swtbot.widget.key", "csFilterText");
         
         Sash sash = new Sash(this, SWT.NONE);
         gd = new GridData();
@@ -109,10 +110,10 @@ public class CSToolBar extends Composite {
      * @author Malte Brunnlieb (03.05.2012)
      */
     void setListeners(FilterController toolBarController) {
-        dropDownBox.setData("setSearchFilter");
+        dropDownBox.setData("actionCommand", "setSearchFilter");
         dropDownBox.addListener(SWT.Selection, toolBarController);
         filterText.addKeyListener(toolBarController);
-        onlyOpenCommentsCheckbox.setData("setOnlyOpenFilter");
+        onlyOpenCommentsCheckbox.setData("actionCommand", "setOnlyOpenFilter");
         onlyOpenCommentsCheckbox.addSelectionListener(toolBarController);
     }
     

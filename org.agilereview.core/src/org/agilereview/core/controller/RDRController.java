@@ -23,90 +23,90 @@ import org.eclipse.core.runtime.Platform;
  * @author Malte Brunnlieb (28.03.2012)
  */
 public class RDRController {
-	
-	/**
-	 * ExtensionPoint id for extensions implementing {@link IReviewDataReceiver}
-	 */
-	public static final String IREVIEWDATARECEIVER_ID = "org.agilereview.core.ReviewDataReceiver";
-	
-	/**
-	 * Singleton instance of {@link RDRController}
-	 */
-	private static final RDRController instance = new RDRController();
-	/**
-	 * Mapping of names to objects of registered {@link IReviewDataReceiver}s
-	 */
-	private final List<IReviewDataReceiver> registeredClients = new LinkedList<IReviewDataReceiver>();
-	
-	/**
-	 * Creates a new instance of {@link RDRController}
-	 * @author Malte Brunnlieb (28.03.2012)
-	 */
-	private RDRController() {
-		checkForNewClients();
-	}
-	
-	/**
-	 * Returns the singleton instance of the {@link RDRController}
-	 * @return the singleton of {@link RDRController}
-	 * @author Malte Brunnlieb (28.03.2012)
-	 */
-	public static RDRController getInstance() {
-		return instance;
-	}
-	
-	/**
-	 * Notifies the registered {@link IReviewDataReceiver} with the new data provided by the backend
-	 * @param rdr {@link IReviewDataReceiver} which should be notified
-	 * @param newData list of {@link Review}s
-	 * @author Malte Brunnlieb (28.03.2012)
-	 */
-	public void notifyClient(IReviewDataReceiver rdr, List<Review> newData) {
-		rdr.setReviewData(newData);
-	}
-	
-	/**
-	 * Notifies all registered {@link IReviewDataReceiver}s with the new data provided by the backend
-	 * @param newData list of {@link Review}s
-	 * @author Malte Brunnlieb (28.03.2012)
-	 */
-	public void notifyAllClients(List<Review> newData) {
-		for (IReviewDataReceiver rdr : registeredClients) {
-			notifyClient(rdr, newData);
-		}
-	}
-	
-	/**
-	 * Checks whether the given {@link IReviewDataReceiver} is already registered
-	 * @param rdr {@link IReviewDataReceiver} to be checked for registration
-	 * @return true, if the given {@link IReviewDataReceiver} is already registered<br>false, otherwise
-	 * @author Malte Brunnlieb (28.03.2012)
-	 */
-	public boolean isRegistered(IReviewDataReceiver rdr) {
-		return registeredClients.contains(rdr);
-	}
-	
-	/**
-	 * Performs a check for new {@link IReviewDataReceiver}s registered at the ExtensionPoint
-	 * @author Malte Brunnlieb (24.03.2012)
-	 */
-	public void checkForNewClients() { //TODO check for new clients whenever a new plugin was installed
-		IConfigurationElement[] config = Platform.getExtensionRegistry().getConfigurationElementsFor(IREVIEWDATARECEIVER_ID);
-		if (config.length == 0) {
-			registeredClients.clear();
-			return;
-		}
-		
-		try {
-			for (IConfigurationElement e : config) {
-				final Object o = e.createExecutableExtension("class");
-				if (o instanceof IReviewDataReceiver) {
-					final IReviewDataReceiver rdr = (IReviewDataReceiver) o;
-					registeredClients.add(rdr);
-				}
-			}
-		} catch (CoreException ex) {
-			ExceptionHandler.logAndNotifyUser("An eclipse internal error occurred while determining ReviewDataReceiver", ex);
-		}
-	}
+    
+    /**
+     * ExtensionPoint id for extensions implementing {@link IReviewDataReceiver}
+     */
+    public static final String IREVIEWDATARECEIVER_ID = "org.agilereview.core.ReviewDataReceiver";
+    
+    /**
+     * Singleton instance of {@link RDRController}
+     */
+    private static final RDRController instance = new RDRController();
+    /**
+     * Mapping of names to objects of registered {@link IReviewDataReceiver}s
+     */
+    private final List<IReviewDataReceiver> registeredClients = new LinkedList<IReviewDataReceiver>();
+    
+    /**
+     * Creates a new instance of {@link RDRController}
+     * @author Malte Brunnlieb (28.03.2012)
+     */
+    private RDRController() {
+        checkForNewClients();
+    }
+    
+    /**
+     * Returns the singleton instance of the {@link RDRController}
+     * @return the singleton of {@link RDRController}
+     * @author Malte Brunnlieb (28.03.2012)
+     */
+    public static RDRController getInstance() {
+        return instance;
+    }
+    
+    /**
+     * Notifies the registered {@link IReviewDataReceiver} with the new data provided by the backend
+     * @param rdr {@link IReviewDataReceiver} which should be notified
+     * @param newData list of {@link Review}s
+     * @author Malte Brunnlieb (28.03.2012)
+     */
+    public void notifyClient(IReviewDataReceiver rdr, List<Review> newData) {
+        rdr.setReviewData(newData);
+    }
+    
+    /**
+     * Notifies all registered {@link IReviewDataReceiver}s with the new data provided by the backend
+     * @param newData list of {@link Review}s
+     * @author Malte Brunnlieb (28.03.2012)
+     */
+    public void notifyAllClients(List<Review> newData) {
+        for (IReviewDataReceiver rdr : registeredClients) {
+            notifyClient(rdr, newData);
+        }
+    }
+    
+    /**
+     * Checks whether the given {@link IReviewDataReceiver} is already registered
+     * @param rdr {@link IReviewDataReceiver} to be checked for registration
+     * @return true, if the given {@link IReviewDataReceiver} is already registered<br>false, otherwise
+     * @author Malte Brunnlieb (28.03.2012)
+     */
+    public boolean isRegistered(IReviewDataReceiver rdr) {
+        return registeredClients.contains(rdr);
+    }
+    
+    /**
+     * Performs a check for new {@link IReviewDataReceiver}s registered at the ExtensionPoint
+     * @author Malte Brunnlieb (24.03.2012)
+     */
+    public void checkForNewClients() { //TODO check for new clients whenever a new plugin was installed
+        IConfigurationElement[] config = Platform.getExtensionRegistry().getConfigurationElementsFor(IREVIEWDATARECEIVER_ID);
+        if (config.length == 0) {
+            registeredClients.clear();
+            return;
+        }
+        
+        for (IConfigurationElement e : config) {
+            try {
+                final Object o = e.createExecutableExtension("class");
+                if (o instanceof IReviewDataReceiver) {
+                    final IReviewDataReceiver rdr = (IReviewDataReceiver) o;
+                    registeredClients.add(rdr);
+                }
+            } catch (CoreException ex) {
+                ExceptionHandler.logAndNotifyUser("An error occurred while instantiating ReviewDataReceiver " + e.getAttribute("class"), ex);
+            }
+        }
+    }
 }

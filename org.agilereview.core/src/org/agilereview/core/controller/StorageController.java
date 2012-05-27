@@ -8,10 +8,12 @@
 package org.agilereview.core.controller;
 
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 
 import org.agilereview.core.exception.ExceptionHandler;
 import org.agilereview.core.exception.NoStorageClientDefinedException;
+import org.agilereview.core.external.definition.IReviewDataReceiver;
 import org.agilereview.core.external.definition.IStorageClient;
 import org.agilereview.core.external.storage.Comment;
 import org.agilereview.core.external.storage.Reply;
@@ -20,6 +22,7 @@ import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.ui.PlatformUI;
 
 /**
  * The {@link StorageController} manages the {@link IStorageClient}s for the org.agilereview.core.StorageClient ExtensionPoint and provides
@@ -44,7 +47,7 @@ public class StorageController implements IStorageClient {
     /**
      * Currently active {@link IStorageClient} on which all operations will be called
      */
-    private final String activeClient = null;
+    private String activeClient = null;
     
     /**
      * Creates a new instance of the {@link StorageController}
@@ -75,16 +78,50 @@ public class StorageController implements IStorageClient {
             return;
         }
         
-        try {
-            for (IConfigurationElement e : config) {
+        String firstClient = null;
+        for (IConfigurationElement e : config) {
+            try {
                 final Object o = e.createExecutableExtension("class");
                 if (o instanceof IStorageClient) {
                     final IStorageClient sc = (IStorageClient) o;
                     registeredClients.put(sc.getName(), sc);
+                    firstClient = sc.getName();
                 }
+            } catch (CoreException ex) {
+                ExceptionHandler.logAndNotifyUser("An error occurred while instantiating StorageClient " + e.getAttribute("class"), ex);
             }
-        } catch (CoreException ex) {
-            ExceptionHandler.logAndNotifyUser("An eclipse internal error occurred while determining StorageClients", ex);
+        }
+        
+        if (PlatformUI.getPreferenceStore().getBoolean("org.agilereview.testrunner.mock.storage")) { //TODO if client can be set via preferences -> use this
+            setStorageClient("StorageClientMock");
+        } else if (firstClient != null) {
+            setStorageClient(firstClient); //TODO do not use last, but manage to set this client via preferences
+        }
+    }
+    
+    /**
+     * Returns the currently available storage clients
+     * @return a list of the names of all available storage clients
+     * @author Malte Brunnlieb (27.05.2012)
+     */
+    public List<String> getAvailableStorageClients() {
+        List<String> names = new LinkedList<String>();
+        for (IStorageClient sc : registeredClients.values()) {
+            names.add(sc.getName());
+        }
+        return names;
+    }
+    
+    /**
+     * Sets the storage client which should store and read review data. If there is no available storage client for the given name, nothing changes.
+     * After setting a new storage client all {@link IReviewDataReceiver} will be notified.
+     * @param name the name under which the storage client is registered
+     * @author Malte Brunnlieb (27.05.2012)
+     */
+    public void setStorageClient(String name) {
+        if (registeredClients.containsKey(name)) {
+            activeClient = name;
+            RDRController.getInstance().notifyAllClients(getAllReviews());
         }
     }
     
@@ -110,7 +147,8 @@ public class StorageController implements IStorageClient {
             Assert.isNotNull(result);
             return result;
         } catch (Throwable ex) {
-            ExceptionHandler.logAndNotifyUser("An unknown exception occured in StorageClient '" + activeClient + "' while retrieving the its name", ex);
+            ExceptionHandler.logAndNotifyUser("An unknown exception occured in StorageClient '" + activeClient + "' while retrieving the its name",
+                    ex);
         }
         return null;
     }
@@ -127,7 +165,8 @@ public class StorageController implements IStorageClient {
             Assert.isNotNull(result);
             return result;
         } catch (Throwable ex) {
-            ExceptionHandler.logAndNotifyUser("An unknown exception occured in StorageClient '" + activeClient + "' while retrieving all comments", ex);
+            ExceptionHandler.logAndNotifyUser("An unknown exception occured in StorageClient '" + activeClient + "' while retrieving all comments",
+                    ex);
         }
         return null;
     }
@@ -141,8 +180,8 @@ public class StorageController implements IStorageClient {
         try {
             registeredClients.get(activeClient).addReview(review);
         } catch (Throwable ex) {
-            ExceptionHandler.logAndNotifyUser("An unknown exception occured in StorageClient '" + activeClient + "' while adding review '" + review.getId()
-                    + "'", ex);
+            ExceptionHandler.logAndNotifyUser("An unknown exception occured in StorageClient '" + activeClient + "' while adding review '"
+                    + review.getId() + "'", ex);
         }
     }
     
@@ -157,8 +196,8 @@ public class StorageController implements IStorageClient {
             Assert.isNotNull(result);
             return result;
         } catch (Throwable ex) {
-            ExceptionHandler.logAndNotifyUser("An unknown exception occured in StorageClient '" + activeClient + "' while retrieving an ID for new review",
-                    ex);
+            ExceptionHandler.logAndNotifyUser("An unknown exception occured in StorageClient '" + activeClient
+                    + "' while retrieving an ID for new review", ex);
         }
         return null;
     }
@@ -174,8 +213,8 @@ public class StorageController implements IStorageClient {
             Assert.isNotNull(result);
             return result;
         } catch (Throwable ex) {
-            ExceptionHandler.logAndNotifyUser(
-                    "An unknown exception occured in StorageClient '" + activeClient + "' while retrieving an ID for new comment", ex);
+            ExceptionHandler.logAndNotifyUser("An unknown exception occured in StorageClient '" + activeClient
+                    + "' while retrieving an ID for new comment", ex);
         }
         return null;
     }
@@ -191,8 +230,8 @@ public class StorageController implements IStorageClient {
             Assert.isNotNull(result);
             return result;
         } catch (Throwable ex) {
-            ExceptionHandler.logAndNotifyUser("An unknown exception occured in StorageClient '" + activeClient + "' while retrieving an ID for new reply",
-                    ex);
+            ExceptionHandler.logAndNotifyUser("An unknown exception occured in StorageClient '" + activeClient
+                    + "' while retrieving an ID for new reply", ex);
         }
         return null;
     }

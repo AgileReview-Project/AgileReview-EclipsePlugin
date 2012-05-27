@@ -11,6 +11,7 @@ import org.agilereview.core.Activator;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.ui.PlatformUI;
 
 /**
  * Handles all exceptions of the core PlugIn. It informs the user about the problem occurred and logs it.
@@ -25,17 +26,16 @@ public class ExceptionHandler {
      * @author Malte Brunnlieb (24.03.2012)
      */
     public static void logAndNotifyUser(final Throwable ex) {
-        System.out.println(Activator.getDefault());
-        System.out.println(Activator.getDefault().getLog());
-        System.out.println(ex.getMessage());
         Activator.getDefault().getLog().log(new Status(Status.ERROR, Activator.PLUGIN_ID, ex.getMessage(), ex));
-        Display.getDefault().asyncExec(new Runnable() {
-            
-            @Override
-            public void run() {
-                MessageDialog.openError(Display.getCurrent().getActiveShell(), "An error occured", ex.toString() + ": " + ex.getMessage());
-            }
-        });
+        if (!PlatformUI.getPreferenceStore().getBoolean("org.agilereview.testrunner.active")) {
+            Display.getDefault().asyncExec(new Runnable() {
+                
+                @Override
+                public void run() {
+                    MessageDialog.openError(Display.getCurrent().getActiveShell(), "An error occured", ex.toString() + ": " + ex.getMessage());
+                }
+            });
+        }
     }
     
     /**
@@ -47,12 +47,14 @@ public class ExceptionHandler {
      */
     public static void logAndNotifyUser(final String msg, final Throwable ex) {
         Activator.getDefault().getLog().log(new Status(Status.ERROR, Activator.PLUGIN_ID, ex.toString() + ": " + msg, ex));
-        Display.getDefault().asyncExec(new Runnable() {
-            
-            @Override
-            public void run() {
-                MessageDialog.openError(Display.getCurrent().getActiveShell(), "An error occured", ex.toString() + ": " + msg);
-            }
-        });
+        if (!PlatformUI.getPreferenceStore().getBoolean("org.agilereview.testrunner.active")) {
+            Display.getDefault().asyncExec(new Runnable() {
+                
+                @Override
+                public void run() {
+                    MessageDialog.openError(Display.getCurrent().getActiveShell(), "An error occured", ex.toString() + ": " + msg);
+                }
+            });
+        }
     }
 }

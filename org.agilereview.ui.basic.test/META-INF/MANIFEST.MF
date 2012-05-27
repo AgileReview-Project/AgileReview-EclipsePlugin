@@ -8,4 +8,6 @@ Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Require-Bundle: org.junit4;bundle-version="4.8.1",
  org.agilereview.test.common;bundle-version="1.0.0",
  org.eclipse.swtbot.eclipse.finder;bundle-version="2.0.5",
- org.eclipse.swtbot.forms.finder;bundle-version="2.0.5"
+ org.eclipse.swtbot.forms.finder;bundle-version="2.0.5",
+ org.apache.log4j;bundle-version="1.2.13",
+ org.agilereview.test.mock.storage;bundle-version="1.0.0"
