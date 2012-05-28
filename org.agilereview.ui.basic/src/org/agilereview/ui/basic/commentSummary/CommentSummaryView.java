@@ -64,6 +64,14 @@ public class CommentSummaryView extends ViewPart {
         parent.setLayout(new GridLayout());
         TableContentProvider.bind(this);
         
+        synchronized (parent) {
+            if (tableContentProvider == null) {
+                displayStorageDisconnect();
+            } else {
+                createUI();
+            }
+        }
+        
         //add help context
         PlatformUI.getWorkbench().getHelpSystem().setHelp(parent, Activator.PLUGIN_ID + ".TableView"); //TODO adapt help context
     }
@@ -89,8 +97,6 @@ public class CommentSummaryView extends ViewPart {
         filterController = new FilterController(toolBar, viewer, commentFilter);
         toolBar.setListeners(filterController);
         getSite().getWorkbenchWindow().getSelectionService().addSelectionListener("org.agilereview.ui.basic.reviewExplorerView", filterController);
-        
-        TableContentProvider.bind(this);
     }
     
     /**
@@ -100,7 +106,9 @@ public class CommentSummaryView extends ViewPart {
      */
     @Override
     public void setFocus() {
-        toolBar.setFocus();
+        if (toolBar != null) {
+            toolBar.setFocus();
+        }
     }
     
     /**
@@ -110,14 +118,16 @@ public class CommentSummaryView extends ViewPart {
      * @author Malte Brunnlieb (27.05.2012)
      */
     public void bindTableModel(TableContentProvider tableModel) {
-        tableContentProvider = tableModel;
-        if (tableContentProvider != null) {
-            if (viewer == null) {
-                createUI();
+        synchronized (parent) {
+            tableContentProvider = tableModel;
+            if (tableContentProvider != null) {
+                if (viewer == null) {
+                    createUI();
+                }
+                viewer.setContentProvider(tableContentProvider);
+            } else {
+                displayStorageDisconnect();
             }
-            viewer.setContentProvider(tableContentProvider);
-        } else {
-            displayStorageDisconnect();
         }
     }
     
@@ -135,6 +145,7 @@ public class CommentSummaryView extends ViewPart {
         gd.horizontalAlignment = GridData.CENTER;
         gd.verticalAlignment = GridData.CENTER;
         label.setLayoutData(gd);
+        parent.pack();
     }
     
     /**
@@ -142,7 +153,10 @@ public class CommentSummaryView extends ViewPart {
      * @author Malte Brunnlieb (27.05.2012)
      */
     private void clearParent() {
-        getSite().getWorkbenchWindow().getSelectionService().removeSelectionListener("org.agilereview.ui.basic.reviewExplorerView", filterController);
+        if (filterController != null) {
+            getSite().getWorkbenchWindow().getSelectionService().removeSelectionListener("org.agilereview.ui.basic.reviewExplorerView",
+                    filterController);
+        }
         toolBar = null;
         viewer = null;
         for (Control child : parent.getChildren()) {
@@ -157,7 +171,10 @@ public class CommentSummaryView extends ViewPart {
      */
     @Override
     public void dispose() {
-        getSite().getWorkbenchWindow().getSelectionService().removeSelectionListener("org.agilereview.ui.basic.reviewExplorerView", filterController);
+        if (filterController != null) {
+            getSite().getWorkbenchWindow().getSelectionService().removeSelectionListener("org.agilereview.ui.basic.reviewExplorerView",
+                    filterController);
+        }
         super.dispose();
     }
 }

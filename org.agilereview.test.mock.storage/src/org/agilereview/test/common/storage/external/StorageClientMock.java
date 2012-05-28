@@ -25,12 +25,25 @@ public class StorageClientMock implements IStorageClient {
      * Dummy object storage
      */
     private List<Review> reviews = new LinkedList<Review>();
+    /**
+     * The instance created by the {@link IStorageClient} extension point
+     */
     private static StorageClientMock instance;
     
+    /**
+     * Creates a new instance of the {@link StorageClientMock}
+     * @author Malte Brunnlieb (28.05.2012)
+     */
     public StorageClientMock() {
         instance = this;
     }
     
+    /**
+     * Returns the instance created by the {@link IStorageClient} extension point. If the instance is not available at the moment, the constructor
+     * will block until it is.
+     * @return the instance created by the {@link IStorageClient} extension point
+     * @author Malte Brunnlieb (28.05.2012)
+     */
     public static StorageClientMock getInstance() {
         while (instance == null) {
         }

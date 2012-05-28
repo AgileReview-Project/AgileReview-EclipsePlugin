@@ -14,29 +14,44 @@ import org.agilereview.core.external.definition.IReviewDataReceiver;
 import org.agilereview.core.external.storage.Comment;
 import org.agilereview.core.external.storage.Review;
 import org.agilereview.ui.basic.commentSummary.CommentSummaryView;
-import org.eclipse.jface.viewers.IContentProvider;
+import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.Viewer;
 
 /**
  * ContentProvider for the {@link CommentSummaryView} table
  * @author Malte Brunnlieb (27.05.2012)
  */
-public class TableContentProvider implements IContentProvider, IReviewDataReceiver {
+public class TableContentProvider implements IStructuredContentProvider, IReviewDataReceiver {
     
+    /**
+     * Instance created by the {@link IReviewDataReceiver} extension point
+     */
     private static TableContentProvider instance;
     /**
      * The comments to be displayed (model of TableViewer viewer)
      */
-    private List<Comment> comments;
+    private final List<Comment> comments = new LinkedList<Comment>();
     /**
      * Current {@link CommentSummaryView} instance
      */
     private static CommentSummaryView commentSummaryView;
+    /**
+     * Object in order to synchronize model <-> table binding
+     */
+    private static Object syncObj = new Object();
     
+    /**
+     * Creates a new {@link TableContentProvider} instance and binds it to the {@link CommentSummaryView} if possible
+     * @author Malte Brunnlieb (28.05.2012)
+     */
     public TableContentProvider() {
-        instance = this;
-        if (commentSummaryView != null) {
-            commentSummaryView.bindTableModel(this);
+        System.out.println("create TableContentProvider");
+        synchronized (syncObj) {
+            instance = this;
+            if (commentSummaryView != null) {
+                commentSummaryView.bindTableModel(this);
+                System.out.println("create TableContentProvider -> bindTableModel");
+            }
         }
     }
     
@@ -46,9 +61,14 @@ public class TableContentProvider implements IContentProvider, IReviewDataReceiv
      * @author Malte Brunnlieb (27.05.2012)
      */
     public static void bind(CommentSummaryView view) {
-        commentSummaryView = view;
-        if (instance != null) {
-            commentSummaryView.bindTableModel(instance);
+        System.out.println("bind CommentSummaryView to model");
+        synchronized (syncObj) {
+            System.out.println("in lock");
+            commentSummaryView = view;
+            if (instance != null) {
+                commentSummaryView.bindTableModel(instance);
+                System.out.println("bind model to commentsummary");
+            }
         }
     }
     
@@ -59,11 +79,10 @@ public class TableContentProvider implements IContentProvider, IReviewDataReceiv
      */
     @Override
     public void setReviewData(List<Review> reviews) {
-        List<Comment> newComments = new LinkedList<Comment>();
+        comments.clear();
         for (Review r : reviews) {
-            newComments.addAll(r.getComments());
+            comments.addAll(r.getComments());
         }
-        comments = newComments;
         
         //TODO inform Parser
     }
@@ -87,6 +106,17 @@ public class TableContentProvider implements IContentProvider, IReviewDataReceiv
      */
     @Override
     public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
-        // TODO check if implementation is necessary
+        viewer.setInput(newInput);
+        viewer.refresh();
+    }
+    
+    /**
+     * {@inheritDoc}
+     * @see org.eclipse.jface.viewers.IStructuredContentProvider#getElements(java.lang.Object)
+     * @author Malte Brunnlieb (28.05.2012)
+     */
+    @Override
+    public Object[] getElements(Object inputElement) {
+        return comments.toArray(new Comment[0]);
     }
 }
