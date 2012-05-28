@@ -72,7 +72,7 @@ public class NewReviewSourceProjectWizard extends Wizard implements INewWizard {
 		String projectName = page.getReviewSourceName();
 		boolean useDirectly = page.getUseDirectly();
 		
-		boolean result = SourceFolderManager.createAndOpenReviewProject(projectName);
+		boolean result = SourceFolderManager.createAndOpenSourceFolder(projectName);
 		if (result) {
 			createdProjectName = projectName;
 		}

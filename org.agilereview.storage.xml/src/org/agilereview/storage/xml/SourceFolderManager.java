@@ -1,9 +1,16 @@
 package org.agilereview.storage.xml;
 
+import java.io.ByteArrayInputStream;
+
+import org.agilereview.core.external.storage.Comment;
+import org.agilereview.core.external.storage.Review;
 import org.agilereview.storage.xml.exception.ExceptionHandler;
 import org.agilereview.storage.xml.wizards.noreviewsource.NoReviewSourceProjectWizard;
+import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IProjectDescription;
+import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
@@ -21,7 +28,7 @@ import org.eclipse.swt.widgets.Display;
 public class SourceFolderManager implements IPropertyChangeListener {
 
 	//TODO compatibility to old nature IDs?
-	
+
 	/**
 	 * Name of the property which stores the name of the current source folder
 	 */
@@ -72,18 +79,18 @@ public class SourceFolderManager implements IPropertyChangeListener {
 				}
 			});
 		} else {
-			setProjectNatures(currentSourceFolder, new String[]{ AGILEREVIEW_NATURE });
+			setProjectNatures(currentSourceFolder, new String[] { AGILEREVIEW_NATURE });
 			currentSourceFolder = p;
-			setProjectNatures(currentSourceFolder, new String[]{ AGILEREVIEW_NATURE, AGILEREVIEW_ACTIVE_NATURE });
+			setProjectNatures(currentSourceFolder, new String[] { AGILEREVIEW_NATURE, AGILEREVIEW_ACTIVE_NATURE });
 		}
 	}
-	
+
 	/**
-	 * Creates and opens the given AgileReview Source Project (if not existent or closed)
+	 * Creates and opens the given AgileReview Source Folder (if not existent or closed)
 	 * @param projectName project name
 	 * @return <i>true</i> if everything worked,<i>false</i> if something went wrong
 	 */
-	public static boolean createAndOpenReviewProject(String projectName) {
+	public static boolean createAndOpenSourceFolder(String projectName) {
 		boolean result = true;
 		IWorkspaceRoot workspaceRoot = ResourcesPlugin.getWorkspace().getRoot();
 		IProject p = workspaceRoot.getProject(projectName);
@@ -106,14 +113,14 @@ public class SourceFolderManager implements IPropertyChangeListener {
 			// Set project description
 			setProjectNatures(p, new String[] { AGILEREVIEW_NATURE });
 		} catch (final CoreException e) {
-			String message = "Could not create or open AgileReview Source Project "+projectName+"!";
+			String message = "Could not create or open AgileReview Source Project " + projectName + "!";
 			Activator.getDefault().getLog().log(new Status(IStatus.ERROR, Activator.PLUGIN_ID, message));
 			ExceptionHandler.notifyUser(message);
 			result = false;
 		}
 		return result;
 	}
-	
+
 	/**
 	 * Sets the given project natures to those specified by those in "natures".
 	 * @param p The project.
@@ -127,20 +134,89 @@ public class SourceFolderManager implements IPropertyChangeListener {
 			p.setDescription(projectDesc, null);// TODO: Use ProgressMonitor?
 			return true;
 		} catch (final CoreException e) {
-			String message = "Could not set project natures for project "+p.getName()+"!";
+			String message = "Could not set project natures for project " + p.getName() + "!";
 			ExceptionHandler.notifyUser(message, e);
 			Activator.getDefault().getLog().log(new Status(IStatus.ERROR, Activator.PLUGIN_ID, message));
 			return false;
 		}
 	}
-	
+
 	/**
 	 * 
 	 * @author Peter Reuter (24.05.2012)
 	 */
-	public static void prepareCurrentSourceProjectForClosing() {
-		setProjectNatures(currentSourceFolder, new String[]{ AGILEREVIEW_NATURE });
+	public static void prepareCurrentSourceFolderForClosing() {
+		setProjectNatures(currentSourceFolder, new String[] { AGILEREVIEW_NATURE });
 	}
+
+	///////////////////////////////////////////////////
+	// static methods for managing files and folders //
+	///////////////////////////////////////////////////
+
+	/**
+	 * Creates an {@link IFile} object which represents the file for storing {@link Comment} objects based on the given reviewId/author pair. The file
+	 * is create if it does not exist.
+	 * @param reviewId
+	 * @param author
+	 * @return {@link IFile} for the given parameter pair
+	 */
+	static IFile getCommentFile(String reviewId, String author) {
+		IFile file = getReviewFolder(reviewId).getFile("author_" + author + ".xml");
+		if (!file.exists()) {
+			try {
+				// TODO maybe use ProgressMonitor here?
+				file.create(new ByteArrayInputStream("".getBytes()), IResource.NONE, null);
+				while (!file.exists()) {
+				}
+			} catch (final CoreException e) {
+				ExceptionHandler.notifyUser(e);
+			}
+		}
+		return file;
+	}
+
+	/**
+	 * Returns an {@link IFolder} object which represents the folder of the {@link Review} given by its ID. The folder is created if it does not
+	 * exists.
+	 * @param reviewId
+	 * @return {@link IFolder} for this review
+	 */
+	static IFolder getReviewFolder(String reviewId) {
+		IFolder folder = getCurrentSourceFolder().getFolder("review." + reviewId);
+		if (!folder.exists()) {
+			try {
+				// TODO maybe use progressmonitor here?
+				folder.create(IResource.NONE, true, null);
+				while (!folder.exists()) {
+				}
+			} catch (final CoreException e) {
+				ExceptionHandler.notifyUser(e);
+			}
+		}
+		return folder;
+	}
+
+	/**
+	 * Returns an {@link IFile} object which represents the the review-file of the {@link Review} given by its ID. The file and its review folder are
+	 * created if they do not exist.
+	 * @param reviewId
+	 * @return {@link IFile} for this review
+	 */
+	static IFile getReviewFile(String reviewId) {
+		IFile file = getReviewFolder(reviewId).getFile("review.xml");
+		if (!file.exists()) {
+			try {
+				// TODO maybe use ProgressMonitor here?
+				file.create(new ByteArrayInputStream("".getBytes()), IResource.NONE, null);
+				while (!file.exists()) {
+				}
+			} catch (final CoreException e) {
+				ExceptionHandler.notifyUser(e);
+			}
+		}
+		return file;
+	}
+
 	///////////////////////////////////////
 	// methods of PropertyChangeListener //
 	///////////////////////////////////////

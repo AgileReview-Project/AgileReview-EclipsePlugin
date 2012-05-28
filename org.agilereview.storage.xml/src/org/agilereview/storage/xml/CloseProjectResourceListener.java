@@ -164,7 +164,7 @@ public class CloseProjectResourceListener implements IResourceChangeListener {
 		// Remove active nature, if needed
 		if (oldSourceProject != null) {
 			if (oldSourceProject.equals(resource)) {
-				SourceFolderManager.prepareCurrentSourceProjectForClosing();
+				SourceFolderManager.prepareCurrentSourceFolderForClosing();
 			}
 		}
 	}
