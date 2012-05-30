@@ -22,7 +22,7 @@ import org.eclipse.core.runtime.Platform;
  * functionality for notifying all registered {@link IReviewDataReceiver} about changed backend data.
  * @author Malte Brunnlieb (28.03.2012)
  */
-public class RDRController {
+public class RDRController implements Runnable {
     
     /**
      * ExtensionPoint id for extensions implementing {@link IReviewDataReceiver}
@@ -61,7 +61,7 @@ public class RDRController {
      * @param newData list of {@link Review}s
      * @author Malte Brunnlieb (28.03.2012)
      */
-    public void notifyClient(IReviewDataReceiver rdr, List<Review> newData) {
+    private void notifyClient(IReviewDataReceiver rdr, List<Review> newData) {
         rdr.setReviewData(newData);
     }
     
@@ -70,7 +70,7 @@ public class RDRController {
      * @param newData list of {@link Review}s
      * @author Malte Brunnlieb (28.03.2012)
      */
-    public void notifyAllClients(List<Review> newData) {
+    void notifyAllClients(List<Review> newData) {
         for (IReviewDataReceiver rdr : registeredClients) {
             notifyClient(rdr, newData);
         }
@@ -82,15 +82,25 @@ public class RDRController {
      * @return true, if the given {@link IReviewDataReceiver} is already registered<br>false, otherwise
      * @author Malte Brunnlieb (28.03.2012)
      */
-    public boolean isRegistered(IReviewDataReceiver rdr) {
+    boolean isRegistered(IReviewDataReceiver rdr) {
         return registeredClients.contains(rdr);
     }
     
     /**
-     * Performs a check for new {@link IReviewDataReceiver}s registered at the ExtensionPoint
+     * Starts searching for new {@link IReviewDataReceiver}s registered at the ExtensionPoint asynchronously
      * @author Malte Brunnlieb (24.03.2012)
      */
-    public void checkForNewClients() { //TODO check for new clients whenever a new plugin was installed
+    void checkForNewClients() {
+        new Thread(this).start();
+    }
+    
+    /**
+     * Performs a check for new {@link IReviewDataReceiver}s registered at the ExtensionPoint
+     * @see java.lang.Runnable#run()
+     * @author Malte Brunnlieb (30.05.2012)
+     */
+    @Override
+    public void run() {
         IConfigurationElement[] config = Platform.getExtensionRegistry().getConfigurationElementsFor(IREVIEWDATARECEIVER_ID);
         if (config.length == 0) {
             registeredClients.clear();

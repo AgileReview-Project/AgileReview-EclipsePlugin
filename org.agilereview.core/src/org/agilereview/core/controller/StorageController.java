@@ -29,7 +29,7 @@ import org.eclipse.ui.PlatformUI;
  * functionalities of the {@link IStorageClient} interface for the currently active {@link IStorageClient}.
  * @author Malte Brunnlieb (22.03.2012)
  */
-public class StorageController implements IStorageClient {
+public class StorageController implements IStorageClient, Runnable {
     
     /**
      * ExtensionPoint id for extensions implementing {@link IStorageClient}
@@ -67,10 +67,20 @@ public class StorageController implements IStorageClient {
     }
     
     /**
-     * Performs a check for new StorageClients registered at the ExtensionPoint
+     * Starts searching for new StorageClients registered at the ExtensionPoint asynchronously
      * @author Malte Brunnlieb (24.03.2012)
      */
-    public void checkForNewClients() {
+    void checkForNewClients() {
+        new Thread(this).start();
+    }
+    
+    /**
+     * Performs a check for new StorageClients registered at the ExtensionPoint
+     * @see java.lang.Runnable#run()
+     * @author Malte Brunnlieb (30.05.2012)
+     */
+    @Override
+    public void run() {
         IConfigurationElement[] config = Platform.getExtensionRegistry().getConfigurationElementsFor(ISTORAGECLIENT_ID);
         if (config.length == 0) {
             ExceptionHandler.logAndNotifyUser(new NoStorageClientDefinedException("No StorageClient available")); //TODO perhaps offer some help
@@ -81,7 +91,7 @@ public class StorageController implements IStorageClient {
         String firstClient = null;
         for (IConfigurationElement e : config) {
             try {
-                final Object o = e.createExecutableExtension("class");
+                final Object o = e.createExecutableExtension("class"); // TODO do not load everything, only the one used... create another "name" tag
                 if (o instanceof IStorageClient) {
                     final IStorageClient sc = (IStorageClient) o;
                     registeredClients.put(sc.getName(), sc);
@@ -121,6 +131,7 @@ public class StorageController implements IStorageClient {
     public void setStorageClient(String name) {
         if (registeredClients.containsKey(name)) {
             activeClient = name;
+            System.out.println(name);
             RDRController.getInstance().notifyAllClients(getAllReviews());
         }
     }
@@ -136,7 +147,7 @@ public class StorageController implements IStorageClient {
     }
     
     /**
-     * This method calls the {@link IStorageClient#getName()} method for the currently active {@link IStorageClient} in a save way
+     * This method will be forwarded to {@link IStorageClient#getName()} of the currently active {@link IStorageClient}
      * @see IStorageClient#getName()
      * @author Malte Brunnlieb (24.03.2012)
      */
@@ -154,7 +165,7 @@ public class StorageController implements IStorageClient {
     }
     
     /**
-     * This method calls the {@link IStorageClient#getAllReviews()} method for the currently active {@link IStorageClient} in a save way
+     * This method will be forwarded to {@link IStorageClient#getAllReviews()} of the currently active {@link IStorageClient}
      * @see org.agilereview.core.external.definition.IStorageClient#getAllReviews()
      * @author Malte Brunnlieb (24.03.2012)
      */
@@ -171,8 +182,9 @@ public class StorageController implements IStorageClient {
         return null;
     }
     
-    /* (non-Javadoc)
-     * @see org.agilereview.core.external.definition.IStorageClient#addReview(org.agilereview.core.external.storage.Review)
+    /**
+     * This method will be forwarded to {@link IStorageClient#addReview(Review)} of the currently active {@link IStorageClient}
+     * @see org.agilereview.core.external.definition.IStorageClient#addReview(Review)
      * @author Malte Brunnlieb (28.04.2012)
      */
     @Override
@@ -185,8 +197,9 @@ public class StorageController implements IStorageClient {
         }
     }
     
-    /* (non-Javadoc)
-     * @see org.agilereview.core.external.definition.IStorageClient#getNewId(org.agilereview.core.external.storage.Review)
+    /**
+     * This method will be forwarded to {@link IStorageClient#getNewId(Review)} of the currently active {@link IStorageClient}
+     * @see org.agilereview.core.external.definition.IStorageClient#getNewId(Review)
      * @author Malte Brunnlieb (28.04.2012)
      */
     @Override
@@ -202,8 +215,9 @@ public class StorageController implements IStorageClient {
         return null;
     }
     
-    /* (non-Javadoc)
-     * @see org.agilereview.core.external.definition.IStorageClient#getNewId(org.agilereview.core.external.storage.Comment)
+    /**
+     * This method will be forwarded to {@link IStorageClient#getNewId(Comment)} of the currently active {@link IStorageClient}
+     * @see org.agilereview.core.external.definition.IStorageClient#getNewId(Comment)
      * @author Malte Brunnlieb (28.04.2012)
      */
     @Override

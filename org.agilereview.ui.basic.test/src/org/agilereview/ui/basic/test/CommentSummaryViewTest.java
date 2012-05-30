@@ -107,28 +107,11 @@ public class CommentSummaryViewTest {
         
         StorageClientMock.getInstance().setStorageContent(reviews);
         
-        //SWTBotView csView = bot.viewById("org.agilereview.ui.basic.commentSummaryView");
-        //((CommentSummaryView) csView.getReference().getPart(false)).setReviewData(reviews);
-        
-        //        try {
-        //            Thread.sleep(5000);
-        //        } catch (InterruptedException e) {
-        //            // TODO Auto-generated catch block
-        //            e.printStackTrace();
-        //        }
-        
         //perform UI test input
         SWTBotCombo filterType = bot.comboBoxWithId("csFilterType");
         filterType.setSelection(Column.AUTHOR.toString());
         SWTBotText searchText = bot.textWithId("csFilterText");
         searchText.pressShortcut(0, 'A');
-        
-        //        try {
-        //            Thread.sleep(5000);
-        //        } catch (InterruptedException e) {
-        //            // TODO Auto-generated catch block
-        //            e.printStackTrace();
-        //        }
         
         //evaluate results
         SWTBotTable table = bot.tableWithId("csTable");

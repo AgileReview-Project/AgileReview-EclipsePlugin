@@ -33,6 +33,21 @@ import org.eclipse.ui.part.ViewPart;
 public class CommentSummaryView extends ViewPart {
     
     /**
+     * The values describe the currently shown content of the {@link CommentSummaryView}
+     * @author Malte Brunnlieb (30.05.2012)
+     */
+    private enum ViewContent {
+        /**
+         * Stays for the state "No StorageClient connected"
+         */
+        DISCONNECTED,
+        /**
+         * Stays for the state where a StorageClient is available and review content will be shown
+         */
+        CONNECTED
+    };
+    
+    /**
      * The {@link ToolBar} for this ViewPart
      */
     private CSToolBar toolBar;
@@ -52,6 +67,10 @@ public class CommentSummaryView extends ViewPart {
      * Parent of this {@link ViewPart}
      */
     private Composite parent;
+    /**
+     * Identifies the current state of the UI
+     */
+    private ViewContent content;
     
     /**
      * {@inheritDoc}
@@ -64,11 +83,11 @@ public class CommentSummaryView extends ViewPart {
         parent.setLayout(new GridLayout());
         TableContentProvider.bind(this);
         
-        synchronized (parent) {
+        synchronized (this.parent) {
             if (tableContentProvider == null) {
-                displayStorageDisconnect();
+                displayStorageDisconnected();
             } else {
-                createUI();
+                buildWorkingUI();
             }
         }
         
@@ -77,11 +96,34 @@ public class CommentSummaryView extends ViewPart {
     }
     
     /**
+     * Binds the given {@link TableContentProvider} to the {@link CSTableViewer} instance of this view. If the parameter is net to null, the
+     * {@link CommentSummaryView} will display a no {@link IStorageClient} registered message instead of a table
+     * @param tableModel model for the {@link CSTableViewer}
+     * @author Malte Brunnlieb (27.05.2012)
+     */
+    public void bindTableModel(TableContentProvider tableModel) {
+        synchronized (parent) {
+            tableContentProvider = tableModel;
+            if (tableContentProvider != null) {
+                if (viewer == null) {
+                    buildWorkingUI();
+                }
+                viewer.setContentProvider(tableContentProvider);
+            } else {
+                displayStorageDisconnected();
+            }
+        }
+    }
+    
+    /**
      * Creates the full functional view using the {@link CSToolBar} and {@link CSTableViewer}
      * @author Malte Brunnlieb (27.05.2012)
      */
-    private void createUI() {
+    private void buildWorkingUI() {
+        if (content == ViewContent.CONNECTED) return;
         clearParent();
+        content = ViewContent.CONNECTED;
+        
         toolBar = new CSToolBar(parent);
         
         viewer = new CSTableViewer(parent);
@@ -100,43 +142,14 @@ public class CommentSummaryView extends ViewPart {
     }
     
     /**
-     * {@inheritDoc}
-     * @see org.eclipse.ui.part.WorkbenchPart#setFocus()
-     * @author Malte Brunnlieb (08.04.2012)
-     */
-    @Override
-    public void setFocus() {
-        if (toolBar != null) {
-            toolBar.setFocus();
-        }
-    }
-    
-    /**
-     * Binds the given {@link TableContentProvider} to the {@link CSTableViewer} instance of this view. If the parameter is net to null, the
-     * {@link CommentSummaryView} will display a no {@link IStorageClient} registered message instead of a table
-     * @param tableModel model for the {@link CSTableViewer}
-     * @author Malte Brunnlieb (27.05.2012)
-     */
-    public void bindTableModel(TableContentProvider tableModel) {
-        synchronized (parent) {
-            tableContentProvider = tableModel;
-            if (tableContentProvider != null) {
-                if (viewer == null) {
-                    createUI();
-                }
-                viewer.setContentProvider(tableContentProvider);
-            } else {
-                displayStorageDisconnect();
-            }
-        }
-    }
-    
-    /**
      * Displays a message as no {@link IStorageClient} provides data
      * @author Malte Brunnlieb (27.05.2012)
      */
-    private void displayStorageDisconnect() {
+    private void displayStorageDisconnected() {
+        if (content == ViewContent.DISCONNECTED) return;
         clearParent();
+        content = ViewContent.CONNECTED;
+        
         Label label = new Label(parent, SWT.CENTER);
         label.setText("No data available as currently no StorageClient is connected.");
         GridData gd = new GridData();
@@ -162,6 +175,7 @@ public class CommentSummaryView extends ViewPart {
         for (Control child : parent.getChildren()) {
             child.dispose();
         }
+        parent.layout();
     }
     
     /**
@@ -176,5 +190,17 @@ public class CommentSummaryView extends ViewPart {
                     filterController);
         }
         super.dispose();
+    }
+    
+    /**
+     * {@inheritDoc}
+     * @see org.eclipse.ui.part.WorkbenchPart#setFocus()
+     * @author Malte Brunnlieb (08.04.2012)
+     */
+    @Override
+    public void setFocus() {
+        if (toolBar != null) {
+            toolBar.setFocus();
+        }
     }
 }

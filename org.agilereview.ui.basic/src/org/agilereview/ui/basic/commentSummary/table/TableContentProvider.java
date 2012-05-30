@@ -45,12 +45,10 @@ public class TableContentProvider implements IStructuredContentProvider, IReview
      * @author Malte Brunnlieb (28.05.2012)
      */
     public TableContentProvider() {
-        System.out.println("create TableContentProvider");
         synchronized (syncObj) {
             instance = this;
             if (commentSummaryView != null) {
                 commentSummaryView.bindTableModel(this);
-                System.out.println("create TableContentProvider -> bindTableModel");
             }
         }
     }
@@ -61,13 +59,10 @@ public class TableContentProvider implements IStructuredContentProvider, IReview
      * @author Malte Brunnlieb (27.05.2012)
      */
     public static void bind(CommentSummaryView view) {
-        System.out.println("bind CommentSummaryView to model");
         synchronized (syncObj) {
-            System.out.println("in lock");
             commentSummaryView = view;
             if (instance != null) {
                 commentSummaryView.bindTableModel(instance);
-                System.out.println("bind model to commentsummary");
             }
         }
     }
@@ -106,8 +101,8 @@ public class TableContentProvider implements IStructuredContentProvider, IReview
      */
     @Override
     public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
-        viewer.setInput(newInput);
-        viewer.refresh();
+        //        viewer.setInput(newInput);
+        //        viewer.refresh();
     }
     
     /**
