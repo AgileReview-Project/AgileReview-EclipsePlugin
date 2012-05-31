@@ -61,16 +61,6 @@ public class StorageClientMock implements IStorageClient {
     
     /**
      * {@inheritDoc}
-     * @see org.agilereview.core.external.definition.IStorageClient#getName()
-     * @author Malte Brunnlieb (27.05.2012)
-     */
-    @Override
-    public String getName() {
-        return "StorageClientMock";
-    }
-    
-    /**
-     * {@inheritDoc}
      * @see org.agilereview.core.external.definition.IStorageClient#getAllReviews()
      * @author Malte Brunnlieb (27.05.2012)
      */

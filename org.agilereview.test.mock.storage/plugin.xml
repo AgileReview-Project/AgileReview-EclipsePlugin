@@ -4,7 +4,8 @@
    <extension
          point="org.agilereview.core.StorageClient">
       <StorageClient
-            class="org.agilereview.test.common.storage.external.StorageClientMock">
+            class="org.agilereview.test.common.storage.external.StorageClientMock"
+            name="StorageMock">
       </StorageClient>
    </extension>
 

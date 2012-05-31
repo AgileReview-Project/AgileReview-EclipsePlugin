@@ -8,8 +8,9 @@
 package org.agilereview.core.controller;
 
 import java.util.HashMap;
-import java.util.LinkedList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.agilereview.core.exception.ExceptionHandler;
 import org.agilereview.core.exception.NoStorageClientDefinedException;
@@ -90,20 +91,14 @@ public class StorageController implements IStorageClient, Runnable {
         
         String firstClient = null;
         for (IConfigurationElement e : config) {
-            try {
-                final Object o = e.createExecutableExtension("class"); // TODO do not load everything, only the one used... create another "name" tag
-                if (o instanceof IStorageClient) {
-                    final IStorageClient sc = (IStorageClient) o;
-                    registeredClients.put(sc.getName(), sc);
-                    firstClient = sc.getName();
-                }
-            } catch (CoreException ex) {
-                ExceptionHandler.logAndNotifyUser("An error occurred while instantiating StorageClient " + e.getAttribute("class"), ex);
+            registeredClients.put(e.getAttribute("name"), null);
+            if (firstClient != null) {
+                firstClient = e.getAttribute("name");
             }
         }
         
         if (PlatformUI.getPreferenceStore().getBoolean("org.agilereview.testrunner.mock.storage")) { //TODO if client can be set via preferences -> use this
-            setStorageClient("StorageClientMock");
+            setStorageClient("StorageMock");
         } else if (firstClient != null) {
             setStorageClient(firstClient); //TODO do not use last, but manage to set this client via preferences
         }
@@ -114,26 +109,54 @@ public class StorageController implements IStorageClient, Runnable {
      * @return a list of the names of all available storage clients
      * @author Malte Brunnlieb (27.05.2012)
      */
-    public List<String> getAvailableStorageClients() {
-        List<String> names = new LinkedList<String>();
-        for (IStorageClient sc : registeredClients.values()) {
-            names.add(sc.getName());
-        }
-        return names;
+    public Set<String> getAvailableStorageClients() {
+        return new HashSet<String>(registeredClients.keySet());
     }
     
     /**
      * Sets the storage client which should store and read review data. If there is no available storage client for the given name, nothing changes.
      * After setting a new storage client all {@link IReviewDataReceiver} will be notified.
      * @param name the name under which the storage client is registered
+     * @return true, if the storage client could be set<br>false, otherwise
      * @author Malte Brunnlieb (27.05.2012)
      */
-    public void setStorageClient(String name) {
+    public boolean setStorageClient(String name) {
         if (registeredClients.containsKey(name)) {
-            activeClient = name;
-            System.out.println(name);
-            RDRController.getInstance().notifyAllClients(getAllReviews());
+            if (registeredClients.get(name) == null) {
+                registeredClients.put(name, loadExtension(name));
+            }
+            if (registeredClients.get(name) != null) {
+                activeClient = name;
+                RDRController.getInstance().notifyAllClients(getAllReviews());
+                return true;
+            }
         }
+        return false;
+    }
+    
+    /**
+     * Loads the extension class identified by its extension name
+     * @param name the name of the extension which should be loaded
+     * @return the {@link IStorageClient} instance loaded from the extension or null if the extension could not be instantiated
+     * @author Malte Brunnlieb (31.05.2012)
+     */
+    private IStorageClient loadExtension(String name) {
+        
+        IConfigurationElement[] config = Platform.getExtensionRegistry().getConfigurationElementsFor(ISTORAGECLIENT_ID);
+        for (IConfigurationElement e : config) {
+            if (e.getAttribute("name").equals(name)) {
+                try {
+                    Object o = e.createExecutableExtension("class");
+                    if (o instanceof IStorageClient) { return (IStorageClient) o; }
+                } catch (CoreException ex) {
+                    ExceptionHandler.logAndNotifyUser("An error occurred while instantiating StorageClient " + name + " defined by class "
+                            + e.getAttribute("class"), ex);
+                    break;
+                }
+            }
+        }
+        
+        return null;
     }
     
     /**
@@ -143,25 +166,7 @@ public class StorageController implements IStorageClient, Runnable {
      * @author Malte Brunnlieb (28.03.2012)
      */
     public boolean isRegistered(IStorageClient sc) {
-        return registeredClients.containsKey(sc.getName());
-    }
-    
-    /**
-     * This method will be forwarded to {@link IStorageClient#getName()} of the currently active {@link IStorageClient}
-     * @see IStorageClient#getName()
-     * @author Malte Brunnlieb (24.03.2012)
-     */
-    @Override
-    public String getName() {
-        try {
-            String result = registeredClients.get(activeClient).getName();
-            Assert.isNotNull(result);
-            return result;
-        } catch (Throwable ex) {
-            ExceptionHandler.logAndNotifyUser("An unknown exception occured in StorageClient '" + activeClient + "' while retrieving the its name",
-                    ex);
-        }
-        return null;
+        return registeredClients.containsValue(sc);
     }
     
     /**

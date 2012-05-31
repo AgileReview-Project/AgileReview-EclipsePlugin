@@ -6,7 +6,8 @@
          name="AgileReview XmlStorageClient"
          point="org.agilereview.core.StorageClient">
       <StorageClient
-            class="org.agilereview.storage.xml.XmlStorageClient">
+            class="org.agilereview.storage.xml.XmlStorageClient"
+            name="XML-Storage">
       </StorageClient>
    </extension>
 
