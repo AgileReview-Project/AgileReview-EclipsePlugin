@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
+import org.agilereview.core.Activator;
 import org.agilereview.core.external.definition.IStorageClient;
 import org.eclipse.core.resources.IFile;
 
@@ -24,9 +25,14 @@ import org.eclipse.core.resources.IFile;
 public class Comment implements PropertyChangeListener {
 	
 	/**
+	 * Name of the property which stores the name of the author
+	 */
+	private static final String AUTHOR_PROPERTYNAME = "author";
+	
+	/**
 	 * The id of the comment that is retrieved from an {@link IStorageClient}
 	 */
-	private final String id;
+	private String id;
 	/**
 	 * The {@link IFile} underlying the editor in which the comment was added
 	 */
@@ -37,8 +43,8 @@ public class Comment implements PropertyChangeListener {
 	private Review review = null;
 	/**
 	 * The author of the comment
-	 */
-	private String author = ""; //TODO maybe seperate author object for sync with color?
+	 */ //TODO maybe seperate author object for sync with color?
+	private String author = Activator.getDefault().getPreferenceStore().getString(AUTHOR_PROPERTYNAME).equals("") ? Activator.getDefault().getPreferenceStore().getDefaultString(AUTHOR_PROPERTYNAME) : Activator.getDefault().getPreferenceStore().getString(AUTHOR_PROPERTYNAME);
 	/**
 	 * The date when the comment was created initially
 	 */
@@ -70,20 +76,18 @@ public class Comment implements PropertyChangeListener {
 	/**
 	 * {@link PropertyChangeSupport} of this POJO, used for firing {@link PropertyChangeEvent}s on changes of fields. 
 	 */
-	private PropertyChangeSupport propertyChangeSupport;
+	private PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(this);
 	
 	/**
 	 * Constructor that should be used if a new comment is created.
 	 * @param id the ID of the comment retrieved from the current {@link IStorageClient}
 	 * @param commentedFile the {@link IFile} underlying the editor in which the comment was added
+	 * @param review The {@link Review} to which the comment belongs to.
 	 */
-	public Comment(String id, IFile commentedFile) {
+	public Comment(String id, IFile commentedFile, Review review) {
 		this.id = id;
 		this.commentedFile = commentedFile;
-		
-		//TODO take author and review from properties
-		this.author = "";
-		this.review = null;
+		this.review = review;
 	}
 	
 	/**

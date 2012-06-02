@@ -14,6 +14,8 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
+import org.agilereview.core.Activator;
+
 /**
  * A class that is used to store replies that were added to a comment. 
  * @author Peter Reuter (19.02.2012)
@@ -21,13 +23,18 @@ import java.util.List;
 public class Reply implements PropertyChangeListener {
 	
 	/**
+	 * Name of the property which stores the name of the author
+	 */
+	private static final String AUTHOR_PROPERTYNAME = "author";
+	
+	/**
 	 * Unique ID of this {@link Reply}
 	 */
-	private String id = "";
+	private String id;
 	/**
 	 * The author of the reply 
-	 */
-	private String author = ""; //TODO maybe seperate author object for sync with color?
+	 */ //TODO maybe seperate author object for sync with color?
+	private String author = Activator.getDefault().getPreferenceStore().getString(AUTHOR_PROPERTYNAME).equals("") ? Activator.getDefault().getPreferenceStore().getDefaultString(AUTHOR_PROPERTYNAME) : Activator.getDefault().getPreferenceStore().getString(AUTHOR_PROPERTYNAME);
 	/**
 	 * The date when the reply was create initially 
 	 */
@@ -51,7 +58,7 @@ public class Reply implements PropertyChangeListener {
 	/**
 	 * {@link PropertyChangeSupport} of this POJO, used for firing {@link PropertyChangeEvent}s on changes of fields.
 	 */
-	private PropertyChangeSupport propertyChangeSupport;
+	private PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(this);
 	
 	
 	/**
@@ -75,10 +82,12 @@ public class Reply implements PropertyChangeListener {
 	
 	/**
 	 * Constructor that should be used if a new reply is created. 
+	 * @param id The ID of the reply
+	 * @param parent The parent {@link Object} of this {@link Reply}, either a {@link Comment} or another {@link Reply}
 	 */
-	public Reply() {
-		//TODO take author from properties
-		this.author = "";
+	public Reply(String id, Object parent) {
+		this.id = id;
+		this.parent = parent;
 	}
 	
 	/**

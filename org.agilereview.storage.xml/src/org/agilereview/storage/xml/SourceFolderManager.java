@@ -32,15 +32,15 @@ public class SourceFolderManager implements IPropertyChangeListener {
 	/**
 	 * Name of the property which stores the name of the current source folder
 	 */
-	public static String SOURCEFOLDER_PROPERTYNAME = "source_folder";
+	public static final String SOURCEFOLDER_PROPERTYNAME = "source_folder";
 	/**
 	 * Nature of the Review Source Folder
 	 */
-	public static String AGILEREVIEW_NATURE = "org.agilereview.sourcefolder";
+	public static final String AGILEREVIEW_NATURE = "org.agilereview.sourcefolder";
 	/**
 	 * Nature of the active Review Source Folder
 	 */
-	public static String AGILEREVIEW_ACTIVE_NATURE = "org.agilereview.sourcefolder.active";
+	public static final String AGILEREVIEW_ACTIVE_NATURE = "org.agilereview.sourcefolder.active";
 	/**
 	 * The {@link IProject} that represents the current source folder
 	 */
@@ -142,7 +142,8 @@ public class SourceFolderManager implements IPropertyChangeListener {
 	}
 
 	/**
-	 * 
+	 * Prepares the current source folder if the user wants to close it. Preparation
+	 * includes removing the "active" nature if it was set.
 	 * @author Peter Reuter (24.05.2012)
 	 */
 	public static void prepareCurrentSourceFolderForClosing() {
