@@ -30,7 +30,7 @@ import org.eclipse.ui.PlatformUI;
  * functionalities of the {@link IStorageClient} interface for the currently active {@link IStorageClient}.
  * @author Malte Brunnlieb (22.03.2012)
  */
-public class StorageController implements IStorageClient, Runnable {
+public class StorageController implements IExtensionController, IStorageClient {
     
     /**
      * ExtensionPoint id for extensions implementing {@link IStorageClient}
@@ -68,10 +68,10 @@ public class StorageController implements IStorageClient, Runnable {
     }
     
     /**
-     * Starts searching for new StorageClients registered at the ExtensionPoint asynchronously
-     * @author Malte Brunnlieb (24.03.2012)
+     * Starts searching for new {@link IReviewDataReceiver}s registered at the ExtensionPoint asynchronously
+     * @author Malte Brunnlieb (02.06.2012)
      */
-    void checkForNewClients() {
+    public void checkForNewClients() {
         new Thread(this).start();
     }
     

@@ -10,6 +10,7 @@ package org.agilereview.core.controller;
 import org.eclipse.core.runtime.IExtension;
 import org.eclipse.core.runtime.IExtensionPoint;
 import org.eclipse.core.runtime.IRegistryEventListener;
+import org.eclipse.core.runtime.Platform;
 
 /**
  * 
@@ -17,35 +18,29 @@ import org.eclipse.core.runtime.IRegistryEventListener;
  */
 public class RegistryListener implements IRegistryEventListener {
     
+    /**
+     * The extension point controller which should be notified about added or removed extensions
+     */
+    private final IExtensionController controller;
+    
+    /**
+     * Creates a new instance of the {@link RegistryListener} listening on the given extensionId
+     * @param extensionId the Id of the extensionPoint this instance listens to
+     * @param controller {@link IExtensionController} which shoule be notified about added or removed extension
+     * @author Malte Brunnlieb (02.06.2012)
+     */
+    public RegistryListener(String extensionId, IExtensionController controller) {
+        this.controller = controller;
+        Platform.getExtensionRegistry().addListener(this, extensionId);
+    }
+    
     /* (non-Javadoc)
      * @see org.eclipse.core.runtime.IRegistryEventListener#added(org.eclipse.core.runtime.IExtension[])
      * @author Malte Brunnlieb (28.03.2012)
      */
     @Override
     public void added(IExtension[] extensions) {
-        
-        StorageController sC = StorageController.getInstance();
-        RDRController rdrC = RDRController.getInstance();
-        
-        boolean newStorageClient = false;
-        boolean newReviewDataReceiverClient = false;
-        
-        //check for new clients and provide latest data
-        for (IExtension e : extensions) {
-            if (e.getExtensionPointUniqueIdentifier().equals(StorageController.ISTORAGECLIENT_ID)) {
-                newStorageClient = true;
-            } else if (e.getExtensionPointUniqueIdentifier().equals(RDRController.IREVIEWDATARECEIVER_ID)) {
-                newReviewDataReceiverClient = true;
-            }
-        }
-        
-        //register all clients if there are new
-        if (newStorageClient) {
-            sC.checkForNewClients();
-        }
-        if (newReviewDataReceiverClient) {
-            rdrC.checkForNewClients();
-        }
+        controller.checkForNewClients();
     }
     
     /* (non-Javadoc)
@@ -54,29 +49,7 @@ public class RegistryListener implements IRegistryEventListener {
      */
     @Override
     public void removed(IExtension[] extensions) {
-        
-        StorageController sC = StorageController.getInstance();
-        RDRController rdrC = RDRController.getInstance();
-        
-        boolean storageClientRemoved = false;
-        boolean reviewDataReceiverClientRemoved = false;
-        
-        //check for new clients and provide latest data
-        for (IExtension e : extensions) {
-            if (e.getExtensionPointUniqueIdentifier().equals(StorageController.ISTORAGECLIENT_ID)) {
-                storageClientRemoved = true;
-            } else if (e.getExtensionPointUniqueIdentifier().equals(RDRController.IREVIEWDATARECEIVER_ID)) {
-                reviewDataReceiverClientRemoved = true;
-            }
-        }
-        
-        //register all clients if there are removed ones
-        if (storageClientRemoved) {
-            sC.checkForNewClients();
-        }
-        if (reviewDataReceiverClientRemoved) {
-            rdrC.checkForNewClients();
-        }
+        controller.checkForNewClients();
     }
     
     /* (non-Javadoc)

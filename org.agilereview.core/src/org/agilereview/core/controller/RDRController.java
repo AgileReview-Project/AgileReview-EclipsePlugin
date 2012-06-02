@@ -22,7 +22,7 @@ import org.eclipse.core.runtime.Platform;
  * functionality for notifying all registered {@link IReviewDataReceiver} about changed backend data.
  * @author Malte Brunnlieb (28.03.2012)
  */
-public class RDRController implements Runnable {
+public class RDRController implements IExtensionController {
     
     /**
      * ExtensionPoint id for extensions implementing {@link IReviewDataReceiver}
@@ -44,6 +44,14 @@ public class RDRController implements Runnable {
      */
     private RDRController() {
         checkForNewClients();
+    }
+    
+    /**
+     * Starts searching for new {@link IReviewDataReceiver}s registered at the ExtensionPoint asynchronously
+     * @author Malte Brunnlieb (02.06.2012)
+     */
+    public void checkForNewClients() {
+        new Thread(this).start();
     }
     
     /**
@@ -84,14 +92,6 @@ public class RDRController implements Runnable {
      */
     boolean isRegistered(IReviewDataReceiver rdr) {
         return registeredClients.contains(rdr);
-    }
-    
-    /**
-     * Starts searching for new {@link IReviewDataReceiver}s registered at the ExtensionPoint asynchronously
-     * @author Malte Brunnlieb (24.03.2012)
-     */
-    void checkForNewClients() {
-        new Thread(this).start();
     }
     
     /**
