@@ -7,12 +7,15 @@
  */
 package org.agilereview.ui.basic.commentSummary.table;
 
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.util.LinkedList;
 import java.util.List;
 
 import org.agilereview.core.external.definition.IReviewDataReceiver;
 import org.agilereview.core.external.storage.Comment;
 import org.agilereview.core.external.storage.Review;
+import org.agilereview.core.external.storage.ReviewList;
 import org.agilereview.ui.basic.commentSummary.CommentSummaryView;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.TableViewer;
@@ -22,7 +25,7 @@ import org.eclipse.jface.viewers.Viewer;
  * ContentProvider for the {@link CommentSummaryView} table
  * @author Malte Brunnlieb (27.05.2012)
  */
-public class ContentProvider implements IStructuredContentProvider, IReviewDataReceiver {
+public class ContentProvider implements IStructuredContentProvider, IReviewDataReceiver, PropertyChangeListener {
     
     /**
      * Instance created by the {@link IReviewDataReceiver} extension point
@@ -74,14 +77,15 @@ public class ContentProvider implements IStructuredContentProvider, IReviewDataR
     
     /**
      * {@inheritDoc}
-     * @see org.agilereview.core.external.definition.IReviewDataReceiver#setReviewData(java.util.List)
+     * @see org.agilereview.core.external.definition.IReviewDataReceiver#setReviewData(ReviewList)
      * @author Malte Brunnlieb (27.05.2012)
      */
     @Override
-    public void setReviewData(List<Review> reviews) {
+    public void setReviewData(ReviewList reviews) {
         if (reviews == null) {
             viewer = commentSummaryView.bindTableModel(null);
         } else {
+            reviews.addPropertyChangeListener(this);
             viewer = commentSummaryView.bindTableModel(this);
             comments.clear();
             for (Review r : reviews) {
@@ -123,5 +127,17 @@ public class ContentProvider implements IStructuredContentProvider, IReviewDataR
     @Override
     public Object[] getElements(Object inputElement) {
         return comments.toArray(new Comment[0]);
+    }
+    
+    /**
+     * {@inheritDoc}
+     * @see java.beans.PropertyChangeListener#propertyChange(java.beans.PropertyChangeEvent)
+     * @author Malte Brunnlieb (03.06.2012)
+     */
+    @Override
+    public void propertyChange(PropertyChangeEvent evt) {
+        if (viewer != null) {
+            viewer.refresh();
+        }
     }
 }

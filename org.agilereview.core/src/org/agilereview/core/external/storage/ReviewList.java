@@ -10,8 +10,8 @@ package org.agilereview.core.external.storage;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
+import java.util.ArrayList;
 import java.util.Collection;
-import java.util.LinkedList;
 
 import org.agilereview.core.external.definition.IReviewDataReceiver;
 
@@ -19,7 +19,7 @@ import org.agilereview.core.external.definition.IReviewDataReceiver;
  * List of {@link Review}s provides property change support for the list itself and the reviews contained
  * @author Malte Brunnlieb (03.06.2012)
  */
-public class ReviewList extends LinkedList<Review> implements PropertyChangeListener {
+public class ReviewList extends ArrayList<Review> implements PropertyChangeListener {
     
     /**
      * Generated serial version UID
@@ -32,12 +32,12 @@ public class ReviewList extends LinkedList<Review> implements PropertyChangeList
     
     /**
      * {@inheritDoc} <br> Added {@link PropertyChangeSupport} for tracking changes by {@link IReviewDataReceiver}
-     * @see java.util.LinkedList#add(int, java.lang.Object)
+     * @see java.util.ArrayList#add(int, java.lang.Object)
      * @author Malte Brunnlieb (03.06.2012)
      */
     @Override
     public void add(int index, Review review) {
-        LinkedList<Review> oldValue = new LinkedList<Review>(this);
+        ArrayList<Review> oldValue = new ArrayList<Review>(this);
         super.add(index, review);
         review.addPropertyChangeListener(this);
         propertyChangeSupport.firePropertyChange("ReviewList", oldValue, this);
@@ -45,12 +45,12 @@ public class ReviewList extends LinkedList<Review> implements PropertyChangeList
     
     /**
      * {@inheritDoc} <br> Added {@link PropertyChangeSupport} for tracking changes by {@link IReviewDataReceiver}
-     * @see java.util.LinkedList#add(java.lang.Object)
+     * @see java.util.ArrayList#add(java.lang.Object)
      * @author Malte Brunnlieb (03.06.2012)
      */
     @Override
     public boolean add(Review e) {
-        LinkedList<Review> oldValue = new LinkedList<Review>(this);
+        ArrayList<Review> oldValue = new ArrayList<Review>(this);
         boolean changed = super.add(e);
         if (changed) {
             e.addPropertyChangeListener(this);
@@ -61,12 +61,12 @@ public class ReviewList extends LinkedList<Review> implements PropertyChangeList
     
     /**
      * {@inheritDoc} <br> Added {@link PropertyChangeSupport} for tracking changes by {@link IReviewDataReceiver}
-     * @see java.util.LinkedList#addAll(java.util.Collection)
+     * @see java.util.ArrayList#addAll(java.util.Collection)
      * @author Malte Brunnlieb (03.06.2012)
      */
     @Override
     public boolean addAll(Collection<? extends Review> c) {
-        LinkedList<Review> oldValue = new LinkedList<Review>(this);
+        ArrayList<Review> oldValue = new ArrayList<Review>(this);
         boolean changed = super.addAll(c);
         if (changed) {
             for (Review r : c) {
@@ -79,12 +79,12 @@ public class ReviewList extends LinkedList<Review> implements PropertyChangeList
     
     /**
      * {@inheritDoc} <br> Added {@link PropertyChangeSupport} for tracking changes by {@link IReviewDataReceiver}
-     * @see java.util.LinkedList#addAll(int, java.util.Collection)
+     * @see java.util.ArrayList#addAll(int, java.util.Collection)
      * @author Malte Brunnlieb (03.06.2012)
      */
     @Override
     public boolean addAll(int index, Collection<? extends Review> c) {
-        LinkedList<Review> oldValue = new LinkedList<Review>(this);
+        ArrayList<Review> oldValue = new ArrayList<Review>(this);
         boolean changed = super.addAll(index, c);
         if (changed) {
             for (Review r : c) {
@@ -97,52 +97,12 @@ public class ReviewList extends LinkedList<Review> implements PropertyChangeList
     
     /**
      * {@inheritDoc} <br> Added {@link PropertyChangeSupport} for tracking changes by {@link IReviewDataReceiver}
-     * @see java.util.LinkedList#addFirst(java.lang.Object)
-     * @author Malte Brunnlieb (03.06.2012)
-     */
-    @Override
-    public void addFirst(Review e) {
-        LinkedList<Review> oldValue = new LinkedList<Review>(this);
-        super.addFirst(e);
-        e.addPropertyChangeListener(this);
-        propertyChangeSupport.firePropertyChange("ReviewList", oldValue, this);
-    }
-    
-    /**
-     * {@inheritDoc} <br> Added {@link PropertyChangeSupport} for tracking changes by {@link IReviewDataReceiver}
-     * @see java.util.LinkedList#addLast(java.lang.Object)
-     * @author Malte Brunnlieb (03.06.2012)
-     */
-    @Override
-    public void addLast(Review e) {
-        LinkedList<Review> oldValue = new LinkedList<Review>(this);
-        super.addLast(e);
-        e.addPropertyChangeListener(this);
-        propertyChangeSupport.firePropertyChange("ReviewList", oldValue, this);
-    }
-    
-    /**
-     * {@inheritDoc} <br> Added {@link PropertyChangeSupport} for tracking changes by {@link IReviewDataReceiver}
-     * @see java.util.LinkedList#remove()
-     * @author Malte Brunnlieb (03.06.2012)
-     */
-    @Override
-    public Review remove() {
-        LinkedList<Review> oldValue = new LinkedList<Review>(this);
-        Review head = super.remove();
-        head.removePropertyChangeListener(this);
-        propertyChangeSupport.firePropertyChange("ReviewList", oldValue, this);
-        return head;
-    }
-    
-    /**
-     * {@inheritDoc} <br> Added {@link PropertyChangeSupport} for tracking changes by {@link IReviewDataReceiver}
-     * @see java.util.LinkedList#remove(int)
+     * @see java.util.ArrayList#remove(int)
      * @author Malte Brunnlieb (03.06.2012)
      */
     @Override
     public Review remove(int index) {
-        LinkedList<Review> oldValue = new LinkedList<Review>(this);
+        ArrayList<Review> oldValue = new ArrayList<Review>(this);
         Review removedObj = super.remove(index);
         removedObj.removePropertyChangeListener(this);
         propertyChangeSupport.firePropertyChange("ReviewList", oldValue, this);
@@ -151,12 +111,12 @@ public class ReviewList extends LinkedList<Review> implements PropertyChangeList
     
     /**
      * {@inheritDoc} <br> Added {@link PropertyChangeSupport} for tracking changes by {@link IReviewDataReceiver}
-     * @see java.util.LinkedList#remove(java.lang.Object)
+     * @see java.util.ArrayList#remove(java.lang.Object)
      * @author Malte Brunnlieb (03.06.2012)
      */
     @Override
     public boolean remove(Object o) {
-        LinkedList<Review> oldValue = new LinkedList<Review>(this);
+        ArrayList<Review> oldValue = new ArrayList<Review>(this);
         boolean success = super.remove(o);
         if (success) {
             ((Review) o).removePropertyChangeListener(this);
@@ -172,7 +132,7 @@ public class ReviewList extends LinkedList<Review> implements PropertyChangeList
      */
     @Override
     public boolean removeAll(Collection<?> c) {
-        LinkedList<Review> oldValue = new LinkedList<Review>(this);
+        ArrayList<Review> oldValue = new ArrayList<Review>(this);
         boolean success = super.removeAll(c);
         if (success) {
             for (Object r : c) {
@@ -185,75 +145,15 @@ public class ReviewList extends LinkedList<Review> implements PropertyChangeList
     
     /**
      * {@inheritDoc} <br> Added {@link PropertyChangeSupport} for tracking changes by {@link IReviewDataReceiver}
-     * @see java.util.LinkedList#removeFirst()
-     * @author Malte Brunnlieb (03.06.2012)
-     */
-    @Override
-    public Review removeFirst() {
-        LinkedList<Review> oldValue = new LinkedList<Review>(this);
-        Review head = super.removeFirst();
-        head.removePropertyChangeListener(this);
-        propertyChangeSupport.firePropertyChange("ReviewList", oldValue, this);
-        return head;
-    }
-    
-    /**
-     * {@inheritDoc} <br> Added {@link PropertyChangeSupport} for tracking changes by {@link IReviewDataReceiver}
-     * @see java.util.LinkedList#removeFirstOccurrence(java.lang.Object)
-     * @author Malte Brunnlieb (03.06.2012)
-     */
-    @Override
-    public boolean removeFirstOccurrence(Object o) {
-        LinkedList<Review> oldValue = new LinkedList<Review>(this);
-        boolean success = super.removeFirstOccurrence(o);
-        if (success) {
-            ((Review) o).addPropertyChangeListener(this);
-            propertyChangeSupport.firePropertyChange("ReviewList", oldValue, this);
-        }
-        return success;
-    }
-    
-    /**
-     * {@inheritDoc} <br> Added {@link PropertyChangeSupport} for tracking changes by {@link IReviewDataReceiver}
-     * @see java.util.LinkedList#removeLast()
-     * @author Malte Brunnlieb (03.06.2012)
-     */
-    @Override
-    public Review removeLast() {
-        LinkedList<Review> oldValue = new LinkedList<Review>(this);
-        Review last = super.removeLast();
-        last.removePropertyChangeListener(this);
-        propertyChangeSupport.firePropertyChange("ReviewList", oldValue, this);
-        return last;
-    }
-    
-    /**
-     * {@inheritDoc} <br> Added {@link PropertyChangeSupport} for tracking changes by {@link IReviewDataReceiver}
-     * @see java.util.LinkedList#removeLastOccurrence(java.lang.Object)
-     * @author Malte Brunnlieb (03.06.2012)
-     */
-    @Override
-    public boolean removeLastOccurrence(Object o) {
-        LinkedList<Review> oldValue = new LinkedList<Review>(this);
-        boolean success = super.removeLastOccurrence(o);
-        if (success) {
-            ((Review) o).removePropertyChangeListener(this);
-            propertyChangeSupport.firePropertyChange("ReviewList", oldValue, this);
-        }
-        return success;
-    }
-    
-    /**
-     * {@inheritDoc} <br> Added {@link PropertyChangeSupport} for tracking changes by {@link IReviewDataReceiver}
      * @see java.util.AbstractCollection#retainAll(java.util.Collection)
      * @author Malte Brunnlieb (03.06.2012)
      */
     @Override
     public boolean retainAll(Collection<?> c) {
-        LinkedList<Review> oldValue = new LinkedList<Review>(this);
+        ArrayList<Review> oldValue = new ArrayList<Review>(this);
         boolean success = super.retainAll(c);
         if (success) {
-            LinkedList<Review> removedOnes = new LinkedList<Review>(oldValue);
+            ArrayList<Review> removedOnes = new ArrayList<Review>(oldValue);
             removedOnes.removeAll(c);
             for (Review r : removedOnes) {
                 r.removePropertyChangeListener(this);
@@ -265,12 +165,12 @@ public class ReviewList extends LinkedList<Review> implements PropertyChangeList
     
     /**
      * {@inheritDoc} <br> Added {@link PropertyChangeSupport} for tracking changes by {@link IReviewDataReceiver}
-     * @see java.util.LinkedList#clear()
+     * @see java.util.ArrayList#clear()
      * @author Malte Brunnlieb (03.06.2012)
      */
     @Override
     public void clear() {
-        LinkedList<Review> oldValue = new LinkedList<Review>(this);
+        ArrayList<Review> oldValue = new ArrayList<Review>(this);
         super.clear();
         for (Review r : oldValue) {
             r.removePropertyChangeListener(this);
