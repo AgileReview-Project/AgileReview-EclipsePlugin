@@ -13,6 +13,7 @@ import java.util.List;
 import org.agilereview.core.exception.ExceptionHandler;
 import org.agilereview.core.external.definition.IReviewDataReceiver;
 import org.agilereview.core.external.storage.Review;
+import org.agilereview.core.external.storage.ReviewList;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.Platform;
@@ -69,7 +70,7 @@ public class RDRController implements IExtensionController {
      * @param newData list of {@link Review}s
      * @author Malte Brunnlieb (28.03.2012)
      */
-    private void notifyClient(IReviewDataReceiver rdr, List<Review> newData) {
+    private void notifyClient(IReviewDataReceiver rdr, ReviewList newData) {
         rdr.setReviewData(newData);
     }
     
@@ -78,7 +79,7 @@ public class RDRController implements IExtensionController {
      * @param newData list of {@link Review}s
      * @author Malte Brunnlieb (28.03.2012)
      */
-    void notifyAllClients(List<Review> newData) {
+    void notifyAllClients(ReviewList newData) {
         for (IReviewDataReceiver rdr : registeredClients) {
             notifyClient(rdr, newData);
         }
