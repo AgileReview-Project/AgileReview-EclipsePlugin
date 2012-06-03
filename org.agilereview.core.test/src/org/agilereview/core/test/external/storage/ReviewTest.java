@@ -7,11 +7,14 @@
  */
 package org.agilereview.core.test.external.storage;
 
+import static org.junit.Assert.assertNotNull;
+
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.Random;
 
 import junit.framework.AssertionFailedError;
 
@@ -25,20 +28,17 @@ import org.junit.Test;
  * TestClass for {@link org.agilereview.core.external.storage.Review}
  * @author Malte Brunnlieb (19.02.2012)
  */
-/**
- * 
- * @author Peter Reuter (03.06.2012)
- */
 public class ReviewTest {
 	
 	/**
 	 * Test method for {@link org.agilereview.core.external.storage.Review#Review(java.lang.String)}.
 	 * @author Malte Brunnlieb (19.02.2012)
-	 * @author Peter Reuter (03.06.2012)
 	 */
 	@Test
 	public final void testReviewString() {
 		Review review = new Review("testID");
+		
+		assertNotNull(review);
 		
 		if (!"testID".equals(review.getId())) {
 			throw new AssertionFailedError("Review not created consistently!");
@@ -49,7 +49,6 @@ public class ReviewTest {
 	 * Test method for
 	 * {@link org.agilereview.core.external.storage.Review#Review(String, int, String, String, String)}.
 	 * @author Malte Brunnlieb (19.02.2012)
-	 * @author Peter Reuter (03.06.2012)
 	 */
 	@Test
 	public final void testReviewStringIntStringStringString() {
@@ -63,6 +62,8 @@ public class ReviewTest {
 
 		// check consistency
 		Review review = new Review("testID", 2, uri.toString(), "Karl-Hänsél", "test description");
+		
+		assertNotNull(review);
 		
 		if (!"testID".equals(review.getId()) || review.getStatus() != 2 || !uri.toString().equals(review.getReference())
 				|| !"Karl-Hänsél".equals(review.getResponsibility()) || !"test description".equals(review.getDescription())) {
@@ -91,13 +92,11 @@ public class ReviewTest {
 	/**
 	 * Test method for {@link org.agilereview.core.external.storage.Review#setStatus(int)}.
 	 * @author Malte Brunnlieb (19.02.2012)
-	 * @author Peter Reuter (03.06.2012)
 	 */
 	@Test
 	public final void testSetStatus() {
 		Review review = new Review("");
-		InternalPropertyChangeListener pcl = new InternalPropertyChangeListener();
-		pcl.setPropertyName("status");
+		HelperPropertyChangeListener pcl = new HelperPropertyChangeListener("status");
 		review.addPropertyChangeListener(pcl);
 		
 		review.setStatus(9);
@@ -119,7 +118,6 @@ public class ReviewTest {
 	/**
 	 * Test method for {@link org.agilereview.core.external.storage.Review#setReference(String)}.
 	 * @author Malte Brunnlieb (19.02.2012)
-	 * @author Peter Reuter (03.06.2012)
 	 */
 	@Test
 	public final void testSetReference() {
@@ -130,8 +128,7 @@ public class ReviewTest {
 		} catch (URISyntaxException e) {
 			throw new AssertionFailedException("Failed on creating an URI for testing purpose");
 		}
-		InternalPropertyChangeListener pcl = new InternalPropertyChangeListener();
-		pcl.setPropertyName("reference");
+		HelperPropertyChangeListener pcl = new HelperPropertyChangeListener("reference");
 		review.addPropertyChangeListener(pcl);
 		
 		review.setReference(uri.toString());
@@ -153,13 +150,11 @@ public class ReviewTest {
 	/**
 	 * Test method for {@link org.agilereview.core.external.storage.Review#setResponsibility(java.lang.String)}.
 	 * @author Malte Brunnlieb (19.02.2012)
-	 * @author Peter Reuter (03.06.2012)
 	 */
 	@Test
 	public final void testSetResponsibility() {
 		Review review = new Review("");
-		InternalPropertyChangeListener pcl = new InternalPropertyChangeListener();
-		pcl.setPropertyName("responsibility");
+		HelperPropertyChangeListener pcl = new HelperPropertyChangeListener("responsibility");
 		review.addPropertyChangeListener(pcl);
 		
 		review.setResponsibility("Käusî Méusli");
@@ -175,7 +170,7 @@ public class ReviewTest {
 	 */
 	@Test
 	public final void testGetComments() {
-		// tested by constructor tests
+		// tested by setComments test
 	}
 	
 	
@@ -203,13 +198,11 @@ public class ReviewTest {
 	/**
 	 * Test method for {@link org.agilereview.core.external.storage.Review#addComment(org.agilereview.core.external.storage.Comment)}.
 	 * @author Malte Brunnlieb (19.02.2012)
-	 * @author Peter Reuter (03.06.2012)
 	 */
 	@Test
 	public final void testAddComment() {
 		Review review = new Review("");
-		InternalPropertyChangeListener pcl = new InternalPropertyChangeListener();
-		pcl.setPropertyName("comments");
+		HelperPropertyChangeListener pcl = new HelperPropertyChangeListener("comments");
 		review.addPropertyChangeListener(pcl);
 
 		int prevSize = review.getComments().size();
@@ -225,22 +218,27 @@ public class ReviewTest {
 	/**
 	 * Test method for {@link org.agilereview.core.external.storage.Review#deleteComment(org.agilereview.core.external.storage.Comment)}.
 	 * @author Malte Brunnlieb (19.02.2012)
-	 * @author Peter Reuter (03.06.2012)
 	 */
 	@Test
 	public final void testDeleteCommentComment() {
 		Review review = new Review("");
-		InternalPropertyChangeListener pcl = new InternalPropertyChangeListener();
-		pcl.setPropertyName("comments");
+		HelperPropertyChangeListener pcl = new HelperPropertyChangeListener("comments");
 		review.addPropertyChangeListener(pcl);
 		
-		Comment c1 = new Comment("c0", HelperClass.getIFile("resources/Test1.txt"), review);
+		Comment c1 = new Comment("c1", HelperClass.getIFile("resources/Test1.txt"), review);
+		Comment c2 = new Comment("c2", HelperClass.getIFile("resources/Test1.txt"), review);
+		Comment c3 = new Comment("c3", HelperClass.getIFile("resources/Test1.txt"), review);
+		Comment[] comments = {c1, c2, c3};
 		review.addComment(c1);
+		review.addComment(c2);
+		review.addComment(c3);
 		int prevSize = review.getComments().size();
 		
-		review.deleteComment(c1);
+		int index = new Random().nextInt(3);
+		
+		review.deleteComment(comments[index]);
 
-		if (!(prevSize-1 == review.getComments().size()) || review.getComments().contains(c1) || !pcl.getPropertyChanged()) {
+		if (!(prevSize-1 == review.getComments().size()) || review.getComments().contains(comments[index]) || !pcl.getPropertyChanged()) {
 			throw new AssertionFailedError("Review comment could not be removed by object successfully!");
 		}
 	}
@@ -248,22 +246,29 @@ public class ReviewTest {
 	/**
 	 * Test method for {@link org.agilereview.core.external.storage.Review#deleteComment(int)}.
 	 * @author Malte Brunnlieb (19.02.2012)
-	 * @author Peter Reuter (03.06.2012)
 	 */
 	@Test
 	public final void testDeleteCommentInt() {
 		Review review = new Review("");
-		InternalPropertyChangeListener pcl = new InternalPropertyChangeListener();
-		pcl.setPropertyName("comments");
+		HelperPropertyChangeListener pcl = new HelperPropertyChangeListener("comments");
 		review.addPropertyChangeListener(pcl);
 		
-		Comment c1 = new Comment("c0", HelperClass.getIFile("resources/Test1.txt"), review);
+		review.addPropertyChangeListener(pcl);
+		
+		Comment c1 = new Comment("c1", HelperClass.getIFile("resources/Test1.txt"), review);
+		Comment c2 = new Comment("c2", HelperClass.getIFile("resources/Test1.txt"), review);
+		Comment c3 = new Comment("c3", HelperClass.getIFile("resources/Test1.txt"), review);
+		Comment[] comments = {c1, c2, c3};
 		review.addComment(c1);
+		review.addComment(c2);
+		review.addComment(c3);
 		int prevSize = review.getComments().size();
 		
-		review.deleteComment(review.getComments().size()-1);
+		int index = new Random().nextInt(3);
+		
+		review.deleteComment(review.getComments().size()-(comments.length-index));
 
-		if (!(prevSize-1 == review.getComments().size()) || review.getComments().contains(c1) || !pcl.getPropertyChanged()) {
+		if (!(prevSize-1 == review.getComments().size()) || review.getComments().contains(comments[index]) || !pcl.getPropertyChanged()) {
 			throw new AssertionFailedError("Review comment could not be removed by object successfully!");
 		}
 	}
@@ -280,13 +285,11 @@ public class ReviewTest {
 	/**
 	 * Test method for {@link org.agilereview.core.external.storage.Review#setIsOpen(boolean)}.
 	 * @author Malte Brunnlieb (19.02.2012)
-	 * @author Peter Reuter (03.06.2012)
 	 */
 	@Test
 	public final void testSetIsOpen() {
 		Review review = new Review("");
-		InternalPropertyChangeListener pcl = new InternalPropertyChangeListener();
-		pcl.setPropertyName("isOpen");
+		HelperPropertyChangeListener pcl = new HelperPropertyChangeListener("isOpen");
 		review.addPropertyChangeListener(pcl);
 		
 		review.setIsOpen(false);
@@ -303,8 +306,7 @@ public class ReviewTest {
 	@Test
 	public void testAddPropertyChangeListener() {
 		Review review = new Review("");
-		InternalPropertyChangeListener pcl = new InternalPropertyChangeListener();
-		pcl.setPropertyName("isOpen");
+		HelperPropertyChangeListener pcl = new HelperPropertyChangeListener("isOpen");
 		
 		review.addPropertyChangeListener(pcl);
 		
@@ -322,8 +324,7 @@ public class ReviewTest {
 	@Test
 	public void testRemovePropertyChangeListener() {
 		Review review = new Review("");
-		InternalPropertyChangeListener pcl = new InternalPropertyChangeListener();
-		pcl.setPropertyName("isOpen");
+		HelperPropertyChangeListener pcl = new HelperPropertyChangeListener("isOpen");
 		review.addPropertyChangeListener(pcl);
 		
 		review.removePropertyChangeListener(pcl);
@@ -342,53 +343,13 @@ public class ReviewTest {
 	@Test
 	public void testPropertyChange() {
 		Review review = new Review("");
-		InternalPropertyChangeListener pcl = new InternalPropertyChangeListener();
-		pcl.setPropertyName("test");
+		HelperPropertyChangeListener pcl = new HelperPropertyChangeListener("test");
 		review.addPropertyChangeListener(pcl);
 		
 		review.propertyChange(new PropertyChangeEvent(review, "test", false, true));
 		
 		if (!pcl.getPropertyChanged()) {
 			throw new AssertionFailedError("PropertyChangeEvent not forwarded correctly!");
-		}
-	}
-	
-	/**
-	 * Helper class to check for correct changes of properties. 
-	 * @author Peter Reuter (03.06.2012)
-	 */
-	private class InternalPropertyChangeListener implements PropertyChangeListener {
-
-		/**
-		 * Indicates whether the property specified by propertyName was changed. 
-		 */
-		private boolean propertyChanged = false;
-		/**
-		 * Name of the property for which changes should occur. 
-		 */
-		private String propertyName = "";
-		
-		@Override
-		public void propertyChange(PropertyChangeEvent evt) {
-			if (evt.getPropertyName().equals(propertyName)) {
-				this.propertyChanged = true;
-			}
-		}
-		
-		/**
-		 * @return A boolean value indicating whether the observed property was changed or not.
-		 * @author Peter Reuter (03.06.2012)
-		 */
-		public boolean getPropertyChanged() {
-			return propertyChanged;
-		}
-		
-		/**
-		 * @param propertyName The property to be observed for changes.
-		 * @author Peter Reuter (03.06.2012)
-		 */
-		public void setPropertyName(String propertyName) {
-			this.propertyName = propertyName;
 		}
 	}
 
