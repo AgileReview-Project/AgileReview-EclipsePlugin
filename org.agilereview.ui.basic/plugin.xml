@@ -7,7 +7,7 @@
             class="org.agilereview.ui.basic.reviewExplorer.ReviewExplorerView">
       </ReviewDataReceiver>
       <ReviewDataReceiver
-            class="org.agilereview.ui.basic.commentSummary.table.TableContentProvider">
+            class="org.agilereview.ui.basic.commentSummary.table.ContentProvider">
       </ReviewDataReceiver>
    </extension>
    <extension

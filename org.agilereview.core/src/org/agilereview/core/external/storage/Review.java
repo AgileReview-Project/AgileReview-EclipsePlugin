@@ -26,7 +26,7 @@ public class Review implements PropertyChangeListener {
     /**
      * The unique name of the review entered by the user
      */
-    private String id;
+    private final String id;
     /**
      * The status of the {@link Review}
      */
@@ -54,7 +54,7 @@ public class Review implements PropertyChangeListener {
     /**
      * {@link PropertyChangeSupport} of this POJO, used for firing {@link PropertyChangeEvent}s on changes of fields.
      */
-    private PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(this);
+    private final PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(this);
     
     /**
      * Constructor that should be used if a new {@link Review}w is created.

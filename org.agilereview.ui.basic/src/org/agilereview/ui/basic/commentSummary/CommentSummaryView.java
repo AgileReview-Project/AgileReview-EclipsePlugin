@@ -13,7 +13,7 @@ import org.agilereview.ui.basic.commentSummary.control.FilterController;
 import org.agilereview.ui.basic.commentSummary.control.ViewController;
 import org.agilereview.ui.basic.commentSummary.filter.ColumnComparator;
 import org.agilereview.ui.basic.commentSummary.filter.SearchFilter;
-import org.agilereview.ui.basic.commentSummary.table.TableContentProvider;
+import org.agilereview.ui.basic.commentSummary.table.ContentProvider;
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.swt.SWT;
@@ -58,7 +58,7 @@ public class CommentSummaryView extends ViewPart {
     /**
      * The content provider for the {@link TableViewer}
      */
-    private TableContentProvider tableContentProvider;
+    private ContentProvider contentProvider;
     /**
      * The {@link FilterController} which manages all filter actions
      */
@@ -81,10 +81,10 @@ public class CommentSummaryView extends ViewPart {
     public void createPartControl(Composite parent) {
         this.parent = parent;
         parent.setLayout(new GridLayout());
-        TableContentProvider.bind(this);
+        ContentProvider.bind(this);
         
         synchronized (this.parent) {
-            if (tableContentProvider == null) {
+            if (contentProvider == null) {
                 displayStorageDisconnected();
             } else {
                 buildWorkingUI();
@@ -96,22 +96,24 @@ public class CommentSummaryView extends ViewPart {
     }
     
     /**
-     * Binds the given {@link TableContentProvider} to the {@link CSTableViewer} instance of this view. If the parameter is net to null, the
+     * Binds the given {@link ContentProvider} to the {@link CSTableViewer} instance of this view. If the parameter is net to null, the
      * {@link CommentSummaryView} will display a no {@link IStorageClient} registered message instead of a table
      * @param tableModel model for the {@link CSTableViewer}
+     * @return The TableViewer the model was bound to. Will be null if the parameter has been set to null.
      * @author Malte Brunnlieb (27.05.2012)
      */
-    public void bindTableModel(TableContentProvider tableModel) {
+    public TableViewer bindTableModel(ContentProvider tableModel) {
         synchronized (parent) {
-            tableContentProvider = tableModel;
-            if (tableContentProvider != null) {
+            contentProvider = tableModel;
+            if (contentProvider != null) {
                 if (viewer == null) {
                     buildWorkingUI();
                 }
-                viewer.setContentProvider(tableContentProvider);
+                viewer.setContentProvider(contentProvider);
             } else {
                 displayStorageDisconnected();
             }
+            return viewer;
         }
     }
     

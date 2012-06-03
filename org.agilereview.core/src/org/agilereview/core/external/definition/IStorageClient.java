@@ -12,6 +12,7 @@ import java.util.List;
 import org.agilereview.core.external.storage.Comment;
 import org.agilereview.core.external.storage.Reply;
 import org.agilereview.core.external.storage.Review;
+import org.agilereview.core.external.storage.ReviewList;
 
 /**
  * Interface that has to be implemeted by AgileReview storage clients.
@@ -21,10 +22,10 @@ public interface IStorageClient {
     
     /**
      * This method returns all {@link Review} objects currently loaded.
-     * @return a {@link List} of {@link Review} objects.
+     * @return a {@link List} of {@link Review} objects wrapped by an {@link ReviewList} transfer object
      * @author Malte Brunnlieb (22.03.2012)
      */
-    public List<Review> getAllReviews();
+    public ReviewList getAllReviews();
     
     /**
      * This method adds a new {@link Review} object to the list of {@link Review} objects currently loaded.

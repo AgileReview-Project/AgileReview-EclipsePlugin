@@ -9,7 +9,6 @@ package org.agilereview.core.controller;
 
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 import org.agilereview.core.exception.ExceptionHandler;
@@ -19,6 +18,7 @@ import org.agilereview.core.external.definition.IStorageClient;
 import org.agilereview.core.external.storage.Comment;
 import org.agilereview.core.external.storage.Reply;
 import org.agilereview.core.external.storage.Review;
+import org.agilereview.core.external.storage.ReviewList;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
@@ -176,9 +176,9 @@ public class StorageController implements IExtensionController, IStorageClient {
      * @author Malte Brunnlieb (24.03.2012)
      */
     @Override
-    public List<Review> getAllReviews() {
+    public ReviewList getAllReviews() {
         try {
-            List<Review> result = registeredClients.get(activeClient).getAllReviews();
+            ReviewList result = registeredClients.get(activeClient).getAllReviews();
             Assert.isNotNull(result);
             return result;
         } catch (Throwable ex) {

@@ -7,13 +7,13 @@
  */
 package org.agilereview.test.common.storage.external;
 
-import java.util.LinkedList;
 import java.util.List;
 
 import org.agilereview.core.external.definition.IStorageClient;
 import org.agilereview.core.external.storage.Comment;
 import org.agilereview.core.external.storage.Reply;
 import org.agilereview.core.external.storage.Review;
+import org.agilereview.core.external.storage.ReviewList;
 
 /**
  * This Mock should is implemented as a dummy {@link IStorageClient} which returns the values set by the provided methods
@@ -24,7 +24,7 @@ public class StorageClientMock implements IStorageClient {
     /**
      * Dummy object storage
      */
-    private List<Review> reviews = new LinkedList<Review>();
+    private final ReviewList reviews = new ReviewList();
     /**
      * The instance created by the {@link IStorageClient} extension point
      */
@@ -56,7 +56,8 @@ public class StorageClientMock implements IStorageClient {
      * @author Malte Brunnlieb (27.05.2012)
      */
     public void setStorageContent(List<Review> reviews) {
-        this.reviews = new LinkedList<Review>(reviews);
+        this.reviews.clear();
+        this.reviews.addAll(reviews);
     }
     
     /**
@@ -65,7 +66,7 @@ public class StorageClientMock implements IStorageClient {
      * @author Malte Brunnlieb (27.05.2012)
      */
     @Override
-    public List<Review> getAllReviews() {
+    public ReviewList getAllReviews() {
         return reviews;
     }
     

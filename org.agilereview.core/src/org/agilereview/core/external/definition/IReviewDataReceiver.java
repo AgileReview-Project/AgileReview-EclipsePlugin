@@ -16,12 +16,12 @@ import org.agilereview.core.external.storage.Review;
  * @author Malte Brunnlieb (28.03.2012)
  */
 public interface IReviewDataReceiver {
-	
-	/**
-	 * Will be called whenever new data are provided by {@link IStorageClient}s
-	 * @param reviews a list of {@link Review}s
-	 * @author Malte Brunnlieb (28.03.2012)
-	 */
-	public void setReviewData(List<Review> reviews);
-	
+    
+    /**
+     * Will be called whenever new data are provided by {@link IStorageClient}s
+     * @param reviews a list of {@link Review}s, can be null in order to signal that no {@link IStorageClient} is currently available
+     * @author Malte Brunnlieb (28.03.2012)
+     */
+    public void setReviewData(List<Review> reviews);
+    
 }

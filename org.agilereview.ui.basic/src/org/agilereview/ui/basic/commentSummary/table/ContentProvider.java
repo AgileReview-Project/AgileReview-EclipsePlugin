@@ -15,22 +15,27 @@ import org.agilereview.core.external.storage.Comment;
 import org.agilereview.core.external.storage.Review;
 import org.agilereview.ui.basic.commentSummary.CommentSummaryView;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
+import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.Viewer;
 
 /**
  * ContentProvider for the {@link CommentSummaryView} table
  * @author Malte Brunnlieb (27.05.2012)
  */
-public class TableContentProvider implements IStructuredContentProvider, IReviewDataReceiver {
+public class ContentProvider implements IStructuredContentProvider, IReviewDataReceiver {
     
     /**
      * Instance created by the {@link IReviewDataReceiver} extension point
      */
-    private static TableContentProvider instance;
+    private static ContentProvider instance;
     /**
      * The comments to be displayed (model of TableViewer viewer)
      */
     private final List<Comment> comments = new LinkedList<Comment>();
+    /**
+     * {@link TableViewer} this model has been bound to
+     */
+    private static TableViewer viewer;
     /**
      * Current {@link CommentSummaryView} instance
      */
@@ -41,14 +46,14 @@ public class TableContentProvider implements IStructuredContentProvider, IReview
     private static Object syncObj = new Object();
     
     /**
-     * Creates a new {@link TableContentProvider} instance and binds it to the {@link CommentSummaryView} if possible
+     * Creates a new {@link ContentProvider} instance and binds it to the {@link CommentSummaryView} if possible
      * @author Malte Brunnlieb (28.05.2012)
      */
-    public TableContentProvider() {
+    public ContentProvider() {
         synchronized (syncObj) {
             instance = this;
             if (commentSummaryView != null) {
-                commentSummaryView.bindTableModel(this);
+                viewer = commentSummaryView.bindTableModel(this);
             }
         }
     }
@@ -62,7 +67,7 @@ public class TableContentProvider implements IStructuredContentProvider, IReview
         synchronized (syncObj) {
             commentSummaryView = view;
             if (instance != null) {
-                commentSummaryView.bindTableModel(instance);
+                viewer = commentSummaryView.bindTableModel(instance);
             }
         }
     }
@@ -74,11 +79,16 @@ public class TableContentProvider implements IStructuredContentProvider, IReview
      */
     @Override
     public void setReviewData(List<Review> reviews) {
-        comments.clear();
-        for (Review r : reviews) {
-            comments.addAll(r.getComments());
+        if (reviews == null) {
+            viewer = commentSummaryView.bindTableModel(null);
+        } else {
+            viewer = commentSummaryView.bindTableModel(this);
+            comments.clear();
+            for (Review r : reviews) {
+                comments.addAll(r.getComments());
+            }
+            viewer.refresh();
         }
-        
         //TODO inform Parser
     }
     
