@@ -121,7 +121,6 @@ public class StorageController implements IExtensionController, IStorageClient {
      * @author Malte Brunnlieb (27.05.2012)
      */
     public boolean setStorageClient(String name) {
-        System.out.println("setStorageClient " + name);
         if (registeredClients.containsKey(name)) {
             if (registeredClients.get(name) == null) {
                 registeredClients.put(name, loadExtension(name));

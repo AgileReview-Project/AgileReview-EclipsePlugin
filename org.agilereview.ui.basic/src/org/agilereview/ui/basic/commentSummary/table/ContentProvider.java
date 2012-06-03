@@ -9,8 +9,7 @@ package org.agilereview.ui.basic.commentSummary.table;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.ArrayList;
 
 import org.agilereview.core.external.definition.IReviewDataReceiver;
 import org.agilereview.core.external.storage.Comment;
@@ -32,9 +31,13 @@ public class ContentProvider implements IStructuredContentProvider, IReviewDataR
      */
     private static ContentProvider instance;
     /**
+     * ReviewList provided by the currently active StorageClient
+     */
+    private static ReviewList reviewList;
+    /**
      * The comments to be displayed (model of TableViewer viewer)
      */
-    private final List<Comment> comments = new LinkedList<Comment>();
+    private final ArrayList<Comment> comments = new ArrayList<Comment>();
     /**
      * {@link TableViewer} this model has been bound to
      */
@@ -70,7 +73,11 @@ public class ContentProvider implements IStructuredContentProvider, IReviewDataR
         synchronized (syncObj) {
             commentSummaryView = view;
             if (instance != null) {
-                viewer = commentSummaryView.bindTableModel(instance);
+                if (reviewList != null) {
+                    viewer = commentSummaryView.bindTableModel(instance);
+                } else {
+                    viewer = commentSummaryView.bindTableModel(null);
+                }
             }
         }
     }
@@ -82,18 +89,33 @@ public class ContentProvider implements IStructuredContentProvider, IReviewDataR
      */
     @Override
     public void setReviewData(ReviewList reviews) {
-        if (reviews == null) {
+        reviewList = reviews;
+        if (reviews == null && commentSummaryView != null) {
             viewer = commentSummaryView.bindTableModel(null);
         } else {
             reviews.addPropertyChangeListener(this);
-            viewer = commentSummaryView.bindTableModel(this);
-            comments.clear();
-            for (Review r : reviews) {
-                comments.addAll(r.getComments());
+            if (commentSummaryView != null) {
+                viewer = commentSummaryView.bindTableModel(this);
             }
-            viewer.refresh();
+            refreshCommentList();
         }
         //TODO inform Parser
+    }
+    
+    /**
+     * Extracts all {@link Comment}s out of the {@link ReviewList} and refreshes the viewer
+     * @author Malte Brunnlieb (03.06.2012)
+     */
+    private void refreshCommentList() {
+        if (reviewList != null) {
+            comments.clear();
+            for (Review r : reviewList) {
+                comments.addAll(r.getComments());
+            }
+            if (viewer != null) {
+                viewer.refresh();
+            }
+        }
     }
     
     /**
@@ -137,6 +159,7 @@ public class ContentProvider implements IStructuredContentProvider, IReviewDataR
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
         if (viewer != null) {
+            refreshCommentList();
             viewer.refresh();
         }
     }
