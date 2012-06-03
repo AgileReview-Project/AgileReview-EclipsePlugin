@@ -22,6 +22,7 @@ import org.agilereview.test.common.storage.external.StorageClientMock;
 import org.agilereview.ui.basic.commentSummary.CommentSummaryView;
 import org.agilereview.ui.basic.commentSummary.table.Column;
 import org.eclipse.core.resources.IFile;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotPerspective;
@@ -99,7 +100,7 @@ public class CommentSummaryViewTest {
         IFile fileMock = mock(IFile.class);
         
         List<Comment> comments = new LinkedList<Comment>();
-        Comment c1 = new Comment("", "Adam", fileMock, reviewMock, Calendar.getInstance(), Calendar.getInstance(), "", 0, 0, "");
+        final Comment c1 = new Comment("", "Adam", fileMock, reviewMock, Calendar.getInstance(), Calendar.getInstance(), "", 0, 0, "");
         comments.add(c1);
         Comment c2 = new Comment("", "Klaus", fileMock, reviewMock, Calendar.getInstance(), Calendar.getInstance(), "", 0, 0, "");
         comments.add(c2);
@@ -110,8 +111,9 @@ public class CommentSummaryViewTest {
         reviews.add(reviewMock);
         
         StorageClientMock.getInstance().setStorageContent(reviews);
+        
         try {
-            Thread.sleep(20000);
+            Thread.sleep(2000);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
@@ -123,11 +125,17 @@ public class CommentSummaryViewTest {
         searchText.pressShortcut(0, 'A');
         
         //evaluate results
-        SWTBotTable table = bot.tableWithId("csTable");
-        TableItem item = table.getTableItem(0).widget;
-        Assert.assertEquals(c1, item);
-        
-        exception.expect(WidgetNotFoundException.class);
-        item = table.getTableItem(1).widget;
+        Display.getDefault().syncExec(new Runnable() {
+            
+            @Override
+            public void run() {
+                SWTBotTable table = bot.tableWithId("csTable");
+                TableItem item = table.getTableItem(0).widget;
+                Assert.assertEquals(c1, item);
+                
+                exception.expect(WidgetNotFoundException.class);
+                item = table.getTableItem(1).widget;
+            }
+        });
     }
 }

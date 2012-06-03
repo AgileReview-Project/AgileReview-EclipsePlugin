@@ -7,9 +7,7 @@
  */
 package org.agilereview.ui.basic.tools;
 
-import org.agilereview.core.external.properties.PropertyInterface;
-import org.agilereview.ui.basic.Activator;
-import org.eclipse.jface.preference.IPreferenceStore;
+import org.agilereview.core.external.properties.PreferencesInterface;
 
 /**
  * Advanced property access point for comments which provides further functionality
@@ -40,11 +38,11 @@ public class CommentProperties {
      * @author Malte Brunnlieb (28.04.2012)
      */
     public void loadProperties() {
-        IPreferenceStore store = Activator.getDefault().getPreferenceStore();
-        String value = store.getString(PropertyInterface.COMMENT_STATUS);
+        PreferencesInterface pref = new PreferencesInterface();
+        String value = pref.getValue(PreferencesInterface.COMMENT_STATUS);
         commentStates = value.split(",");
-        value = store.getString(PropertyInterface.COMMENT_PRIORITIES);
-        commentStates = value.split(",");
+        value = pref.getValue(PreferencesInterface.COMMENT_PRIORITIES);
+        commentPriorities = value.split(",");
     }
     
     /**
