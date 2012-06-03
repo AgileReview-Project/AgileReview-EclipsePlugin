@@ -34,7 +34,7 @@ public class Review implements PropertyChangeListener {
     /**
      * A reference to e.g. a bug tracker
      */
-    private String reference = null;
+    private String reference = "";
     /**
      * The person that is in charge for the {@link Review}
      */
