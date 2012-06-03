@@ -14,13 +14,13 @@ import org.agilereview.ui.basic.commentSummary.control.ViewController;
 import org.agilereview.ui.basic.commentSummary.filter.ColumnComparator;
 import org.agilereview.ui.basic.commentSummary.filter.SearchFilter;
 import org.agilereview.ui.basic.commentSummary.table.ContentProvider;
-import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.ui.PlatformUI;
@@ -109,7 +109,6 @@ public class CommentSummaryView extends ViewPart {
                 if (viewer == null) {
                     buildWorkingUI();
                 }
-                viewer.setContentProvider(contentProvider);
             } else {
                 displayStorageDisconnected();
             }
@@ -122,25 +121,32 @@ public class CommentSummaryView extends ViewPart {
      * @author Malte Brunnlieb (27.05.2012)
      */
     private void buildWorkingUI() {
-        if (content == ViewContent.CONNECTED) return;
-        clearParent();
-        content = ViewContent.CONNECTED;
-        
-        toolBar = new CSToolBar(parent);
-        
-        viewer = new CSTableViewer(parent);
-        viewer.setContentProvider(new ArrayContentProvider());
-        ColumnComparator comparator = new ColumnComparator();
-        viewer.setComparator(comparator);
-        SearchFilter commentFilter = new SearchFilter("ALL");
-        viewer.addFilter(commentFilter);
-        
-        viewer.addDoubleClickListener(new ViewController(viewer));
-        getSite().setSelectionProvider(viewer);
-        
-        filterController = new FilterController(toolBar, viewer, commentFilter);
-        toolBar.setListeners(filterController);
-        getSite().getWorkbenchWindow().getSelectionService().addSelectionListener("org.agilereview.ui.basic.reviewExplorerView", filterController);
+        Display.getDefault().syncExec(new Runnable() {
+            
+            @Override
+            public void run() {
+                if (content == ViewContent.CONNECTED) return;
+                clearParent();
+                content = ViewContent.CONNECTED;
+                
+                toolBar = new CSToolBar(parent);
+                
+                viewer = new CSTableViewer(parent);
+                viewer.setContentProvider(contentProvider);
+                ColumnComparator comparator = new ColumnComparator();
+                viewer.setComparator(comparator);
+                SearchFilter commentFilter = new SearchFilter("ALL");
+                viewer.addFilter(commentFilter);
+                
+                viewer.addDoubleClickListener(new ViewController(viewer));
+                getSite().setSelectionProvider(viewer);
+                
+                filterController = new FilterController(toolBar, viewer, commentFilter);
+                toolBar.setListeners(filterController);
+                getSite().getWorkbenchWindow().getSelectionService().addSelectionListener("org.agilereview.ui.basic.reviewExplorerView",
+                        filterController);
+            }
+        });
     }
     
     /**
@@ -148,19 +154,25 @@ public class CommentSummaryView extends ViewPart {
      * @author Malte Brunnlieb (27.05.2012)
      */
     private void displayStorageDisconnected() {
-        if (content == ViewContent.DISCONNECTED) return;
-        clearParent();
-        content = ViewContent.CONNECTED;
-        
-        Label label = new Label(parent, SWT.CENTER);
-        label.setText("No data available as currently no StorageClient is connected.");
-        GridData gd = new GridData();
-        gd.grabExcessHorizontalSpace = true;
-        gd.grabExcessVerticalSpace = true;
-        gd.horizontalAlignment = GridData.CENTER;
-        gd.verticalAlignment = GridData.CENTER;
-        label.setLayoutData(gd);
-        parent.pack();
+        Display.getDefault().syncExec(new Runnable() {
+            
+            @Override
+            public void run() {
+                if (content == ViewContent.DISCONNECTED) return;
+                clearParent();
+                content = ViewContent.DISCONNECTED;
+                
+                Label label = new Label(parent, SWT.CENTER);
+                label.setText("No data available as currently no StorageClient is connected.");
+                GridData gd = new GridData();
+                gd.grabExcessHorizontalSpace = true;
+                gd.grabExcessVerticalSpace = true;
+                gd.horizontalAlignment = GridData.CENTER;
+                gd.verticalAlignment = GridData.CENTER;
+                label.setLayoutData(gd);
+                parent.pack();
+            }
+        });
     }
     
     /**
@@ -168,16 +180,22 @@ public class CommentSummaryView extends ViewPart {
      * @author Malte Brunnlieb (27.05.2012)
      */
     private void clearParent() {
-        if (filterController != null) {
-            getSite().getWorkbenchWindow().getSelectionService().removeSelectionListener("org.agilereview.ui.basic.reviewExplorerView",
-                    filterController);
-        }
-        toolBar = null;
-        viewer = null;
-        for (Control child : parent.getChildren()) {
-            child.dispose();
-        }
-        parent.layout();
+        Display.getDefault().syncExec(new Runnable() {
+            
+            @Override
+            public void run() {
+                if (filterController != null) {
+                    getSite().getWorkbenchWindow().getSelectionService().removeSelectionListener("org.agilereview.ui.basic.reviewExplorerView",
+                            filterController);
+                }
+                toolBar = null;
+                viewer = null;
+                for (Control child : parent.getChildren()) {
+                    child.dispose();
+                }
+                parent.layout();
+            }
+        });
     }
     
     /**

@@ -10,6 +10,7 @@ package org.agilereview.ui.basic.test;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import java.util.Calendar;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -20,6 +21,7 @@ import org.agilereview.core.external.storage.Review;
 import org.agilereview.test.common.storage.external.StorageClientMock;
 import org.agilereview.ui.basic.commentSummary.CommentSummaryView;
 import org.agilereview.ui.basic.commentSummary.table.Column;
+import org.eclipse.core.resources.IFile;
 import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotPerspective;
@@ -93,19 +95,26 @@ public class CommentSummaryViewTest {
     @Test
     public void testSearchFilter() {
         //test preparation
-        List<Comment> comments = new LinkedList<Comment>();
-        Comment c1Mock = mock(Comment.class);
-        when(c1Mock.getAuthor()).thenReturn("Adam");
-        comments.add(c1Mock);
-        Comment c2Mock = mock(Comment.class);
-        when(c2Mock.getAuthor()).thenReturn("Klaus");
-        comments.add(c2Mock);
-        
         Review reviewMock = mock(Review.class);
+        IFile fileMock = mock(IFile.class);
+        
+        List<Comment> comments = new LinkedList<Comment>();
+        Comment c1 = new Comment("", "Adam", fileMock, reviewMock, Calendar.getInstance(), Calendar.getInstance(), "", 0, 0, "");
+        comments.add(c1);
+        Comment c2 = new Comment("", "Klaus", fileMock, reviewMock, Calendar.getInstance(), Calendar.getInstance(), "", 0, 0, "");
+        comments.add(c2);
         when(reviewMock.getComments()).thenReturn(comments);
+        when(reviewMock.getId()).thenReturn("");
+        
         List<Review> reviews = new LinkedList<Review>();
+        reviews.add(reviewMock);
         
         StorageClientMock.getInstance().setStorageContent(reviews);
+        try {
+            Thread.sleep(20000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
         
         //perform UI test input
         SWTBotCombo filterType = bot.comboBoxWithId("csFilterType");
@@ -116,7 +125,7 @@ public class CommentSummaryViewTest {
         //evaluate results
         SWTBotTable table = bot.tableWithId("csTable");
         TableItem item = table.getTableItem(0).widget;
-        Assert.assertEquals(c1Mock, item);
+        Assert.assertEquals(c1, item);
         
         exception.expect(WidgetNotFoundException.class);
         item = table.getTableItem(1).widget;

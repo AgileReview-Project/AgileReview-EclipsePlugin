@@ -19,6 +19,7 @@ import org.agilereview.ui.basic.commentSummary.CommentSummaryView;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.Viewer;
+import org.eclipse.swt.widgets.Display;
 
 /**
  * ContentProvider for the {@link CommentSummaryView} table
@@ -90,8 +91,10 @@ public class ContentProvider implements IStructuredContentProvider, IReviewDataR
     @Override
     public void setReviewData(ReviewList reviews) {
         reviewList = reviews;
-        if (reviews == null && commentSummaryView != null) {
-            viewer = commentSummaryView.bindTableModel(null);
+        if (reviews == null) {
+            if (commentSummaryView != null) {
+                viewer = commentSummaryView.bindTableModel(null);
+            }
         } else {
             reviews.addPropertyChangeListener(this);
             if (commentSummaryView != null) {
@@ -112,9 +115,7 @@ public class ContentProvider implements IStructuredContentProvider, IReviewDataR
             for (Review r : reviewList) {
                 comments.addAll(r.getComments());
             }
-            if (viewer != null) {
-                viewer.refresh();
-            }
+            refreshViewer();
         }
     }
     
@@ -158,9 +159,21 @@ public class ContentProvider implements IStructuredContentProvider, IReviewDataR
      */
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
+        refreshCommentList();
+    }
+    
+    /**
+     * Refreshes the registered viewer. Does not check whether viewer is != null
+     * @author Malte Brunnlieb (03.06.2012)
+     */
+    private void refreshViewer() {
         if (viewer != null) {
-            refreshCommentList();
-            viewer.refresh();
+            Display.getDefault().asyncExec(new Runnable() {
+                @Override
+                public void run() {
+                    viewer.setInput(comments);
+                }
+            });
         }
     }
 }
