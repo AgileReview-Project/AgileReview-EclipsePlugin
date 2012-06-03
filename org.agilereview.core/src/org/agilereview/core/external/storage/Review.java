@@ -130,7 +130,7 @@ public class Review implements PropertyChangeListener {
      * @param responsibility the person that now is in charge for this {@link Review}
      */
     public void setResponsibility(String responsibility) {
-        String oldValue = responsibility;
+        String oldValue = this.responsibility;
         this.responsibility = responsibility;
         propertyChangeSupport.firePropertyChange("responsibility", oldValue, this.responsibility);
     }
