@@ -17,8 +17,6 @@ import org.agilereview.ui.basic.tools.CommentProperties;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.graphics.Point;
-import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
@@ -26,7 +24,6 @@ import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
-import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Sash;
 import org.eclipse.swt.widgets.Text;
 
@@ -48,10 +45,6 @@ public class CSToolBar extends Composite {
      * CheckBox for the "show only open comments" filter functionality
      */
     private Button onlyOpenCommentsCheckbox;
-    /**
-     * PopUp menu for the filter DropDownBox
-     */
-    private Menu menu;
     
     /**
      * Creates a new instance of the {@link CSToolBar}
@@ -133,19 +126,6 @@ public class CSToolBar extends Composite {
     public void setFilterText(String text) {
         dropDownBox.setText(text);
         pack();
-        //        layout(); //TODO check if necessary! else delete parent attribute!
-    }
-    
-    /**
-     * Shows the DropDown menu for filter selection
-     * @author Malte Brunnlieb (03.05.2012)
-     */
-    public void showDropDownMenu() {
-        Rectangle bounds = dropDownBox.getBounds();
-        Point point = toDisplay(bounds.x, bounds.y + bounds.height);
-        menu.setLocation(point);
-        menu.setVisible(true);
-        filterText.setFocus(); //TODO check whether this is necessary and the intended behavior... why is this needed???
     }
     
     /**

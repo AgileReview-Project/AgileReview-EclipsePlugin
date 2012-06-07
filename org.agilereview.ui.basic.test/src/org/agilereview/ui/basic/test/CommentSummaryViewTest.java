@@ -22,11 +22,10 @@ import org.agilereview.test.common.storage.external.StorageClientMock;
 import org.agilereview.ui.basic.commentSummary.CommentSummaryView;
 import org.agilereview.ui.basic.commentSummary.table.Column;
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotPerspective;
-import org.eclipse.swtbot.swt.finder.exceptions.WidgetNotFoundException;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotCombo;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTable;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotText;
@@ -98,6 +97,7 @@ public class CommentSummaryViewTest {
         //test preparation
         Review reviewMock = mock(Review.class);
         IFile fileMock = mock(IFile.class);
+        when(fileMock.getFullPath()).thenReturn(new Path(""));
         
         List<Comment> comments = new LinkedList<Comment>();
         final Comment c1 = new Comment("", "Adam", fileMock, reviewMock, Calendar.getInstance(), Calendar.getInstance(), "", 0, 0, "");
@@ -126,15 +126,12 @@ public class CommentSummaryViewTest {
         
         //evaluate results
         Display.getDefault().syncExec(new Runnable() {
-            
             @Override
             public void run() {
                 SWTBotTable table = bot.tableWithId("csTable");
-                TableItem item = table.getTableItem(0).widget;
-                Assert.assertEquals(c1, item);
-                
-                exception.expect(WidgetNotFoundException.class);
-                item = table.getTableItem(1).widget;
+                Assert.assertEquals(1, table.rowCount());
+                Comment comment = (Comment) table.getTableItem(0).widget.getData();
+                Assert.assertEquals(c1, comment);
             }
         });
     }

@@ -27,7 +27,6 @@ public enum Column {
             return "ReviewName";
         }
     },
-    
     /**
      * Comment ID
      */
@@ -167,5 +166,18 @@ public enum Column {
             result[i] = columns[i].toString();
         }
         return result;
+    }
+    
+    /**
+     * Returns the {@link Column} represented by the given name.
+     * @param name of the {@link Column}
+     * @return the {@link Column} which is represented by the given name or null if no {@link Column} was found
+     * @author Malte Brunnlieb (07.06.2012)
+     */
+    public static Column get(String name) {
+        for (Column c : values()) {
+            if (c.toString().equals(name)) { return c; }
+        }
+        return null;
     }
 }

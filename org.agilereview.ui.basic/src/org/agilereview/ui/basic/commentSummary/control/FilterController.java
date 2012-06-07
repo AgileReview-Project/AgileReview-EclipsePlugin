@@ -21,6 +21,7 @@ import org.agilereview.ui.basic.commentSummary.CSToolBar;
 import org.agilereview.ui.basic.commentSummary.filter.ExplorerSelectionFilter;
 import org.agilereview.ui.basic.commentSummary.filter.OpenFilter;
 import org.agilereview.ui.basic.commentSummary.filter.SearchFilter;
+import org.agilereview.ui.basic.commentSummary.table.Column;
 import org.agilereview.ui.basic.reviewExplorer.ReviewExplorerView;
 import org.agilereview.ui.basic.tools.ExceptionHandler;
 import org.eclipse.core.commands.Command;
@@ -29,14 +30,13 @@ import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ITreeSelection;
 import org.eclipse.jface.viewers.TreePath;
-import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
-import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.ui.ISelectionListener;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.PlatformUI;
@@ -51,11 +51,11 @@ public class FilterController extends SelectionAdapter implements Listener, KeyL
     /**
      * ToolBar which sets the filters
      */
-    private CSToolBar toolBar;
+    private final CSToolBar toolBar;
     /**
      * TableViewer of the comment table
      */
-    private CSTableViewer tableViewer;
+    private final CSTableViewer tableViewer;
     /**
      * The current {@link SearchFilter} set on the {@link CSTableViewer}
      */
@@ -104,21 +104,15 @@ public class FilterController extends SelectionAdapter implements Listener, KeyL
      */
     @Override
     public void handleEvent(Event event) {
-        if (event.widget == null || event.widget.getData() == null) return;
+        if (event.widget == null || event.widget.getData("actionCommand") == null) return;
         
-        Object command = event.widget.getData();
-        if (command.equals("selectFilter") && event.widget instanceof MenuItem) {
-            // filter selection (DropDown box ToolBar)
-            MenuItem item = (MenuItem) event.widget;
+        Object command = event.widget.getData("actionCommand");
+        if (command.equals("setSearchFilter") && event.widget instanceof Combo) {
+            Combo comboBox = (Combo) event.widget;
             tableViewer.removeFilter(currentSearchFilter);
-            currentSearchFilter = new SearchFilter(item.getText());
+            currentSearchFilter = new SearchFilter(Column.get(comboBox.getText()));
             tableViewer.addFilter(currentSearchFilter);
-            toolBar.setFilterText("Search for " + item.getText());
-        } else if (command.equals("openFilterMenu")) {
-            // filter menu (DropDownBox ToolBar)
-            if (event.detail == SWT.ARROW || event.detail == 0) {
-                toolBar.showDropDownMenu();
-            }
+            toolBar.setFilterText("Search for " + comboBox.getText());
         }
     }
     

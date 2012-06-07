@@ -135,7 +135,7 @@ public class CommentSummaryView extends ViewPart {
                 viewer.setContentProvider(contentProvider);
                 ColumnComparator comparator = new ColumnComparator();
                 viewer.setComparator(comparator);
-                SearchFilter commentFilter = new SearchFilter("ALL");
+                SearchFilter commentFilter = new SearchFilter(null);
                 viewer.addFilter(commentFilter);
                 
                 viewer.addDoubleClickListener(new ViewController(viewer));
