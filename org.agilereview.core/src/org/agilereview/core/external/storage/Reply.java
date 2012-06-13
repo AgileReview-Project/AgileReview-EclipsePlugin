@@ -146,14 +146,14 @@ public class Reply implements PropertyChangeListener {
 	}
 	
 	/**
-	 * @return a list of replies that were added to this comment
+	 * @return a {@link List} of {@link Reply}s that were added to this {@link Comment}
 	 */
 	public List<Reply> getReplies() {
 		return replies;
 	}
 	
 	/**
-	 * Sets the {@link Reply}s of this {@link Reply}. <strong>Only use while deriving {@link Reply}s from external storage!</strong> 
+	 * Sets the {@link Reply}s of this {@link Reply}.<br><strong>Note: </strong>This method is intended to be used only use while deriving {@link Reply}s from external storage! 
 	 * @param replies
 	 * @author Peter Reuter (28.04.2012)
 	 */
@@ -165,7 +165,7 @@ public class Reply implements PropertyChangeListener {
 	}
 	
 	/**
-	 * Adds at the end of the list of replies.
+	 * Adds a {@link Reply} to this {@link Reply} if and only if it was not added before.
 	 * @param reply the reply which is to add
 	 */
 	public void addReply(Reply reply) {
@@ -179,7 +179,7 @@ public class Reply implements PropertyChangeListener {
 	}
 	
 	/**
-	 * Deletes the given reply from the list of replies.
+	 * Deletes the given {@link Reply} from this {@link Reply}.
 	 * @param reply the reply which is to delete
 	 */
 	public void deleteReply(Reply reply) {
@@ -191,7 +191,7 @@ public class Reply implements PropertyChangeListener {
 	}
 	
 	/**
-	 * Deletes the reply with the given index from the list of replies
+	 * Deletes the {@link Reply} with the given index from this {@link Reply}.
 	 * @param index the index of the reply which is to delete
 	 */
 	public void deleteReply(int index) {
@@ -199,7 +199,7 @@ public class Reply implements PropertyChangeListener {
 	}
 
 	/**
-	 * @return the parent {@link Object} of this {@link Reply}, either a {@link Comment} or another {@link Reply}
+	 * @return the parent {@link Object} of this {@link Reply}, either a {@link Comment} or another {@link Reply}.
 	 * @author Peter Reuter (28.04.2012)
 	 */
 	public Object getParent() {
@@ -207,7 +207,7 @@ public class Reply implements PropertyChangeListener {
 	}
 	
 	/**
-	 * Adds a {@link PropertyChangeListener} to the list of listeners that are notified on {@link PropertyChangeEvent}s
+	 * Adds a {@link PropertyChangeListener} that is notified on {@link PropertyChangeEvent}s to this {@link Reply}.
 	 * @param listener
 	 * @author Peter Reuter (28.04.2012)
 	 */
@@ -216,7 +216,7 @@ public class Reply implements PropertyChangeListener {
     }
 
 	/**
-	 * Removes a {@link PropertyChangeListener} from the list of listeners that are notified on {@link PropertyChangeEvent}s
+	 * Removes a {@link PropertyChangeListener} from this {@link Reply}.
 	 * @param listener
 	 * @author Peter Reuter (28.04.2012)
 	 */

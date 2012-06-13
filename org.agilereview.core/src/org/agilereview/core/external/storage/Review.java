@@ -143,7 +143,7 @@ public class Review implements PropertyChangeListener {
     }
     
     /**
-     * Sets the {@link Comment}s of this {@link Review}. <strong>Only use while deriving {@link Comment}s from external storage!</strong>
+     * Sets the {@link Comment}s of this {@link Review}.<br><strong>Note: </strong>This method is intended to be used only while deriving {@link Comment}s from external storage!
      * @param comments
      * @author Peter Reuter (28.04.2012)
      */
@@ -155,6 +155,7 @@ public class Review implements PropertyChangeListener {
     }
     
     /**
+     * Adds a {@link Comment} to this {@link Review} if and only if it was not added before.
      * @param comment the {@link Comment} that is to be added to the {@link List} of {@link Comment}s
      */
     public void addComment(Comment comment) {
@@ -167,6 +168,7 @@ public class Review implements PropertyChangeListener {
     }
     
     /**
+     * Deletes the given {@link Comment} this {@link Review}.
      * @param comment the {@link Comment} that is to be removed from the {@link List} of {@link Comment}s
      */
     public void deleteComment(Comment comment) {
@@ -177,7 +179,8 @@ public class Review implements PropertyChangeListener {
     }
     
     /**
-     * @param index the index of the {@link Comment} that is to be removed from the {@link List} of {@link Comment}s
+     * Deletes the {@link Comment} with the given index from this {@link Review};
+     * @param index the index of the {@link Comment} that is to be deleted
      */
     public void deleteComment(int index) {
         deleteComment(this.comments.get(index));

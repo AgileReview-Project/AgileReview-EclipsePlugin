@@ -255,7 +255,7 @@ public class Comment implements PropertyChangeListener {
 	}
 	
 	/**
-	 * Sets the {@link Reply} of this {@link Comment}. <strong>Only use while deriving {@link Comment}s from external storage!</strong> 
+	 * Sets the {@link Reply}s of this {@link Comment}.<br><strong>Note: </strong>This method is intended to be used only while deriving {@link Comment}s from external storage! 
 	 * @param replies
 	 * @author Peter Reuter (28.04.2012)
 	 */
@@ -267,7 +267,7 @@ public class Comment implements PropertyChangeListener {
 	}
 	
 	/**
-	 * Adds at the end of the list of replies.
+	 * Adds a {@link Reply} to this {@link Comment} if and only if it was not added before.
 	 * @param reply the reply which is to add
 	 */
 	public void addReply(Reply reply) {
@@ -281,7 +281,7 @@ public class Comment implements PropertyChangeListener {
 	}
 	
 	/**
-	 * Deletes the given reply from the list of replies.
+	 * Deletes the given {@link Reply} this {@link Reply}.
 	 * @param reply the reply which is to delete
 	 */
 	public void deleteReply(Reply reply) {
@@ -293,7 +293,7 @@ public class Comment implements PropertyChangeListener {
 	}
 	
 	/**
-	 * Deletes the reply with the given index from the list of replies
+	 * Deletes the {@link Reply} with the given index from this {@link Comment};
 	 * @param index the index of the reply which is to delete
 	 */
 	public void deleteReply(int index) {
@@ -301,7 +301,7 @@ public class Comment implements PropertyChangeListener {
 	}
 
 	/**
-	 * Adds a {@link PropertyChangeListener} to the list of listeners that are notified on {@link PropertyChangeEvent}s
+	 * Adds a {@link PropertyChangeListener} that is notified on {@link PropertyChangeEvent}s to this {@link Comment}
 	 * @param listener
 	 * @author Peter Reuter (28.04.2012)
 	 */
@@ -310,7 +310,7 @@ public class Comment implements PropertyChangeListener {
     }
 
 	/**
-	 * Removes a {@link PropertyChangeListener} from the list of listeners that are notified on {@link PropertyChangeEvent}s
+	 * Removes a {@link PropertyChangeListener} from this {@link Comment}
 	 * @param listener
 	 * @author Peter Reuter (28.04.2012)
 	 */public void removePropertyChangeListener(PropertyChangeListener listener) {
