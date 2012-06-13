@@ -271,11 +271,13 @@ public class Comment implements PropertyChangeListener {
 	 * @param reply the reply which is to add
 	 */
 	public void addReply(Reply reply) {
-		List<Reply> oldValue = new ArrayList<Reply>(this.replies);
-		this.replies.add(reply);
-		reply.addPropertyChangeListener(this);
-		resetModificationDate();
-		propertyChangeSupport.firePropertyChange("replies", oldValue, this.replies);
+		if (!this.replies.contains(reply)) {
+			List<Reply> oldValue = new ArrayList<Reply>(this.replies);
+			this.replies.add(reply);
+			reply.addPropertyChangeListener(this);
+			resetModificationDate();
+			propertyChangeSupport.firePropertyChange("replies", oldValue, this.replies);
+		}
 	}
 	
 	/**

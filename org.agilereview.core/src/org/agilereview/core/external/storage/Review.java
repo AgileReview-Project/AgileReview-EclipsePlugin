@@ -158,10 +158,12 @@ public class Review implements PropertyChangeListener {
      * @param comment the {@link Comment} that is to be added to the {@link List} of {@link Comment}s
      */
     public void addComment(Comment comment) {
-        ArrayList<Comment> oldValue = new ArrayList<Comment>(this.comments);
-        this.comments.add(comment);
-        comment.addPropertyChangeListener(this);
-        propertyChangeSupport.firePropertyChange("comments", oldValue, this.comments);
+        if (!this.comments.contains(comment)) {
+        	ArrayList<Comment> oldValue = new ArrayList<Comment>(this.comments);
+        	this.comments.add(comment);
+            comment.addPropertyChangeListener(this);
+            propertyChangeSupport.firePropertyChange("comments", oldValue, this.comments);	
+        }
     }
     
     /**
