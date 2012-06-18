@@ -33,9 +33,7 @@ import org.eclipse.ui.PlatformUI;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 
 /**
  * Test class for class {@link CommentSummaryView}
@@ -49,17 +47,11 @@ public class CommentSummaryViewTest {
     private final SWTWorkbenchBot bot = new SWTWorkbenchBot();
     
     /**
-     * Expected Exception Type
-     */
-    @Rule
-    public ExpectedException exception = ExpectedException.none();
-    
-    /**
      * Setup method which will be executed before this test class will be executed at all
      * @author Malte Brunnlieb (27.05.2012)
      */
     @BeforeClass
-    public static void setupTests() {
+    public static void setupTestClass() {
         PlatformUI.getPreferenceStore().setValue("org.agilereview.testrunner.active", true);
         PlatformUI.getPreferenceStore().setValue("org.agilereview.testrunner.mock.storage", true); //TODO if client can be set via preferences -> use this
     }
@@ -69,7 +61,7 @@ public class CommentSummaryViewTest {
      * @author Malte Brunnlieb (27.05.2012)
      */
     @AfterClass
-    public static void tearDownTests() {
+    public static void tearDownTestClass() {
         PlatformUI.getPreferenceStore().setValue("org.agilereview.testrunner.active", false);
         PlatformUI.getPreferenceStore().setValue("org.agilereview.testrunner.mock.storage", false); //TODO if client can be set via preferences -> use this
     }
@@ -85,7 +77,6 @@ public class CommentSummaryViewTest {
         if (!perspective.isActive()) {
             perspective.activate();
         }
-        exception = ExpectedException.none();
     }
     
     /**
