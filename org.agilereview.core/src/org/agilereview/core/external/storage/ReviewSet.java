@@ -12,6 +12,7 @@ import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 
 import org.agilereview.core.external.definition.IReviewDataReceiver;
 
@@ -19,7 +20,7 @@ import org.agilereview.core.external.definition.IReviewDataReceiver;
  * List of {@link Review}s provides property change support for the list itself and the reviews contained
  * @author Malte Brunnlieb (03.06.2012)
  */
-public class ReviewList extends ArrayList<Review> implements PropertyChangeListener {
+public class ReviewSet extends HashSet<Review> implements PropertyChangeListener {
     
     /**
      * Generated serial version UID
@@ -32,31 +33,18 @@ public class ReviewList extends ArrayList<Review> implements PropertyChangeListe
     
     /**
      * {@inheritDoc} <br> Added {@link PropertyChangeSupport} for tracking changes by {@link IReviewDataReceiver}
-     * @see java.util.ArrayList#add(int, java.lang.Object)
-     * @author Malte Brunnlieb (03.06.2012)
-     */
-    @Override
-    public void add(int index, Review review) {
-        ArrayList<Review> oldValue = new ArrayList<Review>(this);
-        super.add(index, review);
-        review.addPropertyChangeListener(this);
-        propertyChangeSupport.firePropertyChange("ReviewList", oldValue, this);
-    }
-    
-    /**
-     * {@inheritDoc} <br> Added {@link PropertyChangeSupport} for tracking changes by {@link IReviewDataReceiver}
      * @see java.util.ArrayList#add(java.lang.Object)
      * @author Malte Brunnlieb (03.06.2012)
      */
     @Override
     public boolean add(Review e) {
-        ArrayList<Review> oldValue = new ArrayList<Review>(this);
-        boolean changed = super.add(e);
+		ArrayList<Review> oldValue = new ArrayList<Review>(this);
+		boolean changed = super.add(e);
         if (changed) {
             e.addPropertyChangeListener(this);
-            propertyChangeSupport.firePropertyChange("ReviewList", oldValue, this);
+            propertyChangeSupport.firePropertyChange("reviews", oldValue, this);
         }
-        return changed;
+    	return changed;   	
     }
     
     /**
@@ -66,7 +54,7 @@ public class ReviewList extends ArrayList<Review> implements PropertyChangeListe
      */
     @Override
     public boolean addAll(Collection<? extends Review> c) {
-        ArrayList<Review> oldValue = new ArrayList<Review>(this);
+        HashSet<Review> oldValue = new HashSet<Review>(this);
         boolean changed = super.addAll(c);
         if (changed) {
             for (Review r : c) {
@@ -74,39 +62,7 @@ public class ReviewList extends ArrayList<Review> implements PropertyChangeListe
             }
             propertyChangeSupport.firePropertyChange("ReviewList", oldValue, this);
         }
-        return changed;
-    }
-    
-    /**
-     * {@inheritDoc} <br> Added {@link PropertyChangeSupport} for tracking changes by {@link IReviewDataReceiver}
-     * @see java.util.ArrayList#addAll(int, java.util.Collection)
-     * @author Malte Brunnlieb (03.06.2012)
-     */
-    @Override
-    public boolean addAll(int index, Collection<? extends Review> c) {
-        ArrayList<Review> oldValue = new ArrayList<Review>(this);
-        boolean changed = super.addAll(index, c);
-        if (changed) {
-            for (Review r : c) {
-                r.addPropertyChangeListener(this);
-            }
-            propertyChangeSupport.firePropertyChange("ReviewList", oldValue, this);
-        }
-        return changed;
-    }
-    
-    /**
-     * {@inheritDoc} <br> Added {@link PropertyChangeSupport} for tracking changes by {@link IReviewDataReceiver}
-     * @see java.util.ArrayList#remove(int)
-     * @author Malte Brunnlieb (03.06.2012)
-     */
-    @Override
-    public Review remove(int index) {
-        ArrayList<Review> oldValue = new ArrayList<Review>(this);
-        Review removedObj = super.remove(index);
-        removedObj.removePropertyChangeListener(this);
-        propertyChangeSupport.firePropertyChange("ReviewList", oldValue, this);
-        return removedObj;
+    	return changed;
     }
     
     /**
@@ -116,11 +72,11 @@ public class ReviewList extends ArrayList<Review> implements PropertyChangeListe
      */
     @Override
     public boolean remove(Object o) {
-        ArrayList<Review> oldValue = new ArrayList<Review>(this);
+        HashSet<Review> oldValue = new HashSet<Review>(this);
         boolean success = super.remove(o);
         if (success) {
             ((Review) o).removePropertyChangeListener(this);
-            propertyChangeSupport.firePropertyChange("ReviewList", oldValue, this);
+            propertyChangeSupport.firePropertyChange("reviews", oldValue, this);
         }
         return success;
     }
@@ -132,13 +88,13 @@ public class ReviewList extends ArrayList<Review> implements PropertyChangeListe
      */
     @Override
     public boolean removeAll(Collection<?> c) {
-        ArrayList<Review> oldValue = new ArrayList<Review>(this);
+    	HashSet<Review> oldValue = new HashSet<Review>(this);
         boolean success = super.removeAll(c);
         if (success) {
             for (Object r : c) {
                 ((Review) r).addPropertyChangeListener(this);
             }
-            propertyChangeSupport.firePropertyChange("ReviewList", oldValue, this);
+            propertyChangeSupport.firePropertyChange("reviews", oldValue, this);
         }
         return success;
     }
@@ -150,7 +106,7 @@ public class ReviewList extends ArrayList<Review> implements PropertyChangeListe
      */
     @Override
     public boolean retainAll(Collection<?> c) {
-        ArrayList<Review> oldValue = new ArrayList<Review>(this);
+    	HashSet<Review> oldValue = new HashSet<Review>(this);
         boolean success = super.retainAll(c);
         if (success) {
             ArrayList<Review> removedOnes = new ArrayList<Review>(oldValue);
@@ -158,7 +114,7 @@ public class ReviewList extends ArrayList<Review> implements PropertyChangeListe
             for (Review r : removedOnes) {
                 r.removePropertyChangeListener(this);
             }
-            propertyChangeSupport.firePropertyChange("ReviewList", oldValue, this);
+            propertyChangeSupport.firePropertyChange("reviews", oldValue, this);
         }
         return success;
     }
@@ -170,12 +126,12 @@ public class ReviewList extends ArrayList<Review> implements PropertyChangeListe
      */
     @Override
     public void clear() {
-        ArrayList<Review> oldValue = new ArrayList<Review>(this);
+    	HashSet<Review> oldValue = new HashSet<Review>(this);
         super.clear();
         for (Review r : oldValue) {
             r.removePropertyChangeListener(this);
         }
-        propertyChangeSupport.firePropertyChange("ReviewList", oldValue, this);
+        propertyChangeSupport.firePropertyChange("reviews", oldValue, this);
     }
     
     /**

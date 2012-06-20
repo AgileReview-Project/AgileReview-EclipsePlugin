@@ -13,7 +13,7 @@ import java.util.List;
 import org.agilereview.core.external.definition.IReviewDataReceiver;
 import org.agilereview.core.external.storage.Comment;
 import org.agilereview.core.external.storage.Review;
-import org.agilereview.core.external.storage.ReviewList;
+import org.agilereview.core.external.storage.ReviewSet;
 import org.agilereview.ui.basic.Activator;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ResourcesPlugin;
@@ -63,7 +63,7 @@ public class ReviewExplorerView extends ViewPart implements IReviewDataReceiver 
      * @author Thilo Rauch (28.03.2012)
      */
     @Override
-    public void setReviewData(ReviewList reviews) {
+    public void setReviewData(ReviewSet reviews) {
         this.globalData = reviews;
         try {
             // delete old resource markers
@@ -106,7 +106,7 @@ public class ReviewExplorerView extends ViewPart implements IReviewDataReceiver 
         // Needed so expanding/collapsing of IResources which are displayed multiple times works
         treeViewer.setUseHashlookup(true);
         
-        // TODO: Ähnliches Konstrukt in der neuen Architektur?
+        // TODO: ï¿½hnliches Konstrukt in der neuen Architektur?
         // treeViewer.addSelectionChangedListener(ViewControl.getInstance());
         refreshInput();
         
@@ -123,7 +123,7 @@ public class ReviewExplorerView extends ViewPart implements IReviewDataReceiver 
         getSite().setSelectionProvider(treeViewer);
         
         // register view
-        // TODO Ähnliches Konzept? ViewControl.registerView(this.getClass());
+        // TODO ï¿½hnliches Konzept? ViewControl.registerView(this.getClass());
     }
     
     /**
@@ -169,7 +169,7 @@ public class ReviewExplorerView extends ViewPart implements IReviewDataReceiver 
         treeViewer.collapseToLevel(selection, TreeViewer.ALL_LEVELS);
     }
     
-    // TODO: Überlegen wofür das war...
+    // TODO: ï¿½berlegen wofï¿½r das war...
     //	/**
     //	 * Validates the ReviewExplorer selection in order to update the CONTAINS_CLOSED_REVIEW variable of the {@link SourceProvider}
     //	 */

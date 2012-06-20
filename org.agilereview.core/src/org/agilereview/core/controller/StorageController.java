@@ -18,7 +18,7 @@ import org.agilereview.core.external.definition.IStorageClient;
 import org.agilereview.core.external.storage.Comment;
 import org.agilereview.core.external.storage.Reply;
 import org.agilereview.core.external.storage.Review;
-import org.agilereview.core.external.storage.ReviewList;
+import org.agilereview.core.external.storage.ReviewSet;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
@@ -175,9 +175,9 @@ public class StorageController implements IExtensionController, IStorageClient {
      * @author Malte Brunnlieb (24.03.2012)
      */
     @Override
-    public ReviewList getAllReviews() {
+    public ReviewSet getAllReviews() {
         try {
-            ReviewList result = registeredClients.get(activeClient).getAllReviews();
+            ReviewSet result = registeredClients.get(activeClient).getAllReviews();
             Assert.isNotNull(result);
             return result;
         } catch (Throwable ex) {

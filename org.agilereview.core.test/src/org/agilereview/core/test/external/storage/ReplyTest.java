@@ -109,7 +109,7 @@ public class ReplyTest {
 	 */
 	@Test
 	public void testSetText() {
-		Reply r = createDefaultRepy();
+		Reply r = createDefaultReply();
 		HelperPropertyChangeListener pcl = new HelperPropertyChangeListener("text");
 		r.addPropertyChangeListener(pcl);
 		
@@ -137,7 +137,7 @@ public class ReplyTest {
 	 */
 	@Test
 	public void testSetReplies() {
-		Reply r = createDefaultRepy();
+		Reply r = createDefaultReply();
 		HelperPropertyChangeListener pcl = new HelperPropertyChangeListener("replies");
 		r.addPropertyChangeListener(pcl);
 		
@@ -163,7 +163,7 @@ public class ReplyTest {
 	 */
 	@Test
 	public void testAddReply() {
-		Reply reply = createDefaultRepy();
+		Reply reply = createDefaultReply();
 		HelperPropertyChangeListener pcl = new HelperPropertyChangeListener("replies");
 		reply.addPropertyChangeListener(pcl);
 		
@@ -189,7 +189,7 @@ public class ReplyTest {
 	 */
 	@Test
 	public void testDeleteReplyReply() {
-		Reply reply = createDefaultRepy();
+		Reply reply = createDefaultReply();
 		HelperPropertyChangeListener pcl = new HelperPropertyChangeListener("replies");
 		reply.addPropertyChangeListener(pcl);
 		
@@ -220,7 +220,7 @@ public class ReplyTest {
 	 */
 	@Test
 	public void testDeleteReplyInt() {
-		Reply reply = createDefaultRepy();
+		Reply reply = createDefaultReply();
 		HelperPropertyChangeListener pcl = new HelperPropertyChangeListener("replies");
 		reply.addPropertyChangeListener(pcl);
 
@@ -259,7 +259,7 @@ public class ReplyTest {
 	 */
 	@Test
 	public void testAddPropertyChangeListener() {
-		Reply reply = createDefaultRepy();
+		Reply reply = createDefaultReply();
 		HelperPropertyChangeListener pcl = new HelperPropertyChangeListener("text");
 		reply.addPropertyChangeListener(pcl);
 		
@@ -277,7 +277,7 @@ public class ReplyTest {
 	 */
 	@Test
 	public void testRemovePropertyChangeListener() {
-		Reply reply = createDefaultRepy();
+		Reply reply = createDefaultReply();
 		HelperPropertyChangeListener pcl = new HelperPropertyChangeListener("text");
 		reply.addPropertyChangeListener(pcl);
 		
@@ -295,7 +295,7 @@ public class ReplyTest {
 	 */
 	@Test
 	public void testPropertyChange() {
-		Reply reply = createDefaultRepy();
+		Reply reply = createDefaultReply();
 		HelperPropertyChangeListener pcl = new HelperPropertyChangeListener("test");
 		reply.addPropertyChangeListener(pcl);
 		
@@ -311,7 +311,7 @@ public class ReplyTest {
 	 * @return {@link Reply} as specified above
 	 * @author Peter Reuter (20.06.2012)
 	 */
-	private Reply createDefaultRepy() {
+	private Reply createDefaultReply() {
 		Reply r = new Reply("r1", new Object());
 		assertEquals(r.getCreationDate(), r.getModificationDate());
 		assertNotNull(r);

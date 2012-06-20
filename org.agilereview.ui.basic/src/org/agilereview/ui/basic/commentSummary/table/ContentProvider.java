@@ -14,7 +14,7 @@ import java.util.ArrayList;
 import org.agilereview.core.external.definition.IReviewDataReceiver;
 import org.agilereview.core.external.storage.Comment;
 import org.agilereview.core.external.storage.Review;
-import org.agilereview.core.external.storage.ReviewList;
+import org.agilereview.core.external.storage.ReviewSet;
 import org.agilereview.ui.basic.commentSummary.CommentSummaryView;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.TableViewer;
@@ -34,7 +34,7 @@ public class ContentProvider implements IStructuredContentProvider, IReviewDataR
     /**
      * ReviewList provided by the currently active StorageClient
      */
-    private static ReviewList reviewList;
+    private static ReviewSet reviewList;
     /**
      * The comments to be displayed (model of TableViewer viewer)
      */
@@ -85,11 +85,11 @@ public class ContentProvider implements IStructuredContentProvider, IReviewDataR
     
     /**
      * {@inheritDoc}
-     * @see org.agilereview.core.external.definition.IReviewDataReceiver#setReviewData(ReviewList)
+     * @see org.agilereview.core.external.definition.IReviewDataReceiver#setReviewData(ReviewSet)
      * @author Malte Brunnlieb (27.05.2012)
      */
     @Override
-    public void setReviewData(ReviewList reviews) {
+    public void setReviewData(ReviewSet reviews) {
         reviewList = reviews;
         if (reviews == null) {
             if (commentSummaryView != null) {
@@ -106,7 +106,7 @@ public class ContentProvider implements IStructuredContentProvider, IReviewDataR
     }
     
     /**
-     * Extracts all {@link Comment}s out of the {@link ReviewList} and refreshes the viewer
+     * Extracts all {@link Comment}s out of the {@link ReviewSet} and refreshes the viewer
      * @author Malte Brunnlieb (03.06.2012)
      */
     private void refreshCommentList() {

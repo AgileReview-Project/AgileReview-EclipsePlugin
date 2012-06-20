@@ -13,7 +13,7 @@ import org.agilereview.core.external.definition.IStorageClient;
 import org.agilereview.core.external.storage.Comment;
 import org.agilereview.core.external.storage.Reply;
 import org.agilereview.core.external.storage.Review;
-import org.agilereview.core.external.storage.ReviewList;
+import org.agilereview.core.external.storage.ReviewSet;
 
 /**
  * This Mock should is implemented as a dummy {@link IStorageClient} which returns the values set by the provided methods
@@ -24,7 +24,7 @@ public class StorageClientMock implements IStorageClient {
     /**
      * Dummy object storage
      */
-    private final ReviewList reviews = new ReviewList();
+    private final ReviewSet reviews = new ReviewSet();
     /**
      * The instance created by the {@link IStorageClient} extension point
      */
@@ -66,7 +66,7 @@ public class StorageClientMock implements IStorageClient {
      * @author Malte Brunnlieb (27.05.2012)
      */
     @Override
-    public ReviewList getAllReviews() {
+    public ReviewSet getAllReviews() {
         return reviews;
     }
     
