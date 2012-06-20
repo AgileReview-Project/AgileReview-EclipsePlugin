@@ -210,8 +210,13 @@ public class ReviewTest {
 		
 		review.addComment(c1);
 
-		if (!(prevSize+1 == review.getComments().size()) || !c1.equals(review.getComments().get(review.getComments().size()-1)) || !pcl.getPropertyChanged()) {
+		if (!(review.getComments().contains(c1)) || !(prevSize+1 == review.getComments().size()) || !c1.equals(review.getComments().get(review.getComments().size()-1)) || !pcl.getPropertyChanged()) {
 			throw new AssertionFailedError("Review comment could not be added successfully!");
+		}
+		
+		review.addComment(c1);
+		if (review.getComments().size() > prevSize+1) {
+			throw new AssertionFailedError("Review comment added twice!");
 		}
 	}
 

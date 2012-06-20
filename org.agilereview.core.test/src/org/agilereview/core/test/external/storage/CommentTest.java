@@ -322,8 +322,13 @@ public class CommentTest {
 		
 		comment.addReply(r);
 
-		if (!(prevSize+1 == comment.getReplies().size()) || !comment.getReplies().get(comment.getReplies().size()-1).equals(r) || comment.getModificationDate().equals(comment.getCreationDate()) || !pcl.getPropertyChanged()) {
+		if (!(comment.getReplies().contains(r)) || !(prevSize+1 == comment.getReplies().size()) || !comment.getReplies().get(comment.getReplies().size()-1).equals(r) || comment.getModificationDate().equals(comment.getCreationDate()) || !pcl.getPropertyChanged()) {
 			throw new AssertionFailedError("Reply could not be added successfully!");
+		}
+		
+		comment.addReply(r);
+		if (comment.getReplies().size() > prevSize+1) {
+			throw new AssertionFailedError("Reply added twice!");
 		}
 	}
 
@@ -340,7 +345,8 @@ public class CommentTest {
 		Reply r1 = new Reply("id1", comment);
 		Reply r2 = new Reply("id2", comment);
 		Reply r3 = new Reply("id3", comment);
-		Reply[] replies = {r1, r2, r3};
+		Reply[] replies = {r1, r1, r2, r3};
+		comment.addReply(r1);
 		comment.addReply(r1);
 		comment.addReply(r2);
 		comment.addReply(r3);
@@ -371,7 +377,8 @@ public class CommentTest {
 		Reply r1 = new Reply("id1", comment);
 		Reply r2 = new Reply("id2", comment);
 		Reply r3 = new Reply("id3", comment);
-		Reply[] replies = {r1, r2, r3};
+		Reply[] replies = {r1, r1, r2, r3};
+		comment.addReply(r1);
 		comment.addReply(r1);
 		comment.addReply(r2);
 		comment.addReply(r3);
