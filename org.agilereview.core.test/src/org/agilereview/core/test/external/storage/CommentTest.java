@@ -300,7 +300,7 @@ public class CommentTest {
 		comment.setReplies(replies);
 		
 		if (!(replies.size() == comment.getReplies().size()) || !(comment.getReplies().contains(r1) && comment.getReplies().contains(r2) && comment.getReplies().contains(r3))) {
-			throw new AssertionFailedError("Review comments could not be set successfully!");
+			throw new AssertionFailedError("Replies could not be set successfully!");
 		}
 
 	}
@@ -440,11 +440,11 @@ public class CommentTest {
 	 */
 	@Test
 	public void testPropertyChange() {
-		Comment review = createDefaultComment();
+		Comment comment = createDefaultComment();
 		HelperPropertyChangeListener pcl = new HelperPropertyChangeListener("test");
-		review.addPropertyChangeListener(pcl);
+		comment.addPropertyChangeListener(pcl);
 		
-		review.propertyChange(new PropertyChangeEvent(review, "test", false, true));
+		comment.propertyChange(new PropertyChangeEvent(comment, "test", false, true));
 		
 		if (!pcl.getPropertyChanged()) {
 			throw new AssertionFailedError("PropertyChangeEvent not forwarded correctly!");
