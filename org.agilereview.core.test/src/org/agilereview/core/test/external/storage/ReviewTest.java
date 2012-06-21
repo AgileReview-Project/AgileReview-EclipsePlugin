@@ -263,7 +263,8 @@ public class ReviewTest {
 		Comment c1 = new Comment("c1", HelperClass.getIFile("resources/Test1.txt"), review);
 		Comment c2 = new Comment("c2", HelperClass.getIFile("resources/Test1.txt"), review);
 		Comment c3 = new Comment("c3", HelperClass.getIFile("resources/Test1.txt"), review);
-		Comment[] comments = {c1, c2, c3};
+		Comment[] comments = {c1, c2, c3, c1};
+		review.addComment(c1);
 		review.addComment(c1);
 		review.addComment(c2);
 		review.addComment(c3);
@@ -271,7 +272,7 @@ public class ReviewTest {
 		
 		int index = new Random().nextInt(3);
 		
-		review.deleteComment(review.getComments().size()-(comments.length-index));
+		review.deleteComment(review.getComments().size()-(comments.length-1-index));
 
 		if (!(prevSize-1 == review.getComments().size()) || review.getComments().contains(comments[index]) || !pcl.getPropertyChanged()) {
 			throw new AssertionFailedError("Review comment could not be removed by object successfully!");

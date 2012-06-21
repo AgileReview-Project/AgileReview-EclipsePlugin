@@ -227,7 +227,7 @@ public class ReplyTest {
 		Reply r1 = new Reply("id1", reply);
 		Reply r2 = new Reply("id2", reply);
 		Reply r3 = new Reply("id3", reply);
-		Reply[] replies = {r1, r1, r2, r3};
+		Reply[] replies = {r1, r2, r3, r1};
 		reply.addReply(r1);
 		reply.addReply(r1);
 		reply.addReply(r2);
@@ -239,7 +239,7 @@ public class ReplyTest {
 		
 		sleep();
 
-		reply.deleteReply(reply.getReplies().size()-(replies.length-index));
+		reply.deleteReply(reply.getReplies().size()-(replies.length-1-index));
 		
 		if (!(prevSize-1 == reply.getReplies().size()) || reply.getReplies().contains(replies[index]) || reply.getModificationDate().equals(reply.getCreationDate()) || !pcl.getPropertyChanged()) {
 			throw new AssertionFailedError("Reply could not be removed by index successfully!");

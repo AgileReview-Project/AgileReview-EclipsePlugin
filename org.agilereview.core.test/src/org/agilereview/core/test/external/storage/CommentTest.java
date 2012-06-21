@@ -8,7 +8,6 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Random;
 
-import junit.framework.Assert;
 import junit.framework.AssertionFailedError;
 
 import org.agilereview.core.external.storage.Comment;
@@ -43,7 +42,7 @@ public class CommentTest {
 		// create comment
 		Comment comment = new Comment(id, file, r);
 		// id and file?)
-		Assert.assertNotNull(comment);
+		assertNotNull(comment);
 
 		// check integrity
 		if (!comment.getId().equals(id) || !comment.getCommentedFile().equals(file) || !comment.getReview().equals(r)) {
@@ -377,7 +376,7 @@ public class CommentTest {
 		Reply r1 = new Reply("id1", comment);
 		Reply r2 = new Reply("id2", comment);
 		Reply r3 = new Reply("id3", comment);
-		Reply[] replies = {r1, r1, r2, r3};
+		Reply[] replies = {r1, r2, r3, r1};
 		comment.addReply(r1);
 		comment.addReply(r1);
 		comment.addReply(r2);
@@ -389,7 +388,7 @@ public class CommentTest {
 		
 		sleep();
 
-		comment.deleteReply(comment.getReplies().size()-(replies.length-index));
+		comment.deleteReply(comment.getReplies().size()-(replies.length-1-index));
 		
 		if (!(prevSize-1 == comment.getReplies().size()) || comment.getReplies().contains(replies[index]) || comment.getModificationDate().equals(comment.getCreationDate()) || !pcl.getPropertyChanged()) {
 			throw new AssertionFailedError("Reply could not be removed by index successfully!");
