@@ -14,9 +14,9 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
-import org.agilereview.core.Activator;
 import org.agilereview.core.external.definition.IStorageClient;
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.runtime.Platform;
 
 /**
  * A class that stores data and a list of replies of a comment.
@@ -26,7 +26,7 @@ public class Comment implements PropertyChangeListener {
 	
 	/**
 	 * Name of the property which stores the name of the author
-	 */
+	 */// TODO move static fields to externally available class
 	private static final String AUTHOR_PROPERTYNAME = "author";
 	
 	/**
@@ -44,7 +44,8 @@ public class Comment implements PropertyChangeListener {
 	/**
 	 * The author of the comment
 	 */ //TODO maybe seperate author object for sync with color?
-	private String author = Activator.getDefault().getPreferenceStore().getString(AUTHOR_PROPERTYNAME).equals("") ? Activator.getDefault().getPreferenceStore().getDefaultString(AUTHOR_PROPERTYNAME) : Activator.getDefault().getPreferenceStore().getString(AUTHOR_PROPERTYNAME);
+	//TODO change propertyname to static field
+	private String author = Platform.getPreferencesService().getString("org.agilereview.core", "author", System.getProperty("user.name"), null);
 	/**
 	 * The date when the comment was created initially
 	 */

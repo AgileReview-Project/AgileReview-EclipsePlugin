@@ -14,7 +14,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
-import org.agilereview.core.Activator;
+import org.eclipse.core.runtime.Platform;
 
 /**
  * A class that is used to store replies that were added to a comment. 
@@ -34,7 +34,7 @@ public class Reply implements PropertyChangeListener {
 	/**
 	 * The author of the reply 
 	 */ //TODO maybe seperate author object for sync with color?
-	private String author = Activator.getDefault().getPreferenceStore().getString(AUTHOR_PROPERTYNAME).equals("") ? Activator.getDefault().getPreferenceStore().getDefaultString(AUTHOR_PROPERTYNAME) : Activator.getDefault().getPreferenceStore().getString(AUTHOR_PROPERTYNAME);
+	private String author = Platform.getPreferencesService().getString("org.agilereview.core", "author", System.getProperty("user.name"), null);;
 	/**
 	 * The date when the reply was create initially 
 	 */

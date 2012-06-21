@@ -3,5 +3,11 @@
 <plugin>
    <extension-point id="org.agilereview.core.StorageClient" name="StorageClient" schema="schema/org.agilereview.core.StorageClient.exsd"/>
    <extension-point id="org.agilereview.core.ReviewDataReceiver" name="ReviewDataReceiver" schema="schema/org.agilereview.core.ReviewDataReceiver.exsd"/>
+   <extension
+         point="org.eclipse.core.runtime.preferences">
+      <initializer
+            class="org.agilereview.core.preferences.PreferenceInitializer">
+      </initializer>
+   </extension>
 
 </plugin>
