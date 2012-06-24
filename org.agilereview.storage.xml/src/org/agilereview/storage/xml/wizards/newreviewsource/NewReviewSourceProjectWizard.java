@@ -78,6 +78,7 @@ public class NewReviewSourceProjectWizard extends Wizard implements INewWizard {
 		}
 		
 		if (useDirectly) {
+			// TODO use preferences scopes here
 			Activator.getDefault().getPluginPreferences().setValue(SourceFolderManager.SOURCEFOLDER_PROPERTYNAME, projectName);
 		}
 		

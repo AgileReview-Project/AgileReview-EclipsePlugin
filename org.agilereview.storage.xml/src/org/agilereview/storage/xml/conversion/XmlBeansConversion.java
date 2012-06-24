@@ -28,6 +28,7 @@ public class XmlBeansConversion {
 		String reference = xmlBeansReview.getReferenceId();
 		String responsibility = xmlBeansReview.getResponsibility();
 		String description = xmlBeansReview.getDescription();
+		// TODO set "isOpen" based on preferences
 		
 		Review review = new Review(id, status, reference, responsibility, description);
 

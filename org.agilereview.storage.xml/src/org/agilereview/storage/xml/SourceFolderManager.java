@@ -64,6 +64,7 @@ public class SourceFolderManager implements IPropertyChangeListener {
 	@SuppressWarnings("deprecation")
 	private static void setCurrentSourceFolderProject() {
 		IWorkspaceRoot workspaceRoot = ResourcesPlugin.getWorkspace().getRoot();
+		// TODO use preferences scopes here
 		IProject p = workspaceRoot.getProject(Activator.getDefault().getPluginPreferences().getString(SOURCEFOLDER_PROPERTYNAME));
 		if (!p.exists() || !p.isOpen()) {
 			String message = "Selected Source Folder does not exist or is not open.";
@@ -216,6 +217,20 @@ public class SourceFolderManager implements IPropertyChangeListener {
 			}
 		}
 		return file;
+	}
+	
+	/**
+	 * Deletes a {@link Review} folder (and its content).
+	 * @param reviewId the ID of the review that is to be deleted within the file system.
+	 * @author Peter Reuter (24.06.2012)
+	 */
+	static void deleteReviewContents(String reviewId) {
+		IFolder reviewFolder = getReviewFolder(reviewId);
+		try {
+			reviewFolder.delete(true, null);
+		} catch (CoreException e) {
+			ExceptionHandler.notifyUser(e);
+		}
 	}
 
 	///////////////////////////////////////

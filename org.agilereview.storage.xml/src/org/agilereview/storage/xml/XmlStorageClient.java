@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -14,6 +15,7 @@ import org.agilereview.core.external.definition.IStorageClient;
 import org.agilereview.core.external.storage.Comment;
 import org.agilereview.core.external.storage.Reply;
 import org.agilereview.core.external.storage.Review;
+import org.agilereview.core.external.storage.ReviewSet;
 import org.agilereview.storage.xml.conversion.PojoConversion;
 import org.agilereview.storage.xml.conversion.XmlBeansConversion;
 import org.agilereview.storage.xml.exception.DataLoadingException;
@@ -58,6 +60,10 @@ public class XmlStorageClient extends Plugin implements IStorageClient, IPropert
 	 */
 	private Map<String, Review> idReviewMap = new HashMap<String, Review>();
 	/**
+	 * The set of all loaded {@link Review}s.
+	 */
+	private ReviewSet reviewSet = new ReviewSet();
+	/**
 	 * Map of {@link Comment} IDs to {@link Comment} objects. 
 	 */
 	private Map<String, Comment> idCommentMap = new HashMap<String, Comment>();
@@ -85,7 +91,7 @@ public class XmlStorageClient extends Plugin implements IStorageClient, IPropert
 	@SuppressWarnings("deprecation")
 	private void initialize() {
 		loadReviews();
-		// TODO load comments of open reviews.
+		// TODO use preferences scopes here
 		List<String> reviewIds = Arrays.asList(Activator.getDefault().getPluginPreferences().getString(OPENREVIEWS_PROPERTYNAME).split(","));
 		loadComments(reviewIds);
 	}
@@ -134,8 +140,8 @@ public class XmlStorageClient extends Plugin implements IStorageClient, IPropert
 	////////////////////////////////
 
 	@Override
-	public List<Review> getAllReviews() {
-		return new ArrayList<Review>(this.idReviewMap.values());
+	public ReviewSet getAllReviews() {
+		return this.reviewSet;
 	}
 
 	@Override
@@ -156,6 +162,7 @@ public class XmlStorageClient extends Plugin implements IStorageClient, IPropert
 	@Override
 	public void addReview(Review review) {
 		this.idReviewMap.put(review.getId(), review);
+		this.reviewSet.add(review);
 		for (Comment comment : review.getComments()) {
 			this.idCommentMap.put(comment.getId(), comment);
 			addReplies(comment.getReplies());
@@ -291,6 +298,7 @@ public class XmlStorageClient extends Plugin implements IStorageClient, IPropert
 		for (org.agilereview.xmlSchema.review.ReviewDocument.Review xmlBeansReview : xmlBeansReviews) {
 			Review review = XmlBeansConversion.getReview(xmlBeansReview);
 			this.idReviewMap.put(review.getId(), review);
+			this.reviewSet.add(review);
 			review.addPropertyChangeListener(this);
 		}
 	}
@@ -300,6 +308,7 @@ public class XmlStorageClient extends Plugin implements IStorageClient, IPropert
 	 * @param doc the {@link XmlTokenSource} to save
 	 */
 	private void saveXmlDocument(IFile file, XmlTokenSource doc) {
+		// TODO check whether file is empty --> delete if exists file
 		try {
 			doc.save(file.getLocation().toFile(), new XmlOptions().setSavePrettyPrint());
 		} catch (IOException e) {
@@ -315,6 +324,7 @@ public class XmlStorageClient extends Plugin implements IStorageClient, IPropert
 	public void propertyChange(PropertyChangeEvent event) {
 		if (event.getProperty().equals(SOURCEFOLDER_PROPERTYNAME)) {
 			this.idReviewMap.clear();
+			this.reviewSet.clear();
 			initialize();
 		}
 	}
@@ -325,11 +335,27 @@ public class XmlStorageClient extends Plugin implements IStorageClient, IPropert
 
 	@Override
 	public void propertyChange(java.beans.PropertyChangeEvent evt) {
-		if (evt.getSource() instanceof Review) {
+		if (evt.getSource() instanceof ReviewSet) {
+			@SuppressWarnings("unchecked")
+			HashSet<Review> oldValue = (HashSet<Review>) evt.getOldValue();
+			@SuppressWarnings("unchecked")
+			HashSet<Review> newValue = (HashSet<Review>) evt.getNewValue();
+			if (newValue.size() >= oldValue.size()) {
+				// reviews added
+				newValue.removeAll(oldValue);
+				for (Review review : newValue) {
+					store(review);
+				}
+			} else {
+				// reviews removed
+				oldValue.removeAll(newValue);
+				for (Review review: oldValue) {
+					SourceFolderManager.deleteReviewContents(review.getId());
+				}
+			}
+		} else if (evt.getSource() instanceof Review) {
 			Review review = (Review) evt.getSource();
-			IFile reviewFile = SourceFolderManager.getReviewFile(review.getId());
-			ReviewDocument doc = PojoConversion.getXmlBeansReviewDocument(review);
-			saveXmlDocument(reviewFile, doc);
+			store(review);
 		} else if (evt.getSource() instanceof Comment || evt.getSource() instanceof Reply) {
 			Comment comment;
 			if (evt.getSource() instanceof Comment) {
@@ -345,6 +371,17 @@ public class XmlStorageClient extends Plugin implements IStorageClient, IPropert
 			CommentsDocument doc = PojoConversion.getXmlBeansCommentsDocument(getComments(comment.getReview(), comment.getAuthor()));
 			saveXmlDocument(commentFile, doc);
 		}
+	}
+
+	/**
+	 * Writes back new reviews or changes of a review to the filesystem.
+	 * @param review The {@link Review} that was added or changed.
+	 * @author Peter Reuter (24.06.2012)
+	 */
+	private void store(Review review) {
+		IFile reviewFile = SourceFolderManager.getReviewFile(review.getId());
+		ReviewDocument doc = PojoConversion.getXmlBeansReviewDocument(review);
+		saveXmlDocument(reviewFile, doc);
 	}
 	
 }

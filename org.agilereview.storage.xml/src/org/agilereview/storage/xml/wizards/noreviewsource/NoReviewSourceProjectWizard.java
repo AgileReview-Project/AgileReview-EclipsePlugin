@@ -60,6 +60,7 @@ public class NoReviewSourceProjectWizard extends Wizard implements IWizard {
 		chosenProjectName = page.getReviewSourceName();
 		boolean result = chosenProjectName != null;
 		if (result && setDirectly) {
+			// TODO use preferences scopes here
 			Activator.getDefault().getPluginPreferences().setValue(SourceFolderManager.SOURCEFOLDER_PROPERTYNAME, chosenProjectName);
 		}
 		return result;

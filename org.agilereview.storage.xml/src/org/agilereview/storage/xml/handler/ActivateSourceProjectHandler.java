@@ -28,6 +28,7 @@ public class ActivateSourceProjectHandler extends AbstractHandler {
 				if (o instanceof IProject) {
 						IProject project = (IProject) o;
 						if (project.hasNature(SourceFolderManager.AGILEREVIEW_NATURE)){
+							// TODO use preferences scopes here
 							Activator.getDefault().getPluginPreferences().setValue(SourceFolderManager.SOURCEFOLDER_PROPERTYNAME, project.getName());
 						}
 				}
