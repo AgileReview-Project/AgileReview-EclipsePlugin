@@ -31,14 +31,14 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Plugin;
-import org.eclipse.jface.util.IPropertyChangeListener;
-import org.eclipse.jface.util.PropertyChangeEvent;
+import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener;
+import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent;
 
 /**
  * {@link IStorageClient} that stores review data in XML files.
  * @author Peter Reuter (04.04.2012)
  */
-public class XmlStorageClient extends Plugin implements IStorageClient, IPropertyChangeListener, PropertyChangeListener {
+public class XmlStorageClient extends Plugin implements IStorageClient, IPreferenceChangeListener, PropertyChangeListener {
 	
 	//TODO compatibility to old xml format?
 	
@@ -73,6 +73,9 @@ public class XmlStorageClient extends Plugin implements IStorageClient, IPropert
 	 */
 	private Map<String, Reply> idReplyMap = new HashMap<String, Reply>();
 	
+	/**
+	 * Indicates whether the source folder was reset but not parsed yet. 
+	 */
 	private boolean sourceFolderChangeInProgress = false;
 	
 	///////////////////////////////////////////////////////
@@ -339,21 +342,6 @@ public class XmlStorageClient extends Plugin implements IStorageClient, IPropert
 		saveXmlDocument(reviewFile, doc);
 	}
 	
-	///////////////////////////////////////
-	// method of IPropertyChangeListener //
-	///////////////////////////////////////
-
-	@Override
-	public void propertyChange(PropertyChangeEvent event) {
-		if (event.getProperty().equals(SOURCEFOLDER_PROPERTYNAME)) {
-			this.sourceFolderChangeInProgress = true;
-			SourceFolderManager.setCurrentSourceFolderProject();
-			this.idReviewMap.clear();
-			this.reviewSet.clear();
-			initialize();
-		}
-	}
-	
 	//////////////////////////////////////
 	// method of PropertyChangeListener //
 	//////////////////////////////////////
@@ -399,6 +387,21 @@ public class XmlStorageClient extends Plugin implements IStorageClient, IPropert
 				source = ((Reply)source).getParent();
 			}
 			store((Comment) source);
+		}
+	}
+	
+	///////////////////////////////////////
+	// method of IPropertyChangeListener //
+	///////////////////////////////////////
+	
+	@Override
+	public void preferenceChange(PreferenceChangeEvent event) {
+		if (event.getKey().equals(SOURCEFOLDER_PROPERTYNAME)) {
+			this.sourceFolderChangeInProgress = true;
+			SourceFolderManager.setCurrentSourceFolderProject();
+			this.idReviewMap.clear();
+			this.reviewSet.clear();
+			initialize();
 		}
 	}
 	
