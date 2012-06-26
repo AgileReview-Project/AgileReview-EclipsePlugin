@@ -15,9 +15,8 @@ import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.jface.util.IPropertyChangeListener;
-import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.swt.widgets.Display;
 
@@ -25,7 +24,7 @@ import org.eclipse.swt.widgets.Display;
  * Manages the current source folder and exchanges of the source folder.
  * @author Peter Reuter (25.03.2012)
  */
-public class SourceFolderManager implements IPropertyChangeListener {
+public class SourceFolderManager {
 
 	//TODO compatibility to old nature IDs?
 
@@ -61,11 +60,9 @@ public class SourceFolderManager implements IPropertyChangeListener {
 	 * Loads the the current source folder specified by the name. The name is loaded from the preferences.
 	 * @author Peter Reuter (28.04.2012)
 	 */
-	@SuppressWarnings("deprecation")
-	private static void setCurrentSourceFolderProject() {
+	static void setCurrentSourceFolderProject() {
 		IWorkspaceRoot workspaceRoot = ResourcesPlugin.getWorkspace().getRoot();
-		// TODO use preferences scopes here
-		IProject p = workspaceRoot.getProject(Activator.getDefault().getPluginPreferences().getString(SOURCEFOLDER_PROPERTYNAME));
+		IProject p = workspaceRoot.getProject(Platform.getPreferencesService().getString(Activator.PLUGIN_ID, SourceFolderManager.SOURCEFOLDER_PROPERTYNAME, "", null));
 		if (!p.exists() || !p.isOpen()) {
 			String message = "Selected Source Folder does not exist or is not open.";
 			Activator.getDefault().getLog().log(new Status(IStatus.ERROR, Activator.PLUGIN_ID, message));
@@ -230,17 +227,6 @@ public class SourceFolderManager implements IPropertyChangeListener {
 			reviewFolder.delete(true, null);
 		} catch (CoreException e) {
 			ExceptionHandler.notifyUser(e);
-		}
-	}
-
-	///////////////////////////////////////
-	// methods of PropertyChangeListener //
-	///////////////////////////////////////
-
-	@Override
-	public void propertyChange(PropertyChangeEvent event) {
-		if (event.getProperty().equals(SOURCEFOLDER_PROPERTYNAME)) {
-			setCurrentSourceFolderProject();
 		}
 	}
 

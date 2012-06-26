@@ -2,6 +2,7 @@ package org.agilereview.storage.xml.wizards.newreviewsource;
 
 import org.agilereview.storage.xml.Activator;
 import org.agilereview.storage.xml.SourceFolderManager;
+import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.ui.INewWizard;
@@ -52,8 +53,6 @@ public class NewReviewSourceProjectWizard extends Wizard implements INewWizard {
 
 	@Override
 	public void init(IWorkbench workbench, IStructuredSelection selection) {
-		// TODO Auto-generated method stub
-
 	}
 	
 	/**
@@ -78,8 +77,7 @@ public class NewReviewSourceProjectWizard extends Wizard implements INewWizard {
 		}
 		
 		if (useDirectly) {
-			// TODO use preferences scopes here
-			Activator.getDefault().getPluginPreferences().setValue(SourceFolderManager.SOURCEFOLDER_PROPERTYNAME, projectName);
+			InstanceScope.INSTANCE.getNode(Activator.PLUGIN_ID).put(SourceFolderManager.SOURCEFOLDER_PROPERTYNAME, projectName);
 		}
 		
 		return result;

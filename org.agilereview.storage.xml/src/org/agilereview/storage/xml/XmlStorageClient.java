@@ -29,6 +29,7 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Plugin;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
@@ -52,8 +53,8 @@ public class XmlStorageClient extends Plugin implements IStorageClient, IPropert
 	private static final String SOURCEFOLDER_PROPERTYNAME = "source_folder";
 	/**
 	 * Name of the property which stores the names of the open reviews as a comma separated list.
-	 */
-	private static final String OPENREVIEWS_PROPERTYNAME = "openReviews";
+	 */ // TODO move to special core class
+	private static final String OPENREVIEWS_PROPERTYNAME = "open_reviews";
 
 	/**
 	 * Map of {@link Review} IDs to {@link Review} objects. 
@@ -72,6 +73,8 @@ public class XmlStorageClient extends Plugin implements IStorageClient, IPropert
 	 */
 	private Map<String, Reply> idReplyMap = new HashMap<String, Reply>();
 	
+	private boolean sourceFolderChangeInProgress = false;
+	
 	///////////////////////////////////////////////////////
 	// additional methods needed by the XmlStorageClient //
 	///////////////////////////////////////////////////////
@@ -88,11 +91,9 @@ public class XmlStorageClient extends Plugin implements IStorageClient, IPropert
 	 * Initially loads all {@link Review} objects on startup 
 	 * @author Peter Reuter (04.04.2012)
 	 */
-	@SuppressWarnings("deprecation")
 	private void initialize() {
 		loadReviews();
-		// TODO use preferences scopes here
-		List<String> reviewIds = Arrays.asList(Activator.getDefault().getPluginPreferences().getString(OPENREVIEWS_PROPERTYNAME).split(","));
+		List<String> reviewIds = Arrays.asList(Platform.getPreferencesService().getString("org.agilereview.core", OPENREVIEWS_PROPERTYNAME, "", null).split(","));
 		loadComments(reviewIds);
 	}
 	
@@ -315,6 +316,28 @@ public class XmlStorageClient extends Plugin implements IStorageClient, IPropert
 			ExceptionHandler.notifyUser(e);
 		}
 	}
+
+	/**
+	 * Writes back new comments/replies or changes of a comment/reply to the filesystem.
+	 * @param comment The comment that was changed or is the parent comment of the reply that changed.
+	 * @author Peter Reuter (24.06.2012)
+	 */
+	private void store(Comment comment) {
+		IFile commentFile = SourceFolderManager.getCommentFile(comment.getReview().getId(), comment.getAuthor());
+		CommentsDocument doc = PojoConversion.getXmlBeansCommentsDocument(getComments(comment.getReview(), comment.getAuthor()));
+		saveXmlDocument(commentFile, doc);
+	}
+
+	/**
+	 * Writes back new reviews or changes of a review to the filesystem.
+	 * @param review The {@link Review} that was added or changed.
+	 * @author Peter Reuter (24.06.2012)
+	 */
+	private void store(Review review) {
+		IFile reviewFile = SourceFolderManager.getReviewFile(review.getId());
+		ReviewDocument doc = PojoConversion.getXmlBeansReviewDocument(review);
+		saveXmlDocument(reviewFile, doc);
+	}
 	
 	///////////////////////////////////////
 	// method of IPropertyChangeListener //
@@ -323,6 +346,8 @@ public class XmlStorageClient extends Plugin implements IStorageClient, IPropert
 	@Override
 	public void propertyChange(PropertyChangeEvent event) {
 		if (event.getProperty().equals(SOURCEFOLDER_PROPERTYNAME)) {
+			this.sourceFolderChangeInProgress = true;
+			SourceFolderManager.setCurrentSourceFolderProject();
 			this.idReviewMap.clear();
 			this.reviewSet.clear();
 			initialize();
@@ -346,42 +371,35 @@ public class XmlStorageClient extends Plugin implements IStorageClient, IPropert
 				for (Review review : newValue) {
 					store(review);
 				}
-			} else {
+			} else if (!this.sourceFolderChangeInProgress)  {
 				// reviews removed
 				oldValue.removeAll(newValue);
 				for (Review review: oldValue) {
 					SourceFolderManager.deleteReviewContents(review.getId());
 				}
-			}
-		} else if (evt.getSource() instanceof Review) {
-			Review review = (Review) evt.getSource();
-			store(review);
-		} else if (evt.getSource() instanceof Comment || evt.getSource() instanceof Reply) {
-			Comment comment;
-			if (evt.getSource() instanceof Comment) {
-				comment = (Comment) evt.getSource();
 			} else {
-				Object source = evt.getSource();
-				while (!(source instanceof Comment)) {
-					source = ((Reply)source).getParent();
-				}
-				comment = (Comment) source;
+				// source folder changed --> do not delete anything!
+				this.sourceFolderChangeInProgress = false;
 			}
-			IFile commentFile = SourceFolderManager.getCommentFile(comment.getReview().getId(), comment.getAuthor());
-			CommentsDocument doc = PojoConversion.getXmlBeansCommentsDocument(getComments(comment.getReview(), comment.getAuthor()));
-			saveXmlDocument(commentFile, doc);
+			
+		} else if (evt.getSource() instanceof Review) {
+			if (evt.getPropertyName().equals("isOpen")) {
+				if ((Boolean) evt.getNewValue()) {
+					loadComments(((Review) evt.getSource()).getId());
+				} else {
+					((Review) evt.getSource()).clearComments();
+				}
+			} else {
+				store((Review) evt.getSource());	
+			}
+			
+		} else if (evt.getSource() instanceof Comment || evt.getSource() instanceof Reply) {
+			Object source = evt.getSource();
+			while (!(source instanceof Comment)) {
+				source = ((Reply)source).getParent();
+			}
+			store((Comment) source);
 		}
-	}
-
-	/**
-	 * Writes back new reviews or changes of a review to the filesystem.
-	 * @param review The {@link Review} that was added or changed.
-	 * @author Peter Reuter (24.06.2012)
-	 */
-	private void store(Review review) {
-		IFile reviewFile = SourceFolderManager.getReviewFile(review.getId());
-		ReviewDocument doc = PojoConversion.getXmlBeansReviewDocument(review);
-		saveXmlDocument(reviewFile, doc);
 	}
 	
 }

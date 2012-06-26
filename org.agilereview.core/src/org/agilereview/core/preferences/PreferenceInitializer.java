@@ -16,6 +16,7 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 		IEclipsePreferences preferences = DefaultScope.INSTANCE.getNode(Activator.PLUGIN_ID);
 		// TODO move preferences names to special class with static fields!
 		preferences.put("author", System.getProperty("user.name"));
+		preferences.put("open_reviews", "");
 	}
 
 }

@@ -47,7 +47,7 @@ public class ReviewTest {
 
 	/**
 	 * Test method for
-	 * {@link org.agilereview.core.external.storage.Review#Review(String, int, String, String, String)}.
+	 * {@link org.agilereview.core.external.storage.Review#Review(String, int, String, String, String, boolean)}.
 	 * @author Malte Brunnlieb (19.02.2012)
 	 */
 	@Test
@@ -61,12 +61,12 @@ public class ReviewTest {
 		}
 
 		// check consistency
-		Review review = new Review("testID", 2, uri.toString(), "Karl-Hänsél", "test description");
+		Review review = new Review("testID", 2, uri.toString(), "Karl-Hänsél", "test description", true);
 		
 		assertNotNull(review);
 		
 		if (!"testID".equals(review.getId()) || review.getStatus() != 2 || !uri.toString().equals(review.getReference())
-				|| !"Karl-Hänsél".equals(review.getResponsibility()) || !"test description".equals(review.getDescription())) {
+				|| !"Karl-Hänsél".equals(review.getResponsibility()) || !"test description".equals(review.getDescription()) || !review.getIsOpen()) {
 			throw new AssertionFailedError("Review not created consistently!");
 		}
 	}
@@ -275,7 +275,32 @@ public class ReviewTest {
 		review.deleteComment(review.getComments().size()-(comments.length-1-index));
 
 		if (!(prevSize-1 == review.getComments().size()) || review.getComments().contains(comments[index]) || !pcl.getPropertyChanged()) {
-			throw new AssertionFailedError("Review comment could not be removed by object successfully!");
+			throw new AssertionFailedError("Review comment could not be removed by index successfully!");
+		}
+	}
+	
+	/**
+	 * Test method for {@link org.agilereview.core.external.storage.Review#clearComments()}.
+	 * @author Peter Reuter (26.06.2012)
+	 */
+	public final void testClearComments() {
+		Review review = new Review("");
+		HelperPropertyChangeListener pcl = new HelperPropertyChangeListener("comments");
+		review.addPropertyChangeListener(pcl);
+		
+		review.addPropertyChangeListener(pcl);
+		
+		Comment c1 = new Comment("c1", HelperClass.getIFile("resources/Test1.txt"), review);
+		Comment c2 = new Comment("c2", HelperClass.getIFile("resources/Test1.txt"), review);
+		Comment c3 = new Comment("c3", HelperClass.getIFile("resources/Test1.txt"), review);
+		review.addComment(c1);
+		review.addComment(c2);
+		review.addComment(c3);
+		
+		review.clearComments();
+
+		if (!(0 == review.getComments().size()) || !pcl.getPropertyChanged()) {
+			throw new AssertionFailedError("Review comments could not be cleared successfully!");
 		}
 	}
 
@@ -294,6 +319,7 @@ public class ReviewTest {
 	 */
 	@Test
 	public final void testSetIsOpen() {
+		//TODO check also for correct "open_reviews" property
 		Review review = new Review("");
 		HelperPropertyChangeListener pcl = new HelperPropertyChangeListener("isOpen");
 		review.addPropertyChangeListener(pcl);

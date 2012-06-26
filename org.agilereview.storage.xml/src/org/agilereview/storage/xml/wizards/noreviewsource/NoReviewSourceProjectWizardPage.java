@@ -206,7 +206,7 @@ import org.eclipse.ui.wizards.datatransfer.ExternalProjectImportWizard;
 				IWorkspaceRoot workspaceRoot = ResourcesPlugin.getWorkspace().getRoot();
 				IProject p = workspaceRoot.getProject(comboClosedProjects.getText());
 				try {
-					// TODO: use ProgressMonitor here
+					// TODO: maybe use ProgressMonitor here
 					p.open(null);
 					while (!p.isOpen()) {}
 					updateComboBoxes(p.getName());

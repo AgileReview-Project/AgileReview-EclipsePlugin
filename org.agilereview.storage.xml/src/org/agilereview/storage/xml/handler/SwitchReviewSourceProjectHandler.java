@@ -15,7 +15,6 @@ public class SwitchReviewSourceProjectHandler extends AbstractHandler {
 
 	@Override
 	public Object execute(ExecutionEvent event) throws ExecutionException {
-		//TODO get this from Properties (externalize Strings?)
 		NoReviewSourceProjectWizard dialog = new NoReviewSourceProjectWizard();
 		WizardDialog wDialog = new WizardDialog(HandlerUtil.getActiveShell(event), dialog);
 		wDialog.setBlockOnOpen(true);

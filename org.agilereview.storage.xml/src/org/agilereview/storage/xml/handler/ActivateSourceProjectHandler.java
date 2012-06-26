@@ -1,12 +1,12 @@
 package org.agilereview.storage.xml.handler;
 
-import org.agilereview.storage.xml.Activator;
 import org.agilereview.storage.xml.SourceFolderManager;
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.StructuredSelection;
@@ -28,8 +28,7 @@ public class ActivateSourceProjectHandler extends AbstractHandler {
 				if (o instanceof IProject) {
 						IProject project = (IProject) o;
 						if (project.hasNature(SourceFolderManager.AGILEREVIEW_NATURE)){
-							// TODO use preferences scopes here
-							Activator.getDefault().getPluginPreferences().setValue(SourceFolderManager.SOURCEFOLDER_PROPERTYNAME, project.getName());
+							InstanceScope.INSTANCE.getNode("org.agilereview.core").put(SourceFolderManager.SOURCEFOLDER_PROPERTYNAME, project.getName());
 						}
 				}
 			}

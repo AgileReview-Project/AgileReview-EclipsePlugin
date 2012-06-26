@@ -10,6 +10,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
@@ -18,8 +19,6 @@ import org.eclipse.swt.widgets.Shell;
  * This class handles the case of closing the active review source folder.
  */
 public class CloseProjectResourceListener implements IResourceChangeListener {
-
-	//XXX check remaining XXX in this class
 
 	/**
 	 * This boolean indicates whether there was a PRE_CLOSE event before a POST_BUILD
@@ -87,8 +86,7 @@ public class CloseProjectResourceListener implements IResourceChangeListener {
 						MessageDialog.openInformation(currentShell, "'Agile Review Source Project' deleted", msg);
 //						deletedProjectPath = null; // needed for correct wizard behavior
 						//XXX check whether this fails --> in case, use a private function to open NoReviewSourceWizard
-						// TODO use preferences scopes here
-						Activator.getDefault().getPluginPreferences().setValue(SourceFolderManager.SOURCEFOLDER_PROPERTYNAME, null);
+						InstanceScope.INSTANCE.getNode("org.agilereview.core").put(SourceFolderManager.SOURCEFOLDER_PROPERTYNAME, "");
 						break;
 					}
 				}
@@ -134,8 +132,7 @@ public class CloseProjectResourceListener implements IResourceChangeListener {
 								if (MessageDialog.openQuestion(Display.getCurrent().getActiveShell(), "Warning: AgileReview Source Project", msg)) {
 									try {
 										oldSourceProject.open(null); // TODO use progressmonitor?
-										// TODO use preferences scopes here
-										Activator.getDefault().getPluginPreferences().setValue(SourceFolderManager.SOURCEFOLDER_PROPERTYNAME, oldSourceProject.getName());
+										InstanceScope.INSTANCE.getNode("org.agilereview.core").put(SourceFolderManager.SOURCEFOLDER_PROPERTYNAME, oldSourceProject.getName());
 									} catch (final CoreException e) {
 										String message = "An exception occured while reopening the closed Review Source Project "
 												+ oldSourceProject.getName() + "!" + e.getLocalizedMessage();
@@ -144,8 +141,7 @@ public class CloseProjectResourceListener implements IResourceChangeListener {
 									}
 								} else {
 									//XXX check whether this fails --> in case, use a private function to open NoReviewSourceWizard
-									// TODO use preferences scopes here
-									Activator.getDefault().getPluginPreferences().setValue(SourceFolderManager.SOURCEFOLDER_PROPERTYNAME, null);
+									InstanceScope.INSTANCE.getNode("org.agilereview.core").put(SourceFolderManager.SOURCEFOLDER_PROPERTYNAME, "");
 								}
 							}
 						});

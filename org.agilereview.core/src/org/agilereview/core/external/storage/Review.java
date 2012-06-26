@@ -11,7 +11,13 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
+
+import org.agilereview.core.Activator;
+import org.eclipse.core.runtime.Platform;
+import org.eclipse.core.runtime.preferences.InstanceScope;
 
 /**
  * A class that stores review data and a list of comments belonging to the review.
@@ -71,13 +77,15 @@ public class Review implements PropertyChangeListener {
      * @param reference e.g. a reference to a bug tracker
      * @param responsibility the person that is in charge for this {@link Review}
      * @param description a text describing the e.g. the content or scope of this {@link Review}
+     * @param isOpen indicates whether comments for this review are loaded or not
      */
-    public Review(String id, int status, String reference, String responsibility, String description) {
+    public Review(String id, int status, String reference, String responsibility, String description, boolean isOpen) {
         this(id);
         this.status = status;
         this.reference = reference;
         this.responsibility = responsibility;
         this.description = description;
+        this.isOpen = isOpen;
     }
     
     /**
@@ -187,6 +195,17 @@ public class Review implements PropertyChangeListener {
     }
     
     /**
+     * Removes all {@link Comment}s from this {@link Review}. This method is 
+     * intended to be used when closing reviews or using the cleanup function.
+     * @author Peter Reuter (26.06.2012)
+     */
+    public void clearComments() {
+    	ArrayList<Comment> oldValue = new ArrayList<Comment>(this.comments);
+    	this.comments.clear();
+    	propertyChangeSupport.firePropertyChange("comments", oldValue, this.comments);
+    }
+    
+    /**
      * @return <code>true</code> if the {@link Review} is open, <code>false</code> otherwise
      */
     public boolean getIsOpen() {
@@ -199,6 +218,7 @@ public class Review implements PropertyChangeListener {
     public void setIsOpen(boolean isOpen) {
         boolean oldValue = this.isOpen;
         this.isOpen = isOpen;
+		setOpenReviewsPreference();
         propertyChangeSupport.firePropertyChange("isOpen", oldValue, this.isOpen);
     }
     
@@ -248,5 +268,29 @@ public class Review implements PropertyChangeListener {
     public void propertyChange(PropertyChangeEvent evt) {
         propertyChangeSupport.firePropertyChange(evt);
     }
+
+	/**
+	 * Adds/removes this review to/from the preference holding a comma 
+	 * separated list of open reviews depending on its "open/closed" state.
+	 * @author Peter Reuter (26.06.2012)
+	 */
+	private void setOpenReviewsPreference() {
+		List<String> reviewIds = Arrays.asList(Platform.getPreferencesService().getString(Activator.PLUGIN_ID, "open_reviews", "", null).split(","));
+		if (this.isOpen) {
+			if (!reviewIds.contains(this.id)) {
+				reviewIds.add(this.id);
+			}
+		} else {
+			reviewIds.remove(this.id);
+		}
+		String reviewIdsPref = "";
+		Iterator<String> i = reviewIds.iterator();
+		for (;;) {
+		  reviewIdsPref += i.next();
+		  if (! i.hasNext()) break;
+		  reviewIdsPref += (",");
+		}
+		InstanceScope.INSTANCE.getNode(Activator.PLUGIN_ID).put("open_reviews", reviewIdsPref);
+	}
     
 }
