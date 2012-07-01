@@ -26,7 +26,7 @@ import org.eclipse.swt.widgets.Display;
  * @author Malte Brunnlieb (27.05.2012)
  */
 public class ContentProvider implements IStructuredContentProvider, IReviewDataReceiver, PropertyChangeListener {
-    
+
     /**
      * Instance created by the {@link IReviewDataReceiver} extension point
      */
@@ -51,7 +51,7 @@ public class ContentProvider implements IStructuredContentProvider, IReviewDataR
      * Object in order to synchronize model <-> table binding
      */
     private static Object syncObj = new Object();
-    
+
     /**
      * Creates a new {@link ContentProvider} instance and binds it to the {@link CommentSummaryView} if possible
      * @author Malte Brunnlieb (28.05.2012)
@@ -64,7 +64,7 @@ public class ContentProvider implements IStructuredContentProvider, IReviewDataR
             }
         }
     }
-    
+
     /**
      * Binds the {@link CommentSummaryView} as the content receiver for persistence data
      * @param view {@link CommentSummaryView} which contains the table viewer
@@ -82,7 +82,7 @@ public class ContentProvider implements IStructuredContentProvider, IReviewDataR
             }
         }
     }
-    
+
     /**
      * {@inheritDoc}
      * @see org.agilereview.core.external.definition.IReviewDataReceiver#setReviewData(ReviewSet)
@@ -104,7 +104,7 @@ public class ContentProvider implements IStructuredContentProvider, IReviewDataR
         }
         //TODO inform Parser
     }
-    
+
     /**
      * Extracts all {@link Comment}s out of the {@link ReviewSet} and refreshes the viewer
      * @author Malte Brunnlieb (03.06.2012)
@@ -118,7 +118,7 @@ public class ContentProvider implements IStructuredContentProvider, IReviewDataR
             refreshViewer();
         }
     }
-    
+
     /**
      * {@inheritDoc}
      * @see org.eclipse.jface.viewers.IContentProvider#dispose()
@@ -130,7 +130,7 @@ public class ContentProvider implements IStructuredContentProvider, IReviewDataR
             commentSummaryView.bindTableModel(null);
         }
     }
-    
+
     /**
      * {@inheritDoc}
      * @see org.eclipse.jface.viewers.IContentProvider#inputChanged(org.eclipse.jface.viewers.Viewer, java.lang.Object, java.lang.Object)
@@ -141,7 +141,7 @@ public class ContentProvider implements IStructuredContentProvider, IReviewDataR
         //        viewer.setInput(newInput);
         //        viewer.refresh();
     }
-    
+
     /**
      * {@inheritDoc}
      * @see org.eclipse.jface.viewers.IStructuredContentProvider#getElements(java.lang.Object)
@@ -151,7 +151,7 @@ public class ContentProvider implements IStructuredContentProvider, IReviewDataR
     public Object[] getElements(Object inputElement) {
         return comments.toArray(new Comment[0]);
     }
-    
+
     /**
      * {@inheritDoc}
      * @see java.beans.PropertyChangeListener#propertyChange(java.beans.PropertyChangeEvent)
@@ -161,14 +161,14 @@ public class ContentProvider implements IStructuredContentProvider, IReviewDataR
     public void propertyChange(PropertyChangeEvent evt) {
         refreshCommentList();
     }
-    
+
     /**
      * Refreshes the registered viewer. Does not check whether viewer is != null
      * @author Malte Brunnlieb (03.06.2012)
      */
     private void refreshViewer() {
         if (viewer != null) {
-            Display.getDefault().asyncExec(new Runnable() {
+            Display.getDefault().syncExec(new Runnable() {
                 @Override
                 public void run() {
                     viewer.setInput(comments);

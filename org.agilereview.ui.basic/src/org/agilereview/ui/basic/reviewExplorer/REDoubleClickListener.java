@@ -7,7 +7,6 @@
  */
 package org.agilereview.ui.basic.reviewExplorer;
 
-import org.agilereview.core.external.properties.PreferencesInterface;
 import org.agilereview.core.external.storage.Review;
 import org.agilereview.ui.basic.Activator;
 import org.agilereview.ui.basic.tools.ExceptionHandler;
@@ -37,7 +36,7 @@ import org.eclipse.ui.ide.IDE;
  * @author Thilo Rauch (12.05.2012)
  */
 public class REDoubleClickListener implements IDoubleClickListener {
-    
+
     /* (non-Javadoc)
      * @see org.eclipse.jface.viewers.IDoubleClickListener#doubleClick(org.eclipse.jface.viewers.DoubleClickEvent)
      * @author Thilo Rauch (12.05.2012)
@@ -54,7 +53,7 @@ public class REDoubleClickListener implements IDoubleClickListener {
                 if (o instanceof Review) {
                     if (((Review) o).getIsOpen()) {
                         // case 1.1 The review is open
-                        String activeReview = new PreferencesInterface().getValue(PreferencesInterface.ACTIVE_REVIEW_ID);
+                        String activeReview = "";// XXX new PreferencesInterface().getValue(PreferencesInterface.ACTIVE_REVIEW_ID);
                         if (activeReview.equals(((Review) o).getId())) {
                             // case 1.1.2
                             expandOrCollapse(treeViewer, o);
@@ -78,7 +77,7 @@ public class REDoubleClickListener implements IDoubleClickListener {
             }
         }
     }
-    
+
     /**
      * Opens the given {@link IFile} in an editor.
      * @param file File to open
@@ -100,7 +99,7 @@ public class REDoubleClickListener implements IDoubleClickListener {
                     + "'!\nFile not existent in workspace or respective project may be closed!");
         }
     }
-    
+
     /**
      * Executes the given command and handles the exceptions
      * @param commandId command to execute
@@ -125,7 +124,7 @@ public class REDoubleClickListener implements IDoubleClickListener {
             Activator.getDefault().getLog().log(new Status(IStatus.ERROR, Activator.PLUGIN_ID, msg, e));
         }
     }
-    
+
     /**
      * Helper method to expand or collapse (based on the current state) the given element of the given TreeViewer
      * @param treeViewer TreeViewer in which the element is displayed
@@ -139,5 +138,5 @@ public class REDoubleClickListener implements IDoubleClickListener {
             treeViewer.expandToLevel(element, 1);
         }
     }
-    
+
 }

@@ -17,7 +17,7 @@ class REViewerComparator extends ViewerComparator {
      * Preference query interface of the core plugin
      */
     private PreferencesInterface props = new PreferencesInterface();
-    
+
     @Override
     public int category(Object element) {
         int result = 0;
@@ -36,19 +36,19 @@ class REViewerComparator extends ViewerComparator {
         // Sorting order by category is then: Reviews, Folder, Files
         return result;
     }
-    
+
     @Override
     public int compare(Viewer viewer, Object e1, Object e2) {
         int result = super.compare(viewer, e1, e2);
         if (e1 instanceof Review && e2 instanceof Review) {
-            String activeReview = props.getValue(PreferencesInterface.ACTIVE_REVIEW_ID);
+            String activeReview = ""; // XXX props.getValue(PreferencesInterface.ACTIVE_REVIEW_ID);
             if (activeReview.equals(((Review) e1).getId())) {
                 result = -1;
             } else if (activeReview.equals(((Review) e2).getId())) {
                 result = 1;
             }
         }
-        
+
         return result;
     }
 }

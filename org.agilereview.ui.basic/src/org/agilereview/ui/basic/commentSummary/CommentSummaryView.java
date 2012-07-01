@@ -31,7 +31,7 @@ import org.eclipse.ui.part.ViewPart;
  * @author Malte Brunnlieb (08.04.2012)
  */
 public class CommentSummaryView extends ViewPart {
-    
+
     /**
      * The values describe the currently shown content of the {@link CommentSummaryView}
      * @author Malte Brunnlieb (30.05.2012)
@@ -46,7 +46,7 @@ public class CommentSummaryView extends ViewPart {
          */
         CONNECTED
     };
-    
+
     /**
      * The {@link ToolBar} for this ViewPart
      */
@@ -71,7 +71,7 @@ public class CommentSummaryView extends ViewPart {
      * Identifies the current state of the UI
      */
     private ViewContent content;
-    
+
     /**
      * {@inheritDoc}
      * @see org.eclipse.ui.part.WorkbenchPart#createPartControl(org.eclipse.swt.widgets.Composite)
@@ -82,7 +82,7 @@ public class CommentSummaryView extends ViewPart {
         this.parent = parent;
         parent.setLayout(new GridLayout());
         ContentProvider.bind(this);
-        
+
         synchronized (this.parent) {
             if (contentProvider == null) {
                 displayStorageDisconnected();
@@ -90,11 +90,11 @@ public class CommentSummaryView extends ViewPart {
                 buildWorkingUI();
             }
         }
-        
+
         //add help context
         PlatformUI.getWorkbench().getHelpSystem().setHelp(parent, Activator.PLUGIN_ID + ".TableView"); //TODO adapt help context
     }
-    
+
     /**
      * Binds the given {@link ContentProvider} to the {@link CSTableViewer} instance of this view. If the parameter is net to null, the
      * {@link CommentSummaryView} will display a no {@link IStorageClient} registered message instead of a table
@@ -115,53 +115,56 @@ public class CommentSummaryView extends ViewPart {
             return viewer;
         }
     }
-    
+
     /**
      * Creates the full functional view using the {@link CSToolBar} and {@link CSTableViewer}
      * @author Malte Brunnlieb (27.05.2012)
      */
     private void buildWorkingUI() {
         Display.getDefault().syncExec(new Runnable() {
-            
+
             @Override
             public void run() {
-                if (content == ViewContent.CONNECTED) return;
+                if (content == ViewContent.CONNECTED)
+                    return;
                 clearParent();
                 content = ViewContent.CONNECTED;
-                
+
                 toolBar = new CSToolBar(parent);
-                
+
                 viewer = new CSTableViewer(parent);
                 viewer.setContentProvider(contentProvider);
                 ColumnComparator comparator = new ColumnComparator();
                 viewer.setComparator(comparator);
                 SearchFilter commentFilter = new SearchFilter(null);
                 viewer.addFilter(commentFilter);
-                
+
                 viewer.addDoubleClickListener(new ViewController(viewer));
                 getSite().setSelectionProvider(viewer);
-                
+
                 filterController = new FilterController(toolBar, viewer, commentFilter);
                 toolBar.setListeners(filterController);
-                getSite().getWorkbenchWindow().getSelectionService().addSelectionListener("org.agilereview.ui.basic.reviewExplorerView",
-                        filterController);
+                getSite().getWorkbenchWindow().getSelectionService()
+                        .addSelectionListener("org.agilereview.ui.basic.reviewExplorerView", filterController);
+                parent.layout();
             }
         });
     }
-    
+
     /**
      * Displays a message as no {@link IStorageClient} provides data
      * @author Malte Brunnlieb (27.05.2012)
      */
     private void displayStorageDisconnected() {
         Display.getDefault().syncExec(new Runnable() {
-            
+
             @Override
             public void run() {
-                if (content == ViewContent.DISCONNECTED) return;
+                if (content == ViewContent.DISCONNECTED)
+                    return;
                 clearParent();
                 content = ViewContent.DISCONNECTED;
-                
+
                 Label label = new Label(parent, SWT.CENTER);
                 label.setText("No data available as currently no StorageClient is connected.");
                 GridData gd = new GridData();
@@ -169,24 +172,25 @@ public class CommentSummaryView extends ViewPart {
                 gd.grabExcessVerticalSpace = true;
                 gd.horizontalAlignment = GridData.CENTER;
                 gd.verticalAlignment = GridData.CENTER;
+                gd.widthHint = parent.getMonitor().getClientArea().width;
                 label.setLayoutData(gd);
                 parent.pack();
             }
         });
     }
-    
+
     /**
      * Disposes all children of the current parent.
      * @author Malte Brunnlieb (27.05.2012)
      */
     private void clearParent() {
         Display.getDefault().syncExec(new Runnable() {
-            
+
             @Override
             public void run() {
                 if (filterController != null) {
-                    getSite().getWorkbenchWindow().getSelectionService().removeSelectionListener("org.agilereview.ui.basic.reviewExplorerView",
-                            filterController);
+                    getSite().getWorkbenchWindow().getSelectionService()
+                            .removeSelectionListener("org.agilereview.ui.basic.reviewExplorerView", filterController);
                 }
                 toolBar = null;
                 viewer = null;
@@ -197,7 +201,7 @@ public class CommentSummaryView extends ViewPart {
             }
         });
     }
-    
+
     /**
      * {@inheritDoc} Also removes selection listeners
      * @see org.eclipse.ui.part.WorkbenchPart#dispose()
@@ -206,12 +210,12 @@ public class CommentSummaryView extends ViewPart {
     @Override
     public void dispose() {
         if (filterController != null) {
-            getSite().getWorkbenchWindow().getSelectionService().removeSelectionListener("org.agilereview.ui.basic.reviewExplorerView",
-                    filterController);
+            getSite().getWorkbenchWindow().getSelectionService()
+                    .removeSelectionListener("org.agilereview.ui.basic.reviewExplorerView", filterController);
         }
         super.dispose();
     }
-    
+
     /**
      * {@inheritDoc}
      * @see org.eclipse.ui.part.WorkbenchPart#setFocus()

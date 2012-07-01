@@ -38,7 +38,7 @@ public class ReviewSet extends HashSet<Review> implements PropertyChangeListener
      */
     @Override
     public boolean add(Review e) {
-		ArrayList<Review> oldValue = new ArrayList<Review>(this);
+		HashSet<Review> oldValue = new HashSet<Review>(this);
 		boolean changed = super.add(e);
         if (changed) {
             e.addPropertyChangeListener(this);
