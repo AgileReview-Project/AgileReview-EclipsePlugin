@@ -80,8 +80,10 @@ public class RDRController implements IExtensionController {
      * @author Malte Brunnlieb (28.03.2012)
      */
     void notifyAllClients(ReviewSet newData) {
-        for (IReviewDataReceiver rdr : registeredClients) {
-            notifyClient(rdr, newData);
+        synchronized (registeredClients) {
+            for (IReviewDataReceiver rdr : registeredClients) {
+                notifyClient(rdr, newData);
+            }
         }
     }
     
@@ -92,7 +94,9 @@ public class RDRController implements IExtensionController {
      * @author Malte Brunnlieb (28.03.2012)
      */
     boolean isRegistered(IReviewDataReceiver rdr) {
-        return registeredClients.contains(rdr);
+        synchronized (registeredClients) {
+            return registeredClients.contains(rdr);
+        }
     }
     
     /**
@@ -102,21 +106,23 @@ public class RDRController implements IExtensionController {
      */
     @Override
     public void run() {
-        IConfigurationElement[] config = Platform.getExtensionRegistry().getConfigurationElementsFor(IREVIEWDATARECEIVER_ID);
-        if (config.length == 0) {
-            registeredClients.clear();
-            return;
-        }
-        
-        for (IConfigurationElement e : config) {
-            try {
-                final Object o = e.createExecutableExtension("class");
-                if (o instanceof IReviewDataReceiver) {
-                    final IReviewDataReceiver rdr = (IReviewDataReceiver) o;
-                    registeredClients.add(rdr);
+        synchronized (registeredClients) {
+            IConfigurationElement[] config = Platform.getExtensionRegistry().getConfigurationElementsFor(IREVIEWDATARECEIVER_ID);
+            if (config.length == 0) {
+                registeredClients.clear();
+                return;
+            }
+            
+            for (IConfigurationElement e : config) {
+                try {
+                    final Object o = e.createExecutableExtension("class");
+                    if (o instanceof IReviewDataReceiver) {
+                        final IReviewDataReceiver rdr = (IReviewDataReceiver) o;
+                        registeredClients.add(rdr);
+                    }
+                } catch (CoreException ex) {
+                    ExceptionHandler.logAndNotifyUser("An error occurred while instantiating ReviewDataReceiver " + e.getAttribute("class"), ex);
                 }
-            } catch (CoreException ex) {
-                ExceptionHandler.logAndNotifyUser("An error occurred while instantiating ReviewDataReceiver " + e.getAttribute("class"), ex);
             }
         }
     }

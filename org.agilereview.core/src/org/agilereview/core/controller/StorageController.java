@@ -82,25 +82,27 @@ public class StorageController implements IExtensionController, IStorageClient {
      */
     @Override
     public void run() {
-        IConfigurationElement[] config = Platform.getExtensionRegistry().getConfigurationElementsFor(ISTORAGECLIENT_ID);
-        if (config.length == 0) {
-            ExceptionHandler.logAndNotifyUser(new NoStorageClientDefinedException("No StorageClient available")); //TODO perhaps offer some help
-            registeredClients.clear();
-            return;
-        }
-        
-        String firstClient = null;
-        for (IConfigurationElement e : config) {
-            registeredClients.put(e.getAttribute("name"), null);
-            if (firstClient != null) {
-                firstClient = e.getAttribute("name");
+        synchronized (registeredClients) {
+            IConfigurationElement[] config = Platform.getExtensionRegistry().getConfigurationElementsFor(ISTORAGECLIENT_ID);
+            if (config.length == 0) {
+                ExceptionHandler.logAndNotifyUser(new NoStorageClientDefinedException("No StorageClient available")); //TODO perhaps offer some help
+                registeredClients.clear();
+                return;
             }
-        }
-        
-        if (PlatformUI.getPreferenceStore().getBoolean("org.agilereview.testrunner.mock.storage")) { //TODO if client can be set via preferences -> use this
-            setStorageClient("StorageMock");
-        } else if (firstClient != null) {
-            setStorageClient(firstClient); //TODO do not use last, but manage to set this client via preferences
+            
+            String firstClient = null;
+            for (IConfigurationElement e : config) {
+                registeredClients.put(e.getAttribute("name"), null);
+                if (firstClient != null) {
+                    firstClient = e.getAttribute("name");
+                }
+            }
+            
+            if (PlatformUI.getPreferenceStore().getBoolean("org.agilereview.testrunner.mock.storage")) { //TODO if client can be set via preferences -> use this
+                setStorageClient("StorageMock");
+            } else if (firstClient != null) {
+                setStorageClient(firstClient); //TODO do not use last, but manage to set this client via preferences
+            }
         }
     }
     
@@ -110,7 +112,9 @@ public class StorageController implements IExtensionController, IStorageClient {
      * @author Malte Brunnlieb (27.05.2012)
      */
     public Set<String> getAvailableStorageClients() {
-        return new HashSet<String>(registeredClients.keySet());
+        synchronized (registeredClients) {
+            return new HashSet<String>(registeredClients.keySet());
+        }
     }
     
     /**
@@ -121,17 +125,19 @@ public class StorageController implements IExtensionController, IStorageClient {
      * @author Malte Brunnlieb (27.05.2012)
      */
     public boolean setStorageClient(String name) {
-        if (registeredClients.containsKey(name)) {
-            if (registeredClients.get(name) == null) {
-                registeredClients.put(name, loadExtension(name));
+        synchronized (registeredClients) {
+            if (registeredClients.containsKey(name)) {
+                if (registeredClients.get(name) == null) {
+                    registeredClients.put(name, loadExtension(name));
+                }
+                if (registeredClients.get(name) != null) {
+                    activeClient = name;
+                    RDRController.getInstance().notifyAllClients(getAllReviews());
+                    return true;
+                }
             }
-            if (registeredClients.get(name) != null) {
-                activeClient = name;
-                RDRController.getInstance().notifyAllClients(getAllReviews());
-                return true;
-            }
+            return false;
         }
-        return false;
     }
     
     /**
@@ -166,7 +172,9 @@ public class StorageController implements IExtensionController, IStorageClient {
      * @author Malte Brunnlieb (28.03.2012)
      */
     public boolean isRegistered(IStorageClient sc) {
-        return registeredClients.containsValue(sc);
+        synchronized (registeredClients) {
+            return registeredClients.containsValue(sc);
+        }
     }
     
     /**
