@@ -5,7 +5,7 @@
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  * Contributors: Malte Brunnlieb, Philipp Diebold, Peter Reuter, Thilo Rauch
  */
-package org.agilereview.ui.basic.test;
+package org.agilereview.ui.basic.test.reviewExplorer;
 
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -39,7 +39,7 @@ import org.junit.Test;
  * Test class for class {@link CommentSummaryView}
  * @author Malte Brunnlieb (26.05.2012)
  */
-public class ReviewExplorerViewViewTest {
+public class ReviewExplorerViewTest {
 
     /**
      * SWTBot instance for UI-Tests
