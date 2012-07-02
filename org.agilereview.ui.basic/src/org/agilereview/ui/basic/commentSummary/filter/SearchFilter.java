@@ -7,6 +7,8 @@
  */
 package org.agilereview.ui.basic.commentSummary.filter;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.regex.Pattern;
 
 import org.agilereview.core.external.storage.Comment;
@@ -40,7 +42,11 @@ public class SearchFilter extends ViewerFilter {
      * @author Malte Brunnlieb (07.06.2012)
      */
     public SearchFilter(Column restriction) {
-        this.restriction = restriction;
+        if (restriction == null) {
+            this.restriction = Column.NULL;
+        } else {
+            this.restriction = restriction;
+        }
         commentProperties = new CommentProperties();
     }
     
@@ -58,73 +64,35 @@ public class SearchFilter extends ViewerFilter {
      */
     @Override
     public boolean select(Viewer viewer, Object parentElement, Object element) {
-        boolean matches = false;
         Comment c = (Comment) element;
-        if (searchString == null || searchString.length() == 0) {
-            matches = true;
-        } else if (restriction == null) {
-            if (c.getReview().getId().matches(searchString) || c.getId().matches(searchString) || c.getAuthor().matches(searchString)
-                    || c.getRecipient().matches(searchString) || commentProperties.getStatusByID(c.getStatus()).matches(searchString)
-                    || commentProperties.getPriorityByID(c.getPriority()).matches(searchString)
-                    || c.getCreationDate().toString().matches(searchString) || c.getModificationDate().toString().matches(searchString)
-                    || String.valueOf(c.getReplies().size()).matches(searchString)
-                    || c.getCommentedFile().getFullPath().toOSString().matches(searchString)) {
-                matches = true;
-            }
-        } else {
-            switch (restriction) {
-            case AUTHOR:
-                if (c.getAuthor().matches(searchString)) {
-                    matches = true;
-                }
-                break;
-            case COMMENT_ID:
-                if (c.getId().matches(searchString)) {
-                    matches = true;
-                }
-                break;
-            case DATE_CREATED:
-                if (c.getCreationDate().toString().matches(searchString)) {
-                    matches = true;
-                }
-                break;
-            case DATE_MODIFIED:
-                if (c.getModificationDate().toString().matches(searchString)) {
-                    matches = true;
-                }
-                break;
-            case LOCATION:
-                if (c.getCommentedFile().getFullPath().toOSString().matches(searchString)) {
-                    matches = true;
-                }
-                break;
-            case NO_REPLIES:
-                if (String.valueOf(c.getReplies().size()).matches(searchString)) {
-                    matches = true;
-                }
-                break;
-            case PRIORITY:
-                if (commentProperties.getPriorityByID(c.getPriority()).matches(searchString)) {
-                    matches = true;
-                }
-                break;
-            case RECIPIENT:
-                if (c.getRecipient().matches(searchString)) {
-                    matches = true;
-                }
-                break;
-            case REVIEW_ID:
-                if (c.getReview().getId().matches(searchString)) {
-                    matches = true;
-                }
-                break;
-            case STATUS:
-                if (commentProperties.getStatusByID(c.getStatus()).matches(searchString)) {
-                    matches = true;
-                }
-                break;
-            }
+        if (searchString == null || searchString.length() == 0) { return true; }
+        
+        switch (restriction) {
+        default:
+        case AUTHOR:
+            if (c.getAuthor().matches(searchString)) { return true; }
+        case COMMENT_ID:
+            if (c.getId().matches(searchString)) { return true; }
+        case DATE_CREATED:
+            DateFormat df = new SimpleDateFormat("dd.M.yyyy', 'HH:mm:ss");
+            if (df.format(c.getCreationDate().getTime()).matches(searchString)) { return true; }
+        case DATE_MODIFIED:
+            df = new SimpleDateFormat("dd.M.yyyy', 'HH:mm:ss");
+            if (df.format(c.getModificationDate().getTime()).matches(searchString)) { return true; }
+        case LOCATION:
+            if (c.getCommentedFile().getFullPath().toOSString().matches(searchString)) { return true; }
+        case NO_REPLIES:
+            if (String.valueOf(c.getReplies().size()).matches(searchString)) { return true; }
+        case PRIORITY:
+            if (commentProperties.getPriorityByID(c.getPriority()).matches(searchString)) { return true; }
+        case RECIPIENT:
+            if (c.getRecipient().matches(searchString)) { return true; }
+        case REVIEW_ID:
+            if (c.getReview().getId().matches(searchString)) { return true; }
+        case STATUS:
+            if (commentProperties.getStatusByID(c.getStatus()).matches(searchString)) { return true; }
         }
-        return matches;
+        
+        return false;
     }
 }

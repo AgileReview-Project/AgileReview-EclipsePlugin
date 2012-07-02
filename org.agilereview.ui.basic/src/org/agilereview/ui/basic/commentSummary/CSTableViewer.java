@@ -53,7 +53,7 @@ public class CSTableViewer extends TableViewer {
         
         Column[] columns = Column.values();
         TableViewerColumn col;
-        for (int i = 0; i < columns.length; i++) {
+        for (int i = 0; i < columns.length - 1; i++) {
             col = createColumn(columns[i], i);
             col.setLabelProvider(new CSColumnLabelProvider(columns[i]));
         }

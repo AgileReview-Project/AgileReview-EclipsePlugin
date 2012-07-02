@@ -109,10 +109,26 @@ public class CommentSummaryViewTest {
             e.printStackTrace();
         }
         
-        //perform UI test input
+        //perform UI test input (author)
         SWTBotCombo filterType = bot.comboBoxWithId("csFilterType");
         filterType.setSelection(Column.AUTHOR.toString());
         SWTBotText searchText = bot.textWithId("csFilterText");
+        searchText.pressShortcut(0, 'A');
+        
+        //evaluate results
+        Display.getDefault().syncExec(new Runnable() {
+            @Override
+            public void run() {
+                SWTBotTable table = bot.tableWithId("csTable");
+                Assert.assertEquals(1, table.rowCount());
+                Comment comment = (Comment) table.getTableItem(0).widget.getData();
+                Assert.assertEquals(c1, comment);
+            }
+        });
+        
+        //perform UI test input (global)
+        filterType.setSelection(0);
+        searchText.setText("");
         searchText.pressShortcut(0, 'A');
         
         //evaluate results

@@ -70,7 +70,7 @@ public class CSToolBar extends Composite {
         dropDownBox = new Combo(this, SWT.READ_ONLY);
         dropDownBox.setText("Search for ALL");
         dropDownBox.setToolTipText("Click here to select the filter option");
-        List<String> filterList = new LinkedList<String>(Arrays.asList(Column.valuesToString()));
+        List<String> filterList = new LinkedList<String>(Arrays.asList(Column.tableColumnsToString()));
         String all = "All Columns";
         filterList.add(0, all);
         dropDownBox.setItems(filterList.toArray(new String[0]));

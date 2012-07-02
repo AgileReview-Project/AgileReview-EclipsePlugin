@@ -152,17 +152,21 @@ public enum Column {
         public String toString() {
             return "Location";
         }
-    };
+    },
+    /**
+     * Null value for switch case compatibility
+     */
+    NULL;
     
     /**
-     * Returns all values using their string representation
+     * Returns all necessary column table values using their string representation
      * @return a {@link String} array of names
      * @author Malte Brunnlieb (12.05.2012)
      */
-    public static String[] valuesToString() {
+    public static String[] tableColumnsToString() {
         Column[] columns = values();
-        String[] result = new String[columns.length];
-        for (int i = 0; i < columns.length; i++) {
+        String[] result = new String[columns.length - 1];
+        for (int i = 0; i < columns.length - 1; i++) {
             result[i] = columns[i].toString();
         }
         return result;
