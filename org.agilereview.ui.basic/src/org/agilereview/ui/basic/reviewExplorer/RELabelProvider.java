@@ -1,8 +1,9 @@
 package org.agilereview.ui.basic.reviewExplorer;
 
-import org.agilereview.core.external.properties.PreferencesInterface;
+import org.agilereview.core.external.preferences.AgileReviewPreferences;
 import org.agilereview.core.external.storage.Review;
 import org.agilereview.ui.basic.Activator;
+import org.agilereview.ui.basic.tools.Preferences;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
@@ -23,11 +24,11 @@ class RELabelProvider extends ColumnLabelProvider {
     /**
      * Standard grey color for displaying not exisitng resources
      */
-    private Color grey = Display.getDefault().getSystemColor(SWT.COLOR_GRAY);
+    private final Color grey = Display.getDefault().getSystemColor(SWT.COLOR_GRAY);
     /**
      * Preference query interface of the core plugin
      */
-    private PreferencesInterface props = new PreferencesInterface();
+    private final Preferences props = new Preferences();
     
     /**
      * Empty Constructor
@@ -57,7 +58,7 @@ class RELabelProvider extends ColumnLabelProvider {
             // A closed review cannot be active
             if (!currentReview.getIsOpen()) {
                 result = PlatformUI.getWorkbench().getSharedImages().getImage(org.eclipse.ui.ide.IDE.SharedImages.IMG_OBJ_PROJECT_CLOSED);
-            } else if (currentReview.getId().equals(this.props.getValue(PreferencesInterface.ACTIVE_REVIEW_ID))) {
+            } else if (currentReview.getId().equals(this.props.get(AgileReviewPreferences.ACTIVE_REVIEW_ID))) {
                 String activeReviewIconPath = Activator.getDefault().getInternalProperty(Activator.Keys.ACTIVE_REVIEW_ICON);
                 result = AbstractUIPlugin.imageDescriptorFromPlugin(Activator.PLUGIN_ID, activeReviewIconPath).createImage();
             }
@@ -77,7 +78,7 @@ class RELabelProvider extends ColumnLabelProvider {
             Review review = (Review) element;
             result = review.getId();
             // Check whether this review is active
-            if (review.getId().equals(this.props.getValue(PreferencesInterface.ACTIVE_REVIEW_ID))) {
+            if (review.getId().equals(this.props.get(AgileReviewPreferences.ACTIVE_REVIEW_ID))) {
                 result += " (active)";
             }
         } else if (element instanceof IResource) {

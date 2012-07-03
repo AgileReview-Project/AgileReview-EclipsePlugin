@@ -1,6 +1,5 @@
 package org.agilereview.ui.basic.reviewExplorer;
 
-import org.agilereview.core.external.properties.PreferencesInterface;
 import org.agilereview.core.external.storage.Review;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
@@ -13,11 +12,7 @@ import org.eclipse.jface.viewers.ViewerComparator;
  * ordered by their names
  */
 class REViewerComparator extends ViewerComparator {
-    /**
-     * Preference query interface of the core plugin
-     */
-    private PreferencesInterface props = new PreferencesInterface();
-
+    
     @Override
     public int category(Object element) {
         int result = 0;
@@ -36,7 +31,7 @@ class REViewerComparator extends ViewerComparator {
         // Sorting order by category is then: Reviews, Folder, Files
         return result;
     }
-
+    
     @Override
     public int compare(Viewer viewer, Object e1, Object e2) {
         int result = super.compare(viewer, e1, e2);
@@ -48,7 +43,7 @@ class REViewerComparator extends ViewerComparator {
                 result = 1;
             }
         }
-
+        
         return result;
     }
 }
