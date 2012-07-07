@@ -3,7 +3,7 @@ package org.agilereview.ui.basic.reviewExplorer;
 import org.agilereview.core.external.preferences.AgileReviewPreferences;
 import org.agilereview.core.external.storage.Review;
 import org.agilereview.ui.basic.Activator;
-import org.agilereview.ui.basic.tools.Preferences;
+import org.agilereview.ui.basic.tools.PreferencesAccessor;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
@@ -28,7 +28,7 @@ class RELabelProvider extends ColumnLabelProvider {
     /**
      * Preference query interface of the core plugin
      */
-    private final Preferences props = new Preferences();
+    private final PreferencesAccessor props = new PreferencesAccessor();
     
     /**
      * Empty Constructor

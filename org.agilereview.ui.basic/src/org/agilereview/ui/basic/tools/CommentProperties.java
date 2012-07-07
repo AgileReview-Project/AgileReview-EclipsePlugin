@@ -14,7 +14,7 @@ import org.agilereview.core.external.preferences.AgileReviewPreferences;
  * @author Malte Brunnlieb (28.04.2012)
  */
 public class CommentProperties {
-    
+
     /**
      * Properties value: comment status
      */
@@ -23,7 +23,7 @@ public class CommentProperties {
      * Properties value: comment properties
      */
     private String[] commentPriorities;
-    
+
     /**
      * Creates a new {@link CommentProperties} instance
      * 
@@ -32,19 +32,19 @@ public class CommentProperties {
     public CommentProperties() {
         loadProperties();
     }
-    
+
     /**
      * Loads all necessary property values
      * @author Malte Brunnlieb (28.04.2012)
      */
     public void loadProperties() {
-        Preferences pref = new Preferences();
+        PreferencesAccessor pref = new PreferencesAccessor();
         String value = pref.get(AgileReviewPreferences.COMMENT_STATUS);
         commentStates = value.split(",");
         value = pref.get(AgileReviewPreferences.COMMENT_PRIORITIES);
         commentPriorities = value.split(",");
     }
-    
+
     /**
      * Returns a Comment status value defined in the properties according to its id
      * @param ID for the requested Comment status
@@ -59,7 +59,7 @@ public class CommentProperties {
         }
         return status;
     }
-    
+
     /**
      * Returns a Comment priority value defined in the properties according to its id
      * @param ID for the requested Comment priority

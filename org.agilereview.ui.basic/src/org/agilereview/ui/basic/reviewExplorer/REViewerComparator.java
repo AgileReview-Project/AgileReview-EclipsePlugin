@@ -1,6 +1,8 @@
 package org.agilereview.ui.basic.reviewExplorer;
 
+import org.agilereview.core.external.preferences.AgileReviewPreferences;
 import org.agilereview.core.external.storage.Review;
+import org.agilereview.ui.basic.tools.PreferencesAccessor;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.jface.viewers.Viewer;
@@ -12,7 +14,7 @@ import org.eclipse.jface.viewers.ViewerComparator;
  * ordered by their names
  */
 class REViewerComparator extends ViewerComparator {
-    
+
     @Override
     public int category(Object element) {
         int result = 0;
@@ -31,19 +33,19 @@ class REViewerComparator extends ViewerComparator {
         // Sorting order by category is then: Reviews, Folder, Files
         return result;
     }
-    
+
     @Override
     public int compare(Viewer viewer, Object e1, Object e2) {
         int result = super.compare(viewer, e1, e2);
         if (e1 instanceof Review && e2 instanceof Review) {
-            String activeReview = ""; // XXX props.getValue(PreferencesInterface.ACTIVE_REVIEW_ID);
+            String activeReview = new PreferencesAccessor().get(AgileReviewPreferences.ACTIVE_REVIEW_ID);
             if (activeReview.equals(((Review) e1).getId())) {
                 result = -1;
             } else if (activeReview.equals(((Review) e2).getId())) {
                 result = 1;
             }
         }
-        
+
         return result;
     }
 }

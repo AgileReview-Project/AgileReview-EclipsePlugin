@@ -7,9 +7,11 @@
  */
 package org.agilereview.ui.basic.reviewExplorer;
 
+import org.agilereview.core.external.preferences.AgileReviewPreferences;
 import org.agilereview.core.external.storage.Review;
 import org.agilereview.ui.basic.Activator;
 import org.agilereview.ui.basic.tools.ExceptionHandler;
+import org.agilereview.ui.basic.tools.PreferencesAccessor;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.commands.NotEnabledException;
 import org.eclipse.core.commands.NotHandledException;
@@ -53,7 +55,7 @@ public class REDoubleClickListener implements IDoubleClickListener {
                 if (o instanceof Review) {
                     if (((Review) o).getIsOpen()) {
                         // case 1.1 The review is open
-                        String activeReview = "";// XXX new PreferencesInterface().getValue(PreferencesInterface.ACTIVE_REVIEW_ID);
+                        String activeReview = new PreferencesAccessor().get(AgileReviewPreferences.ACTIVE_REVIEW_ID);
                         if (activeReview.equals(((Review) o).getId())) {
                             // case 1.1.2
                             expandOrCollapse(treeViewer, o);

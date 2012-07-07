@@ -17,7 +17,7 @@ import org.eclipse.core.runtime.preferences.InstanceScope;
  * This class provides access to the core preferences of AgileReview
  * @author Malte Brunnlieb (03.07.2012)
  */
-public class Preferences {
+public class PreferencesAccessor {
     
     /**
      * Preference query interface of the core plugin
@@ -32,7 +32,7 @@ public class Preferences {
      * Creates a new instance for the AgileReview preferences
      * @author Malte Brunnlieb (03.07.2012)
      */
-    public Preferences() {
+    public PreferencesAccessor() {
         scopes = new IScopeContext[] { InstanceScope.INSTANCE, DefaultScope.INSTANCE };
         props = Platform.getPreferencesService();
     }
