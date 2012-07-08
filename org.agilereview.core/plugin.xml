@@ -9,5 +9,41 @@
             class="org.agilereview.core.preferences.PreferenceInitializer">
       </initializer>
    </extension>
+   <extension
+         point="org.eclipse.ui.commands">
+      <category
+            description="Common commands which will be used by many exensions of AgileReview"
+            id="org.agilereview.core.commonCommands"
+            name="Common AgileReview Commands">
+      </category>
+      <command
+            categoryId="org.agilereview.core.commonCommands"
+            description="Create a new review"
+            id="org.agilereview.core.newReview"
+            name="New Review">
+      </command>
+      <command
+            categoryId="org.agilereview.core.commonCommands"
+            description="Open or closes a review"
+            id="org.agilereview.core.openCloseReview"
+            name="Open/Close Review">
+         <commandParameter
+               id="org.agilereview.core.openCloseReview.review"
+               name="Review"
+               optional="false">
+         </commandParameter>
+      </command>
+   </extension>
+   <extension
+         point="org.eclipse.ui.commandImages">
+      <image
+            commandId="org.agilereview.core.newReview"
+            icon="icons/review_add.png">
+      </image>
+      <image
+            commandId="org.agilereview.core.openCloseReview"
+            icon="icons/closed_project.gif">
+      </image>
+   </extension>
 
 </plugin>
