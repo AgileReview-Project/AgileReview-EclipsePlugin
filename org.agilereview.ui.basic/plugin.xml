@@ -7,7 +7,7 @@
             class="org.agilereview.ui.basic.commentSummary.table.ContentProvider">
       </ReviewDataReceiver>
       <ReviewDataReceiver
-            class="org.agilereview.ui.basic.reviewExplorer.REContentProvider">
+            class="org.agilereview.ui.basic.reviewExplorer.REDataReceiver">
       </ReviewDataReceiver>
    </extension>
    <extension
@@ -42,8 +42,7 @@
          allPopups="false"
          locationURI="toolbar:org.agilereview.ui.basic.reviewExplorerView">
       <command
-            commandId="org.agilereview.newReview"
-            icon="icons/review_add.png"
+            commandId="org.agilereview.core.newReview"
             label="Create new review"
             style="push"
             tooltip="Create a new review">
@@ -60,8 +59,7 @@
             tooltip="Activate selected review">
       </command>
       <command
-            commandId="org.agilereview.openCloseReview"
-            icon="icons/closed_project.gif"
+            commandId="org.agilereview.core.openCloseReview"
             label="Open/Close selected reviews"
             style="push"
             tooltip="Open/Close reviews">
@@ -101,8 +99,8 @@
             visible="true">
       </separator>
       <command
-            commandId="org.eclipse.ui.navigate.linkWithEditor"
-            label="Link Review Explorer with Comments Summary"
+            commandId="org.agilereview.ui.basic.linkReviewExplorer"
+            label="Link Review Explorer for filtering"
             style="toggle">
       </command>
    </menuContribution>
@@ -110,8 +108,7 @@
          allPopups="true"
          locationURI="popup:org.agilereview.ui.basic.reviewExplorerView">
       <command
-            commandId="org.agilereview.newReview"
-            icon="icons/review_add.png"
+            commandId="org.agilereview.core.newReview"
             label="Create new review"
             style="push"
             tooltip="Create a new review">
@@ -142,8 +139,7 @@
             tooltip="Activate selected review">
       </command>
       <command
-            commandId="org.agilereview.openCloseReview"
-            icon="icons/closed_project.gif"
+            commandId="org.agilereview.core.openCloseReview"
             label="Open/Close selected reviews"
             style="push"
             tooltip="Open/Close reviews">
@@ -268,6 +264,30 @@
                relative="org.eclipse.ui.editorss">
          </view>
       </perspectiveExtension>
+   </extension>
+   <extension
+         point="org.eclipse.ui.commands">
+      <category
+            description="Basic UI commands"
+            id="org.agilereview.ui.basic.commands"
+            name="Basic UI commands">
+      </category>
+      <command
+            category="org.agilereview.ui.basic.commands"
+            categoryId="org.agilereview.ui.basic.commands"
+            defaultHandler="org.agilereview.ui.basic.handler.LinkReviewExplorerHandler"
+            description="Links the review explorer to the filtering mechanism"
+            id="org.agilereview.ui.basic.linkReviewExplorer"
+            name="Link ReviewExplorer">
+      </command>
+   </extension>
+   <extension
+         point="org.eclipse.ui.commandImages">
+      <image
+            commandId="org.agilereview.ui.basic.linkReviewExplorer"
+            disabledIcon="IMG_ELCL_SYNCED_DISABLED"
+            icon="IMG_ELCL_SYNCED">
+      </image>
    </extension>
 
 </plugin>

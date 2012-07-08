@@ -30,6 +30,7 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotPerspective;
 import org.eclipse.ui.PlatformUI;
+import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -79,26 +80,52 @@ public class ReviewExplorerViewTest {
         }
     }
 
+    @After
+    public void tearDownTest() {
+        try {
+            ResourcesPlugin.getWorkspace().getRoot().delete(true, true, new NullProgressMonitor());
+        } catch (CoreException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+    }
+
     /**
      * UI-Test for SearchFilter functionality
      * @author Malte Brunnlieb (26.05.2012)
      */
     @Test
     public void testViewGeneral() {
+        setupWorkspace();
+        try {
+            Thread.sleep(90 * 1000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        waitForJobs(30000);
+    }
+
+    /**
+     * Setup a basic workspace
+     * @author Thilo Rauch (07.07.2012)
+     */
+    private void setupWorkspace() {
         // test data        
         Review reviewMock1 = mock(Review.class); // new Review("r1");
         Review reviewMock2 = mock(Review.class); // new Review("r2");
         IProject p = ResourcesPlugin.getWorkspace().getRoot().getProject("TestProject1");
         IFolder f = p.getFolder("src");
         IFile file = f.getFile("AnswerToEverything.java");
-        try {
-            p.create(new NullProgressMonitor());
-            p.open(new NullProgressMonitor());
-            f.create(true, true, new NullProgressMonitor());
-            file.create(new ByteArrayInputStream("test 123".getBytes()), true, new NullProgressMonitor());
-        } catch (CoreException e1) {
-            // TODO Auto-generated catch block
-            e1.printStackTrace();
+        if (!file.exists()) {
+            try {
+                p.create(new NullProgressMonitor());
+                p.open(new NullProgressMonitor());
+                f.create(true, true, new NullProgressMonitor());
+                file.create(new ByteArrayInputStream("test 123".getBytes()), true, new NullProgressMonitor());
+            } catch (CoreException e1) {
+                // TODO Auto-generated catch block
+                e1.printStackTrace();
+            }
         }
         System.out.println(file.exists());
         List<Comment> comments1 = new LinkedList<Comment>();
@@ -121,13 +148,11 @@ public class ReviewExplorerViewTest {
         reviews.add(reviewMock2);
 
         StorageClientMock.getInstance().setStorageContent(reviews);
-
         try {
-            Thread.sleep(90 * 1000);
+            Thread.sleep(2 * 1000);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        waitForJobs(30000);
     }
 
     /**
