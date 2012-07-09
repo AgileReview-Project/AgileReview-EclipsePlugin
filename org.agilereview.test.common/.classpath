@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
+	<classpathentry kind="src" path="src"/>
 	<classpathentry exported="true" kind="lib" path="mockito-1.9.0/sources/mockito-all-1.9.0-sources.jar"/>
 	<classpathentry exported="true" kind="lib" path="mockito-1.9.0/sources/mockito-core-1.9.0-sources.jar"/>
 	<classpathentry exported="true" kind="lib" path="mockito-1.9.0/separate-jars/com.springsource.org.hamcrest.core-1.1.0.jar"/>

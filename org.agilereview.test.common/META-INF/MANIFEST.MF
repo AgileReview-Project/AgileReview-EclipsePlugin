@@ -9,7 +9,8 @@ Bundle-ClassPath: mockito-1.9.0/mockito-all-1.9.0.jar,
  mockito-1.9.0/separate-jars/mockito-core-1.9.0.jar,
  mockito-1.9.0/sources/mockito-all-1.9.0-sources.jar,
  mockito-1.9.0/sources/mockito-core-1.9.0-sources.jar
-Export-Package: org.hamcrest,
+Export-Package: org.agilereview.test.common.utils,
+ org.hamcrest,
  org.hamcrest.core,
  org.hamcrest.internal,
  org.mockito,
@@ -76,5 +77,9 @@ Export-Package: org.hamcrest,
  org.objenesis.instantiator.sun,
  org.objenesis.strategy
 Require-Bundle: org.junit,
- org.apache.ant
+ org.apache.ant,
+ org.eclipse.core.runtime;bundle-version="3.8.0",
+ org.eclipse.jdt.core;bundle-version="3.8.1",
+ org.eclipse.core.resources;bundle-version="3.8.0",
+ org.eclipse.jdt.launching;bundle-version="3.6.100"
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
