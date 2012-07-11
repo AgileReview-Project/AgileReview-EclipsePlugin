@@ -31,10 +31,6 @@ public class RDRController implements IExtensionController {
     public static final String IREVIEWDATARECEIVER_ID = "org.agilereview.core.ReviewDataReceiver";
     
     /**
-     * Singleton instance of {@link RDRController}
-     */
-    private static final RDRController instance = new RDRController();
-    /**
      * Mapping of names to objects of registered {@link IReviewDataReceiver}s
      */
     private final List<IReviewDataReceiver> registeredClients = new LinkedList<IReviewDataReceiver>();
@@ -43,7 +39,7 @@ public class RDRController implements IExtensionController {
      * Creates a new instance of {@link RDRController}
      * @author Malte Brunnlieb (28.03.2012)
      */
-    private RDRController() {
+    RDRController() {
         checkForNewClients();
     }
     
@@ -53,15 +49,6 @@ public class RDRController implements IExtensionController {
      */
     public void checkForNewClients() {
         new Thread(this).start();
-    }
-    
-    /**
-     * Returns the singleton instance of the {@link RDRController}
-     * @return the singleton of {@link RDRController}
-     * @author Malte Brunnlieb (28.03.2012)
-     */
-    public static RDRController getInstance() {
-        return instance;
     }
     
     /**

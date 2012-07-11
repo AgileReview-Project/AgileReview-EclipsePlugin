@@ -7,6 +7,8 @@
  */
 package org.agilereview.core;
 
+import org.agilereview.core.controller.ExtensionControllerFactory;
+import org.agilereview.core.controller.ExtensionControllerFactory.ExtensionPoint;
 import org.agilereview.core.controller.RDRController;
 import org.agilereview.core.controller.RegistryListener;
 import org.agilereview.core.controller.StorageController;
@@ -68,7 +70,8 @@ public class Activator extends AbstractUIPlugin {
      * @author Malte Brunnlieb (24.05.2012)
      */
     private void registerListeners() {
-        new RegistryListener(RDRController.IREVIEWDATARECEIVER_ID, RDRController.getInstance());
-        new RegistryListener(StorageController.ISTORAGECLIENT_ID, StorageController.getInstance());
+        new RegistryListener(RDRController.IREVIEWDATARECEIVER_ID, ExtensionControllerFactory
+                .createExtensionController(ExtensionPoint.ReviewDataReceiver));
+        new RegistryListener(StorageController.ISTORAGECLIENT_ID, ExtensionControllerFactory.createExtensionController(ExtensionPoint.StorageClient));
     }
 }

@@ -11,6 +11,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.agilereview.core.controller.ExtensionControllerFactory.ExtensionPoint;
 import org.agilereview.core.exception.ExceptionHandler;
 import org.agilereview.core.exception.NoStorageClientDefinedException;
 import org.agilereview.core.external.definition.IReviewDataReceiver;
@@ -38,10 +39,6 @@ public class StorageController implements IExtensionController, IStorageClient {
     public static final String ISTORAGECLIENT_ID = "org.agilereview.core.StorageClient";
     
     /**
-     * Singleton instance of {@link StorageController}
-     */
-    private static final StorageController instance = new StorageController();
-    /**
      * Mapping of names to objects of registered {@link IStorageClient}s
      */
     private final HashMap<String, IStorageClient> registeredClients = new HashMap<String, IStorageClient>();
@@ -54,17 +51,8 @@ public class StorageController implements IExtensionController, IStorageClient {
      * Creates a new instance of the {@link StorageController}
      * @author Malte Brunnlieb (22.03.2012)
      */
-    private StorageController() {
+    StorageController() {
         checkForNewClients();
-    }
-    
-    /**
-     * Returns the unique instance of the {@link StorageController}
-     * @return the unique instance of the {@link StorageController}
-     * @author Malte Brunnlieb (22.03.2012)
-     */
-    public static StorageController getInstance() {
-        return instance;
     }
     
     /**
@@ -132,7 +120,8 @@ public class StorageController implements IExtensionController, IStorageClient {
                 }
                 if (registeredClients.get(name) != null) {
                     activeClient = name;
-                    RDRController.getInstance().notifyAllClients(getAllReviews());
+                    RDRController c = (RDRController) ExtensionControllerFactory.createExtensionController(ExtensionPoint.ReviewDataReceiver);
+                    c.notifyAllClients(getAllReviews());
                     return true;
                 }
             }
