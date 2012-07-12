@@ -28,19 +28,19 @@ public abstract class AbstractReviewDataReceiver implements IReviewDataReceiver 
     /**
      * Object in order to synchronize model <-> table binding
      */
-    private static Object syncObj = new Object(); // XXX All instance sync on same object --> think again
+    //  private static Object syncObj = new Object(); // XXX All instance sync on same object --> think again
 
     // private static Map<Class<? extends AbstractReviewDataReceiver>, AbstractReviewDataView> viewMap = new HashMap<Class<? extends AbstractReviewDataReceiver>, AbstractReviewDataView>();
 
     public AbstractReviewDataReceiver() {
         // XXX remove later
         System.out.println("DataReceiver created");
-        synchronized (syncObj) {
-            Object instanceObj = getInstance(getReviewDataViewClass());
-            if (instanceObj != null) {
-                bindViewOn((AbstractReviewDataView) instanceObj, this);
-            }
+        // synchronized (syncObj) {
+        Object instanceObj = getInstance(getReviewDataViewClass());
+        if (instanceObj != null) {
+            bindViewOn((AbstractReviewDataView) instanceObj, this);
         }
+        // }
     }
 
     public abstract Class<? extends AbstractReviewDataView> getReviewDataViewClass();
@@ -79,13 +79,13 @@ public abstract class AbstractReviewDataReceiver implements IReviewDataReceiver 
     }
 
     public static void bindViewOn(AbstractReviewDataView dataView, Class<? extends AbstractReviewDataReceiver> receiverClass) {
-        synchronized (syncObj) {
-            Object instanceObj = getInstance(receiverClass);
-            if (instanceObj != null) {
-                // No check need, has to be of that type
-                bindViewOn(dataView, (AbstractReviewDataReceiver) instanceObj);
-            }
+        //synchronized (syncObj) {
+        Object instanceObj = getInstance(receiverClass);
+        if (instanceObj != null) {
+            // No check need, has to be of that type
+            bindViewOn(dataView, (AbstractReviewDataReceiver) instanceObj);
         }
+        // }
     }
 
     private static Object getInstance(Class<?> c) {

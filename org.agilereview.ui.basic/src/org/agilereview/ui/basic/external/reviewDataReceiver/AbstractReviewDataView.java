@@ -56,6 +56,8 @@ public abstract class AbstractReviewDataView extends ViewPart {
 
     private ViewContent viewContent = ViewContent.NONE;
 
+    private Object syncObject = new Object();
+
     //    /**
     //     * Current Instance used by the ViewPart
     //     */
@@ -75,15 +77,15 @@ public abstract class AbstractReviewDataView extends ViewPart {
         System.out.println("View created");
         this.parent = parent;
         parent.setLayout(new GridLayout());
-        // give sub-classes possibility to initialize
-        initialize();
+        //        // give sub-classes possibility to initialize
+        //        initialize();
         // XXX Think about sync
-        synchronized (this.parent) {
-            AbstractReviewDataReceiver.bindViewOn(this, getReviewDataReceiverClass());
-            // XXX remove later
-            System.out.println("View side binding finsihed");
-            buildRightUI();
-        }
+        // synchronized (this.parent) {
+        AbstractReviewDataReceiver.bindViewOn(this, getReviewDataReceiverClass());
+        // XXX remove later
+        System.out.println("View side binding finished");
+        buildRightUI();
+        // }
 
     }
 
@@ -102,7 +104,7 @@ public abstract class AbstractReviewDataView extends ViewPart {
     //    }
 
     public void setInput(Object input) {
-        synchronized (parent) {
+        synchronized (syncObject) {
             viewInput = input;
             buildRightUI();
             if (input != null) {
@@ -112,20 +114,22 @@ public abstract class AbstractReviewDataView extends ViewPart {
     }
 
     private void buildRightUI() {
-        // XXX remove later
-        System.out.println("Build right UI called with input " + viewInput);
-        if (viewInput != null) {
-            if (viewContent == ViewContent.WORKING)
-                return;
-            viewContent = ViewContent.WORKING;
-            clearParent();
-            buildUI(parent, viewInput);
-        } else {
-            if (viewContent == ViewContent.DUMMY)
-                return;
-            viewContent = ViewContent.DUMMY;
-            clearParent();
-            buildDummyUI();
+        synchronized (syncObject) {
+            // XXX remove later
+            System.out.println("Build right UI called with input " + viewInput);
+            if (viewInput != null) {
+                if (viewContent == ViewContent.WORKING)
+                    return;
+                viewContent = ViewContent.WORKING;
+                clearParent();
+                buildUI(parent, viewInput);
+            } else {
+                if (viewContent == ViewContent.DUMMY)
+                    return;
+                viewContent = ViewContent.DUMMY;
+                clearParent();
+                buildDummyUI();
+            }
         }
     }
 
@@ -135,7 +139,7 @@ public abstract class AbstractReviewDataView extends ViewPart {
 
     protected abstract void buildUI(Composite parent, Object initalInput);
 
-    protected abstract void initialize();
+    //    protected abstract void initialize();
 
     /**
      * Displays a message that no {@link IStorageClient} provides data

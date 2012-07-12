@@ -57,6 +57,8 @@ public class ContentProvider implements IStructuredContentProvider, IReviewDataR
      * @author Malte Brunnlieb (28.05.2012)
      */
     public ContentProvider() {
+        // XXX remove this (DEBUG only)
+        System.out.println("CSV receiver created");
         synchronized (syncObj) {
             instance = this;
             if (commentSummaryView != null) {

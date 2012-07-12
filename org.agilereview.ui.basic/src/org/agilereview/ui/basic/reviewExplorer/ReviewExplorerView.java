@@ -37,19 +37,24 @@ public class ReviewExplorerView extends AbstractReviewDataView {
      */
     private static ReviewExplorerView instance;
 
+    public ReviewExplorerView() {
+        super();
+        instance = this;
+    }
+
     public static ReviewExplorerView getInstance() {
         return instance;
     }
 
-    /* (non-Javadoc)
-     * @see org.agilereview.ui.basic.external.reviewDataReceiver.AbstractReviewDataView#initialize()
-     * @author Thilo Rauch (08.07.2012)
-     */
-    @Override
-    protected void initialize() {
-        // capture instance
-        instance = this;
-    }
+    //    /* (non-Javadoc)
+    //     * @see org.agilereview.ui.basic.external.reviewDataReceiver.AbstractReviewDataView#initialize()
+    //     * @author Thilo Rauch (08.07.2012)
+    //     */
+    //    @Override
+    //    protected void initialize() {
+    //        // capture instance
+    //        instance = this;
+    //    }
 
     @Override
     public void setFocus() {

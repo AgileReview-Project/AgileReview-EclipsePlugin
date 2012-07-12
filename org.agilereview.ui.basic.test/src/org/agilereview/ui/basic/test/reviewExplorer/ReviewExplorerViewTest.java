@@ -127,7 +127,7 @@ public class ReviewExplorerViewTest {
                 e1.printStackTrace();
             }
         }
-        System.out.println(file.exists());
+
         List<Comment> comments1 = new LinkedList<Comment>();
         List<Comment> comments2 = new LinkedList<Comment>();
         Comment c1 = new Comment("c1", "Adam", file, reviewMock1, Calendar.getInstance(), Calendar.getInstance(), "", 0, 0, "");
