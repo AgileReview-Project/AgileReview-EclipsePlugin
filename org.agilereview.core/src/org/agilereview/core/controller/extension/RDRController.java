@@ -65,21 +65,4 @@ public class RDRController extends AbstractController<IReviewDataReceiver> {
         }
     }
     
-    /* (non-Javadoc)
-     * @see org.agilereview.core.controller.extension.AbstractController#handleNoExtensionAvailable()
-     * @author Malte Brunnlieb (12.07.2012)
-     */
-    @Override
-    protected void handleNoExtensionAvailable() {
-        // nothing to do
-    }
-    
-    /* (non-Javadoc)
-     * @see org.agilereview.core.controller.extension.AbstractController#doAfterCheckForClients()
-     * @author Malte Brunnlieb (12.07.2012)
-     */
-    @Override
-    protected void doAfterCheckForClients() {
-        // nothing to do
-    }
 }

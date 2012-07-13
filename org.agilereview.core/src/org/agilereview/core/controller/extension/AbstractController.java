@@ -33,6 +33,9 @@ public abstract class AbstractController<T> implements IExtensionController {
      */
     private final HashMap<String, T> registeredClients = new HashMap<String, T>();
     
+    /**
+     * Checks whether the controller was fully initialized (first checkForClients included)
+     */
     private boolean initialized = false;
     
     /**
@@ -40,7 +43,7 @@ public abstract class AbstractController<T> implements IExtensionController {
      * @param extensionID extension point id
      * @author Malte Brunnlieb (22.03.2012)
      */
-    public AbstractController(String extensionID) {
+    AbstractController(String extensionID) {
         this.extensionID = extensionID;
         checkForNewClients();
     }
@@ -126,14 +129,17 @@ public abstract class AbstractController<T> implements IExtensionController {
     }
     
     /**
-     * Will be called if no extension is available.
+     * Will be called if no extension is available. <br> This class is intended to be overwritten. The default implementation does nothing.
      * @author Malte Brunnlieb (12.07.2012)
      */
-    protected abstract void handleNoExtensionAvailable();
+    protected void handleNoExtensionAvailable() {
+    }
     
     /**
-     * Will be called after checking for new extensions. The function call is synchronized over all checkForNewClients calls.
+     * Will be called after checking for new extensions. The function call is synchronized over all checkForNewClients calls. <br> This class is
+     * intended to be overwritten. The default implementation does nothing.
      * @author Malte Brunnlieb (12.07.2012)
      */
-    protected abstract void doAfterCheckForClients();
+    protected void doAfterCheckForClients() {
+    }
 }
