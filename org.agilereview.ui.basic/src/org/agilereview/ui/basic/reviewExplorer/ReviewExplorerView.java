@@ -14,9 +14,7 @@ import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.TreePath;
 import org.eclipse.jface.viewers.TreeViewer;
-import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.ui.PlatformUI;
 
@@ -33,28 +31,27 @@ public class ReviewExplorerView extends AbstractReviewDataView {
     private TreeViewer treeViewer;
 
     /**
-     * Current Instance used by the ViewPart
+     * Current Instance used by the ViewPart. Part of the ReviewDataView pattern.
      */
     private static ReviewExplorerView instance;
 
+    /**
+     * Constructor used to capture the instance created by eclipse. Part of the ReviewDataView pattern.
+     * @author Thilo Rauch (13.07.2012)
+     */
     public ReviewExplorerView() {
         super();
         instance = this;
     }
 
+    /**
+     * GetInstance() method to provide access to the instance created by Eclipse. Part of the ReviewDataView pattern.
+     * @return instance of this class created by eclipse
+     * @author Thilo Rauch (13.07.2012)
+     */
     public static ReviewExplorerView getInstance() {
         return instance;
     }
-
-    //    /* (non-Javadoc)
-    //     * @see org.agilereview.ui.basic.external.reviewDataReceiver.AbstractReviewDataView#initialize()
-    //     * @author Thilo Rauch (08.07.2012)
-    //     */
-    //    @Override
-    //    protected void initialize() {
-    //        // capture instance
-    //        instance = this;
-    //    }
 
     @Override
     public void setFocus() {
@@ -66,51 +63,28 @@ public class ReviewExplorerView extends AbstractReviewDataView {
      */
     @Override
     protected void buildUI(final Composite parent, final Object initialInput) {
-        Display.getDefault().syncExec(new Runnable() {
-            @Override
-            public void run() {
-                // Create the treeview MULTI, H_SCROLL, V_SCROLL, and BORDER
-                treeViewer = new TreeViewer(parent);
-                treeViewer.setContentProvider(new REContentProvider());
-                treeViewer.setLabelProvider(new RELabelProvider());
-                treeViewer.setComparator(new REViewerComparator());
-                // Needed so expanding/collapsing of IResources which are displayed multiple times works
-                treeViewer.setUseHashlookup(true);
-                if (initialInput != null) {
-                    treeViewer.setInput(initialInput);
-                }
+        // Create the treeview MULTI, H_SCROLL, V_SCROLL, and BORDER
+        treeViewer = new TreeViewer(parent);
+        treeViewer.setContentProvider(new REContentProvider());
+        treeViewer.setLabelProvider(new RELabelProvider());
+        treeViewer.setComparator(new REViewerComparator());
+        // Needed so expanding/collapsing of IResources which are displayed multiple times works
+        treeViewer.setUseHashlookup(true);
+        if (initialInput != null) {
+            treeViewer.setInput(initialInput);
+        }
 
-                GridData gd = new GridData();
-                gd.grabExcessHorizontalSpace = true;
-                gd.grabExcessVerticalSpace = true;
-                gd.horizontalAlignment = GridData.FILL;
-                gd.verticalAlignment = GridData.FILL;
-                // gd.widthHint = parent.getMonitor().getClientArea().width;
-                treeViewer.getTree().setLayoutData(gd);
-                parent.layout();
+        treeViewer.addDoubleClickListener(new REDoubleClickListener());
+        // TODO: Still supported? 
+        PlatformUI.getWorkbench().getHelpSystem().setHelp(parent, Activator.PLUGIN_ID + ".ReviewExplorer");
 
-                // TODO: Ähnliches Konstrukt in der neuen Architektur?
-                // treeViewer.addSelectionChangedListener(ViewControl.getInstance());
-                //                ReviewSet set = new ReviewSet();
-                //                set.add(new Review("blubb"));
-                //                refreshInput(set);
-
-                treeViewer.addDoubleClickListener(new REDoubleClickListener());
-                // TODO: Still supported? 
-                PlatformUI.getWorkbench().getHelpSystem().setHelp(parent, Activator.PLUGIN_ID + ".ReviewExplorer");
-
-                // Create a popup menu
-                MenuManager menuManager = new MenuManager();
-                Menu menu = menuManager.createContextMenu(treeViewer.getControl());
-                // Set the MenuManager
-                treeViewer.getControl().setMenu(menu);
-                getSite().registerContextMenu(menuManager, treeViewer);
-                getSite().setSelectionProvider(treeViewer);
-
-                // register view
-                // TODO Ähnliches Konzept? ViewControl.registerView(this.getClass());
-            }
-        });
+        // Create a popup menu
+        MenuManager menuManager = new MenuManager();
+        Menu menu = menuManager.createContextMenu(treeViewer.getControl());
+        // Set the MenuManager
+        treeViewer.getControl().setMenu(menu);
+        getSite().registerContextMenu(menuManager, treeViewer);
+        getSite().setSelectionProvider(treeViewer);
     }
 
     /* (non-Javadoc)
@@ -118,7 +92,7 @@ public class ReviewExplorerView extends AbstractReviewDataView {
      * @author Thilo Rauch (07.07.2012)
      */
     @Override
-    public Class<? extends AbstractReviewDataReceiver> getReviewDataReceiverClass() {
+    protected Class<? extends AbstractReviewDataReceiver> getReviewDataReceiverClass() {
         // TODO Auto-generated method stub
         return REDataReceiver.class;
     }
@@ -128,32 +102,26 @@ public class ReviewExplorerView extends AbstractReviewDataView {
      * @author Thilo Rauch (06.05.2012)
      */
     @Override
-    public void refreshInput(final Object input) {
+    protected void refreshInput(final Object input) {
         if (this.treeViewer != null) {
-            Display.getDefault().syncExec(new Runnable() {
-                @Override
-                public void run() {
-                    // Save previous selection
-                    ISelection selection = treeViewer.getSelection();
-                    // Save expansion state
-                    treeViewer.getControl().setRedraw(false);
-                    TreePath[] expandedElements = treeViewer.getExpandedTreePaths();
+            ISelection selection = treeViewer.getSelection();
+            // Save expansion state
+            treeViewer.getControl().setRedraw(false);
+            TreePath[] expandedElements = treeViewer.getExpandedTreePaths();
 
-                    // Refresh the input
-                    treeViewer.setInput(input);
-                    // treeViewer.refresh();
+            // Refresh the input
+            treeViewer.setInput(input);
+            // treeViewer.refresh();
 
-                    // Expand nodes again
-                    for (Object o : expandedElements) {
-                        treeViewer.expandToLevel(o, 1);
-                    }
-                    treeViewer.getControl().setRedraw(true);
-                    treeViewer.getControl().redraw();
+            // Expand nodes again
+            for (Object o : expandedElements) {
+                treeViewer.expandToLevel(o, 1);
+            }
+            treeViewer.getControl().setRedraw(true);
+            treeViewer.getControl().redraw();
 
-                    //Reset selection
-                    treeViewer.setSelection(selection, true);
-                }
-            });
+            //Reset selection
+            treeViewer.setSelection(selection, true);
         }
     }
 

@@ -8,7 +8,6 @@
 package org.agilereview.ui.basic.external.reviewDataReceiver;
 
 import org.agilereview.core.external.definition.IStorageClient;
-import org.agilereview.ui.basic.commentSummary.CommentSummaryView;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -16,16 +15,32 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Layout;
 import org.eclipse.ui.part.ViewPart;
 
 /**
+ * This class is part of the framework for providing views with review information. Extend this abstract class and implement the abstract methods to
+ * get a view which should display review data. If you use this class and {@link AbstractReviewDataReceiver} then both classes will connect to each
+ * other so the review data will be pushed into the view. Both, View and DataReceiver, are created by eclipse but these abstract classes handle nearly
+ * every aspect regarding instance control for you.
+ * 
+ * The only thing the extending class has to do is capture the instance created by the framework and provide it trough a static getInstance() method.
+ * Example
+ * 
+ * <p><blockquote><pre> <code> class MyView extends AbstractReviewDataView { <br> &nbsp; private static MyView instance;
+ * 
+ * &nbsp; public MyView() { super(); instance = this; }
+ * 
+ * &nbsp; public static MyView getInstance() { return instance; } }
+ * 
+ * </code> </blockquote></pre></p>
  * 
  * @author Thilo Rauch (07.07.2012)
  */
 public abstract class AbstractReviewDataView extends ViewPart {
 
     /**
-     * The values describe the currently shown content of the {@link CommentSummaryView}
+     * The values describe the currently shown content of the {@link AbstractReviewDataView}
      * @author Malte Brunnlieb (30.05.2012)
      */
     private enum ViewContent {
@@ -47,137 +62,156 @@ public abstract class AbstractReviewDataView extends ViewPart {
      * Parent of this {@link ViewPart}
      */
     private Composite parent;
-    //    /**
-    //     * Identifies whether a content is currently connected or not
-    //     */
-    //    private boolean isContentConnected = false; // XXX volatile oder so?
 
+    /**
+     * Layout initially set on the parent. Saved for restoring after a dummy UI was shown
+     */
+    private Layout intialLayout;
+
+    /**
+     * Data shown by this view (as it was set by the {@link AbstractReviewDataReceiver}. If <code>null</code>, then now storage client is connected
+     */
     private Object viewInput;
 
+    /**
+     * Enum {@link ViewContent} indicating what is currently shown in the UI
+     */
     private ViewContent viewContent = ViewContent.NONE;
 
+    /**
+     * Simple object for thread synchronization
+     */
     private Object syncObject = new Object();
-
-    //    /**
-    //     * Current Instance used by the ViewPart
-    //     */
-    //    private static AbstractReviewDataView instance;
-    //
-    //    public static AbstractReviewDataView getInstance() {
-    //        return instance;
-    //    }
 
     /* (non-Javadoc)
      * @see org.eclipse.ui.part.WorkbenchPart#createPartControl(org.eclipse.swt.widgets.Composite)
      * @author Thilo Rauch (07.07.2012)
      */
     @Override
-    public void createPartControl(Composite parent) {
+    public final void createPartControl(Composite parent) {
         // XXX remove later
         System.out.println("View created");
         this.parent = parent;
-        parent.setLayout(new GridLayout());
-        //        // give sub-classes possibility to initialize
-        //        initialize();
-        // XXX Think about sync
-        // synchronized (this.parent) {
+        // Capture old layout
+        intialLayout = parent.getLayout();
         AbstractReviewDataReceiver.bindViewOn(this, getReviewDataReceiverClass());
         // XXX remove later
         System.out.println("View side binding finished");
         buildRightUI();
-        // }
-
     }
 
-    //    /**
-    //     * Binds the given {@link ContentProvider} to the {@link CSTableViewer} instance of this view. If the parameter is net to null, the
-    //     * {@link CommentSummaryView} will display a no {@link IStorageClient} registered message instead of a table
-    //     * @param tableModel model for the {@link CSTableViewer}
-    //     * @return The TableViewer the model was bound to. Will be null if the parameter has been set to null.
-    //     * @author Malte Brunnlieb (27.05.2012)
-    //     */
-    //    public void dataReceiverChanged(boolean connected) {
-    //        synchronized (parent) {
-    //            isContentConnected = connected;
-    //            buildRightUI();
-    //        }
-    //    }
-
-    public void setInput(Object input) {
+    /**
+     * Method for the {@link AbstractReviewDataReceiver} to push the review data into the view. Input is either null (indicating no StorageClient) or
+     * review data. The input may have been transformed by the user (using the
+     * {@link AbstractReviewDataReceiver#transformData(org.agilereview.core.external.storage.ReviewSet) transformData} method of the
+     * AbstractReviewDataReceiver.
+     * @param input
+     * @author Thilo Rauch (13.07.2012)
+     */
+    final void setInput(final Object input) {
         synchronized (syncObject) {
             viewInput = input;
             buildRightUI();
             if (input != null) {
-                refreshInput(input);
+                Display.getDefault().syncExec(new Runnable() {
+                    @Override
+                    public void run() {
+                        refreshInput(input);
+                    }
+                });
             }
         }
     }
 
-    private void buildRightUI() {
-        synchronized (syncObject) {
-            // XXX remove later
-            System.out.println("Build right UI called with input " + viewInput);
-            if (viewInput != null) {
-                if (viewContent == ViewContent.WORKING)
-                    return;
-                viewContent = ViewContent.WORKING;
-                clearParent();
-                buildUI(parent, viewInput);
-            } else {
-                if (viewContent == ViewContent.DUMMY)
-                    return;
-                viewContent = ViewContent.DUMMY;
-                clearParent();
-                buildDummyUI();
-            }
-        }
-    }
-
-    public abstract Class<? extends AbstractReviewDataReceiver> getReviewDataReceiverClass();
-
-    protected abstract void refreshInput(Object reviewData);
-
-    protected abstract void buildUI(Composite parent, Object initalInput);
-
-    //    protected abstract void initialize();
+/**
+     * Method for the binding framework to find the data receiver corresponding to this view.
+     * Should look like (with regard to sample):
+     * <p><blockquote><pre>
+     * {@code 
+     *     @Override
+     *     public Class<? extends AbstractReviewDataReceiver> getReviewDataReceiverClass() {
+     *          return MyViewDataReceiver.class;
+     *     }
+     * }
+     * </pre></blockquote></p>
+     * @return Class of the corresponding data receiver
+     * @author Thilo Rauch (13.07.2012)
+     */
+    protected abstract Class<? extends AbstractReviewDataReceiver> getReviewDataReceiverClass();
 
     /**
-     * Displays a message that no {@link IStorageClient} provides data
+     * Method for the user to build the view's UI.
+     * @param parent parent component to add the UI controls to
+     * @param initalInput inital input to the view (if something was pushed to the view before this method was called). May be null.
+     * @author Thilo Rauch (13.07.2012)
+     */
+    protected abstract void buildUI(Composite parent, Object initalInput);
+
+    /**
+     * Method for refreshing the input on the UI. Is called by the framework when new review data is pushed from the Storage but can also be called by
+     * the user. A typical use of this method is to call setInput() on a viewer shown in the view (possibly doing other stuff before and after).
+     * @param reviewData new data
+     * @author Thilo Rauch (13.07.2012)
+     */
+    protected abstract void refreshInput(Object reviewData);
+
+    /**
+     * Build either the DummyUI or the user-defined UI (based on {@link #viewInput}). If the requested UI is already shown, nothing is done.
+     * @author Thilo Rauch (13.07.2012)
+     */
+    private void buildRightUI() {
+        synchronized (syncObject) {
+            // Ensure execution in UI thread
+            Display.getDefault().syncExec(new Runnable() {
+                @Override
+                public void run() {
+                    // XXX remove later
+                    System.out.println("Build right UI called with input " + viewInput);
+                    if (viewInput != null) {
+                        if (viewContent == ViewContent.WORKING)
+                            return;
+                        viewContent = ViewContent.WORKING;
+                        clearParent();
+                        buildUI(parent, viewInput);
+                    } else {
+                        if (viewContent == ViewContent.DUMMY)
+                            return;
+                        viewContent = ViewContent.DUMMY;
+                        clearParent();
+                        buildDummyUI();
+                    }
+                    parent.layout();
+                }
+            });
+        }
+    }
+
+    /**
+     * Displays a message that no {@link IStorageClient} is connected to provide data.
      * @author Malte Brunnlieb (27.05.2012)
      */
     private void buildDummyUI() {
-        Display.getDefault().syncExec(new Runnable() {
-
-            @Override
-            public void run() {
-                Label label = new Label(parent, SWT.WRAP | SWT.CENTER);
-                label.setText("No data available as currently no StorageClient is connected.");
-                GridData gd = new GridData();
-                gd.grabExcessHorizontalSpace = true;
-                gd.grabExcessVerticalSpace = true;
-                gd.horizontalAlignment = GridData.CENTER;
-                gd.verticalAlignment = GridData.CENTER;
-                gd.widthHint = parent.getMonitor().getClientArea().width;
-                label.setLayoutData(gd);
-                parent.pack();
-            }
-        });
+        parent.setLayout(new GridLayout());
+        Label label = new Label(parent, SWT.WRAP | SWT.CENTER);
+        label.setText("No data available as currently no StorageClient is connected.");
+        GridData gd = new GridData();
+        gd.grabExcessHorizontalSpace = true;
+        gd.grabExcessVerticalSpace = true;
+        gd.horizontalAlignment = GridData.CENTER;
+        gd.verticalAlignment = GridData.CENTER;
+        gd.widthHint = parent.getMonitor().getClientArea().width;
+        label.setLayoutData(gd);
+        parent.pack();
     }
 
     /**
-     * Disposes all children of the current parent.
+     * Disposes all children of the current parent, resetting the layout
      * @author Malte Brunnlieb (27.05.2012)
      */
     private void clearParent() {
-        Display.getDefault().syncExec(new Runnable() {
-            @Override
-            public void run() {
-                // XXX treeViewer = null;
-                for (Control child : parent.getChildren()) {
-                    child.dispose();
-                }
-                parent.layout();
-            }
-        });
+        for (Control child : parent.getChildren()) {
+            child.dispose();
+        }
+        parent.setLayout(intialLayout);
     }
 }

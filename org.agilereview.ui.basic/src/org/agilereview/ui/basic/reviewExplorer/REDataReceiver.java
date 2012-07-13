@@ -17,19 +17,31 @@ import org.agilereview.ui.basic.external.reviewDataReceiver.AbstractReviewDataVi
  */
 public class REDataReceiver extends AbstractReviewDataReceiver {
 
+    /**
+     * Current Instance used by the ViewPart. Part of the ReviewDataView pattern.
+     */
     private static REDataReceiver instance;
 
+    /**
+     * Constructor used to capture the instance created by eclipse. Part of the ReviewDataView pattern.
+     * @author Thilo Rauch (13.07.2012)
+     */
     public REDataReceiver() {
         super();
         instance = this;
     }
 
+    /**
+     * GetInstance() method to provide access to the instance created by Eclipse. Part of the ReviewDataView pattern.
+     * @return instance of this class created by eclipse
+     * @author Thilo Rauch (13.07.2012)
+     */
     public static AbstractReviewDataReceiver getInstance() {
         return instance;
     }
 
     @Override
-    public Object transformData(ReviewSet rawData) {
+    protected Object transformData(ReviewSet rawData) {
         return super.transformData(rawData);
     }
 
@@ -38,17 +50,8 @@ public class REDataReceiver extends AbstractReviewDataReceiver {
      * @author Thilo Rauch (08.07.2012)
      */
     @Override
-    public Class<? extends AbstractReviewDataView> getReviewDataViewClass() {
+    protected Class<? extends AbstractReviewDataView> getReviewDataViewClass() {
         return ReviewExplorerView.class;
     }
-
-    //    /* (non-Javadoc)
-    //     * @see org.agilereview.ui.basic.external.reviewDataReceiver.AbstractReviewDataReceiver#bindView(org.agilereview.ui.basic.external.reviewDataReceiver.AbstractReviewDataView)
-    //     * @author Thilo Rauch (08.07.2012)
-    //     */
-    //    @Override
-    //    public void bindView(AbstractReviewDataView view) {
-    //
-    //    }
 
 }

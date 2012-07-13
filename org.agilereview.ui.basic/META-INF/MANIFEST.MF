@@ -14,3 +14,8 @@ Bundle-ActivationPolicy: lazy
 Import-Package: org.agilereview.core.external.definition,
  org.agilereview.core.external.storage,
  org.eclipse.ui.ide
+Export-Package: org.agilereview.ui.basic.external.reviewDataReceiver;
+  uses:="org.agilereview.core.external.storage,
+   org.eclipse.ui.part,
+   org.agilereview.core.external.definition,
+   org.eclipse.swt.widgets"
