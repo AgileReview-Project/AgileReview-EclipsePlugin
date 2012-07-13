@@ -7,11 +7,11 @@
  */
 package org.agilereview.core;
 
-import org.agilereview.core.controller.ExtensionControllerFactory;
-import org.agilereview.core.controller.ExtensionControllerFactory.ExtensionPoint;
-import org.agilereview.core.controller.RDRController;
+import org.agilereview.core.controller.extension.ExtensionControllerFactory;
+import org.agilereview.core.controller.extension.RDRController;
+import org.agilereview.core.controller.extension.StorageController;
+import org.agilereview.core.controller.extension.ExtensionControllerFactory.ExtensionPoint;
 import org.agilereview.core.controller.RegistryListener;
-import org.agilereview.core.controller.StorageController;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 

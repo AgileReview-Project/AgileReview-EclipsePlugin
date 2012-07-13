@@ -11,7 +11,7 @@ package org.agilereview.core.exception;
  * 
  * @author Malte Brunnlieb (24.03.2012)
  */
-public class NoStorageClientDefinedException extends Exception {
+public class NoStorageClientException extends Exception {
 	
 	/**
 	 * Generated version UID
@@ -19,11 +19,11 @@ public class NoStorageClientDefinedException extends Exception {
 	private static final long serialVersionUID = 2452264158515257109L;
 	
 	/**
-	 * Creates a new {@link NoStorageClientDefinedException} with the given message.
+	 * Creates a new {@link NoStorageClientException} with the given message.
 	 * @param msg Message for this Exception
 	 * @author Malte Brunnlieb (24.03.2012)
 	 */
-	public NoStorageClientDefinedException(String msg) {
+	public NoStorageClientException(String msg) {
 		super(msg);
 	}
 	

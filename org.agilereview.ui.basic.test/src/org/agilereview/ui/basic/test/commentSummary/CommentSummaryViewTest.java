@@ -18,6 +18,7 @@ import junit.framework.Assert;
 
 import org.agilereview.core.external.storage.Comment;
 import org.agilereview.core.external.storage.Review;
+import org.agilereview.core.external.storage.ReviewSet;
 import org.agilereview.test.common.storage.external.StorageClientMock;
 import org.agilereview.ui.basic.commentSummary.CommentSummaryView;
 import org.agilereview.ui.basic.commentSummary.table.Column;
@@ -98,16 +99,10 @@ public class CommentSummaryViewTest {
         when(reviewMock.getComments()).thenReturn(comments);
         when(reviewMock.getId()).thenReturn("");
         
-        List<Review> reviews = new LinkedList<Review>();
+        ReviewSet reviews = new ReviewSet();
         reviews.add(reviewMock);
         
         StorageClientMock.getInstance().setStorageContent(reviews);
-        
-        try {
-            Thread.sleep(2000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
         
         //perform UI test input (author)
         SWTBotCombo filterType = bot.comboBoxWithId("csFilterType");

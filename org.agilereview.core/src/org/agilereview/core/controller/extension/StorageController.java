@@ -5,15 +5,14 @@
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  * Contributors: Malte Brunnlieb, Philipp Diebold, Peter Reuter, Thilo Rauch
  */
-package org.agilereview.core.controller;
+package org.agilereview.core.controller.extension;
 
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Set;
 
-import org.agilereview.core.controller.ExtensionControllerFactory.ExtensionPoint;
+import org.agilereview.core.controller.extension.ExtensionControllerFactory.ExtensionPoint;
 import org.agilereview.core.exception.ExceptionHandler;
-import org.agilereview.core.exception.NoStorageClientDefinedException;
+import org.agilereview.core.exception.ExtensionCreationException;
+import org.agilereview.core.exception.NoStorageClientException;
 import org.agilereview.core.external.definition.IReviewDataReceiver;
 import org.agilereview.core.external.definition.IStorageClient;
 import org.agilereview.core.external.storage.Comment;
@@ -22,8 +21,6 @@ import org.agilereview.core.external.storage.Review;
 import org.agilereview.core.external.storage.ReviewSet;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IConfigurationElement;
-import org.eclipse.core.runtime.Platform;
 import org.eclipse.ui.PlatformUI;
 
 /**
@@ -31,7 +28,7 @@ import org.eclipse.ui.PlatformUI;
  * functionalities of the {@link IStorageClient} interface for the currently active {@link IStorageClient}.
  * @author Malte Brunnlieb (22.03.2012)
  */
-public class StorageController implements IExtensionController, IStorageClient {
+public class StorageController extends AbstractController<IStorageClient> implements IStorageClient {
     
     /**
      * ExtensionPoint id for extensions implementing {@link IStorageClient}
@@ -39,131 +36,82 @@ public class StorageController implements IExtensionController, IStorageClient {
     public static final String ISTORAGECLIENT_ID = "org.agilereview.core.StorageClient";
     
     /**
-     * Mapping of names to objects of registered {@link IStorageClient}s
-     */
-    private final HashMap<String, IStorageClient> registeredClients = new HashMap<String, IStorageClient>();
-    /**
      * Currently active {@link IStorageClient} on which all operations will be called
      */
-    private String activeClient = null;
+    private IStorageClient activeClient = null;
     
     /**
      * Creates a new instance of the {@link StorageController}
      * @author Malte Brunnlieb (22.03.2012)
      */
     StorageController() {
-        checkForNewClients();
+        super(ISTORAGECLIENT_ID);
     }
     
-    /**
-     * Starts searching for new {@link IReviewDataReceiver}s registered at the ExtensionPoint asynchronously
-     * @author Malte Brunnlieb (02.06.2012)
-     */
-    public void checkForNewClients() {
-        new Thread(this).start();
-    }
-    
-    /**
-     * Performs a check for new StorageClients registered at the ExtensionPoint
-     * @see java.lang.Runnable#run()
-     * @author Malte Brunnlieb (30.05.2012)
+    /* (non-Javadoc)
+     * @see org.agilereview.core.controller.AbstractController#handleNoExtensionAvailable()
+     * @author Malte Brunnlieb (12.07.2012)
      */
     @Override
-    public void run() {
-        synchronized (registeredClients) {
-            IConfigurationElement[] config = Platform.getExtensionRegistry().getConfigurationElementsFor(ISTORAGECLIENT_ID);
-            if (config.length == 0) {
-                ExceptionHandler.logAndNotifyUser(new NoStorageClientDefinedException("No StorageClient available")); //TODO perhaps offer some help
-                registeredClients.clear();
-                return;
-            }
-            
-            String firstClient = null;
-            for (IConfigurationElement e : config) {
-                registeredClients.put(e.getAttribute("name"), null);
-                if (firstClient != null) {
-                    firstClient = e.getAttribute("name");
-                }
-            }
-            
+    protected void handleNoExtensionAvailable() {
+        ExceptionHandler.logAndNotifyUser(new NoStorageClientException("No StorageClient available"));
+    }
+    
+    /* (non-Javadoc)
+     * @see org.agilereview.core.controller.AbstractController#doAfterCheckForClients()
+     * @author Malte Brunnlieb (12.07.2012)
+     */
+    @Override
+    protected void doAfterCheckForClients() {
+        try {
             if (PlatformUI.getPreferenceStore().getBoolean("org.agilereview.testrunner.mock.storage")) { //TODO if client can be set via preferences -> use this
                 setStorageClient("StorageMock");
-            } else if (firstClient != null) {
-                setStorageClient(firstClient); //TODO do not use last, but manage to set this client via preferences
+            } else if (getFirstExtension() != null) {
+                setStorageClient(getFirstExtension()); //TODO do not use last, but manage to set this client via preferences
             }
+        } catch (ExtensionCreationException e) {
+            ExceptionHandler.logAndNotifyUser(e.getLocalizedMessage(), e);
+            e.printStackTrace();
         }
     }
     
     /**
-     * Returns the currently available storage clients
-     * @return a list of the names of all available storage clients
-     * @author Malte Brunnlieb (27.05.2012)
+     * Returns the first registered extension
+     * @return the name for the first registered extension
+     * @author Malte Brunnlieb (12.07.2012)
      */
-    public Set<String> getAvailableStorageClients() {
-        synchronized (registeredClients) {
-            return new HashSet<String>(registeredClients.keySet());
+    private String getFirstExtension() {
+        Set<String> extensions = getAvailableExtensions();
+        if (extensions.size() > 0) {
+            String first = extensions.toArray(new String[0])[0];
+            return first;
         }
+        return null;
     }
     
     /**
      * Sets the storage client which should store and read review data. If there is no available storage client for the given name, nothing changes.
      * After setting a new storage client all {@link IReviewDataReceiver} will be notified.
      * @param name the name under which the storage client is registered
-     * @return true, if the storage client could be set<br>false, otherwise
+     * @throws ExtensionCreationException will be thrown when there is no extension registered with the current name or an error occurred while
+     *             creating the intended extension
      * @author Malte Brunnlieb (27.05.2012)
      */
-    public boolean setStorageClient(String name) {
-        synchronized (registeredClients) {
-            if (registeredClients.containsKey(name)) {
-                if (registeredClients.get(name) == null) {
-                    registeredClients.put(name, loadExtension(name));
-                }
-                if (registeredClients.get(name) != null) {
-                    activeClient = name;
-                    RDRController c = (RDRController) ExtensionControllerFactory.createExtensionController(ExtensionPoint.ReviewDataReceiver);
-                    c.notifyAllClients(getAllReviews());
-                    return true;
-                }
-            }
-            return false;
-        }
-    }
-    
-    /**
-     * Loads the extension class identified by its extension name
-     * @param name the name of the extension which should be loaded
-     * @return the {@link IStorageClient} instance loaded from the extension or null if the extension could not be instantiated
-     * @author Malte Brunnlieb (31.05.2012)
-     */
-    private IStorageClient loadExtension(String name) {
+    public void setStorageClient(String name) throws ExtensionCreationException {
+        if (activeClient != null && activeClient.equals(name)) return;
         
-        IConfigurationElement[] config = Platform.getExtensionRegistry().getConfigurationElementsFor(ISTORAGECLIENT_ID);
-        for (IConfigurationElement e : config) {
-            if (e.getAttribute("name").equals(name)) {
-                try {
-                    Object o = e.createExecutableExtension("class");
-                    if (o instanceof IStorageClient) { return (IStorageClient) o; }
-                } catch (CoreException ex) {
-                    ExceptionHandler.logAndNotifyUser("An error occurred while instantiating StorageClient " + name + " defined by class "
-                            + e.getAttribute("class"), ex);
-                    break;
-                }
-            }
+        Set<String> extensions = getAvailableExtensions();
+        if (!extensions.contains(name)) { throw new ExtensionCreationException("The StorageClient with id " + name + " could not be found!"); }
+        
+        try {
+            activeClient = getExtension(name);
+        } catch (CoreException e) {
+            e.printStackTrace();
+            throw new ExtensionCreationException("The StorageClient with id " + name + " could not be intantiated!");
         }
         
-        return null;
-    }
-    
-    /**
-     * Checks whether the given {@link IStorageClient} is already registered
-     * @param sc {@link IStorageClient} to be checked for registration
-     * @return true, if the given {@link IStorageClient} is already registered<br>false, otherwise
-     * @author Malte Brunnlieb (28.03.2012)
-     */
-    public boolean isRegistered(IStorageClient sc) {
-        synchronized (registeredClients) {
-            return registeredClients.containsValue(sc);
-        }
+        RDRController c = (RDRController) ExtensionControllerFactory.createExtensionController(ExtensionPoint.ReviewDataReceiver);
+        c.notifyAllClients(getAllReviews());
     }
     
     /**
@@ -174,7 +122,7 @@ public class StorageController implements IExtensionController, IStorageClient {
     @Override
     public ReviewSet getAllReviews() {
         try {
-            ReviewSet result = registeredClients.get(activeClient).getAllReviews();
+            ReviewSet result = activeClient.getAllReviews();
             Assert.isNotNull(result);
             return result;
         } catch (Throwable ex) {
@@ -192,7 +140,7 @@ public class StorageController implements IExtensionController, IStorageClient {
     @Override
     public void addReview(Review review) {
         try {
-            registeredClients.get(activeClient).addReview(review);
+            activeClient.addReview(review);
         } catch (Throwable ex) {
             ExceptionHandler.logAndNotifyUser("An unknown exception occured in StorageClient '" + activeClient + "' while adding review '"
                     + review.getId() + "'", ex);
@@ -207,7 +155,7 @@ public class StorageController implements IExtensionController, IStorageClient {
     @Override
     public String getNewId(Review review) {
         try {
-            String result = registeredClients.get(activeClient).getNewId(review);
+            String result = activeClient.getNewId(review);
             Assert.isNotNull(result);
             return result;
         } catch (Throwable ex) {
@@ -225,7 +173,7 @@ public class StorageController implements IExtensionController, IStorageClient {
     @Override
     public String getNewId(Comment comment) {
         try {
-            String result = registeredClients.get(activeClient).getNewId(comment);
+            String result = activeClient.getNewId(comment);
             Assert.isNotNull(result);
             return result;
         } catch (Throwable ex) {
@@ -242,7 +190,7 @@ public class StorageController implements IExtensionController, IStorageClient {
     @Override
     public String getNewId(Reply reply) {
         try {
-            String result = registeredClients.get(activeClient).getNewId(reply);
+            String result = activeClient.getNewId(reply);
             Assert.isNotNull(result);
             return result;
         } catch (Throwable ex) {
@@ -251,4 +199,5 @@ public class StorageController implements IExtensionController, IStorageClient {
         }
         return null;
     }
+    
 }

@@ -7,8 +7,6 @@
  */
 package org.agilereview.test.common.storage.external;
 
-import java.util.List;
-
 import org.agilereview.core.external.definition.IStorageClient;
 import org.agilereview.core.external.storage.Comment;
 import org.agilereview.core.external.storage.Reply;
@@ -55,7 +53,7 @@ public class StorageClientMock implements IStorageClient {
      * @param reviews a list of {@link Review}s
      * @author Malte Brunnlieb (27.05.2012)
      */
-    public void setStorageContent(List<Review> reviews) {
+    public void setStorageContent(ReviewSet reviews) {
         this.reviews.clear();
         this.reviews.addAll(reviews);
     }

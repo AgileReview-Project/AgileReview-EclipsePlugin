@@ -5,10 +5,11 @@
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  * Contributors: Malte Brunnlieb, Philipp Diebold, Peter Reuter, Thilo Rauch
  */
-package org.agilereview.core.controller;
+package org.agilereview.core.controller.extension;
 
 import java.util.HashMap;
 
+import org.agilereview.core.controller.IExtensionController;
 import org.agilereview.core.external.definition.IReviewDataReceiver;
 import org.agilereview.core.external.definition.IStorageClient;
 

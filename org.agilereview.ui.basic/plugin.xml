@@ -4,10 +4,12 @@
    <extension
          point="org.agilereview.core.ReviewDataReceiver">
       <ReviewDataReceiver
-            class="org.agilereview.ui.basic.commentSummary.table.ContentProvider">
+            class="org.agilereview.ui.basic.commentSummary.table.ContentProvider"
+            name="org.agilereview.ui.basic.commentSummary.table.ContentProvider">
       </ReviewDataReceiver>
       <ReviewDataReceiver
-            class="org.agilereview.ui.basic.reviewExplorer.REDataReceiver">
+            class="org.agilereview.ui.basic.reviewExplorer.REDataReceiver"
+            name="org.agilereview.ui.basic.reviewExplorer.REDataReceiver">
       </ReviewDataReceiver>
    </extension>
    <extension
