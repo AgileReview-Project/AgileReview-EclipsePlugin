@@ -5,13 +5,11 @@
          point="org.agilereview.core.ReviewDataReceiver">
       <ReviewDataReceiver
             class="org.agilereview.ui.basic.commentSummary.table.ContentProvider"
-            id="org.agilereview.ui.basic.commentSummary"
-            name="org.agilereview.ui.basic.commentSummary.table.ContentProvider">
+            id="org.agilereview.ui.basic.commentSummary.table.ContentProvider">
       </ReviewDataReceiver>
       <ReviewDataReceiver
             class="org.agilereview.ui.basic.reviewExplorer.REDataReceiver"
-            id="org.agilereview.ui.basic.reviewExplorer"
-            name="org.agilereview.ui.basic.reviewExplorer.REDataReceiver">
+            id="org.agilereview.ui.basic.reviewExplorer.REDataReceiver">
       </ReviewDataReceiver>
    </extension>
    <extension
