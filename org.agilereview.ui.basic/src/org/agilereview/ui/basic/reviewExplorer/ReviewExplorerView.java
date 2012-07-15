@@ -24,17 +24,17 @@ import org.eclipse.ui.PlatformUI;
  * @author Thilo Rauch (28.03.2012)
  */
 public class ReviewExplorerView extends AbstractReviewDataView {
-
+    
     /**
      * The tree for showing the reviews
      */
     private TreeViewer treeViewer;
-
+    
     /**
      * Current Instance used by the ViewPart. Part of the ReviewDataView pattern.
      */
     private static ReviewExplorerView instance;
-
+    
     /**
      * Constructor used to capture the instance created by eclipse. Part of the ReviewDataView pattern.
      * @author Thilo Rauch (13.07.2012)
@@ -43,7 +43,7 @@ public class ReviewExplorerView extends AbstractReviewDataView {
         super();
         instance = this;
     }
-
+    
     /**
      * GetInstance() method to provide access to the instance created by Eclipse. Part of the ReviewDataView pattern.
      * @return instance of this class created by eclipse
@@ -52,11 +52,11 @@ public class ReviewExplorerView extends AbstractReviewDataView {
     public static ReviewExplorerView getInstance() {
         return instance;
     }
-
+    
     @Override
     public void setFocus() {
     }
-
+    
     /* (non-Javadoc)
      * @see org.agilereview.ui.basic.external.reviewDataReceiver.AbstractReviewDataView#buildUI(org.eclipse.swt.widgets.Composite)
      * @author Thilo Rauch (07.07.2012)
@@ -73,11 +73,14 @@ public class ReviewExplorerView extends AbstractReviewDataView {
         if (initialInput != null) {
             treeViewer.setInput(initialInput);
         }
-
+        
+        // Prepare for SWTBot test
+        treeViewer.getTree().setData("org.eclipse.swtbot.widget.key", "reTree");
+        
         treeViewer.addDoubleClickListener(new REDoubleClickListener());
         // TODO: Still supported? 
         PlatformUI.getWorkbench().getHelpSystem().setHelp(parent, Activator.PLUGIN_ID + ".ReviewExplorer");
-
+        
         // Create a popup menu
         MenuManager menuManager = new MenuManager();
         Menu menu = menuManager.createContextMenu(treeViewer.getControl());
@@ -86,7 +89,7 @@ public class ReviewExplorerView extends AbstractReviewDataView {
         getSite().registerContextMenu(menuManager, treeViewer);
         getSite().setSelectionProvider(treeViewer);
     }
-
+    
     /* (non-Javadoc)
      * @see org.agilereview.ui.basic.external.reviewDataReceiver.AbstractReviewDataView#getReviewDataReceiverClass()
      * @author Thilo Rauch (07.07.2012)
@@ -96,7 +99,7 @@ public class ReviewExplorerView extends AbstractReviewDataView {
         // TODO Auto-generated method stub
         return REDataReceiver.class;
     }
-
+    
     /**
      * Sets the input of the ReviewExplorer completely new
      * @author Thilo Rauch (06.05.2012)
@@ -108,23 +111,23 @@ public class ReviewExplorerView extends AbstractReviewDataView {
             // Save expansion state
             treeViewer.getControl().setRedraw(false);
             TreePath[] expandedElements = treeViewer.getExpandedTreePaths();
-
+            
             // Refresh the input
             treeViewer.setInput(input);
             // treeViewer.refresh();
-
+            
             // Expand nodes again
             for (Object o : expandedElements) {
                 treeViewer.expandToLevel(o, 1);
             }
             treeViewer.getControl().setRedraw(true);
             treeViewer.getControl().redraw();
-
+            
             //Reset selection
             treeViewer.setSelection(selection, true);
         }
     }
-
+    
     /**
      * Expands all sub nodes of the passed node
      * @param selection node which should be expanded
@@ -132,7 +135,7 @@ public class ReviewExplorerView extends AbstractReviewDataView {
     public void expandAllSubNodes(Object selection) {
         treeViewer.expandToLevel(selection, TreeViewer.ALL_LEVELS);
     }
-
+    
     /**
      * Collapses all sub nodes of the passed node
      * @param selection node which should be expanded
@@ -140,7 +143,7 @@ public class ReviewExplorerView extends AbstractReviewDataView {
     public void collapseAllSubNodes(Object selection) {
         treeViewer.collapseToLevel(selection, TreeViewer.ALL_LEVELS);
     }
-
+    
     // TODO: Überlegen wofür das war...
     //	/**
     //	 * Validates the ReviewExplorer selection in order to update the CONTAINS_CLOSED_REVIEW variable of the {@link SourceProvider}
@@ -182,5 +185,5 @@ public class ReviewExplorerView extends AbstractReviewDataView {
     //			sp2.setVariable(SourceProvider.IS_ACTIVE_REVIEW, firstReviewIsActive);
     //		}
     //	}
-
+    
 }

@@ -79,6 +79,15 @@ public class StorageClientMock implements IStorageClient {
     }
     
     /**
+     * Additioanl method for testing
+     * @param review
+     * @author Thilo Rauch (15.07.2012)
+     */
+    public void removeReview(Review review) {
+        reviews.remove(review);
+    }
+    
+    /**
      * Dummy implementation, returns always "newId"
      * @see org.agilereview.core.external.definition.IStorageClient#getNewId(org.agilereview.core.external.storage.Review)
      * @author Malte Brunnlieb (27.05.2012)

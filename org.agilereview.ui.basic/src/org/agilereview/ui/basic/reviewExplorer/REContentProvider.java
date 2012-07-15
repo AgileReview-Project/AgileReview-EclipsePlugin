@@ -25,61 +25,47 @@ import org.eclipse.swt.widgets.Display;
  * @author Thilo Rauch (28.03.2012)
  */
 public class REContentProvider implements ITreePathContentProvider, PropertyChangeListener {
-
-    //	/**
-    //	 * ID of the AgileReview resource marker
-    //	 */
-    //	public static String AGILE_REVIEW_MARKER_ID = "org.agilereview.ui.basic.commented";
-
+    
     /**
      * Reviews received from the core
      */
     private ReviewSet reviews;
+    
     /**
-     * All comments
+     * The tree viewer of the RevieExlorer
      */
-    private LinkedList<Comment> comments = new LinkedList<Comment>();
-
     private Viewer viewer;
-
-    /**
-     * Creates a new {@link REContentProvider} instance and binds it to the {@link ReviewExplorerView} if possible
-     * @author Malte Brunnlieb (28.05.2012)
-     */
-    public REContentProvider() {
-    }
-
+    
     @Override
     public void dispose() {
     }
-
+    
     @Override
     public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
         // Capture viewer
         this.viewer = viewer;
-
+        
         // XXX Check if this is called on disposal
-
+        
         // Deregister listener
         if (oldInput instanceof ReviewSet) {
             ((ReviewSet) oldInput).removePropertyChangeListener(this);
         }
-
+        
         if (newInput instanceof ReviewSet) {
             // XXX remove or log
             System.out.println("RE input changed from '" + oldInput + "' to '" + newInput + "'");
             reviews = (ReviewSet) newInput;
             // Add PropertyChangeListener
             reviews.addPropertyChangeListener(this);
-
+            
             // Now refresh the data and the viewer
-            refreshCommentList();
             if (viewer != null) {
                 viewer.refresh();
             }
         }
     }
-
+    
     @Override
     public Object[] getElements(Object inputElement) {
         Object[] result = new Object[0];
@@ -89,7 +75,7 @@ public class REContentProvider implements ITreePathContentProvider, PropertyChan
         }
         return result;
     }
-
+    
     @Override
     public Object[] getChildren(TreePath parentPath) {
         Object[] result = new Object[0];
@@ -108,29 +94,7 @@ public class REContentProvider implements ITreePathContentProvider, PropertyChan
         }
         return result;
     }
-
-    //	/**
-    //	 * Only return the resources from the input which itself or one of its descendants is marked with a AgileReview marker
-    //	 * @param input input collection
-    //	 * @return filtered input
-    //	 * @author Thilo Rauch (28.03.2012)
-    //	 */
-    //	private Object[] filterMarkedResource(IResource[] input) {
-    //		List<IResource> result = new LinkedList<IResource>();
-    //		for (IResource r : input) {
-    //			IMarker[] markersOnResource;
-    //			try {
-    //				markersOnResource = r.findMarkers(AGILE_REVIEW_MARKER_ID, false, IResource.DEPTH_INFINITE);
-    //				if (markersOnResource.length>0) {
-    //					result.add(r);
-    //				}
-    //			} catch (CoreException e) {
-    //				// Resource does not exist or is in an closed project --> do not add
-    //			}
-    //		}
-    //		return result.toArray();
-    //	}
-
+    
     @Override
     public TreePath[] getParents(Object element) {
         TreePath[] result = { TreePath.EMPTY };
@@ -157,7 +121,7 @@ public class REContentProvider implements ITreePathContentProvider, PropertyChan
         }
         return result;
     }
-
+    
     @Override
     public boolean hasChildren(TreePath path) {
         boolean result = false;
@@ -168,7 +132,7 @@ public class REContentProvider implements ITreePathContentProvider, PropertyChan
         }
         return result;
     }
-
+    
     /* (non-Javadoc)
      * @see java.beans.PropertyChangeListener#propertyChange(java.beans.PropertyChangeEvent)
      * @author Thilo Rauch (14.07.2012)
@@ -178,7 +142,7 @@ public class REContentProvider implements ITreePathContentProvider, PropertyChan
         if ((evt.getSource() instanceof Review && evt.getPropertyName().equals("comments"))
                 || (evt.getSource() instanceof ReviewSet && evt.getPropertyName().equals("reviews"))) {
             // Refresh the data and the viewer
-            refreshCommentList();
+            //            refreshCommentList();
             Display.getDefault().syncExec(new Runnable() {
                 @Override
                 public void run() {
@@ -187,7 +151,7 @@ public class REContentProvider implements ITreePathContentProvider, PropertyChan
             });
         }
     }
-
+    
     /**
      * Filters from the given input only elements which themselves or one of their descendants has a comment from the given review
      * @param input possible set of resources
@@ -207,13 +171,4 @@ public class REContentProvider implements ITreePathContentProvider, PropertyChan
         }
         return result.toArray();
     }
-
-    private void refreshCommentList() {
-        // Extract comments
-        comments.clear();
-        for (Review r : reviews) {
-            comments.addAll(r.getComments());
-        }
-    }
-
 }
