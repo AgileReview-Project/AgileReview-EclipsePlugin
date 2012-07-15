@@ -72,7 +72,7 @@ public abstract class AbstractController<T> implements IExtensionController {
             }
             
             for (IConfigurationElement e : config) {
-                registeredClients.put(e.getAttribute("name"), null);
+                registeredClients.put(e.getAttribute("id"), null);
             }
             
             initialized = true;
@@ -92,7 +92,7 @@ public abstract class AbstractController<T> implements IExtensionController {
     private T loadExtension(String name) throws CoreException {
         IConfigurationElement[] config = Platform.getExtensionRegistry().getConfigurationElementsFor(extensionID);
         for (IConfigurationElement e : config) {
-            if (e.getAttribute("name").equals(name)) {
+            if (e.getAttribute("id").equals(name)) {
                 Object o = e.createExecutableExtension("class");
                 return (T) o;
             }
