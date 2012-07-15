@@ -101,7 +101,9 @@ public class StorageController extends AbstractController<IStorageClient> implem
         if (activeClient != null && activeClient.equals(name)) return;
         
         Set<String> extensions = getAvailableExtensions();
-        if (!extensions.contains(name)) { throw new ExtensionCreationException("The StorageClient with id " + name + " could not be found!"); }
+        if (!extensions.contains(name)) {
+            throw new ExtensionCreationException("The StorageClient with id " + name + " could not be found!");
+        }
         
         try {
             activeClient = getExtension(name);
@@ -110,7 +112,7 @@ public class StorageController extends AbstractController<IStorageClient> implem
             throw new ExtensionCreationException("The StorageClient with id " + name + " could not be intantiated!");
         }
         
-        RDRController c = (RDRController) ExtensionControllerFactory.createExtensionController(ExtensionPoint.ReviewDataReceiver);
+        RDRController c = (RDRController) ExtensionControllerFactory.getExtensionController(ExtensionPoint.ReviewDataReceiver);
         c.notifyAllClients(getAllReviews());
     }
     

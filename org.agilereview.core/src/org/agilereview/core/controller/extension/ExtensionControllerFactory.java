@@ -10,6 +10,7 @@ package org.agilereview.core.controller.extension;
 import java.util.HashMap;
 
 import org.agilereview.core.controller.IExtensionController;
+import org.agilereview.core.external.definition.IEditorParser;
 import org.agilereview.core.external.definition.IReviewDataReceiver;
 import org.agilereview.core.external.definition.IStorageClient;
 
@@ -25,18 +26,22 @@ public class ExtensionControllerFactory {
     private static HashMap<ExtensionPoint, IExtensionController> extensionControllerMap = new HashMap<ExtensionPoint, IExtensionController>();
     
     /**
-     * Extension point
+     * Available extension points
      * @author Malte Brunnlieb (11.07.2012)
      */
     public enum ExtensionPoint {
         /**
-         * {@link IReviewDataReceiver} extension point
+         * extension point for {@link IReviewDataReceiver}
          */
         ReviewDataReceiver,
         /**
-         * {@link IStorageClient} extension point
+         * extension point for {@link IStorageClient}
          */
-        StorageClient
+        StorageClient,
+        /**
+         * extension point for {@link IEditorParser}
+         */
+        EditorParser
     }
     
     /**
@@ -45,12 +50,14 @@ public class ExtensionControllerFactory {
      * @return unique instance of the related {@link IExtensionController}
      * @author Malte Brunnlieb (11.07.2012)
      */
-    public static IExtensionController createExtensionController(ExtensionPoint ex) {
+    public static IExtensionController getExtensionController(ExtensionPoint ex) {
         switch (ex) {
         case StorageClient:
-            return createAndReturn(ExtensionPoint.StorageClient, StorageController.class);
+            return getController(ExtensionPoint.StorageClient, StorageController.class);
         case ReviewDataReceiver:
-            return createAndReturn(ExtensionPoint.ReviewDataReceiver, RDRController.class);
+            return getController(ExtensionPoint.ReviewDataReceiver, RDRController.class);
+        case EditorParser:
+            return getController(ExtensionPoint.EditorParser, EditorParserController.class);
         default:
             return null;
         }
@@ -64,7 +71,7 @@ public class ExtensionControllerFactory {
      * @return the instance of the related {@link IExtensionController}
      * @author Malte Brunnlieb (11.07.2012)
      */
-    private static IExtensionController createAndReturn(ExtensionPoint ex, Class<?> clazz) {
+    private static IExtensionController getController(ExtensionPoint ex, Class<?> clazz) {
         Object o;
         try {
             o = clazz.newInstance();

@@ -83,16 +83,16 @@ public abstract class AbstractController<T> implements IExtensionController {
     
     /**
      * Loads the extension class identified by its extension name
-     * @param name the name of the extension which should be loaded
+     * @param id the name of the extension which should be loaded
      * @return the {@link IStorageClient} instance loaded from the extension or null if the extension could not be instantiated
      * @author Malte Brunnlieb (31.05.2012)
      * @throws CoreException
      */
     @SuppressWarnings("unchecked")
-    private T loadExtension(String name) throws CoreException {
+    private T loadExtension(String id) throws CoreException {
         IConfigurationElement[] config = Platform.getExtensionRegistry().getConfigurationElementsFor(extensionID);
         for (IConfigurationElement e : config) {
-            if (e.getAttribute("id").equals(name)) {
+            if (e.getAttribute("id").equals(id)) {
                 Object o = e.createExecutableExtension("class");
                 return (T) o;
             }
@@ -103,16 +103,16 @@ public abstract class AbstractController<T> implements IExtensionController {
     
     /**
      * Returns the extension for the given name. If there is currently no instance of this extension, the extension is loaded.
-     * @param name unique name for the extension to retrieve
+     * @param id unique name for the extension to retrieve
      * @return the extension for the given name
      * @throws CoreException
      * @author Malte Brunnlieb (12.07.2012)
      */
-    protected T getExtension(String name) throws CoreException {
-        if (registeredClients.get(name) == null) {
-            registeredClients.put(name, loadExtension(name));
+    protected T getExtension(String id) throws CoreException {
+        if (registeredClients.get(id) == null) {
+            registeredClients.put(id, loadExtension(id));
         }
-        return registeredClients.get(name);
+        return registeredClients.get(id);
     }
     
     /**

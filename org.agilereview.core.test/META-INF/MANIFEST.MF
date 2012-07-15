@@ -1,6 +1,8 @@
 Manifest-Version: 1.0
-Require-Bundle: org.junit4;bundle-version="4.5.0",org.agilereview.test
- .common
+Require-Bundle: org.junit4;bundle-version="4.5.0",
+ org.agilereview.test.common,
+ org.eclipse.ui.editors;bundle-version="3.7.0",
+ org.agilereview.test.mock.editorParser;bundle-version="1.0.0"
 Fragment-Host: org.agilereview.core;bundle-version="0.9.0"
 Bundle-Version: 1.0.0.qualifier
 Bundle-Name: org.agilereview.core.test

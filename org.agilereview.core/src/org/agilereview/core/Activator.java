@@ -71,7 +71,7 @@ public class Activator extends AbstractUIPlugin {
      */
     private void registerListeners() {
         new RegistryListener(RDRController.IREVIEWDATARECEIVER_ID, ExtensionControllerFactory
-                .createExtensionController(ExtensionPoint.ReviewDataReceiver));
-        new RegistryListener(StorageController.ISTORAGECLIENT_ID, ExtensionControllerFactory.createExtensionController(ExtensionPoint.StorageClient));
+                .getExtensionController(ExtensionPoint.ReviewDataReceiver));
+        new RegistryListener(StorageController.ISTORAGECLIENT_ID, ExtensionControllerFactory.getExtensionController(ExtensionPoint.StorageClient));
     }
 }
