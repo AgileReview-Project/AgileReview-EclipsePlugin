@@ -21,7 +21,7 @@ import org.agilereview.core.external.definition.IReviewDataReceiver;
  * @author Malte Brunnlieb (03.06.2012)
  */
 public class ReviewSet extends HashSet<Review> implements PropertyChangeListener {
-    
+
     /**
      * Generated serial version UID
      */
@@ -30,7 +30,7 @@ public class ReviewSet extends HashSet<Review> implements PropertyChangeListener
      * {@link PropertyChangeSupport} of this POJO, used for firing {@link PropertyChangeEvent}s on changes of fields.
      */
     private final PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(this);
-    
+
     /**
      * {@inheritDoc} <br> Added {@link PropertyChangeSupport} for tracking changes by {@link IReviewDataReceiver}
      * @see java.util.ArrayList#add(java.lang.Object)
@@ -38,15 +38,15 @@ public class ReviewSet extends HashSet<Review> implements PropertyChangeListener
      */
     @Override
     public boolean add(Review e) {
-		HashSet<Review> oldValue = new HashSet<Review>(this);
-		boolean changed = super.add(e);
+        HashSet<Review> oldValue = new HashSet<Review>(this);
+        boolean changed = super.add(e);
         if (changed) {
             e.addPropertyChangeListener(this);
             propertyChangeSupport.firePropertyChange("reviews", oldValue, this);
         }
-    	return changed;   	
+        return changed;
     }
-    
+
     /**
      * {@inheritDoc} <br> Added {@link PropertyChangeSupport} for tracking changes by {@link IReviewDataReceiver}
      * @see java.util.ArrayList#addAll(java.util.Collection)
@@ -60,11 +60,11 @@ public class ReviewSet extends HashSet<Review> implements PropertyChangeListener
             for (Review r : c) {
                 r.addPropertyChangeListener(this);
             }
-            propertyChangeSupport.firePropertyChange("ReviewList", oldValue, this);
+            propertyChangeSupport.firePropertyChange("reviews", oldValue, this);
         }
-    	return changed;
+        return changed;
     }
-    
+
     /**
      * {@inheritDoc} <br> Added {@link PropertyChangeSupport} for tracking changes by {@link IReviewDataReceiver}
      * @see java.util.ArrayList#remove(java.lang.Object)
@@ -80,7 +80,7 @@ public class ReviewSet extends HashSet<Review> implements PropertyChangeListener
         }
         return success;
     }
-    
+
     /**
      * {@inheritDoc} <br> Added {@link PropertyChangeSupport} for tracking changes by {@link IReviewDataReceiver}
      * @see java.util.AbstractCollection#removeAll(java.util.Collection)
@@ -88,7 +88,7 @@ public class ReviewSet extends HashSet<Review> implements PropertyChangeListener
      */
     @Override
     public boolean removeAll(Collection<?> c) {
-    	HashSet<Review> oldValue = new HashSet<Review>(this);
+        HashSet<Review> oldValue = new HashSet<Review>(this);
         boolean success = super.removeAll(c);
         if (success) {
             for (Object r : c) {
@@ -98,7 +98,7 @@ public class ReviewSet extends HashSet<Review> implements PropertyChangeListener
         }
         return success;
     }
-    
+
     /**
      * {@inheritDoc} <br> Added {@link PropertyChangeSupport} for tracking changes by {@link IReviewDataReceiver}
      * @see java.util.AbstractCollection#retainAll(java.util.Collection)
@@ -106,7 +106,7 @@ public class ReviewSet extends HashSet<Review> implements PropertyChangeListener
      */
     @Override
     public boolean retainAll(Collection<?> c) {
-    	HashSet<Review> oldValue = new HashSet<Review>(this);
+        HashSet<Review> oldValue = new HashSet<Review>(this);
         boolean success = super.retainAll(c);
         if (success) {
             ArrayList<Review> removedOnes = new ArrayList<Review>(oldValue);
@@ -118,7 +118,7 @@ public class ReviewSet extends HashSet<Review> implements PropertyChangeListener
         }
         return success;
     }
-    
+
     /**
      * {@inheritDoc} <br> Added {@link PropertyChangeSupport} for tracking changes by {@link IReviewDataReceiver}
      * @see java.util.ArrayList#clear()
@@ -126,14 +126,14 @@ public class ReviewSet extends HashSet<Review> implements PropertyChangeListener
      */
     @Override
     public void clear() {
-    	HashSet<Review> oldValue = new HashSet<Review>(this);
+        HashSet<Review> oldValue = new HashSet<Review>(this);
         super.clear();
         for (Review r : oldValue) {
             r.removePropertyChangeListener(this);
         }
         propertyChangeSupport.firePropertyChange("reviews", oldValue, this);
     }
-    
+
     /**
      * Adds a {@link PropertyChangeListener} to the list of listeners that are notified on {@link PropertyChangeEvent}s
      * @param listener
@@ -142,7 +142,7 @@ public class ReviewSet extends HashSet<Review> implements PropertyChangeListener
     public void addPropertyChangeListener(PropertyChangeListener listener) {
         propertyChangeSupport.addPropertyChangeListener(listener);
     }
-    
+
     /**
      * Removes a {@link PropertyChangeListener} from the list of listeners that are notified on {@link PropertyChangeEvent}s
      * @param listener
@@ -151,7 +151,7 @@ public class ReviewSet extends HashSet<Review> implements PropertyChangeListener
     public void removePropertyChangeListener(PropertyChangeListener listener) {
         propertyChangeSupport.removePropertyChangeListener(listener);
     }
-    
+
     /*
      * (non-Javadoc)
      * @see java.beans.PropertyChangeListener#propertyChange(java.beans.PropertyChangeEvent)

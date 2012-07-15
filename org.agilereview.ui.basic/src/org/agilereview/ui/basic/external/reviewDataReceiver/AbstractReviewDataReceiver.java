@@ -154,11 +154,4 @@ public abstract class AbstractReviewDataReceiver implements IReviewDataReceiver 
             receiver.view.setInput(null);
         }
     }
-
-    // XXX wofür?
-    public void disconnect() {
-        if (view != null) {
-            view.setInput(null);
-        }
-    }
 }
