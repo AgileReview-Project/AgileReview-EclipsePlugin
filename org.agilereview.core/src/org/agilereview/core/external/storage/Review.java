@@ -18,6 +18,7 @@ import java.util.List;
 import org.agilereview.core.Activator;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.preferences.InstanceScope;
+import org.osgi.service.prefs.BackingStoreException;
 
 /**
  * A class that stores review data and a list of comments belonging to the review.
@@ -27,7 +28,7 @@ import org.eclipse.core.runtime.preferences.InstanceScope;
  * 
  * @author Peter Reuter (28.04.2012)
  */
-public class Review implements PropertyChangeListener {
+public final class Review implements PropertyChangeListener {
     
     /**
      * The unique name of the review entered by the user
@@ -68,6 +69,7 @@ public class Review implements PropertyChangeListener {
      */
     public Review(String id) {
         this.id = id;
+        setOpenReviewsPreference();
     }
     
     /**
@@ -201,6 +203,9 @@ public class Review implements PropertyChangeListener {
      */
     public void clearComments() {
     	ArrayList<Comment> oldValue = new ArrayList<Comment>(this.comments);
+    	for (Comment c: this.comments) {
+    		c.clearReplies();
+    	}
     	this.comments.clear();
     	propertyChangeSupport.firePropertyChange("comments", oldValue, this.comments);
     }
@@ -274,7 +279,7 @@ public class Review implements PropertyChangeListener {
 	 * separated list of open reviews depending on its "open/closed" state.
 	 * @author Peter Reuter (26.06.2012)
 	 */
-	private void setOpenReviewsPreference() {
+	void setOpenReviewsPreference() {
 		List<String> reviewIds = Arrays.asList(Platform.getPreferencesService().getString(Activator.PLUGIN_ID, "open_reviews", "", null).split(","));
 		if (this.isOpen) {
 			if (!reviewIds.contains(this.id)) {
@@ -291,6 +296,11 @@ public class Review implements PropertyChangeListener {
 		  reviewIdsPref += (",");
 		}
 		InstanceScope.INSTANCE.getNode(Activator.PLUGIN_ID).put("open_reviews", reviewIdsPref);
+		try {
+			InstanceScope.INSTANCE.getNode(Activator.PLUGIN_ID).flush();
+		} catch (BackingStoreException e) {
+			// TODO what to do here?
+		}
 	}
     
 }

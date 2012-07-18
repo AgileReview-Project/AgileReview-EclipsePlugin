@@ -69,16 +69,6 @@ public class StorageClientMock implements IStorageClient {
     }
     
     /**
-     * {@inheritDoc}
-     * @see org.agilereview.core.external.definition.IStorageClient#addReview(org.agilereview.core.external.storage.Review)
-     * @author Malte Brunnlieb (27.05.2012)
-     */
-    @Override
-    public void addReview(Review review) {
-        reviews.add(review);
-    }
-    
-    /**
      * Additioanl method for testing
      * @param review
      * @author Thilo Rauch (15.07.2012)

@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.List;
 
+import org.agilereview.core.external.preferences.AgileReviewPreferences;
 import org.agilereview.core.external.storage.Comment;
 import org.agilereview.core.external.storage.Reply;
 import org.agilereview.core.external.storage.Review;
@@ -20,11 +21,6 @@ import org.eclipse.core.runtime.Platform;
 public class XmlBeansConversion {
 	
 	/**
-	 * Name of the property which stores the names of the open reviews as a comma separated list.
-	 */ //TODO move to special core class
-	private static final String OPENREVIEWS_PROPERTYNAME = "open_reviews";
-	
-	/**
 	 * Creates a {@link Review} object from the given XmlBeans {@link org.agilereview.xmlSchema.review.ReviewDocument.Review} object.
 	 * @param xmlBeansReview The {@link org.agilereview.xmlSchema.review.ReviewDocument.Review} object to convert.
 	 * @return The {@link Review} object constructed from the {@link Review} object.
@@ -36,7 +32,7 @@ public class XmlBeansConversion {
 		String reference = xmlBeansReview.getReferenceId();
 		String responsibility = xmlBeansReview.getResponsibility();
 		String description = xmlBeansReview.getDescription();
-		List<String> reviewIds = Arrays.asList(Platform.getPreferencesService().getString("org.agilereview.core", OPENREVIEWS_PROPERTYNAME, "", null).split(","));
+		List<String> reviewIds = Arrays.asList(Platform.getPreferencesService().getString("org.agilereview.core", AgileReviewPreferences.OPEN_REVIEWS, "", null).split(","));
 		boolean isOpen = reviewIds.contains(id);
 		
 		Review review = new Review(id, status, reference, responsibility, description, isOpen);

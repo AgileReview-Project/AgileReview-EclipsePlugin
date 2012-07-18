@@ -7,6 +7,8 @@
  */
 package org.agilereview.core.external.preferences;
 
+import org.agilereview.core.external.storage.Review;
+
 /**
  * The {@link AgileReviewPreferences} holds preferences IDs for external access
  * @author Malte Brunnlieb (28.04.2012)
@@ -25,5 +27,14 @@ public interface AgileReviewPreferences {
      * id of the currently active review
      */
     public static final String ACTIVE_REVIEW_ID = "org.agilereview.active_review_id";
+    /**
+     * Name of the current user 
+     */
+    public static final String AUTHOR = "org.agilereview.author";
+    /**
+     * Comma separated list of open reviews, do not modify by hand, handled by {@link Review#setIsOpen(boolean)}
+     */
+    public static final String OPEN_REVIEWS = "org.agilereview.open_reviews";
+    // TODO add possibility for storing open reviews of multiple storageclients using e.g. JSON syntax
     
 }

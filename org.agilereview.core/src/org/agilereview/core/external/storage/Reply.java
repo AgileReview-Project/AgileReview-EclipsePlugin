@@ -20,7 +20,7 @@ import org.eclipse.core.runtime.Platform;
  * A class that is used to store replies that were added to a comment. 
  * @author Peter Reuter (19.02.2012)
  */
-public class Reply implements PropertyChangeListener {
+public final class Reply implements PropertyChangeListener {
 	
 	/**
 	 * Name of the property which stores the name of the author
@@ -34,7 +34,7 @@ public class Reply implements PropertyChangeListener {
 	/**
 	 * The author of the reply 
 	 */ //TODO maybe seperate author object for sync with color?
-	private String author = Platform.getPreferencesService().getString("org.agilereview.core", "author", System.getProperty("user.name"), null);;
+	private String author = Platform.getPreferencesService().getString("org.agilereview.core", AUTHOR_PROPERTYNAME, System.getProperty("user.name"), null);;
 	/**
 	 * The date when the reply was create initially 
 	 */
@@ -197,6 +197,20 @@ public class Reply implements PropertyChangeListener {
 	public void deleteReply(int index) {
 		deleteReply(this.replies.get(index));
 	}
+	
+	/**
+     * Removes all {@link Reply}s from this {@link Reply}. This method is 
+     * intended to be used when closing reviews or using the cleanup function.
+     * @author Peter Reuter (26.06.2012)
+     */
+    public void clearReplies() {
+    	ArrayList<Reply> oldValue = new ArrayList<Reply>(this.replies);
+    	for (Reply r: this.replies) {
+    		r.clearReplies();
+    	}
+    	this.replies.clear();
+    	propertyChangeSupport.firePropertyChange("replies", oldValue, this.replies);
+    }
 
 	/**
 	 * @return the parent {@link Object} of this {@link Reply}, either a {@link Comment} or another {@link Reply}.

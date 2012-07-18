@@ -28,13 +28,6 @@ public interface IStorageClient {
     public ReviewSet getAllReviews();
     
     /**
-     * This method adds a new {@link Review} object to the list of {@link Review} objects currently loaded.
-     * @param review
-     * @author Peter Reuter (04.04.2012)
-     */
-    public void addReview(Review review);
-    
-    /**
      * @param review the {@link Review} for which a new ID is requested
      * @return A unique identifier for this {@link Review} as it is required by the {@link IStorageClient}.
      * @author Peter Reuter (28.04.2012)

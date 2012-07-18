@@ -20,7 +20,7 @@ import org.agilereview.core.external.definition.IReviewDataReceiver;
  * List of {@link Review}s provides property change support for the list itself and the reviews contained
  * @author Malte Brunnlieb (03.06.2012)
  */
-public class ReviewSet extends HashSet<Review> implements PropertyChangeListener {
+public final class ReviewSet extends HashSet<Review> implements PropertyChangeListener {
 
     /**
      * Generated serial version UID
@@ -75,6 +75,7 @@ public class ReviewSet extends HashSet<Review> implements PropertyChangeListener
         HashSet<Review> oldValue = new HashSet<Review>(this);
         boolean success = super.remove(o);
         if (success) {
+        	((Review) o).setOpenReviewsPreference();
             ((Review) o).removePropertyChangeListener(this);
             propertyChangeSupport.firePropertyChange("reviews", oldValue, this);
         }
@@ -92,7 +93,8 @@ public class ReviewSet extends HashSet<Review> implements PropertyChangeListener
         boolean success = super.removeAll(c);
         if (success) {
             for (Object r : c) {
-                ((Review) r).addPropertyChangeListener(this);
+            	((Review) r).setOpenReviewsPreference();
+                ((Review) r).removePropertyChangeListener(this);
             }
             propertyChangeSupport.firePropertyChange("reviews", oldValue, this);
         }
@@ -112,6 +114,7 @@ public class ReviewSet extends HashSet<Review> implements PropertyChangeListener
             ArrayList<Review> removedOnes = new ArrayList<Review>(oldValue);
             removedOnes.removeAll(c);
             for (Review r : removedOnes) {
+            	r.setOpenReviewsPreference();
                 r.removePropertyChangeListener(this);
             }
             propertyChangeSupport.firePropertyChange("reviews", oldValue, this);
@@ -127,10 +130,12 @@ public class ReviewSet extends HashSet<Review> implements PropertyChangeListener
     @Override
     public void clear() {
         HashSet<Review> oldValue = new HashSet<Review>(this);
-        super.clear();
-        for (Review r : oldValue) {
+        for (Review r : this) {
+        	r.clearComments();
+        	r.setOpenReviewsPreference();
             r.removePropertyChangeListener(this);
         }
+        super.clear();
         propertyChangeSupport.firePropertyChange("reviews", oldValue, this);
     }
 

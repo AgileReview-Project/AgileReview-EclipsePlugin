@@ -62,24 +62,29 @@ public class SourceFolderManager {
 	 */
 	static void setCurrentSourceFolderProject() {
 		IWorkspaceRoot workspaceRoot = ResourcesPlugin.getWorkspace().getRoot();
-		IProject p = workspaceRoot.getProject(Platform.getPreferencesService().getString(Activator.PLUGIN_ID, SourceFolderManager.SOURCEFOLDER_PROPERTYNAME, "", null));
-		if (!p.exists() || !p.isOpen()) {
-			String message = "Selected Source Folder does not exist or is not open.";
-			Activator.getDefault().getLog().log(new Status(IStatus.ERROR, Activator.PLUGIN_ID, message));
-			ExceptionHandler.notifyUser(message);
-			Display.getCurrent().syncExec(new Runnable() {
-				@Override
-				public void run() {
-					NoReviewSourceProjectWizard dialog = new NoReviewSourceProjectWizard();
-					WizardDialog wDialog = new WizardDialog(Display.getCurrent().getActiveShell(), dialog);
-					wDialog.setBlockOnOpen(true);
-					wDialog.open();
-				}
-			});
+		String projectName = Platform.getPreferencesService().getString(Activator.PLUGIN_ID, SourceFolderManager.SOURCEFOLDER_PROPERTYNAME, "", null);
+		if ("".equals(projectName)) {
+			currentSourceFolder = null;
 		} else {
-			setProjectNatures(currentSourceFolder, new String[] { AGILEREVIEW_NATURE });
-			currentSourceFolder = p;
-			setProjectNatures(currentSourceFolder, new String[] { AGILEREVIEW_NATURE, AGILEREVIEW_ACTIVE_NATURE });
+			IProject p = workspaceRoot.getProject(projectName);
+			if (!p.exists() || !p.isOpen()) {
+				String message = "Selected Source Folder does not exist or is not open.";
+				Activator.getDefault().getLog().log(new Status(IStatus.ERROR, Activator.PLUGIN_ID, message));
+				ExceptionHandler.notifyUser(message);
+				Display.getCurrent().syncExec(new Runnable() {
+					@Override
+					public void run() {
+						NoReviewSourceProjectWizard dialog = new NoReviewSourceProjectWizard();
+						WizardDialog wDialog = new WizardDialog(Display.getCurrent().getActiveShell(), dialog);
+						wDialog.setBlockOnOpen(true);
+						wDialog.open();
+					}
+				});
+			} else {
+				setProjectNatures(currentSourceFolder, new String[] { AGILEREVIEW_NATURE });
+				currentSourceFolder = p;
+				setProjectNatures(currentSourceFolder, new String[] { AGILEREVIEW_NATURE, AGILEREVIEW_ACTIVE_NATURE });
+			}
 		}
 	}
 
@@ -140,8 +145,7 @@ public class SourceFolderManager {
 	}
 
 	/**
-	 * Prepares the current source folder if the user wants to close it. Preparation
-	 * includes removing the "active" nature if it was set.
+	 * Prepares the current source folder if the user wants to close it. Preparation includes removing the "active" nature if it was set.
 	 * @author Peter Reuter (24.05.2012)
 	 */
 	public static void prepareCurrentSourceFolderForClosing() {
@@ -215,7 +219,7 @@ public class SourceFolderManager {
 		}
 		return file;
 	}
-	
+
 	/**
 	 * Deletes a {@link Review} folder (and its content).
 	 * @param reviewId the ID of the review that is to be deleted within the file system.
@@ -225,6 +229,21 @@ public class SourceFolderManager {
 		IFolder reviewFolder = getReviewFolder(reviewId);
 		try {
 			reviewFolder.delete(true, null);
+		} catch (CoreException e) {
+			ExceptionHandler.notifyUser(e);
+		}
+	}
+	
+	/**
+	 * Deletes a {@link Comment} file.
+	 * @param reviewId The review ID to which the comment file belongs. 
+	 * @param author The author of the comments contained in this file.
+	 * @author Peter Reuter (18.07.2012)
+	 */
+	static void deleteCommentFile(String reviewId, String author) {
+		IFile commentFile = getCommentFile(reviewId, author);
+		try {
+			commentFile.delete(true, null);
 		} catch (CoreException e) {
 			ExceptionHandler.notifyUser(e);
 		}

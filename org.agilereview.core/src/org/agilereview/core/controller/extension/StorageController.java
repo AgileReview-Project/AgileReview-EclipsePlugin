@@ -135,21 +135,6 @@ public class StorageController extends AbstractController<IStorageClient> implem
     }
     
     /**
-     * This method will be forwarded to {@link IStorageClient#addReview(Review)} of the currently active {@link IStorageClient}
-     * @see org.agilereview.core.external.definition.IStorageClient#addReview(Review)
-     * @author Malte Brunnlieb (28.04.2012)
-     */
-    @Override
-    public void addReview(Review review) {
-        try {
-            activeClient.addReview(review);
-        } catch (Throwable ex) {
-            ExceptionHandler.logAndNotifyUser("An unknown exception occured in StorageClient '" + activeClient + "' while adding review '"
-                    + review.getId() + "'", ex);
-        }
-    }
-    
-    /**
      * This method will be forwarded to {@link IStorageClient#getNewId(Review)} of the currently active {@link IStorageClient}
      * @see org.agilereview.core.external.definition.IStorageClient#getNewId(Review)
      * @author Malte Brunnlieb (28.04.2012)

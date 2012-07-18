@@ -12,6 +12,7 @@ import java.util.Map;
 import java.util.UUID;
 
 import org.agilereview.core.external.definition.IStorageClient;
+import org.agilereview.core.external.preferences.AgileReviewPreferences;
 import org.agilereview.core.external.storage.Comment;
 import org.agilereview.core.external.storage.Reply;
 import org.agilereview.core.external.storage.Review;
@@ -39,25 +40,21 @@ import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChange
  * @author Peter Reuter (04.04.2012)
  */
 public class XmlStorageClient extends Plugin implements IStorageClient, IPreferenceChangeListener, PropertyChangeListener {
-	
+
 	//TODO compatibility to old xml format?
-	
+
 	/**
-	 * ID of this plugin 
+	 * ID of this plugin
 	 */
 	private static final String ID = "org.agilereview.storage.xml.XmlStorageClient";
-	
+
 	/**
 	 * Name of the property which stores the name of the current source folder
 	 */
 	private static final String SOURCEFOLDER_PROPERTYNAME = "source_folder";
-	/**
-	 * Name of the property which stores the names of the open reviews as a comma separated list.
-	 */ // TODO move to special core class
-	private static final String OPENREVIEWS_PROPERTYNAME = "open_reviews";
 
 	/**
-	 * Map of {@link Review} IDs to {@link Review} objects. 
+	 * Map of {@link Review} IDs to {@link Review} objects.
 	 */
 	private Map<String, Review> idReviewMap = new HashMap<String, Review>();
 	/**
@@ -65,25 +62,20 @@ public class XmlStorageClient extends Plugin implements IStorageClient, IPrefere
 	 */
 	private ReviewSet reviewSet = new ReviewSet();
 	/**
-	 * Map of {@link Comment} IDs to {@link Comment} objects. 
+	 * Map of {@link Comment} IDs to {@link Comment} objects.
 	 */
 	private Map<String, Comment> idCommentMap = new HashMap<String, Comment>();
 	/**
-	 * Map of {@link Reply} IDs to {@link Reply} objects. 
+	 * Map of {@link Reply} IDs to {@link Reply} objects.
 	 */
 	private Map<String, Reply> idReplyMap = new HashMap<String, Reply>();
-	
-	/**
-	 * Indicates whether the source folder was reset but not parsed yet. 
-	 */
-	private boolean sourceFolderChangeInProgress = false;
-	
+
 	///////////////////////////////////////////////////////
 	// additional methods needed by the XmlStorageClient //
 	///////////////////////////////////////////////////////
-	
+
 	/**
-	 * Constructor for the XmlStorageClient which initializes the local review data base  
+	 * Constructor for the XmlStorageClient which initializes the local review data base
 	 * @author Peter Reuter (04.04.2012)
 	 */
 	public XmlStorageClient() {
@@ -91,15 +83,27 @@ public class XmlStorageClient extends Plugin implements IStorageClient, IPrefere
 	}
 
 	/**
-	 * Initially loads all {@link Review} objects on startup 
+	 * Initially loads all {@link Review} objects on startup
 	 * @author Peter Reuter (04.04.2012)
 	 */
 	private void initialize() {
-		loadReviews();
-		List<String> reviewIds = Arrays.asList(Platform.getPreferencesService().getString("org.agilereview.core", OPENREVIEWS_PROPERTYNAME, "", null).split(","));
-		loadComments(reviewIds);
+		// disable propertychangelistener
+		reviewSet.removePropertyChangeListener(this);
+
+		// clean up internal data structure (maps etc.)
+		unloadReviews(this.reviewSet);
+		// clear pojos
+		this.reviewSet.clear();
+		// update sourcefolder, load new data
+		if (SourceFolderManager.getCurrentSourceFolder() != null) {
+			loadReviews();
+			List<String> reviewIds = Arrays.asList(Platform.getPreferencesService().getString("org.agilereview.core", AgileReviewPreferences.OPEN_REVIEWS, "", null).split(","));
+			loadComments(reviewIds);
+		}
+		// reenable propertychangelistener
+		reviewSet.addPropertyChangeListener(this);
 	}
-	
+
 	/**
 	 * Generates a unique ID for {@link Review}, {@link Comment} and {@link Reply} objects.
 	 * @return a random and unique ID.
@@ -110,35 +114,6 @@ public class XmlStorageClient extends Plugin implements IStorageClient, IPrefere
 		return UUID.randomUUID().toString();
 	}
 
-	/**
-	 * Returns all {@link Comment} objects belonging to the given {@link Review} and author.
-	 * @param review
-	 * @param author
-	 * @return An {@link ArrayList} of {@link Comment} objects.
-	 * @author Peter Reuter (04.04.2012)
-	 */
-	private ArrayList<Comment> getComments(Review review, String author) {
-		ArrayList<Comment> result = new ArrayList<Comment>();
-		for (Comment comment : review.getComments()) {
-			if (comment.getAuthor().equals(author)) {
-				result.add(comment);				
-			}
-		}
-		return result;
-	}
-	
-	/**
-	 * Adds the {@link List} of {@link Reply} objects recursively to the idReplyMap.
-	 * @param replies
-	 * @author Peter Reuter (04.04.2012)
-	 */
-	private void addReplies(List<Reply> replies) {
-		for (Reply reply : replies) {
-			this.idReplyMap.put(reply.getId(), reply);
-			addReplies(reply.getReplies());
-		}
-	}
-	
 	////////////////////////////////
 	// methods of IStorageClients //
 	////////////////////////////////
@@ -163,30 +138,103 @@ public class XmlStorageClient extends Plugin implements IStorageClient, IPrefere
 		return getNewId();
 	}
 
-	@Override
-	public void addReview(Review review) {
-		this.idReviewMap.put(review.getId(), review);
-		this.reviewSet.add(review);
-		for (Comment comment : review.getComments()) {
+	//////////////////////////////////////////////////////
+	// methods for loading POJO data from xmlbeans data //
+	//////////////////////////////////////////////////////
+
+	/**
+	 * Loads all {@link Comment} objects of the {@link Review} given by its ID.
+	 * @param reviewId The ID of the {@link Review}.
+	 * @author Peter Reuter (04.04.2012)
+	 */
+	private void loadComments(String reviewId) {
+		List<org.agilereview.xmlSchema.author.CommentDocument.Comment> xmlBeansComments = loadAllXmlBeansComment(reviewId);
+		for (org.agilereview.xmlSchema.author.CommentDocument.Comment xmlBeansComment : xmlBeansComments) {
+			Review review = this.idReviewMap.get(xmlBeansComment.getReviewID());
+			Comment comment = XmlBeansConversion.getComment(review, xmlBeansComment);
+			this.idReviewMap.get(reviewId).addComment(comment);
 			this.idCommentMap.put(comment.getId(), comment);
-			addReplies(comment.getReplies());
+			comment.setReplies(XmlBeansConversion.getReplyList(comment, xmlBeansComment.getReplies().getReplyArray()));
+		}
+	}
+
+	/**
+	 * Loads all {@link Review} objects and adds a {@link PropertyChangeListener} to each of them.
+	 * @author Peter Reuter (04.04.2012)
+	 */
+	private void loadReviews() {
+		List<org.agilereview.xmlSchema.review.ReviewDocument.Review> xmlBeansReviews = loadAllXmlBeansReview();
+		for (org.agilereview.xmlSchema.review.ReviewDocument.Review xmlBeansReview : xmlBeansReviews) {
+			Review review = XmlBeansConversion.getReview(xmlBeansReview);
+			this.idReviewMap.put(review.getId(), review);
+		}
+		this.reviewSet.addAll(idReviewMap.values());
+	}
+
+	/**
+	 * Loads all {@link Comment} objects of the {@link Review}s given by their ID.
+	 * @param reviewIds
+	 * @author Peter Reuter (04.04.2012)
+	 */
+	private void loadComments(List<String> reviewIds) {
+		for (String reviewId : reviewIds) {
+			loadComments(reviewId);
 		}
 	}
 	
-	//////////////////////////////////////////
-	// methods for extracting xmlbeans data //
-	//////////////////////////////////////////
+	/////////////////////////////////////
+	// methods for unloading POJO data //
+	/////////////////////////////////////
 
 	/**
-	 * Loads all {@link org.agilereview.xmlSchema.review.ReviewDocument.Review}
-	 *  objects from all files available in the current source folder.
+	 * TODO add javadoc
+	 * @param reviews 
+	 * @author Peter Reuter (18.07.2012)
+	 */
+	private void unloadReviews(HashSet<Review> reviews) {
+		for (Review r: reviews) {
+			unloadComments(r.getComments());
+			this.reviewSet.remove(r);
+			this.idReviewMap.remove(r.getId());	
+		}
+	}
+
+	/**
+	 * TODO add javadoc
+	 * @param comments 
+	 * @author Peter Reuter (18.07.2012)
+	 */
+	private void unloadComments(List<Comment> comments) {
+		for (Comment c : comments) {
+			unloadReplies(c.getReplies());
+			this.idCommentMap.remove(c);
+		}
+	}
+
+	/**
+	 * TODO add javadoc
+	 * @param replies
+	 * @author Peter Reuter (18.07.2012)
+	 */
+	private void unloadReplies(List<Reply> replies) {
+		for (Reply r : replies) {
+			unloadReplies(r.getReplies());
+			this.idReplyMap.remove(r);
+		}
+	}
+
+	/////////////////////////////////////////////////
+	// methods for loading xmlbeans data from disc //
+	/////////////////////////////////////////////////
+
+	/**
+	 * Loads all {@link org.agilereview.xmlSchema.review.ReviewDocument.Review} objects from all files available in the current source folder.
 	 * @return A {@link List} of XmlBeans objects representing the review files.
 	 * @author Peter Reuter (04.04.2012)
 	 */
 	private List<org.agilereview.xmlSchema.review.ReviewDocument.Review> loadAllXmlBeansReview() {
-		List<org.agilereview.xmlSchema.review.ReviewDocument.Review> result = null;
+		List<org.agilereview.xmlSchema.review.ReviewDocument.Review> result = new ArrayList<org.agilereview.xmlSchema.review.ReviewDocument.Review>();
 		try {
-			result = new ArrayList<org.agilereview.xmlSchema.review.ReviewDocument.Review>();
 			IResource[] allFolders = SourceFolderManager.getCurrentSourceFolder().members();
 			LinkedList<IResource> errorFiles = new LinkedList<IResource>();
 			for (IResource currFolder : allFolders) {
@@ -217,26 +265,24 @@ public class XmlStorageClient extends Plugin implements IStorageClient, IPrefere
 
 		return result;
 	}
-	
+
 	/**
-	 * Loads all {@link org.agilereview.xmlSchema.author.CommentDocument.Comment}
-	 *  objects from files available in the current source folder and belonging
-	 *  to the given review. 
+	 * Loads all {@link org.agilereview.xmlSchema.author.CommentDocument.Comment} objects from files available in the current source folder and
+	 * belonging to the given review.
 	 * @param reviewId The ID of the review.
 	 * @return A {@link List} of XmlBeans objects representing the comments belonging to the review given.
 	 * @author Peter Reuter (04.04.2012)
 	 */
 	private List<org.agilereview.xmlSchema.author.CommentDocument.Comment> loadAllXmlBeansComment(String reviewId) {
-		List<org.agilereview.xmlSchema.author.CommentDocument.Comment> result = null;
+		List<org.agilereview.xmlSchema.author.CommentDocument.Comment> result = new ArrayList<org.agilereview.xmlSchema.author.CommentDocument.Comment>();
 		try {
-			result = new ArrayList<org.agilereview.xmlSchema.author.CommentDocument.Comment>();
 			IFolder reviewFolder = SourceFolderManager.getReviewFolder(reviewId);
 			LinkedList<IResource> errorFiles = new LinkedList<IResource>();
 			IResource[] resources = reviewFolder.members();
 			for (IResource commentFile : resources) {
 				if (commentFile instanceof IFile && !commentFile.getName().equals("review.xml")) {
 					try {
-						CommentsDocument doc = CommentsDocument.Factory.parse(((IFile)commentFile).getContents());
+						CommentsDocument doc = CommentsDocument.Factory.parse(((IFile) commentFile).getContents());
 						result.addAll(Arrays.asList(doc.getComments().getCommentArray()));
 					} catch (XmlException e) {
 						errorFiles.add(commentFile);
@@ -244,7 +290,7 @@ public class XmlStorageClient extends Plugin implements IStorageClient, IPrefere
 						errorFiles.add(commentFile);
 					}
 				}
-				
+
 			}
 			if (!errorFiles.isEmpty()) {
 				String message = "AgileReview could not load the following review files:\n\n";
@@ -260,52 +306,11 @@ public class XmlStorageClient extends Plugin implements IStorageClient, IPrefere
 		}
 
 		return result;
-	}	
-	
-	////////////////////////////////////////////////////////////////////
-	// methods for loading/storing reviews and comments from/to files //
-	////////////////////////////////////////////////////////////////////
-
-	/**
-	 * Loads all {@link Comment} objects of the {@link Review} given by its ID.
-	 * @param reviewId The ID of the {@link Review}.
-	 * @author Peter Reuter (04.04.2012)
-	 */
-	private void loadComments(String reviewId) {
-		List<org.agilereview.xmlSchema.author.CommentDocument.Comment> xmlBeansComments = loadAllXmlBeansComment(reviewId);
-		for (org.agilereview.xmlSchema.author.CommentDocument.Comment xmlBeansComment : xmlBeansComments) {
-			Review review = this.idReviewMap.get(xmlBeansComment.getReviewID());
-			Comment comment = XmlBeansConversion.getComment(review, xmlBeansComment);
-			this.idReviewMap.get(reviewId).addComment(comment);
-			this.idCommentMap.put(comment.getId(), comment);
-			comment.setReplies(XmlBeansConversion.getReplyList(comment, xmlBeansComment.getReplies().getReplyArray()));
-		}
 	}
 	
-	/**
-	 * Loads all {@link Comment} objects of the {@link Review}s given by their ID.
-	 * @param reviewIds
-	 * @author Peter Reuter (04.04.2012)
-	 */
-	private void loadComments(List<String> reviewIds) {
-		for (String reviewId : reviewIds) {
-			loadComments(reviewId);
-		}
-	}
-
-	/**
-	 * Loads all {@link Review} objects and adds a {@link PropertyChangeListener} to each of them. 
-	 * @author Peter Reuter (04.04.2012)
-	 */
-	private void loadReviews() {
-		List<org.agilereview.xmlSchema.review.ReviewDocument.Review> xmlBeansReviews = loadAllXmlBeansReview();
-		for (org.agilereview.xmlSchema.review.ReviewDocument.Review xmlBeansReview : xmlBeansReviews) {
-			Review review = XmlBeansConversion.getReview(xmlBeansReview);
-			this.idReviewMap.put(review.getId(), review);
-			this.reviewSet.add(review);
-			review.addPropertyChangeListener(this);
-		}
-	}
+	//////////////////////////////////////////////
+	// methods for storing xmldocuments on disc //
+	//////////////////////////////////////////////
 
 	/**
 	 * @param file the {@link IFile} which will representing the saved {@link XmlTokenSource}
@@ -342,6 +347,78 @@ public class XmlStorageClient extends Plugin implements IStorageClient, IPrefere
 		saveXmlDocument(reviewFile, doc);
 	}
 	
+	///////////////////////////////////////////////
+	// helper methods for PropertyChangeListener //
+	///////////////////////////////////////////////
+
+	/**
+	 * TODO add javadoc
+	 * @param evt
+	 * @author Peter Reuter (18.07.2012)
+	 */
+	private void propertyChangeOfCommentOrReply(java.beans.PropertyChangeEvent evt) {
+		Object source = evt.getSource();
+		while (!(source instanceof Comment)) {
+			source = ((Reply)source).getParent();
+		}
+		store((Comment) source);
+	}
+
+	/**
+	 * TODO add javadoc
+	 * @param evt
+	 * @author Peter Reuter (18.07.2012)
+	 */
+	private void propertyChangeOfReview(java.beans.PropertyChangeEvent evt) {
+		if (evt.getPropertyName().equals("isOpen")) {
+			if ((Boolean) evt.getNewValue()) {
+				loadComments(((Review) evt.getSource()).getId());
+			} else {
+				Review review = ((Review) evt.getSource()); 
+				unloadComments(review.getComments());
+			}
+		} else {
+			store((Review) evt.getSource());
+			//TODO check if comments were added or removed --> handle this!
+		}
+	}
+
+	/**
+	 * TODO add javadoc
+	 * @param evt
+	 * @author Peter Reuter (18.07.2012)
+	 */
+	private void propertyChangeOfReviewSet(java.beans.PropertyChangeEvent evt) {
+		@SuppressWarnings("unchecked")
+		HashSet<Review> oldValue = (HashSet<Review>) evt.getOldValue();
+		@SuppressWarnings("unchecked")
+		HashSet<Review> newValue = (HashSet<Review>) evt.getNewValue();
+		if (newValue.size() >= oldValue.size()) {
+			// reviews added
+			HashSet<Review> diff = new HashSet<Review>(newValue);
+			diff.removeAll(oldValue);
+			for (Review review : diff) {
+				this.idReviewMap.put(review.getId(), review);
+				this.reviewSet.add(review);
+				for (Comment comment : review.getComments()) {
+					this.idCommentMap.put(comment.getId(), comment);
+					addReplies(comment.getReplies());
+				}
+				store(review);
+			}
+		} else {
+			// reviews removed
+			HashSet<Review> diff = new HashSet<Review>(oldValue);
+			diff.removeAll(newValue);
+			for (Review review : diff) {
+				this.idReviewMap.remove(review.getId());
+				this.reviewSet.remove(review);
+				unloadComments(review.getComments());
+				SourceFolderManager.deleteReviewContents(review.getId());
+			}
+		}
+	}
+
 	//////////////////////////////////////
 	// method of PropertyChangeListener //
 	//////////////////////////////////////
@@ -349,60 +426,57 @@ public class XmlStorageClient extends Plugin implements IStorageClient, IPrefere
 	@Override
 	public void propertyChange(java.beans.PropertyChangeEvent evt) {
 		if (evt.getSource() instanceof ReviewSet) {
-			@SuppressWarnings("unchecked")
-			HashSet<Review> oldValue = (HashSet<Review>) evt.getOldValue();
-			@SuppressWarnings("unchecked")
-			HashSet<Review> newValue = (HashSet<Review>) evt.getNewValue();
-			if (newValue.size() >= oldValue.size()) {
-				// reviews added
-				newValue.removeAll(oldValue);
-				for (Review review : newValue) {
-					store(review);
-				}
-			} else if (!this.sourceFolderChangeInProgress)  {
-				// reviews removed
-				oldValue.removeAll(newValue);
-				for (Review review: oldValue) {
-					SourceFolderManager.deleteReviewContents(review.getId());
-				}
-			} else {
-				// source folder changed --> do not delete anything!
-				this.sourceFolderChangeInProgress = false;
-			}
-			
+			propertyChangeOfReviewSet(evt);
 		} else if (evt.getSource() instanceof Review) {
-			if (evt.getPropertyName().equals("isOpen")) {
-				if ((Boolean) evt.getNewValue()) {
-					loadComments(((Review) evt.getSource()).getId());
-				} else {
-					((Review) evt.getSource()).clearComments();
-				}
-			} else {
-				store((Review) evt.getSource());	
-			}
-			
+			propertyChangeOfReview(evt);
 		} else if (evt.getSource() instanceof Comment || evt.getSource() instanceof Reply) {
-			Object source = evt.getSource();
-			while (!(source instanceof Comment)) {
-				source = ((Reply)source).getParent();
-			}
-			store((Comment) source);
+			propertyChangeOfCommentOrReply(evt);
 		}
 	}
-	
+
 	///////////////////////////////////////
 	// method of IPropertyChangeListener //
 	///////////////////////////////////////
-	
+
 	@Override
 	public void preferenceChange(PreferenceChangeEvent event) {
 		if (event.getKey().equals(SOURCEFOLDER_PROPERTYNAME)) {
-			this.sourceFolderChangeInProgress = true;
 			SourceFolderManager.setCurrentSourceFolderProject();
-			this.idReviewMap.clear();
-			this.reviewSet.clear();
 			initialize();
 		}
 	}
 	
+	//////////////////////////
+	// other helper methods //
+	//////////////////////////
+
+	/**
+	 * Returns all {@link Comment} objects belonging to the given {@link Review} and author.
+	 * @param review
+	 * @param author
+	 * @return An {@link ArrayList} of {@link Comment} objects.
+	 * @author Peter Reuter (04.04.2012)
+	 */
+	private ArrayList<Comment> getComments(Review review, String author) {
+		ArrayList<Comment> result = new ArrayList<Comment>();
+		for (Comment comment : review.getComments()) {
+			if (comment.getAuthor().equals(author)) {
+				result.add(comment);
+			}
+		}
+		return result;
+	}
+
+	/**
+	 * Adds the {@link List} of {@link Reply} objects recursively to the idReplyMap.
+	 * @param replies
+	 * @author Peter Reuter (04.04.2012)
+	 */
+	private void addReplies(List<Reply> replies) {
+		for (Reply reply : replies) {
+			this.idReplyMap.put(reply.getId(), reply);
+			addReplies(reply.getReplies());
+		}
+	}
+
 }
