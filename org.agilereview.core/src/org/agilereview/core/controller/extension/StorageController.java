@@ -106,7 +106,7 @@ public class StorageController extends AbstractController<IStorageClient> implem
         }
         
         try {
-            activeClient = getExtension(name);
+            activeClient = getUniqueExtension(name);
         } catch (CoreException e) {
             e.printStackTrace();
             throw new ExtensionCreationException("The StorageClient with id " + name + " could not be intantiated!");

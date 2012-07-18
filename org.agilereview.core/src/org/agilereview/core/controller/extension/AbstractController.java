@@ -108,11 +108,22 @@ public abstract class AbstractController<T> implements IExtensionController {
      * @throws CoreException
      * @author Malte Brunnlieb (12.07.2012)
      */
-    protected T getExtension(String id) throws CoreException {
+    protected T getUniqueExtension(String id) throws CoreException {
         if (registeredClients.get(id) == null) {
             registeredClients.put(id, loadExtension(id));
         }
         return registeredClients.get(id);
+    }
+    
+    /**
+     * Creates a new extension of the given id
+     * @param id for the extension to be created
+     * @return a new instance of the extension refrenced by the id
+     * @throws CoreException if the extension could not be created
+     * @author Malte Brunnlieb (18.07.2012)
+     */
+    protected T createNewExtension(String id) throws CoreException {
+        return loadExtension(id);
     }
     
     /**

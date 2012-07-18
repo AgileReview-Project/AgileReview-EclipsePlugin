@@ -22,14 +22,14 @@ import org.junit.Test;
 public class EditorParserControllerTest {
     
     /**
-     * Test for Method {@link EditorParserController#getParser(Class)}
+     * Test for Method {@link EditorParserController#createParser(Class)}
      * @author Malte Brunnlieb (15.07.2012)
      */
     @Test
     public void getParserTest() {
         EditorParserController controller = (EditorParserController) ExtensionControllerFactory.getExtensionController(ExtensionPoint.EditorParser);
         EditorParserMock.waitUnitCreation();
-        Assert.assertNotNull(controller.getParser(TextEditor.class));
-        Assert.assertNull(controller.getParser(getClass()));
+        Assert.assertNotNull(controller.createParser(TextEditor.class));
+        Assert.assertNull(controller.createParser(getClass()));
     }
 }

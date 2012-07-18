@@ -56,7 +56,7 @@ public class RDRController extends AbstractController<IReviewDataReceiver> {
         System.out.println("Clients Length = " + clients.size());
         for (String client : clients) {
             try {
-                notifyClient(getExtension(client), newData);
+                notifyClient(getUniqueExtension(client), newData);
             } catch (CoreException e) {
                 ExceptionHandler.logAndNotifyUser("The ReviewDataReceiver '" + client
                         + "' could not be instantiated! This can lead to inconsistent data views.", e);

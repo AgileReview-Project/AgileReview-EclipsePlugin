@@ -30,7 +30,7 @@ public class EditorParserController extends AbstractController<IEditorParser> {
     /**
      * A mapping of supported editor classes to the parser extension supporting the editor type
      */
-    public static final HashMap<Class<?>, IEditorParser> editorParserMap = new HashMap<Class<?>, IEditorParser>();
+    public static final HashMap<Class<?>, String> editorParserMap = new HashMap<Class<?>, String>();
     
     /**
      * Creates a new instance of the {@link EditorParserController}
@@ -46,11 +46,16 @@ public class EditorParserController extends AbstractController<IEditorParser> {
      * @return the {@link IEditorParser} supporting the given editor class or <code>null</code> if there is none TODO return null parser
      * @author Malte Brunnlieb (15.07.2012)
      */
-    public IEditorParser getParser(Class<?> editorClass) {
+    public IEditorParser createParser(Class<?> editorClass) {
         synchronized (editorParserMap) {
             for (Class<?> clazz : editorParserMap.keySet()) {
                 if (clazz.isAssignableFrom(editorClass)) { //TODO check if this works
-                    return editorParserMap.get(clazz);
+                    try {
+                        return createNewExtension(editorParserMap.get(clazz));
+                    } catch (CoreException e) {
+                        ExceptionHandler.logAndNotifyUser("An error occurred while creating the EditorParser " + editorParserMap.get(clazz), e);
+                        e.printStackTrace();
+                    }
                 }
             }
             return null; //TODO return null parser
@@ -70,14 +75,8 @@ public class EditorParserController extends AbstractController<IEditorParser> {
             for (String extension : extensions) {
                 Class<?> clazz = getClass(extension, "editor");
                 if (clazz != null) {
-                    try {
-                        editorParserMap.put(clazz, getExtension(extension));
-                    } catch (CoreException e) {
-                        ExceptionHandler.logAndNotifyUser("An error occurred while creating the EditorParser " + extension, e);
-                        e.printStackTrace();
-                    }
+                    editorParserMap.put(clazz, extension);
                 }
-                
             }
         }
     }
