@@ -153,7 +153,8 @@ public final class Review implements PropertyChangeListener {
     }
     
     /**
-     * Sets the {@link Comment}s of this {@link Review}.<br><strong>Note: </strong>This method is intended to be used only while deriving {@link Comment}s from external storage!
+     * Sets the {@link Comment}s of this {@link Review}.<br><strong>Note: </strong>This method is intended to be used only while deriving
+     * {@link Comment}s from external storage!
      * @param comments
      * @author Peter Reuter (28.04.2012)
      */
@@ -170,10 +171,10 @@ public final class Review implements PropertyChangeListener {
      */
     public void addComment(Comment comment) {
         if (!this.comments.contains(comment)) {
-        	ArrayList<Comment> oldValue = new ArrayList<Comment>(this.comments);
-        	this.comments.add(comment);
+            ArrayList<Comment> oldValue = new ArrayList<Comment>(this.comments);
+            this.comments.add(comment);
             comment.addPropertyChangeListener(this);
-            propertyChangeSupport.firePropertyChange("comments", oldValue, this.comments);	
+            propertyChangeSupport.firePropertyChange("comments", oldValue, this.comments);
         }
     }
     
@@ -197,17 +198,16 @@ public final class Review implements PropertyChangeListener {
     }
     
     /**
-     * Removes all {@link Comment}s from this {@link Review}. This method is 
-     * intended to be used when closing reviews or using the cleanup function.
+     * Removes all {@link Comment}s from this {@link Review}. This method is intended to be used when closing reviews or using the cleanup function.
      * @author Peter Reuter (26.06.2012)
      */
     public void clearComments() {
-    	ArrayList<Comment> oldValue = new ArrayList<Comment>(this.comments);
-    	for (Comment c: this.comments) {
-    		c.clearReplies();
-    	}
-    	this.comments.clear();
-    	propertyChangeSupport.firePropertyChange("comments", oldValue, this.comments);
+        ArrayList<Comment> oldValue = new ArrayList<Comment>(this.comments);
+        for (Comment c : this.comments) {
+            c.clearReplies();
+        }
+        this.comments.clear();
+        propertyChangeSupport.firePropertyChange("comments", oldValue, this.comments);
     }
     
     /**
@@ -223,7 +223,7 @@ public final class Review implements PropertyChangeListener {
     public void setIsOpen(boolean isOpen) {
         boolean oldValue = this.isOpen;
         this.isOpen = isOpen;
-		setOpenReviewsPreference();
+        setOpenReviewsPreference();
         propertyChangeSupport.firePropertyChange("isOpen", oldValue, this.isOpen);
     }
     
@@ -273,34 +273,34 @@ public final class Review implements PropertyChangeListener {
     public void propertyChange(PropertyChangeEvent evt) {
         propertyChangeSupport.firePropertyChange(evt);
     }
-
-	/**
-	 * Adds/removes this review to/from the preference holding a comma 
-	 * separated list of open reviews depending on its "open/closed" state.
-	 * @author Peter Reuter (26.06.2012)
-	 */
-	void setOpenReviewsPreference() {
-		List<String> reviewIds = Arrays.asList(Platform.getPreferencesService().getString(Activator.PLUGIN_ID, "open_reviews", "", null).split(","));
-		if (this.isOpen) {
-			if (!reviewIds.contains(this.id)) {
-				reviewIds.add(this.id);
-			}
-		} else {
-			reviewIds.remove(this.id);
-		}
-		String reviewIdsPref = "";
-		Iterator<String> i = reviewIds.iterator();
-		for (;;) {
-		  reviewIdsPref += i.next();
-		  if (! i.hasNext()) break;
-		  reviewIdsPref += (",");
-		}
-		InstanceScope.INSTANCE.getNode(Activator.PLUGIN_ID).put("open_reviews", reviewIdsPref);
-		try {
-			InstanceScope.INSTANCE.getNode(Activator.PLUGIN_ID).flush();
-		} catch (BackingStoreException e) {
-			// TODO what to do here?
-		}
-	}
+    
+    /**
+     * Adds/removes this review to/from the preference holding a comma separated list of open reviews depending on its "open/closed" state.
+     * @author Peter Reuter (26.06.2012)
+     */
+    void setOpenReviewsPreference() {
+        List<String> reviewIds = new ArrayList<String>(Arrays.asList(Platform.getPreferencesService().getString(Activator.PLUGIN_ID, "open_reviews",
+                "", null).split(",")));
+        if (this.isOpen) {
+            if (!reviewIds.contains(this.id)) {
+                reviewIds.add(this.id);
+            }
+        } else {
+            reviewIds.remove(this.id);
+        }
+        String reviewIdsPref = "";
+        Iterator<String> i = reviewIds.iterator();
+        for (;;) {
+            reviewIdsPref += i.next();
+            if (!i.hasNext()) break;
+            reviewIdsPref += (",");
+        }
+        InstanceScope.INSTANCE.getNode(Activator.PLUGIN_ID).put("open_reviews", reviewIdsPref);
+        try {
+            InstanceScope.INSTANCE.getNode(Activator.PLUGIN_ID).flush();
+        } catch (BackingStoreException e) {
+            // TODO what to do here?
+        }
+    }
     
 }
