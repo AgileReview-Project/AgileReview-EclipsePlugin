@@ -28,11 +28,12 @@
             description="Open or closes a review"
             id="org.agilereview.core.openCloseReview"
             name="Open/Close Review">
-         <commandParameter
-               id="org.agilereview.core.openCloseReview.review"
-               name="Review"
-               optional="false">
-         </commandParameter>
+      </command>
+      <command
+            categoryId="org.agilereview.core.commonCommands"
+            description="Activates a review"
+            id="org.agilereview.core.activateReview"
+            name="Activate Review">
       </command>
    </extension>
    <extension
@@ -44,6 +45,10 @@
       <image
             commandId="org.agilereview.core.openCloseReview"
             icon="icons/closed_project.gif">
+      </image>
+      <image
+            commandId="org.agilereview.core.activateReview"
+            icon="icons/review_activate.png">
       </image>
    </extension>
 

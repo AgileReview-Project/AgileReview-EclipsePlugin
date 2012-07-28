@@ -22,11 +22,14 @@ import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.jdt.core.IJavaProject;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotPerspective;
+import org.eclipse.swtbot.swt.finder.exceptions.WidgetNotFoundException;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 import org.eclipse.ui.PlatformUI;
@@ -89,12 +92,12 @@ public class ReviewExplorerViewTest {
         tmpJavaProject1.createProject();
         tmpJavaProject2.createProject();
         // Wait for a second so everything is loaded
-        try {
-            Thread.sleep(1000);
-        } catch (InterruptedException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
+        //        try {
+        //            Thread.sleep(2000);
+        //        } catch (InterruptedException e) {
+        //            // TODO Auto-generated catch block
+        //            e.printStackTrace();
+        //        }
     }
     
     @After
@@ -105,6 +108,25 @@ public class ReviewExplorerViewTest {
         //            // TODO Auto-generated catch block
         //            e.printStackTrace();
         //        }
+    }
+    
+    private SWTBotTree getTreeViewer() {
+        SWTBotTree tree = null;
+        int retryCount = 3;
+        while (tree == null && retryCount > 0) {
+            try {
+                tree = bot.treeWithId("reTree");
+            } catch (WidgetNotFoundException e) {
+                // Wait a second, try again
+                try {
+                    Thread.sleep(1 * 1000);
+                } catch (InterruptedException e1) {
+                    e1.printStackTrace();
+                }
+                retryCount--;
+            }
+        }
+        return tree;
     }
     
     private IFile createFileStructure(IJavaProject project, String[] folderArr, String fileName) {
@@ -159,7 +181,7 @@ public class ReviewExplorerViewTest {
             e1.printStackTrace();
         }
         
-        SWTBotTree tree = bot.treeWithId("reTree");
+        SWTBotTree tree = getTreeViewer();
         
         // Now check structure
         String[] expectation = { "r1", "TestProject1", "src", "test.java" };
@@ -171,6 +193,95 @@ public class ReviewExplorerViewTest {
             items = items[0].getItems();
         }
         Assert.assertEquals(0, items.length);
+    }
+    
+    /**
+     * Simulate Refactoring and see whether everything is shown correctly
+     * @throws CoreException
+     * @author Thilo Rauch (15.07.2012)
+     */
+    @Test
+    public void simulateRefactoring() throws CoreException {
+        // setup test data
+        IFile file = createFileStructure(tmpJavaProject1.getProject(), new String[] { "src" }, "test.java");
+        
+        Review r1 = new Review("r1");
+        Comment c1 = new Comment("c1", "Alice", file, r1, Calendar.getInstance(), Calendar.getInstance(), "", 0, 0, "");
+        r1.addComment(c1);
+        
+        ReviewSet reviews = new ReviewSet();
+        reviews.add(r1);
+        
+        StorageClientMock.getInstance().setStorageContent(reviews);
+        
+        try {
+            Thread.sleep(2 * 1000);
+        } catch (InterruptedException e1) {
+            e1.printStackTrace();
+        }
+        
+        // Expand to file
+        SWTBotTree tree = getTreeViewer();
+        
+        SWTBotTreeItem node = tree.expandNode("r1", "TestProject1", "src");
+        Assert.assertEquals("test.java", node.getNode(0).getText());
+        
+        // Rename file
+        IPath newpath = file.getFullPath().removeLastSegments(1).append("file123.java");
+        file.move(newpath, true, new NullProgressMonitor());
+        
+        IFile newFile = createFileStructure(tmpJavaProject1.getProject(), new String[] { "src" }, "file123.java");
+        
+        Assert.assertEquals("file123.java", newFile.getName());
+        c1.setCommentedFile(newFile);
+        
+        // Check change on comment
+        Assert.assertEquals("file123.java", c1.getCommentedFile().getName());
+        
+        // Check that tree was refreshed
+        Assert.assertEquals("file123.java", node.getNode(0).getText());
+    }
+    
+    /**
+     * Simulate closing a review and see whether everything is shown correctly
+     * @throws CoreException
+     * @author Thilo Rauch (15.07.2012)
+     */
+    @Test
+    public void simulateClosingReview() throws CoreException {
+        // setup test data
+        IFile file = createFileStructure(tmpJavaProject1.getProject(), new String[] { "src" }, "test.java");
+        
+        final Review r1 = new Review("r1");
+        Comment c1 = new Comment("c1", "Alice", file, r1, Calendar.getInstance(), Calendar.getInstance(), "", 0, 0, "");
+        r1.addComment(c1);
+        
+        ReviewSet reviews = new ReviewSet();
+        reviews.add(r1);
+        
+        StorageClientMock.getInstance().setStorageContent(reviews);
+        
+        try {
+            Thread.sleep(2 * 1000);
+        } catch (InterruptedException e1) {
+            e1.printStackTrace();
+        }
+        
+        SWTBotTree tree = getTreeViewer();
+        final SWTBotTreeItem item = tree.getTreeItem("r1");
+        item.display.syncExec(new Runnable() {
+            @Override
+            public void run() {
+                Image old = item.widget.getImage();
+                
+                r1.clearComments();
+                r1.setIsOpen(false);
+                
+                item.expand();
+                Assert.assertEquals(0, item.getItems().length);
+                Assert.assertFalse(item.widget.getImage().equals(old));
+            }
+        });
     }
     
     /**
@@ -201,7 +312,7 @@ public class ReviewExplorerViewTest {
             e1.printStackTrace();
         }
         
-        SWTBotTree tree = bot.treeWithId("reTree");
+        SWTBotTree tree = getTreeViewer();
         
         // Now check structure
         String[] expectationBefore = { "r1" };
@@ -266,7 +377,7 @@ public class ReviewExplorerViewTest {
             e1.printStackTrace();
         }
         
-        SWTBotTree tree = bot.treeWithId("reTree");
+        SWTBotTree tree = getTreeViewer();
         
         // Now check structure
         String[] expectation = { "r1", "TestProject1" };
@@ -322,7 +433,7 @@ public class ReviewExplorerViewTest {
             e1.printStackTrace();
         }
         
-        SWTBotTree tree = bot.treeWithId("reTree");
+        SWTBotTree tree = getTreeViewer();
         
         // Now check structure
         String[] expectation = { "r1", "TestProject1", "folder1" };
@@ -373,7 +484,7 @@ public class ReviewExplorerViewTest {
             e1.printStackTrace();
         }
         
-        SWTBotTree tree = bot.treeWithId("reTree");
+        SWTBotTree tree = getTreeViewer();
         
         // Now check structure
         String[] expectationR1 = { "TestProject1", "folder1", "file1.java" };
@@ -430,7 +541,7 @@ public class ReviewExplorerViewTest {
             e1.printStackTrace();
         }
         
-        SWTBotTree tree = bot.treeWithId("reTree");
+        SWTBotTree tree = getTreeViewer();
         
         // Check before changing
         Assert.assertEquals(1, tree.getAllItems().length);
@@ -442,6 +553,11 @@ public class ReviewExplorerViewTest {
         ReviewSet reviews2 = new ReviewSet();
         reviews2.add(r2);
         StorageClientMock.getInstance().setStorageContent(reviews2);
+        try {
+            Thread.sleep(2 * 1000);
+        } catch (InterruptedException e1) {
+            e1.printStackTrace();
+        }
         
         // Check for change
         Assert.assertEquals(1, tree.getAllItems().length);
@@ -473,7 +589,7 @@ public class ReviewExplorerViewTest {
             e1.printStackTrace();
         }
         
-        SWTBotTree tree = bot.treeWithId("reTree");
+        SWTBotTree tree = getTreeViewer();
         
         // Check before changing
         Assert.assertEquals(1, tree.getAllItems().length);
@@ -482,7 +598,9 @@ public class ReviewExplorerViewTest {
         Review r2 = new Review("r2");
         Comment c2 = new Comment("c2", "Alice", file, r2, Calendar.getInstance(), Calendar.getInstance(), "", 0, 0, "");
         r2.addComment(c2);
-        StorageClientMock.getInstance().addReview(r2);
+        reviews.add(r2);
+        StorageClientMock.getInstance().setStorageContent(reviews);
+        // StorageClientMock.getInstance().addReview(r2);
         
         // Check for change
         Assert.assertEquals(2, tree.getAllItems().length);
@@ -517,7 +635,7 @@ public class ReviewExplorerViewTest {
             e1.printStackTrace();
         }
         
-        SWTBotTree tree = bot.treeWithId("reTree");
+        SWTBotTree tree = getTreeViewer();
         
         // Review
         SWTBotTreeItem item = tree.getAllItems()[0];

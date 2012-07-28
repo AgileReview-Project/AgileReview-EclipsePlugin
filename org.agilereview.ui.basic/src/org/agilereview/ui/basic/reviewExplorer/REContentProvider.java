@@ -45,8 +45,6 @@ public class REContentProvider implements ITreePathContentProvider, PropertyChan
         // Capture viewer
         this.viewer = viewer;
         
-        // XXX Check if this is called on disposal
-        
         // Deregister listener
         if (oldInput instanceof ReviewSet) {
             ((ReviewSet) oldInput).removePropertyChangeListener(this);
@@ -139,16 +137,11 @@ public class REContentProvider implements ITreePathContentProvider, PropertyChan
      */
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
-        if ((evt.getSource() instanceof Review && evt.getPropertyName().equals("comments"))
-                || (evt.getSource() instanceof ReviewSet && evt.getPropertyName().equals("reviews"))) {
-            // Refresh the data and the viewer
-            //            refreshCommentList();
-            Display.getDefault().syncExec(new Runnable() {
-                @Override
-                public void run() {
-                    viewer.refresh();
-                }
-            });
+        if ((evt.getSource() instanceof Review && (evt.getPropertyName().equals("comments") || evt.getPropertyName().equals("isOpen")))
+                || (evt.getSource() instanceof ReviewSet && evt.getPropertyName().equals("reviews"))
+                || (evt.getSource() instanceof Comment && evt.getPropertyName().equals("commentedFile"))) {
+            // Update viewer
+            updateViewer();
         }
     }
     
@@ -170,5 +163,14 @@ public class REContentProvider implements ITreePathContentProvider, PropertyChan
             }
         }
         return result.toArray();
+    }
+    
+    private void updateViewer() {
+        Display.getDefault().syncExec(new Runnable() {
+            @Override
+            public void run() {
+                viewer.refresh();
+            }
+        });
     }
 }
