@@ -92,6 +92,7 @@ public class CSToolBar extends Composite {
         String statusStr = new CommentProperties().getStatusByID(0);
         onlyOpenCommentsCheckbox.setText("Only show " + statusStr + " comments");
         onlyOpenCommentsCheckbox.setToolTipText("Show only " + statusStr + " comments");
+        onlyOpenCommentsCheckbox.setData("org.eclipse.swtbot.widget.key", "csOnlyOpenCommentsCheckbox");
         
         pack();
     }

@@ -24,11 +24,7 @@ import org.osgi.service.prefs.BackingStoreException;
  * A class that stores review data and a list of comments belonging to the review.
  * @author Peter Reuter (19.02.2012)
  */
-/**
- * 
- * @author Peter Reuter (28.04.2012)
- */
-public final class Review implements PropertyChangeListener {
+public class Review implements PropertyChangeListener {
     
     /**
      * The unique name of the review entered by the user
