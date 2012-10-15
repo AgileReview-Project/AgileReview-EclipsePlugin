@@ -27,6 +27,7 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotPerspective;
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotCheckBox;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotCombo;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTable;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotText;
@@ -85,7 +86,7 @@ public class CommentSummaryViewTest {
      * @author Malte Brunnlieb (26.05.2012)
      */
     @Test
-    public void testFilter_searchByAuthor() {
+    public void testFilter_search() {
         //test preparation
         Review reviewMock = mock(Review.class);
         IFile fileMock = mock(IFile.class);
@@ -139,48 +140,6 @@ public class CommentSummaryViewTest {
     }
     
     /**
-     * UI-Test for SearchFilter functionality
-     * @author Malte Brunnlieb (08.09.2012)
-     */
-    @Test
-    public void testFilter_searchGlobal() {
-        //test preparation
-        Review reviewMock = mock(Review.class);
-        IFile fileMock = mock(IFile.class);
-        when(fileMock.getFullPath()).thenReturn(new Path(""));
-        
-        List<Comment> comments = new LinkedList<Comment>();
-        final Comment c1 = new Comment("", "Adam", fileMock, reviewMock, Calendar.getInstance(), Calendar.getInstance(), "", 0, 0, "");
-        comments.add(c1);
-        Comment c2 = new Comment("", "Klaus", fileMock, reviewMock, Calendar.getInstance(), Calendar.getInstance(), "", 0, 0, "");
-        comments.add(c2);
-        when(reviewMock.getComments()).thenReturn(comments);
-        when(reviewMock.getId()).thenReturn("");
-        
-        ReviewSet reviews = new ReviewSet();
-        reviews.add(reviewMock);
-        
-        StorageClientMock.getInstance().setStorageContent(reviews);
-        
-        SWTBotCombo filterType = bot.comboBoxWithId("csFilterType");
-        SWTBotText searchText = bot.textWithId("csFilterText");
-        filterType.setSelection(0);
-        searchText.setText("");
-        searchText.pressShortcut(0, 'A');
-        
-        //evaluate results
-        Display.getDefault().syncExec(new Runnable() {
-            @Override
-            public void run() {
-                SWTBotTable table = bot.tableWithId("csTable");
-                Assert.assertEquals(1, table.rowCount());
-                Comment comment = (Comment) table.getTableItem(0).widget.getData();
-                Assert.assertEquals(c1, comment);
-            }
-        });
-    }
-    
-    /**
      * UI-Test for OnlyOpen filter functionality
      * @author Malte Brunnlieb (15.07.2012)
      */
@@ -192,10 +151,12 @@ public class CommentSummaryViewTest {
         when(fileMock.getFullPath()).thenReturn(new Path(""));
         
         List<Comment> comments = new LinkedList<Comment>();
-        final Comment c1 = new Comment("", "Adam", fileMock, reviewMock, Calendar.getInstance(), Calendar.getInstance(), "", 1, 0, "");
+        Comment c1 = new Comment("", "Adam", fileMock, reviewMock, Calendar.getInstance(), Calendar.getInstance(), "", 1, 0, "");
         comments.add(c1);
-        Comment c2 = new Comment("", "Klaus", fileMock, reviewMock, Calendar.getInstance(), Calendar.getInstance(), "", 0, 0, "");
+        final Comment c2 = new Comment("", "Klaus", fileMock, reviewMock, Calendar.getInstance(), Calendar.getInstance(), "", 0, 0, "");
         comments.add(c2);
+        final Comment c3 = new Comment("", "ASDF", fileMock, reviewMock, Calendar.getInstance(), Calendar.getInstance(), "", 2, 0, "");
+        comments.add(c3);
         when(reviewMock.getComments()).thenReturn(comments);
         when(reviewMock.getId()).thenReturn("");
         
@@ -205,7 +166,8 @@ public class CommentSummaryViewTest {
         StorageClientMock.getInstance().setStorageContent(reviews);
         
         //perform UI test input (author)
-        SWTBotCombo openCloseFilter = bot.comboBoxWithId("csOnlyOpenCommentsCheckbox");
+        SWTBotCheckBox onlyOpenFilter = bot.checkBoxWithId("csOnlyOpenCommentsCheckbox");
+        onlyOpenFilter.click();
         
         //evaluate results
         Display.getDefault().syncExec(new Runnable() {
@@ -214,21 +176,7 @@ public class CommentSummaryViewTest {
                 SWTBotTable table = bot.tableWithId("csTable");
                 Assert.assertEquals(1, table.rowCount());
                 Comment comment = (Comment) table.getTableItem(0).widget.getData();
-                Assert.assertEquals(c1, comment);
-            }
-        });
-        
-        //perform UI test input (global)
-        openCloseFilter.setSelection(0);
-        
-        //evaluate results
-        Display.getDefault().syncExec(new Runnable() {
-            @Override
-            public void run() {
-                SWTBotTable table = bot.tableWithId("csTable");
-                Assert.assertEquals(1, table.rowCount());
-                Comment comment = (Comment) table.getTableItem(0).widget.getData();
-                Assert.assertEquals(c1, comment);
+                Assert.assertEquals(c2, comment);
             }
         });
     }
