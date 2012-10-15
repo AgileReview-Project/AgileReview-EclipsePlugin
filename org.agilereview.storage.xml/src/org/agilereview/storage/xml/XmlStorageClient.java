@@ -31,22 +31,18 @@ import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.Platform;
-import org.eclipse.core.runtime.Plugin;
+import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent;
+import org.eclipse.core.runtime.preferences.InstanceScope;
 
 /**
  * {@link IStorageClient} that stores review data in XML files.
  * @author Peter Reuter (04.04.2012)
  */
-public class XmlStorageClient extends Plugin implements IStorageClient, IPreferenceChangeListener, PropertyChangeListener {
+public class XmlStorageClient implements IStorageClient, IPreferenceChangeListener, PropertyChangeListener {
 
 	//TODO compatibility to old xml format?
-
-	/**
-	 * ID of this plugin
-	 */
-	private static final String ID = "org.agilereview.storage.xml.XmlStorageClient";
 
 	/**
 	 * Name of the property which stores the name of the current source folder
@@ -70,6 +66,8 @@ public class XmlStorageClient extends Plugin implements IStorageClient, IPrefere
 	 */
 	private Map<String, Reply> idReplyMap = new HashMap<String, Reply>();
 
+	private IEclipsePreferences preferencesNode = InstanceScope.INSTANCE.getNode(Activator.PLUGIN_ID);
+
 	///////////////////////////////////////////////////////
 	// additional methods needed by the XmlStorageClient //
 	///////////////////////////////////////////////////////
@@ -79,7 +77,14 @@ public class XmlStorageClient extends Plugin implements IStorageClient, IPrefere
 	 * @author Peter Reuter (04.04.2012)
 	 */
 	public XmlStorageClient() {
+		preferencesNode.addPreferenceChangeListener(this);
 		initialize();
+	}
+	
+	@Override
+	protected void finalize() throws Throwable {
+		preferencesNode.removePreferenceChangeListener(this);
+		super.finalize();
 	}
 
 	/**
@@ -97,7 +102,8 @@ public class XmlStorageClient extends Plugin implements IStorageClient, IPrefere
 		// update sourcefolder, load new data
 		if (SourceFolderManager.getCurrentSourceFolder() != null) {
 			loadReviews();
-			List<String> reviewIds = Arrays.asList(Platform.getPreferencesService().getString("org.agilereview.core", AgileReviewPreferences.OPEN_REVIEWS, "", null).split(","));
+			List<String> reviewIds = Arrays.asList(Platform.getPreferencesService()
+					.getString("org.agilereview.core", AgileReviewPreferences.OPEN_REVIEWS, "", null).split(","));
 			loadComments(reviewIds);
 		}
 		// reenable propertychangelistener
@@ -181,27 +187,27 @@ public class XmlStorageClient extends Plugin implements IStorageClient, IPrefere
 			loadComments(reviewId);
 		}
 	}
-	
+
 	/////////////////////////////////////
 	// methods for unloading POJO data //
 	/////////////////////////////////////
 
 	/**
 	 * TODO add javadoc
-	 * @param reviews 
+	 * @param reviews
 	 * @author Peter Reuter (18.07.2012)
 	 */
 	private void unloadReviews(HashSet<Review> reviews) {
-		for (Review r: reviews) {
+		for (Review r : reviews) {
 			unloadComments(r.getComments());
 			this.reviewSet.remove(r);
-			this.idReviewMap.remove(r.getId());	
+			this.idReviewMap.remove(r.getId());
 		}
 	}
 
 	/**
 	 * TODO add javadoc
-	 * @param comments 
+	 * @param comments
 	 * @author Peter Reuter (18.07.2012)
 	 */
 	private void unloadComments(List<Comment> comments) {
@@ -307,7 +313,7 @@ public class XmlStorageClient extends Plugin implements IStorageClient, IPrefere
 
 		return result;
 	}
-	
+
 	//////////////////////////////////////////////
 	// methods for storing xmldocuments on disc //
 	//////////////////////////////////////////////
@@ -346,7 +352,7 @@ public class XmlStorageClient extends Plugin implements IStorageClient, IPrefere
 		ReviewDocument doc = PojoConversion.getXmlBeansReviewDocument(review);
 		saveXmlDocument(reviewFile, doc);
 	}
-	
+
 	///////////////////////////////////////////////
 	// helper methods for PropertyChangeListener //
 	///////////////////////////////////////////////
@@ -359,7 +365,7 @@ public class XmlStorageClient extends Plugin implements IStorageClient, IPrefere
 	private void propertyChangeOfCommentOrReply(java.beans.PropertyChangeEvent evt) {
 		Object source = evt.getSource();
 		while (!(source instanceof Comment)) {
-			source = ((Reply)source).getParent();
+			source = ((Reply) source).getParent();
 		}
 		store((Comment) source);
 	}
@@ -374,7 +380,7 @@ public class XmlStorageClient extends Plugin implements IStorageClient, IPrefere
 			if ((Boolean) evt.getNewValue()) {
 				loadComments(((Review) evt.getSource()).getId());
 			} else {
-				Review review = ((Review) evt.getSource()); 
+				Review review = ((Review) evt.getSource());
 				unloadComments(review.getComments());
 			}
 		} else {
@@ -445,7 +451,7 @@ public class XmlStorageClient extends Plugin implements IStorageClient, IPrefere
 			initialize();
 		}
 	}
-	
+
 	//////////////////////////
 	// other helper methods //
 	//////////////////////////

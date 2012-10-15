@@ -7,8 +7,14 @@
  */
 package org.agilereview.storage.xml.test;
 
-import static org.junit.Assert.fail;
+import java.io.File;
+import java.io.FileInputStream;
 
+import org.agilereview.storage.xml.Activator;
+import org.agilereview.storage.xml.SourceFolderManager;
+import org.eclipse.core.resources.IFile;
+import org.eclipse.core.runtime.Path;
+import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -46,13 +52,13 @@ public class XmlStorageIntegrationTest {
 	 */
 	@Before
 	public void setUp() throws Exception {
-//		tmpAgileReviewSourceFolder.createProject();
-//		File reviewFolder = new File("/org.agilereview.storage.xml.test/resources/review.r135");
-//		for (File f : reviewFolder.listFiles()) {
-//			IFile newFile = tmpAgileReviewSourceFolder.getProject().getFile(new Path(f.getName()));
-//            newFile.create(new FileInputStream(f), true, null);
-//		}
-//		InstanceScope.INSTANCE.getNode(Activator.PLUGIN_ID).put(SourceFolderManager.SOURCEFOLDER_PROPERTYNAME, projectName);
+		tmpAgileReviewSourceFolder.createProject();
+		File reviewFolder = new File("/org.agilereview.storage.xml.test/resources/review.r135");
+		for (File f : reviewFolder.listFiles()) {
+			IFile newFile = tmpAgileReviewSourceFolder.getProject().getFile(new Path(f.getName()));
+            newFile.create(new FileInputStream(f), true, null);
+		}
+		InstanceScope.INSTANCE.getNode(Activator.PLUGIN_ID).put(SourceFolderManager.SOURCEFOLDER_PROPERTYNAME, projectName);
 	}
 
 	/**
@@ -65,7 +71,7 @@ public class XmlStorageIntegrationTest {
 
 	@Test
 	public void test() {
-		fail("Not yet implemented");
+		
 	}
 
 }

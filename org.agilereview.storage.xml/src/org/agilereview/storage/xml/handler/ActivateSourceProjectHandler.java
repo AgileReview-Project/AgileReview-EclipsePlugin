@@ -1,6 +1,7 @@
 package org.agilereview.storage.xml.handler;
 
 import org.agilereview.storage.xml.SourceFolderManager;
+import org.agilereview.storage.xml.exception.ExceptionHandler;
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
@@ -22,6 +23,7 @@ public class ActivateSourceProjectHandler extends AbstractHandler {
 	public Object execute(ExecutionEvent event) throws ExecutionException {
 		try {
 			ISelection sel = HandlerUtil.getCurrentSelection(event);
+			boolean error = false;
 			if (sel instanceof StructuredSelection) {
 				IStructuredSelection strucSel = (IStructuredSelection)sel;
 				Object o = strucSel.getFirstElement();
@@ -29,9 +31,18 @@ public class ActivateSourceProjectHandler extends AbstractHandler {
 						IProject project = (IProject) o;
 						if (project.hasNature(SourceFolderManager.AGILEREVIEW_NATURE)){
 							InstanceScope.INSTANCE.getNode("org.agilereview.core").put(SourceFolderManager.SOURCEFOLDER_PROPERTYNAME, project.getName());
+						} else {
+							error = true;
 						}
+				} else {
+					error = true;
 				}
+			} else {
+				error = true;
 			}
+			
+			if (error) ExceptionHandler.notifyUser("Current selection is not an AgileReview Source Folder!");
+			
 		} catch (CoreException e) { // CoreException presented to the user via the ExecutionException
 			throw new ExecutionException("Closed or non-existent project selected.", e);
 		}

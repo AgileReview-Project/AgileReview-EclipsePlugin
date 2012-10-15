@@ -12,7 +12,7 @@ public class Activator extends Plugin {
 	/**
 	 * The plug-in ID 
 	 */
-	public static final String PLUGIN_ID = "org.agilereview.XmlStorage"; //$NON-NLS-1$
+	public static final String PLUGIN_ID = "org.agilereview.storage.XmlStorage"; //$NON-NLS-1$
 	/**
 	 * The shared instance
 	 */
@@ -25,6 +25,7 @@ public class Activator extends Plugin {
 	public void start(BundleContext context) throws Exception {
 		super.start(context);
 		plugin = this;
+		
 	}
 
 	/*
