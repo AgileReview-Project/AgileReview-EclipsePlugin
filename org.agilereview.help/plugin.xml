@@ -6,6 +6,10 @@
    </extension>
    <extension
          point="org.eclipse.help.contexts">
+      <contexts
+            file="dynamicHelp/contexts.xml"
+            plugin="org.agilereview.ui.basic">
+      </contexts>
    </extension>
    <extension
          point="org.eclipse.ui.cheatsheets.cheatSheetContent">

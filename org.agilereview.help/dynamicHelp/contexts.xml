@@ -1,0 +1,11 @@
+<contexts>
+	<context id="DetailView" title="DetailView">
+		<description> This View shows the details of a review or comment. It also conducts for changing or deleting a shown review/comment.</description>
+	</context>
+	<context id="CommentSummaryView" title="CommentSummaryView">
+		<description> This view shows a (selected) set of all comments of the selected review. It tries to provide most of the informations which are needed within a comment.</description>
+	</context>
+ <context id="ReviewExplorer" title="ReviewExplorer">
+    <description>This view shows the reviewsand its including folders and files.</description>
+ </context>
+</contexts> 
