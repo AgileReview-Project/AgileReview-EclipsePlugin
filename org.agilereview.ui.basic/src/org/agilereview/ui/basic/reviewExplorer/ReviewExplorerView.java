@@ -96,7 +96,6 @@ public class ReviewExplorerView extends AbstractReviewDataView {
      */
     @Override
     protected Class<? extends AbstractReviewDataReceiver> getReviewDataReceiverClass() {
-        // TODO Auto-generated method stub
         return REDataReceiver.class;
     }
     

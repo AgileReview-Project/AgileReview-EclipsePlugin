@@ -28,6 +28,7 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
         preferences.put(AgileReviewPreferences.AUTHOR, System.getProperty("user.name"));
         preferences.put(AgileReviewPreferences.OPEN_REVIEWS, "");
         preferences.put(AgileReviewPreferences.COMMENT_STATUS, pref.getProperty(AgileReviewPreferences.COMMENT_STATUS));
+        preferences.put(AgileReviewPreferences.COMMENT_PRIORITIES, pref.getProperty(AgileReviewPreferences.COMMENT_PRIORITIES));
     }
     
     /**

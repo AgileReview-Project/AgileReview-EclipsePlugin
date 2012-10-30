@@ -11,6 +11,10 @@
             class="org.agilereview.ui.basic.reviewExplorer.REDataReceiver"
             id="org.agilereview.ui.basic.reviewExplorer.REDataReceiver">
       </ReviewDataReceiver>
+      <ReviewDataReceiver
+            class="org.agilereview.ui.basic.detail.DetailDataReceiver"
+            id="org.agilereview.ui.basic.detail.DetailDataReceiver">
+      </ReviewDataReceiver>
    </extension>
    <extension
          point="org.eclipse.ui.views">
@@ -33,6 +37,13 @@
             name="AgileReview BasicUI"
             parentCategory="org.agilereview.ui.basic.category">
       </category>
+      <view
+            category="org.agilereview.ui.basic.category"
+            class="org.agilereview.ui.basic.detail.DetailView"
+            id="org.agilereview.ui.basic.detailView"
+            name="Detail"
+            restorable="true">
+      </view>
    </extension>
    <extension
          id="commented"
@@ -283,6 +294,13 @@
                minimized="false"
                ratio="0.7f"
                relationship="bottom"
+               relative="org.eclipse.ui.editorss">
+         </view>
+         <view
+               id="org.agilereview.ui.basic.detailView"
+               minimized="false"
+               ratio="0.2f"
+               relationship="right"
                relative="org.eclipse.ui.editorss">
          </view>
       </perspectiveExtension>

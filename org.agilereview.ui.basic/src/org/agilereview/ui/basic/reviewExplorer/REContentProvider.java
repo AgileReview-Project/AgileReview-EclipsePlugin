@@ -51,8 +51,6 @@ public class REContentProvider implements ITreePathContentProvider, PropertyChan
         }
         
         if (newInput instanceof ReviewSet) {
-            // XXX remove or log
-            System.out.println("RE input changed from '" + oldInput + "' to '" + newInput + "'");
             reviews = (ReviewSet) newInput;
             // Add PropertyChangeListener
             reviews.addPropertyChangeListener(this);

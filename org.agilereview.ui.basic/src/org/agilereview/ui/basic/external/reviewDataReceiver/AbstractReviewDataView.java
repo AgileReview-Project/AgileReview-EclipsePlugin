@@ -38,7 +38,7 @@ import org.eclipse.ui.part.ViewPart;
  * @author Thilo Rauch (07.07.2012)
  */
 public abstract class AbstractReviewDataView extends ViewPart {
-
+    
     /**
      * The values describe the currently shown content of the {@link AbstractReviewDataView}
      * @author Malte Brunnlieb (30.05.2012)
@@ -57,49 +57,45 @@ public abstract class AbstractReviewDataView extends ViewPart {
          */
         NONE
     };
-
+    
     /**
      * Parent of this {@link ViewPart}
      */
     private Composite parent;
-
+    
     /**
      * Layout initially set on the parent. Saved for restoring after a dummy UI was shown
      */
     private Layout intialLayout;
-
+    
     /**
      * Data shown by this view (as it was set by the {@link AbstractReviewDataReceiver}. If <code>null</code>, then now storage client is connected
      */
     private Object viewInput;
-
+    
     /**
      * Enum {@link ViewContent} indicating what is currently shown in the UI
      */
     private ViewContent viewContent = ViewContent.NONE;
-
+    
     /**
      * Simple object for thread synchronization
      */
     private Object syncObject = new Object();
-
+    
     /* (non-Javadoc)
      * @see org.eclipse.ui.part.WorkbenchPart#createPartControl(org.eclipse.swt.widgets.Composite)
      * @author Thilo Rauch (07.07.2012)
      */
     @Override
     public final void createPartControl(Composite parent) {
-        // XXX remove later
-        System.out.println("View created");
         this.parent = parent;
         // Capture old layout
         intialLayout = parent.getLayout();
         AbstractReviewDataReceiver.bindViewOn(this, getReviewDataReceiverClass());
-        // XXX remove later
-        System.out.println("View side binding finished");
         buildRightUI();
     }
-
+    
     /**
      * Method for the {@link AbstractReviewDataReceiver} to push the review data into the view. Input is either null (indicating no StorageClient) or
      * review data. The input may have been transformed by the user (using the
@@ -122,7 +118,7 @@ public abstract class AbstractReviewDataView extends ViewPart {
             }
         }
     }
-
+    
 /**
      * Method for the binding framework to find the data receiver corresponding to this view.
      * Should look like (with regard to sample):
@@ -138,7 +134,7 @@ public abstract class AbstractReviewDataView extends ViewPart {
      * @author Thilo Rauch (13.07.2012)
      */
     protected abstract Class<? extends AbstractReviewDataReceiver> getReviewDataReceiverClass();
-
+    
     /**
      * Method for the user to build the view's UI.
      * @param parent parent component to add the UI controls to
@@ -146,7 +142,7 @@ public abstract class AbstractReviewDataView extends ViewPart {
      * @author Thilo Rauch (13.07.2012)
      */
     protected abstract void buildUI(Composite parent, Object initalInput);
-
+    
     /**
      * Method for refreshing the input on the UI. Is called by the framework when new review data is pushed from the Storage but can also be called by
      * the user. A typical use of this method is to call setInput() on a viewer shown in the view (possibly doing other stuff before and after).
@@ -154,7 +150,7 @@ public abstract class AbstractReviewDataView extends ViewPart {
      * @author Thilo Rauch (13.07.2012)
      */
     protected abstract void refreshInput(Object reviewData);
-
+    
     /**
      * Build either the DummyUI or the user-defined UI (based on {@link #viewInput}). If the requested UI is already shown, nothing is done.
      * @author Thilo Rauch (13.07.2012)
@@ -165,17 +161,13 @@ public abstract class AbstractReviewDataView extends ViewPart {
             Display.getDefault().syncExec(new Runnable() {
                 @Override
                 public void run() {
-                    // XXX remove later
-                    System.out.println("Build right UI called with input " + viewInput);
                     if (viewInput != null) {
-                        if (viewContent == ViewContent.WORKING)
-                            return;
+                        if (viewContent == ViewContent.WORKING) return;
                         viewContent = ViewContent.WORKING;
                         clearParent();
                         buildUI(parent, viewInput);
                     } else {
-                        if (viewContent == ViewContent.DUMMY)
-                            return;
+                        if (viewContent == ViewContent.DUMMY) return;
                         viewContent = ViewContent.DUMMY;
                         clearParent();
                         buildDummyUI();
@@ -185,7 +177,7 @@ public abstract class AbstractReviewDataView extends ViewPart {
             });
         }
     }
-
+    
     /**
      * Displays a message that no {@link IStorageClient} is connected to provide data.
      * @author Malte Brunnlieb (27.05.2012)
@@ -203,7 +195,7 @@ public abstract class AbstractReviewDataView extends ViewPart {
         label.setLayoutData(gd);
         parent.pack();
     }
-
+    
     /**
      * Disposes all children of the current parent, resetting the layout
      * @author Malte Brunnlieb (27.05.2012)

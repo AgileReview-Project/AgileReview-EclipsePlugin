@@ -32,7 +32,7 @@ import org.agilereview.core.external.storage.ReviewSet;
  * @author Thilo Rauch (07.07.2012)
  */
 public abstract class AbstractReviewDataReceiver implements IReviewDataReceiver {
-
+    
     /**
      * Last review set provided by the extension point
      */
@@ -41,31 +41,27 @@ public abstract class AbstractReviewDataReceiver implements IReviewDataReceiver 
      * Current {@link AbstractReviewDataView} instance
      */
     private AbstractReviewDataView view;
-
+    
     /**
      * Constructor which has be be invoked by extending classes
      * @author Thilo Rauch (13.07.2012)
      */
     public AbstractReviewDataReceiver() {
-        // XXX remove later
-        System.out.println("DataReceiver created");
         Object instanceObj = getInstance(getReviewDataViewClass());
         if (instanceObj != null) {
             bindViewOn((AbstractReviewDataView) instanceObj, this);
         }
     }
-
+    
     /* (non-Javadoc)
      * @see org.agilereview.core.external.definition.IReviewDataReceiver#setReviewData(org.agilereview.core.external.storage.ReviewSet)
      * @author Thilo Rauch (07.07.2012)
      */
     @Override
     public final void setReviewData(ReviewSet reviews) {
-        // XXX remove later
-        System.out.println("setReviewData called with " + reviews);
         // First set reviews
         reviewData = reviews;
-
+        
         // Now think about binding to View
         if (reviewData == null) {
             if (view != null) {
@@ -77,7 +73,7 @@ public abstract class AbstractReviewDataReceiver implements IReviewDataReceiver 
             }
         }
     }
-
+    
     /**
      * Binds the given view to an instance of the given class, if one can be retrieved by a static getInstance() method of that type
      * @param dataView View to bind to
@@ -91,7 +87,7 @@ public abstract class AbstractReviewDataReceiver implements IReviewDataReceiver 
             bindViewOn(dataView, (AbstractReviewDataReceiver) instanceObj);
         }
     }
-
+    
 /**
      * Method for the binding framework to find the view corresponding to this data receiver.
      * Should look like (with regard to sample):
@@ -107,9 +103,9 @@ public abstract class AbstractReviewDataReceiver implements IReviewDataReceiver 
      * @author Thilo Rauch (13.07.2012)
      */
     protected abstract Class<? extends AbstractReviewDataView> getReviewDataViewClass();
-
+    
     /**
-     * Override this method if you don't want a {@link ReviewSet} passed to you view. You can transform the data however you like before it s passed
+     * Override this method if you don't want a {@link ReviewSet} passed to your view. You can transform the data however you like before it s passed
      * to the view.
      * @param rawData The {@link ReviewSet} passed by the extension point
      * @return The transformed data which should be input to the view
@@ -118,7 +114,7 @@ public abstract class AbstractReviewDataReceiver implements IReviewDataReceiver 
     protected Object transformData(ReviewSet rawData) {
         return rawData;
     }
-
+    
     /**
      * Gets an instance of the specified class if the class has an getInstance() method which actually returns a instance of that class.
      * @param c Class a instance is wanted for
@@ -139,7 +135,7 @@ public abstract class AbstractReviewDataReceiver implements IReviewDataReceiver 
         }
         return null;
     }
-
+    
     /**
      * Binds the given view to the given data receiver
      * @param dataView view to bind
