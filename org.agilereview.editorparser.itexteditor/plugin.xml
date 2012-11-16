@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         point="org.agilereview.core.EditorParser">
+      <EditorParser
+            class="org.agilereview.editorparser.itexteditor.control.EditorParserExtension"
+            editor="org.eclipse.ui.texteditor.ITextEditor"
+            id="org.agilereview.editorparser.itexteditor.EditorParser">
+      </EditorParser>
+   </extension>
+
+</plugin>
