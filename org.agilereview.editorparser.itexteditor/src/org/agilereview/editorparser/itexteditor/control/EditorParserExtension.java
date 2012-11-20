@@ -56,4 +56,24 @@ public class EditorParserExtension implements IEditorParser {
         
     }
     
+    /* (non-Javadoc)
+     * @see org.agilereview.core.external.definition.IEditorParser#clearAllTags()
+     * @author Malte Brunnlieb (19.11.2012)
+     */
+    @Override
+    public void clearAllTags() {
+        // TODO Auto-generated method stub
+        
+    }
+    
+    /* (non-Javadoc)
+     * @see org.agilereview.core.external.definition.IEditorParser#reparse()
+     * @author Malte Brunnlieb (19.11.2012)
+     */
+    @Override
+    public void reparse() {
+        // TODO Auto-generated method stub
+        
+    }
+    
 }

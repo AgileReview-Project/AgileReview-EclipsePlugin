@@ -22,8 +22,8 @@ public class EditorParserMock implements IEditorParser {
     public static EditorParserMock instance;
     
     /**
-     * Creates a new instance of the {@link EditorParserMock}. This constructor should not be used. It only will set the instance created by the extension
-     * point
+     * Creates a new instance of the {@link EditorParserMock}. This constructor should not be used. It only will set the instance created by the
+     * extension point
      * @author Malte Brunnlieb (15.07.2012)
      */
     public EditorParserMock() {
@@ -72,6 +72,24 @@ public class EditorParserMock implements IEditorParser {
      */
     @Override
     public void removeTagsInCurrentEditor(String tagId) {
+        // do nothing for the moment
+    }
+    
+    /* (non-Javadoc)
+     * @see org.agilereview.core.external.definition.IEditorParser#clearAllTags()
+     * @author Malte Brunnlieb (20.11.2012)
+     */
+    @Override
+    public void clearAllTags() {
+        // do nothing for the moment
+    }
+    
+    /* (non-Javadoc)
+     * @see org.agilereview.core.external.definition.IEditorParser#reparse()
+     * @author Malte Brunnlieb (20.11.2012)
+     */
+    @Override
+    public void reparse() {
         // do nothing for the moment
     }
     

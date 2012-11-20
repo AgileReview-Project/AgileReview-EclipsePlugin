@@ -2,17 +2,15 @@ package org.agilereview.editorparser.itexteditor.control;
 
 import java.util.ArrayList;
 
+import org.agilereview.editorparser.itexteditor.prefs.ColorReservationPreferences;
+import org.agilereview.editorparser.itexteditor.prefs.ColorReservationPreferences.Author;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.ui.PlatformUI;
-
-import de.tukl.cs.softech.agilereview.tools.PropertiesManager;
-import de.tukl.cs.softech.agilereview.views.ViewControl;
-import de.tukl.cs.softech.agilereview.views.commenttable.CommentTableView;
 
 /**
  * The ColorManager is responsible for a consistent global management of the annotation color scheme, such that up to 10 different annotation colors
  * for different authors are displayed. Any further annotation will be displayed by a default color.
- * @author Malte Brunnlieb (AgileReview Team)
+ * @author Malte Brunnlieb (20.11.12)
  */
 public class ColorManager {
     
@@ -40,17 +38,23 @@ public class ColorManager {
      * @param author
      */
     public static void changeIDEUser(String author) {
+        
+        ColorReservationPreferences prefs = ColorReservationPreferences.create();
+        
+        if (prefs.getReservation(Author.IDEUser).isEmpty()) {
+            prefs.setReservation(Author.IDEUser, author);
+        }
+        
         if (authors.isEmpty()) {
             authors.add(author);
         } else if (!author.equals(authors.get(0))) {
             //if the new IDE user was registered as an author, swap his position with the IDE user position (0)
-            String oldAuthor = authors.remove(0);
+            String oldAuthor = authors.get(0);
             int i = authors.indexOf(author);
             if (i >= 0) {
-                authors.remove(i);
-                authors.add(i, oldAuthor);
+                authors.set(i, oldAuthor);
             }
-            authors.add(0, author);
+            authors.set(0, author);
         }
         
         if (ViewControl.isOpen(CommentTableView.class)) {

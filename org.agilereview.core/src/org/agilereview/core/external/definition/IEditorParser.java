@@ -47,4 +47,16 @@ public interface IEditorParser {
      * @author Malte Brunnlieb (13.07.2012)
      */
     public void removeTagsInCurrentEditor(String tagId);
+    
+    /**
+     * Deletes all Tags in the parsed editor
+     * @author Malte Brunnlieb (16.11.2012)
+     */
+    public void clearAllTags();
+    
+    /**
+     * Forces the editor parser to reparse its contents<br>This will be necessary after every kind of refactoring
+     * @author Malte Brunnlieb (16.11.2012)
+     */
+    public void reparse();
 }

@@ -11,17 +11,14 @@ import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.agilereview.core.external.preferences.AgileReviewPreferences;
 import org.agilereview.core.external.storage.Comment;
 import org.agilereview.editorparser.itexteditor.data.ComparablePosition;
 import org.agilereview.editorparser.itexteditor.exception.ExceptionHandler;
 import org.agilereview.editorparser.itexteditor.exception.NoDocumentFoundException;
+import org.agilereview.editorparser.itexteditor.prefs.FileSupportPreferencesFactory;
+import org.agilereview.editorparser.itexteditor.prefs.FileSupportPreferencesFactory.FileSupportEntry;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.Platform;
-import org.eclipse.core.runtime.preferences.DefaultScope;
-import org.eclipse.core.runtime.preferences.IScopeContext;
-import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.FindReplaceDocumentAdapter;
@@ -45,9 +42,13 @@ public class TagParser {
      */
     private static final HashMap<String, String[]> supportedFiles = getParserFileendingsMappingTags();
     /**
+     * Sign which separates the comment id from all meta information
+     */
+    public static String keySeparator = "|";
+    /**
      * Core Regular Expression to find the core tag structure
      */
-    public static String RAW_TAG_REGEX = "/\\*-?(\\?)?\\|(.+?)\\|(\\?)?(-)?\\*/";
+    public static String RAW_TAG_REGEX = "/\\*-?(\\?)?" + Pattern.quote(keySeparator) + "(.+?)" + Pattern.quote(keySeparator) + "(\\?)?(-)?\\*/";
     /**
      * Path of the file this parser represents
      */
@@ -91,8 +92,9 @@ public class TagParser {
      * @param commentBeginTag begin tag for comments in this document
      * @param commentEndTag end tag for comments in this document
      * @throws NoDocumentFoundException will be thrown, if the file type which this editor represents is not supported
+     * @throws CoreException
      */
-    TagParser(ITextEditor editor, String commentBeginTag, String commentEndTag) throws NoDocumentFoundException {
+    TagParser(ITextEditor editor, String commentBeginTag, String commentEndTag) throws NoDocumentFoundException, CoreException {
         
         tagRegex = Pattern.quote(commentBeginTag) + RAW_TAG_REGEX + Pattern.quote(commentEndTag);
         tagPattern = Pattern.compile(tagRegex);
@@ -134,24 +136,17 @@ public class TagParser {
     }
     
     /**
-     * Parses the configuration of supported files in a more appropriate data type
+     * Converts the loaded preferences into a better fitting data structure for the tag parser
      * @return a HashMap of file ending to multi line comment tags
      * @author Malte Brunnlieb (12.11.2012)
      */
     private static HashMap<String, String[]> getParserFileendingsMappingTags() {
-        IScopeContext[] scopes = new IScopeContext[] { InstanceScope.INSTANCE, DefaultScope.INSTANCE };
-        String pref = Platform.getPreferencesService().getString("org.agilereview.core", AgileReviewPreferences.SUPPORTED_FILES,
-                AgileReviewPreferences.SUPPORTED_FILES, scopes);
         HashMap<String, String[]> supportedFiles = new HashMap<String, String[]>();
         
-        Pattern p = Pattern.compile("\\[\\[([^\\]]+),([^\\[\\]]+)\\]([^\\]]+)\\]");
-        Matcher m = p.matcher(pref);
-        while (m.find()) {
-            String[] fileendings = m.group(3).split(",");
-            for (String ending : fileendings) {
-                if (!ending.trim().isEmpty()) {
-                    supportedFiles.put(ending, new String[] { m.group(1), m.group(2) });
-                }
+        FileSupportEntry[] entries = FileSupportPreferencesFactory.load();
+        for (FileSupportEntry entry : entries) {
+            for (String fileending : entry.fileendings) {
+                supportedFiles.put(fileending, entry.commentTags);
             }
         }
         
@@ -386,52 +381,34 @@ public class TagParser {
         idTagPositions.put(key, oldPos);
     }
     
-    /*
-     * (non-Javadoc)
-     * 
-     * @see de.tukl.cs.softech.agilereview.annotations.IAnnotationParser#filter(java.util.ArrayList)
-     */
-    public void filter(HashSet<Comment> comments) {
-        HashMap<String, Position> toDisplay = new HashMap<String, Position>();
-        for (Comment c : comments) {
-            String commentKey = c.getReview().getId() + keySeparator + c.getAuthor() + keySeparator + c.getId();
-            if (path.equals(ReviewAccess.computePath(c)) && this.idPositionMap.get(commentKey) != null) {
-                toDisplay.put(commentKey, this.idPositionMap.get(commentKey));
-                ColorManager.addReservation(c.getAuthor());
-            }
-        }
-        
-        displayedComments.clear();
-        displayedComments.addAll(toDisplay.keySet());
-        
-        // Do not prove for open perspective, because annotations will be cleaned by empty comment array
-        this.annotationModel.displayAnnotations(toDisplay);
-    }
+    //    public void filter(HashSet<Comment> comments) {
+    //        HashMap<String, Position> toDisplay = new HashMap<String, Position>();
+    //        for (Comment c : comments) {
+    //            String commentKey = c.getReview().getId() + keySeparator + c.getAuthor() + keySeparator + c.getId();
+    //            if (path.equals(ReviewAccess.computePath(c)) && this.idPositionMap.get(commentKey) != null) {
+    //                toDisplay.put(commentKey, this.idPositionMap.get(commentKey));
+    //                ColorManager.addReservation(c.getAuthor());
+    //            }
+    //        }
+    //        
+    //        displayedComments.clear();
+    //        displayedComments.addAll(toDisplay.keySet());
+    //        
+    //        // Do not prove for open perspective, because annotations will be cleaned by empty comment array
+    //        this.annotationModel.displayAnnotations(toDisplay);
+    //    }
     
-    /*
-     * (non-Javadoc)
-     * 
-     * @see de.tukl.cs.softech.agilereview.annotations.IAnnotationParser#clearAnnotations()
-     */
-    public void clearAnnotations() {
-        filter(new HashSet<Comment>());
-    }
+    //    public void clearAnnotations() {
+    //        filter(new HashSet<Comment>());
+    //    }
     
-    /*
-     * (non-Javadoc)
-     * 
-     * @see de.tukl.cs.softech.agilereview.annotations.IAnnotationParser#addTagsInDocument(agileReview.softech.tukl.de.CommentDocument.Comment)
-     */
     public void addTagsInDocument(Comment comment, boolean display) throws BadLocationException {
-        // VARIANT(return Position):Position result = null;
-        
         ISelection selection = editor.getSelectionProvider().getSelection();
         if (selection instanceof ITextSelection) {
             int selStartLine = ((ITextSelection) selection).getStartLine();
             int selEndLine = ((ITextSelection) selection).getEndLine();
             addTagsInDocument(comment, display, selStartLine, selEndLine);
         }
-        // VARIANT(return Position):return result;
     }
     
     /**
@@ -445,16 +422,13 @@ public class TagParser {
     private void addTagsInDocument(Comment comment, boolean display, int selStartLine, int selEndLine) throws BadLocationException {
         boolean startLineInserted = false, endLineInserted = false;;
         int origSelStartLine = selStartLine;
-        String commentKey = comment.getReviewID() + keySeparator + comment.getAuthor() + keySeparator + comment.getId();
+        String commentKey = comment.getId();
         String commentTag = keySeparator + commentKey + keySeparator;
         boolean[] significantlyChanged = new boolean[] { false, false };
         
         // check if selection needs to be adapted
         int[] newLines = computeSelectionAdapations(selStartLine, selEndLine);
         if (newLines[0] != -1 || newLines[1] != -1) {
-            PluginLogger.log(this.getClass().toString(), "addTagsInDocument",
-                    "Selection for inserting tags needs to be adapted, performing adaptation.");
-            
             // adapt starting line if necessary
             if (newLines[0] != -1) {
                 int newStartLineOffset = document.getLineOffset(newLines[0]);
@@ -514,19 +488,9 @@ public class TagParser {
         
         if (significantlyChanged[0] || significantlyChanged[1]) {
             // inform user
-            Display.getDefault().asyncExec(new Runnable() {
-                
-                @Override
-                public void run() {
-                    MessageDialog
-                            .openWarning(
-                                    Display.getDefault().getActiveShell(),
-                                    "Warning!",
-                                    "Inserting a AgileReview comment at the current selection will destroy one ore more code comments. "
-                                            + "AgileReview will adapt the current selection to avoid this.\nIf it is necessary a new line will be inserted above the selection which will be removed on comment deletion.");
-                }
-                
-            });
+            ExceptionHandler
+                    .warnUser("Inserting a AgileReview comment at the current selection will destroy one ore more code comments. "
+                            + "AgileReview will adapt the current selection to avoid this.\nIf it is necessary a new line will be inserted above the selection which will be removed on comment deletion.");
             
         }
         
