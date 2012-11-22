@@ -7,7 +7,11 @@
  */
 package org.agilereview.editorparser.itexteditor.control;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.agilereview.core.external.definition.IEditorParser;
+import org.agilereview.core.external.exception.FileNotSupportedException;
 import org.agilereview.editorparser.itexteditor.prefs.FileSupportPreferencesFactory;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.ui.IEditorPart;
@@ -17,26 +21,37 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.texteditor.ITextEditor;
 
 /**
- * Extension interface for the {@link IEditorParser} extension point
+ * Extension interface for the {@link IEditorParser} extension point and manager class for all created editor parsers of this plug-in
  * @author Malte Brunnlieb (11.11.2012)
  */
 public class EditorParserExtension implements IEditorParser {
     
-    /* (non-Javadoc)
-     * @see org.agilereview.core.external.definition.IEditorParser#addTags(org.agilereview.core.external.definition.IFile, int, int, java.lang.String)
-     * @author Malte Brunnlieb (11.11.2012)
+    private HashMap<IFile, TagParser> parserMap = new HashMap<IFile, TagParser>();
+    
+    /*
+     * (non-Javadoc)
+     * @see org.agilereview.core.external.definition.IEditorParser#addTags(org.eclipse.core.resources.IFile, int, int, java.lang.String)
+     * @author Malte Brunnlieb (22.11.2012)
      */
     @Override
-    public void addTags(IFile file, int startLine, int endLine, String tagId) {
-        if (file == null || !file.exists()) return;
-       
-        Map<String, String[]> fileendingToCommentTagsMap = FileSupportPreferencesFactory.createFileSupportMap();
-        IEditorPart editor = getOpenEditor(file).getEditor(true);
-        if (editor != null && editor instanceof ITextEditor && ) {
+    public void addTags(IFile file, int startLine, int endLine, String tagId) throws FileNotSupportedException {
+        try {
+            if (file == null || !file.exists()) return;
             
-            new TagParser(editor, , )
-        } else {
-            //TODO file parsing
+            Map<String, String[]> fileendingToCommentTagsMap = FileSupportPreferencesFactory.createFileSupportMap();
+            IEditorPart editor = getOpenEditor(file).getEditor(true);
+            if (editor != null && editor instanceof ITextEditor && fileendingToCommentTagsMap.containsKey(file.getFileExtension())) {
+                String[] tags = fileendingToCommentTagsMap.get(file.getFullPath().getFileExtension());
+                if (tags == null) { throw new FileNotSupportedException(); }
+                if (!parserMap.containsKey(file)) {
+                    parserMap.put(file, new TagParser((ITextEditor) editor, tags[0], tags[1]));
+                }
+                parserMap.get(file).addTagsInDocument(tagId)
+            } else {
+                throw new FileNotSupportedException();
+            }
+        } catch (Throwable e) {
+            throw new FileNotSupportedException();
         }
     }
     

@@ -11,5 +11,6 @@ Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-Vendor: AgileReview Project
 Export-Package: org.agilereview.core.external.definition;uses:="org.agilereview.core.external.storage,org.eclipse.core.resources",
+ org.agilereview.core.external.exception,
  org.agilereview.core.external.preferences,
  org.agilereview.core.external.storage;uses:="org.eclipse.core.resources"

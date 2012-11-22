@@ -5,7 +5,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import java.util.regex.Pattern;
 
 import org.eclipse.jface.text.Position;
 import org.eclipse.jface.text.source.Annotation;
@@ -127,10 +126,9 @@ public class AnnotationManager {
      * @return created annotation
      */
     private Annotation createNewAnnotation(String commentKey) {
-        String[] commentData = commentKey.split(Pattern.quote(pm.getInternalProperty(PropertiesManager.INTERNAL_KEYS.KEY_SEPARATOR)));
         String annotationType;
-        if (colorManager.isMultiColorEnabled() && colorManager.hasCustomizedColor(commentData[1])) {
-            annotationType = "AgileReview.comment.annotation.author" + ColorManager.getIndexOf(commentData[1]);
+        if (colorManager.isMultiColorEnabled() && colorManager.hasCustomizedColor(author)) {
+            annotationType = "AgileReview.comment.annotation." + (commentData[1]);
         } else {
             annotationType = "AgileReview.comment.annotation";
         }

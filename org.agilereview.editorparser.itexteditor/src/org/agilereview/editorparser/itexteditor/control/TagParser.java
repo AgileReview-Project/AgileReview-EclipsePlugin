@@ -2,7 +2,6 @@ package org.agilereview.editorparser.itexteditor.control;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
@@ -16,8 +15,6 @@ import org.agilereview.editorparser.itexteditor.data.ComparablePosition;
 import org.agilereview.editorparser.itexteditor.exception.ExceptionHandler;
 import org.agilereview.editorparser.itexteditor.exception.NoDocumentFoundException;
 import org.agilereview.editorparser.itexteditor.prefs.AuthorReservationPreferences;
-import org.agilereview.editorparser.itexteditor.prefs.FileSupportPreferencesFactory;
-import org.agilereview.editorparser.itexteditor.prefs.FileSupportPreferencesFactory.FileSupportEntry;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.FindReplaceDocumentAdapter;
@@ -36,21 +33,17 @@ import org.eclipse.ui.texteditor.ITextEditor;
 public class TagParser {
     
     /**
-     * Supported files mapping to the corresponding comment tags
-     */
-    private static final HashMap<String, String[]> supportedFiles = getParserFileendingsMappingTags();
-    /**
      * Sign which separates the comment id from all meta information
      */
-    public static String keySeparator = "|";
+    private static String keySeparator = "|";
     /**
      * Core Regular Expression to find the core tag structure
      */
     public static String RAW_TAG_REGEX = "/\\*-?(\\?)?" + Pattern.quote(keySeparator) + "(.+?)" + Pattern.quote(keySeparator) + "(\\?)?(-)?\\*/";
     /**
-     * Path of the file this parser represents
+     * Commenting tags for this instance
      */
-    private String path;
+    private String[] tags;
     /**
      * Regular Expression used by this instance
      */
@@ -87,14 +80,13 @@ public class TagParser {
     /**
      * Creates a new instance of AnnotationParser with the given input
      * @param editor the editor which contents should be analyzed
-     * @param commentBeginTag begin tag for comments in this document
-     * @param commentEndTag end tag for comments in this document
+     * @param commentTags a two dimensional array which holds the comment begin tag and end tag for this parser instance
      * @throws NoDocumentFoundException will be thrown, if the file type which this editor represents is not supported
      * @throws CoreException
      */
-    TagParser(ITextEditor editor, String commentBeginTag, String commentEndTag) throws NoDocumentFoundException, CoreException {
+    TagParser(ITextEditor editor, String[] commentTags) throws NoDocumentFoundException, CoreException {
         
-        tagRegex = Pattern.quote(commentBeginTag) + RAW_TAG_REGEX + Pattern.quote(commentEndTag);
+        tagRegex = Pattern.quote(commentTags[0]) + RAW_TAG_REGEX + Pattern.quote(commentTags[1]);
         tagPattern = Pattern.compile(tagRegex);
         
         this.editor = editor;
@@ -106,50 +98,8 @@ public class TagParser {
             throw new NoDocumentFoundException();
         }
         
-        // Set the path this Parser stand for
-        //        IEditorInput input = this.editor.getEditorInput();
-        //        IFile file = (IFile) input.getAdapter(IFile.class);
-        //        final String editorTitle = editor.getTitle();
-        //        if (file != null) {
-        //            path = file.getFullPath().toOSString().replaceFirst(Pattern.quote(System.getProperty("file.separator")), "");
-        //        } else {
-        //            
-        //            Display.getDefault().asyncExec(new Runnable() {
-        //                
-        //                @Override
-        //                public void run() {
-        //                    MessageDialog
-        //                            .openError(
-        //                                    Display.getDefault().getActiveShell(),
-        //                                    "FileNotFoundException",
-        //                                    "The file for editor "
-        //                                            + editorTitle
-        //                                            + " could not be found. Please consider saving the file before adding comments to it. Afterwards, for adding comments close the current editor and re-open it.");
-        //                }
-        //                
-        //            });
-        //            throw new NoDocumentFoundException();
-        //        }
         this.annotationModel = new AnnotationManager(editor);
         parseInput();
-    }
-    
-    /**
-     * Converts the loaded preferences into a better fitting data structure for the tag parser
-     * @return a HashMap of file ending to multi line comment tags
-     * @author Malte Brunnlieb (12.11.2012)
-     */
-    private static HashMap<String, String[]> getParserFileendingsMappingTags() {
-        HashMap<String, String[]> supportedFiles = new HashMap<String, String[]>();
-        
-        FileSupportEntry[] entries = FileSupportPreferencesFactory.load();
-        for (FileSupportEntry entry : entries) {
-            for (String fileending : entry.fileendings) {
-                supportedFiles.put(fileending, entry.commentTags);
-            }
-        }
-        
-        return supportedFiles;
     }
     
     /**
@@ -401,12 +351,12 @@ public class TagParser {
     //        filter(new HashSet<Comment>());
     //    }
     
-    public void addTagsInDocument(Comment comment, boolean display) throws BadLocationException, CoreException {
+    public void addTagsInDocument(String tagId, boolean display) throws BadLocationException, CoreException {
         ISelection selection = editor.getSelectionProvider().getSelection();
         if (selection instanceof ITextSelection) {
             int selStartLine = ((ITextSelection) selection).getStartLine();
             int selEndLine = ((ITextSelection) selection).getEndLine();
-            addTagsInDocument(comment, display, selStartLine, selEndLine);
+            addTagsInDocument(tagId, display, selStartLine, selEndLine);
         }
     }
     
@@ -419,11 +369,10 @@ public class TagParser {
      * @throws BadLocationException Thrown if the selected location is not in the document (Should theoretically never happen)
      * @throws CoreException
      */
-    private void addTagsInDocument(Comment comment, boolean display, int selStartLine, int selEndLine) throws BadLocationException, CoreException {
+    private void addTagsInDocument(String tagId, boolean display, int selStartLine, int selEndLine) throws BadLocationException, CoreException {
         boolean startLineInserted = false, endLineInserted = false;;
         int origSelStartLine = selStartLine;
-        String commentKey = comment.getId();
-        String commentTag = keySeparator + commentKey + keySeparator;
+        String commentTag = keySeparator + tagId + keySeparator;
         boolean[] significantlyChanged = new boolean[] { false, false };
         
         // check if selection needs to be adapted
@@ -511,7 +460,6 @@ public class TagParser {
             int insertOffset = document.getLineOffset(selStartLine) + document.getLineLength(selStartLine) - lineDelimiterLength;
             
             // Write tag -> get start+end-tag for current file-ending, insert into file
-            String[] tags = supportedFiles.get(editor.getEditorInput().getName().substring(editor.getEditorInput().getName().lastIndexOf(".") + 1));
             document.replace(insertOffset, 0, tags[0] + "-?" + commentTag + "?" + (startLineInserted || endLineInserted ? "-" : "") + tags[1]);
             
             // VARIANT(return Position):result = new Position(document.getLineOffset(selStartLine),
@@ -534,7 +482,6 @@ public class TagParser {
             int insertEndOffset = document.getLineOffset(selEndLine) + document.getLineLength(selEndLine) - lineDelimiterLength;
             
             // Write tags -> get tags for current file-ending, insert second tag, insert first tag
-            String[] tags = supportedFiles.get(editor.getEditorInput().getName().substring(editor.getEditorInput().getName().lastIndexOf(".") + 1));
             document.replace(insertEndOffset, 0, tags[0] + "-" + commentTag + "?" + (endLineInserted ? "-" : "") + tags[1]);
             document.replace(insertStartOffset, 0, tags[0] + "-?" + commentTag + (startLineInserted ? "-" : "") + tags[1]);
             
@@ -548,8 +495,8 @@ public class TagParser {
         parseInput();
         
         if (isAgileReviewPerspectiveOpen() && display) {
-            new AuthorReservationPreferences().addReservation(comment.getAuthor());
-            this.annotationModel.addAnnotation(commentKey, this.idPositionMap.get(commentKey));
+            new AuthorReservationPreferences().addReservation(get.getAuthor());
+            this.annotationModel.addAnnotation(tagId, this.idPositionMap.get(tagId));
         }
     }
     
@@ -574,8 +521,6 @@ public class TagParser {
      */
     private int[] computeSelectionAdapations(int startLine, int endLine) throws BadLocationException {
         int[] result = { -1, -1 };
-        String[] tags = supportedFiles.get(editor.getEditorInput().getName().substring(editor.getEditorInput().getName().lastIndexOf(".") + 1));
-        
         int[] startLineAdaptions = checkForCodeComment(startLine, tags);
         int[] endLineAdaptions = checkForCodeComment(endLine, tags);
         
