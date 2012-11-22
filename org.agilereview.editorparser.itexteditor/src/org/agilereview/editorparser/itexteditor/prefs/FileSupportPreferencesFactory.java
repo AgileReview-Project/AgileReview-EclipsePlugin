@@ -7,6 +7,9 @@
  */
 package org.agilereview.editorparser.itexteditor.prefs;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.agilereview.core.external.preferences.AgileReviewPreferences;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.preferences.DefaultScope;
@@ -38,10 +41,19 @@ public class FileSupportPreferencesFactory {
     }
     
     /**
-     * Only access restriction
-     * @author Malte Brunnlieb (20.11.2012)
+     * Creates a mapping of file endings to comment tags from the eclipse preferences store
+     * @return a mapping of file endings to comment tags
+     * @author Malte Brunnlieb (22.11.2012)
      */
-    private FileSupportPreferencesFactory() {
+    public static Map<String, String[]> createFileSupportMap() {
+        Map<String, String[]> result = new HashMap<String, String[]>();
+        FileSupportEntry[] entries = load();
+        for (FileSupportEntry entry : entries) {
+            for (String fileending : entry.fileendings) {
+                result.put(fileending, entry.commentTags);
+            }
+        }
+        return result;
     }
     
     /**
@@ -49,7 +61,7 @@ public class FileSupportPreferencesFactory {
      * @return an array of {@link FileSupportEntry}s
      * @author Malte Brunnlieb (20.11.2012)
      */
-    public static FileSupportEntry[] load() {
+    private static FileSupportEntry[] load() {
         IScopeContext[] scopes = new IScopeContext[] { InstanceScope.INSTANCE, DefaultScope.INSTANCE };
         String pref = Platform.getPreferencesService().getString("org.agilereview.core", AgileReviewPreferences.SUPPORTED_FILES,
                 AgileReviewPreferences.SUPPORTED_FILES, scopes);

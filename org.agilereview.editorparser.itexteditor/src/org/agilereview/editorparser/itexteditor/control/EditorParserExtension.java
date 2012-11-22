@@ -8,10 +8,16 @@
 package org.agilereview.editorparser.itexteditor.control;
 
 import org.agilereview.core.external.definition.IEditorParser;
+import org.agilereview.editorparser.itexteditor.prefs.FileSupportPreferencesFactory;
 import org.eclipse.core.resources.IFile;
+import org.eclipse.ui.IEditorPart;
+import org.eclipse.ui.IEditorReference;
+import org.eclipse.ui.PartInitException;
+import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.texteditor.ITextEditor;
 
 /**
- * 
+ * Extension interface for the {@link IEditorParser} extension point
  * @author Malte Brunnlieb (11.11.2012)
  */
 public class EditorParserExtension implements IEditorParser {
@@ -22,8 +28,16 @@ public class EditorParserExtension implements IEditorParser {
      */
     @Override
     public void addTags(IFile file, int startLine, int endLine, String tagId) {
-        // TODO Auto-generated method stub
-        
+        if (file == null || !file.exists()) return;
+       
+        Map<String, String[]> fileendingToCommentTagsMap = FileSupportPreferencesFactory.createFileSupportMap();
+        IEditorPart editor = getOpenEditor(file).getEditor(true);
+        if (editor != null && editor instanceof ITextEditor && ) {
+            
+            new TagParser(editor, , )
+        } else {
+            //TODO file parsing
+        }
     }
     
     /* (non-Javadoc)
@@ -74,6 +88,25 @@ public class EditorParserExtension implements IEditorParser {
     public void reparse() {
         // TODO Auto-generated method stub
         
+    }
+    
+    /**
+     * Checks whether the given file is opened in an editor. Is this the case, the editor reference will be return.
+     * @param file The file which should be checked to be opened by an editor
+     * @return The editorReference, if the file is opened by an editor<br>null, otherwise
+     * @author Malte Brunnlieb (22.11.2012)
+     */
+    private IEditorReference getOpenEditor(IFile file) {
+        IEditorReference[] editors = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().getEditorReferences();
+        for (IEditorReference editor : editors) {
+            try {
+                IFile editorFile = (IFile) editor.getEditorInput().getAdapter(IFile.class);
+                if (editorFile != null && editorFile.getFullPath().toOSString().equals(file.getFullPath().toOSString())) { return editor; }
+            } catch (PartInitException e) {
+                // suppress as the editor has to be restarted manually, so we can manipulate the file directly
+            }
+        }
+        return null;
     }
     
 }

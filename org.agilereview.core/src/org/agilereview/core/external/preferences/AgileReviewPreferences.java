@@ -55,4 +55,14 @@ public interface AgileReviewPreferences {
      */
     public static final String AUTHOR_COLOR_ALLOCATION = "org.agilereview.preferences.author_color_allocation";
     
+    /**
+     * Default comment color if multi color support is disabled (format: R,G,B)
+     */
+    public static final String AUTHOR_COLOR_DEFAULT = "org.agilereview.preferences.author_color_default";
+    
+    /**
+     * A Boolean value which states whether the author should be distinguishable by their comment color or not
+     */
+    public static final String AUTHOR_COLORS_ENABLED = "org.agilereview.preferences.author_colors_enabled";
+    
 }

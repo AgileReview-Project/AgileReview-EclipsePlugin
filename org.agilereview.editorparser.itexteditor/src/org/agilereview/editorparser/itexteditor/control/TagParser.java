@@ -15,11 +15,10 @@ import org.agilereview.core.external.storage.Comment;
 import org.agilereview.editorparser.itexteditor.data.ComparablePosition;
 import org.agilereview.editorparser.itexteditor.exception.ExceptionHandler;
 import org.agilereview.editorparser.itexteditor.exception.NoDocumentFoundException;
+import org.agilereview.editorparser.itexteditor.prefs.AuthorReservationPreferences;
 import org.agilereview.editorparser.itexteditor.prefs.FileSupportPreferencesFactory;
 import org.agilereview.editorparser.itexteditor.prefs.FileSupportPreferencesFactory.FileSupportEntry;
-import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.FindReplaceDocumentAdapter;
 import org.eclipse.jface.text.IDocument;
@@ -28,8 +27,7 @@ import org.eclipse.jface.text.ITextSelection;
 import org.eclipse.jface.text.Position;
 import org.eclipse.jface.text.TextSelection;
 import org.eclipse.jface.viewers.ISelection;
-import org.eclipse.swt.widgets.Display;
-import org.eclipse.ui.IEditorInput;
+import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.texteditor.ITextEditor;
 
 /**
@@ -109,28 +107,29 @@ public class TagParser {
         }
         
         // Set the path this Parser stand for
-        IEditorInput input = this.editor.getEditorInput();
-        IFile file = (IFile) input.getAdapter(IFile.class);
-        final String editorTitle = editor.getTitle();
-        if (file != null) {
-            path = file.getFullPath().toOSString().replaceFirst(Pattern.quote(System.getProperty("file.separator")), "");
-        } else {
-            Display.getDefault().asyncExec(new Runnable() {
-                
-                @Override
-                public void run() {
-                    MessageDialog
-                            .openError(
-                                    Display.getDefault().getActiveShell(),
-                                    "FileNotFoundException",
-                                    "The file for editor "
-                                            + editorTitle
-                                            + " could not be found. Please consider saving the file before adding comments to it. Afterwards, for adding comments close the current editor and re-open it.");
-                }
-                
-            });
-            throw new NoDocumentFoundException();
-        }
+        //        IEditorInput input = this.editor.getEditorInput();
+        //        IFile file = (IFile) input.getAdapter(IFile.class);
+        //        final String editorTitle = editor.getTitle();
+        //        if (file != null) {
+        //            path = file.getFullPath().toOSString().replaceFirst(Pattern.quote(System.getProperty("file.separator")), "");
+        //        } else {
+        //            
+        //            Display.getDefault().asyncExec(new Runnable() {
+        //                
+        //                @Override
+        //                public void run() {
+        //                    MessageDialog
+        //                            .openError(
+        //                                    Display.getDefault().getActiveShell(),
+        //                                    "FileNotFoundException",
+        //                                    "The file for editor "
+        //                                            + editorTitle
+        //                                            + " could not be found. Please consider saving the file before adding comments to it. Afterwards, for adding comments close the current editor and re-open it.");
+        //                }
+        //                
+        //            });
+        //            throw new NoDocumentFoundException();
+        //        }
         this.annotationModel = new AnnotationManager(editor);
         parseInput();
     }
@@ -402,7 +401,7 @@ public class TagParser {
     //        filter(new HashSet<Comment>());
     //    }
     
-    public void addTagsInDocument(Comment comment, boolean display) throws BadLocationException {
+    public void addTagsInDocument(Comment comment, boolean display) throws BadLocationException, CoreException {
         ISelection selection = editor.getSelectionProvider().getSelection();
         if (selection instanceof ITextSelection) {
             int selStartLine = ((ITextSelection) selection).getStartLine();
@@ -418,8 +417,9 @@ public class TagParser {
      * @param selStartLine of the position where the comment should be inserted
      * @param selEndLine of the position where the comment should be inserted
      * @throws BadLocationException Thrown if the selected location is not in the document (Should theoretically never happen)
+     * @throws CoreException
      */
-    private void addTagsInDocument(Comment comment, boolean display, int selStartLine, int selEndLine) throws BadLocationException {
+    private void addTagsInDocument(Comment comment, boolean display, int selStartLine, int selEndLine) throws BadLocationException, CoreException {
         boolean startLineInserted = false, endLineInserted = false;;
         int origSelStartLine = selStartLine;
         String commentKey = comment.getId();
@@ -545,12 +545,22 @@ public class TagParser {
         
         // Save, so Eclipse save actions can take place before parsing  
         saveDocument();
-        
         parseInput();
-        if (ViewControl.isPerspectiveOpen() && display) {
-            ColorManager.addReservation(comment.getAuthor());
+        
+        if (isAgileReviewPerspectiveOpen() && display) {
+            new AuthorReservationPreferences().addReservation(comment.getAuthor());
             this.annotationModel.addAnnotation(commentKey, this.idPositionMap.get(commentKey));
         }
+    }
+    
+    /**
+     * Checks whether the current perspective is the AgileReview perspective
+     * @return true, if the current opened perspective is the AgileReview perspective,<br>false, otherwise
+     * @author Malte Brunnlieb (22.11.2012)
+     */
+    private boolean isAgileReviewPerspectiveOpen() {
+        String perspectiveID = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().getPerspective().getId();
+        return perspectiveID != null && perspectiveID.equals("org.agilereview.ui.basic.perspective"); //TODO should be configurable or compared in a more extensible way
     }
     
     /**
@@ -638,27 +648,16 @@ public class TagParser {
         return lineContent.contains(string);
     }
     
-    /*
-     * (non-Javadoc)
-     * 
-     * @see de.tukl.cs.softech.agilereview.annotations.IAnnotationParser#removeCommentTags(agileReview.softech.tukl.de.CommentDocument.Comment)
-     */
-    public void removeCommentTags(Comment comment) throws BadLocationException {
+    public void removeCommentTags(Comment comment) throws BadLocationException, CoreException {
         removeCommentsTags(new HashSet<Comment>(Arrays.asList(new Comment[] { comment })));
     }
     
-    /*
-     * (non-Javadoc)
-     * 
-     * @see de.tukl.cs.softech.agilereview.annotations.IAnnotationParser#removeCommentsTags(java.util.Set)
-     */
-    public void removeCommentsTags(Set<Comment> comments) throws BadLocationException {
-        String separator = pm.getInternalProperty(PropertiesManager.INTERNAL_KEYS.KEY_SEPARATOR);
+    public void removeCommentsTags(Set<Comment> comments) throws BadLocationException, CoreException {
         TreeSet<Position> tagPositions = new TreeSet<Position>();
         String key;
         HashSet<String> keyList = new HashSet<String>();
         for (Comment c : comments) {
-            key = c.getReviewID() + separator + c.getAuthor() + separator + c.getId();
+            key = c.getId();
             Position[] ps = idTagPositions.get(key);
             if (ps != null) {
                 ArrayList<ComparablePosition> cp = new ArrayList<ComparablePosition>();
@@ -684,27 +683,17 @@ public class TagParser {
         parseInput();
     }
     
-    /*
-     * (non-Javadoc)
-     * 
-     * @see de.tukl.cs.softech.agilereview.annotations.IAnnotationParser#reload()
-     */
-    public void reload() {
-        parseInput();
-    }
+    //    public void reload() throws CoreException {
+    //        parseInput();
+    //    }
     
-    /*
-     * (non-Javadoc)
-     * 
-     * @see de.tukl.cs.softech.agilereview.annotations.IAnnotationParser#revealCommentLocation(java.lang.String)
-     */
-    public void revealCommentLocation(String commentID) throws BadLocationException {
-        if (this.idPositionMap.get(commentID) != null) {
-            editor.selectAndReveal(this.idPositionMap.get(commentID).offset, 0);
-        } else {
-            throw new BadLocationException();
-        }
-    }
+    //    public void revealCommentLocation(String commentID) throws BadLocationException {
+    //        if (this.idPositionMap.get(commentID) != null) {
+    //            editor.selectAndReveal(this.idPositionMap.get(commentID).offset, 0);
+    //        } else {
+    //            throw new BadLocationException();
+    //        }
+    //    }
     
     /**
      * Returns all comments which are overlapping with the given {@link Position}
@@ -730,14 +719,13 @@ public class TagParser {
         return positions.higher(new ComparablePosition(current));
     }
     
-    @Override
-    public void relocateComment(Comment comment, boolean display) throws BadLocationException {
-        ISelection selection = editor.getSelectionProvider().getSelection();
-        if (selection instanceof ITextSelection) {
-            int selStartLine = ((ITextSelection) selection).getStartLine();
-            int selEndLine = ((ITextSelection) selection).getEndLine();
-            removeCommentTags(comment);
-            addTagsInDocument(comment, display, selStartLine, selEndLine);
-        }
-    }
+    //    public void relocateComment(Comment comment, boolean display) throws BadLocationException {
+    //        ISelection selection = editor.getSelectionProvider().getSelection();
+    //        if (selection instanceof ITextSelection) {
+    //            int selStartLine = ((ITextSelection) selection).getStartLine();
+    //            int selEndLine = ((ITextSelection) selection).getEndLine();
+    //            removeCommentTags(comment);
+    //            addTagsInDocument(comment, display, selStartLine, selEndLine);
+    //        }
+    //    }
 }

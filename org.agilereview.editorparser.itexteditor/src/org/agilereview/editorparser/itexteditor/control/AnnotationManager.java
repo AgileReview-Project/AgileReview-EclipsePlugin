@@ -20,6 +20,7 @@ import org.eclipse.ui.texteditor.ITextEditor;
  */
 public class AnnotationManager {
     
+    private ColorManager colorManager = new ColorManager();
     /**
      * The texteditor's annotation model
      */
@@ -128,7 +129,7 @@ public class AnnotationManager {
     private Annotation createNewAnnotation(String commentKey) {
         String[] commentData = commentKey.split(Pattern.quote(pm.getInternalProperty(PropertiesManager.INTERNAL_KEYS.KEY_SEPARATOR)));
         String annotationType;
-        if (ColorManager.isMultiColorEnabled() && ColorManager.hasCustomizedColor(commentData[1])) {
+        if (colorManager.isMultiColorEnabled() && colorManager.hasCustomizedColor(commentData[1])) {
             annotationType = "AgileReview.comment.annotation.author" + ColorManager.getIndexOf(commentData[1]);
         } else {
             annotationType = "AgileReview.comment.annotation";

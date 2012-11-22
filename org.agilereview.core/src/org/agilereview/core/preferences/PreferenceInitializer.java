@@ -2,6 +2,7 @@ package org.agilereview.core.preferences;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Enumeration;
 import java.util.Properties;
 
 import org.agilereview.core.Activator;
@@ -27,8 +28,16 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
         
         preferences.put(AgileReviewPreferences.AUTHOR, System.getProperty("user.name"));
         preferences.put(AgileReviewPreferences.OPEN_REVIEWS, "");
-        preferences.put(AgileReviewPreferences.COMMENT_STATUS, pref.getProperty(AgileReviewPreferences.COMMENT_STATUS));
-        preferences.put(AgileReviewPreferences.COMMENT_PRIORITIES, pref.getProperty(AgileReviewPreferences.COMMENT_PRIORITIES));
+        preferences.put(AgileReviewPreferences.AUTHOR_COLOR_ALLOCATION, "{ 'IDEUser':'" + System.getProperty("user.name")
+                + "','Author2':'','Author3':'','Author4':'','Author5':'','Author6':'" + "','Author7':'','Author8':'','Author9':'','Author10':'' }");
+        //        preferences.put(AgileReviewPreferences.COMMENT_STATUS, pref.getProperty(AgileReviewPreferences.COMMENT_STATUS));
+        //        preferences.put(AgileReviewPreferences.COMMENT_PRIORITIES, pref.getProperty(AgileReviewPreferences.COMMENT_PRIORITIES));
+        
+        Enumeration<String> properties = (Enumeration<String>) pref.propertyNames();
+        while (properties.hasMoreElements()) {
+            String next = properties.nextElement();
+            preferences.put(next, pref.getProperty(next));
+        }
     }
     
     /**
