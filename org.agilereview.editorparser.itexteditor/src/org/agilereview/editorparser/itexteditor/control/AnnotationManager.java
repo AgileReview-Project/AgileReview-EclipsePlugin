@@ -6,6 +6,8 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import org.agilereview.core.external.storage.Comment;
+import org.agilereview.editorparser.itexteditor.prefs.AuthorReservationPreferences;
 import org.eclipse.jface.text.Position;
 import org.eclipse.jface.text.source.Annotation;
 import org.eclipse.jface.text.source.IAnnotationModel;
@@ -19,6 +21,9 @@ import org.eclipse.ui.texteditor.ITextEditor;
  */
 public class AnnotationManager {
     
+    /**
+     * The color manager for author color management
+     */
     private ColorManager colorManager = new ColorManager();
     /**
      * The texteditor's annotation model
@@ -127,13 +132,14 @@ public class AnnotationManager {
      */
     private Annotation createNewAnnotation(String commentKey) {
         String annotationType;
-        if (colorManager.isMultiColorEnabled() && colorManager.hasCustomizedColor(author)) {
-            annotationType = "AgileReview.comment.annotation." + (commentData[1]);
+        Comment comment = DataManager.getInstance().getComment(commentKey);
+        if (colorManager.isMultiColorEnabled() && colorManager.hasCustomizedColor(comment.getAuthor())) {
+            annotationType = "AgileReview.comment.annotation." + new AuthorReservationPreferences().getAuthorTag(comment.getAuthor());
         } else {
             annotationType = "AgileReview.comment.annotation";
         }
-        Annotation annotation = new Annotation(annotationType, true, "Review: " + commentData[0] + ", Author: " + commentData[1] + ", Comment-ID: "
-                + commentData[2]);
+        Annotation annotation = new Annotation(annotationType, true, "Review: " + comment.getReview().getId() + ", Author: " + comment.getAuthor()
+                + ", Comment-ID: " + comment.getId());
         this.annotationMap.put(commentKey, annotation);
         return annotation;
     }

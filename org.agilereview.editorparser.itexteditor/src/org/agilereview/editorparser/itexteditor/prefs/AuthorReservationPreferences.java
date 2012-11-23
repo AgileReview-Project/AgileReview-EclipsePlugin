@@ -71,6 +71,7 @@ public class AuthorReservationPreferences {
      * @author Malte Brunnlieb (21.11.2012)
      */
     public List<String> getReservations() {
+        loadData();
         List<String> reservations = new LinkedList<String>();
         for (AuthorTag authorTag : AuthorTag.values()) {
             String author = getReservation(authorTag);

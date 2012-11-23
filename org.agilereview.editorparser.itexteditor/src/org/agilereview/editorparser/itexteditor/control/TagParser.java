@@ -351,25 +351,24 @@ public class TagParser {
     //        filter(new HashSet<Comment>());
     //    }
     
-    public void addTagsInDocument(String tagId, boolean display) throws BadLocationException, CoreException {
+    public void addTagsInDocument(String tagId) throws BadLocationException, CoreException {
         ISelection selection = editor.getSelectionProvider().getSelection();
         if (selection instanceof ITextSelection) {
             int selStartLine = ((ITextSelection) selection).getStartLine();
             int selEndLine = ((ITextSelection) selection).getEndLine();
-            addTagsInDocument(tagId, display, selStartLine, selEndLine);
+            addTagsInDocument(tagId, selStartLine, selEndLine);
         }
     }
     
     /**
      * Adds the Comment tags for the given comment in the currently opened file at the currently selected place
-     * @param comment Comment for which the tags should be inserted
-     * @param display if true, the new comment will instantly displayed<br> false, otherwise
+     * @param tagId Comment id for which the tags should be inserted
      * @param selStartLine of the position where the comment should be inserted
      * @param selEndLine of the position where the comment should be inserted
      * @throws BadLocationException Thrown if the selected location is not in the document (Should theoretically never happen)
      * @throws CoreException
      */
-    private void addTagsInDocument(String tagId, boolean display, int selStartLine, int selEndLine) throws BadLocationException, CoreException {
+    public void addTagsInDocument(String tagId, int selStartLine, int selEndLine) throws BadLocationException, CoreException {
         boolean startLineInserted = false, endLineInserted = false;;
         int origSelStartLine = selStartLine;
         String commentTag = keySeparator + tagId + keySeparator;
@@ -494,8 +493,8 @@ public class TagParser {
         saveDocument();
         parseInput();
         
-        if (isAgileReviewPerspectiveOpen() && display) {
-            new AuthorReservationPreferences().addReservation(get.getAuthor());
+        if (isAgileReviewPerspectiveOpen()) {
+            new AuthorReservationPreferences().addReservation(DataManager.getInstance().getComment(tagId).getAuthor());
             this.annotationModel.addAnnotation(tagId, this.idPositionMap.get(tagId));
         }
     }

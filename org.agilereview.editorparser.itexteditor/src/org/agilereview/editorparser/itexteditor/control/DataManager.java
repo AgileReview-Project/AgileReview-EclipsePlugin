@@ -21,7 +21,33 @@ import org.agilereview.core.external.storage.ReviewSet;
  */
 public class DataManager implements IReviewDataReceiver, PropertyChangeListener {
     
+    /**
+     * Current set of reviews provided by the core plug-in
+     */
     private ReviewSet reviews;
+    /**
+     * Instance created by the AgileReview core plug-in
+     */
+    private static DataManager instance;
+    
+    /**
+     * Constructor which saves the current created instance for further usage
+     * @author Malte Brunnlieb (23.11.2012)
+     */
+    public DataManager() {
+        instance = this;
+    }
+    
+    /**
+     * Returns the single instance of the {@link IReviewDataReceiver} created by the AgileReview core plug-in
+     * @return the last instance created by the framework
+     * @author Malte Brunnlieb (23.11.2012)
+     */
+    public static DataManager getInstance() {
+        while (instance == null) {
+        }
+        return instance;
+    }
     
     /*
      * (non-Javadoc)
