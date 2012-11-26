@@ -1,16 +1,13 @@
 package org.agilereview.editorparser.itexteditor.control;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.agilereview.core.external.storage.Comment;
 import org.agilereview.editorparser.itexteditor.data.ComparablePosition;
 import org.agilereview.editorparser.itexteditor.exception.ExceptionHandler;
 import org.agilereview.editorparser.itexteditor.exception.NoDocumentFoundException;
@@ -330,27 +327,6 @@ public class TagParser {
         idTagPositions.put(key, oldPos);
     }
     
-    //    public void filter(HashSet<Comment> comments) {
-    //        HashMap<String, Position> toDisplay = new HashMap<String, Position>();
-    //        for (Comment c : comments) {
-    //            String commentKey = c.getReview().getId() + keySeparator + c.getAuthor() + keySeparator + c.getId();
-    //            if (path.equals(ReviewAccess.computePath(c)) && this.idPositionMap.get(commentKey) != null) {
-    //                toDisplay.put(commentKey, this.idPositionMap.get(commentKey));
-    //                ColorManager.addReservation(c.getAuthor());
-    //            }
-    //        }
-    //        
-    //        displayedComments.clear();
-    //        displayedComments.addAll(toDisplay.keySet());
-    //        
-    //        // Do not prove for open perspective, because annotations will be cleaned by empty comment array
-    //        this.annotationModel.displayAnnotations(toDisplay);
-    //    }
-    
-    //    public void clearAnnotations() {
-    //        filter(new HashSet<Comment>());
-    //    }
-    
     public void addTagsInDocument(String tagId) throws BadLocationException, CoreException {
         ISelection selection = editor.getSelectionProvider().getSelection();
         if (selection instanceof ITextSelection) {
@@ -408,7 +384,7 @@ public class TagParser {
         }
         
         // add new line if start line is last line of javaDoc
-        int[] adaptionLines = checkForCodeComment(selStartLine - 1, new String[] { "/*", "*/" });
+        int[] adaptionLines = checkForCodeComment(selStartLine - 1, tags);
         if (adaptionLines[1] != -1 && lineContains(adaptionLines[0] + 1, "/**")) {
             int newStartLineOffset = document.getLineOffset(selStartLine + 1);
             int newStartLineLength = document.getLineLength(selStartLine + 1);
@@ -422,7 +398,7 @@ public class TagParser {
         }
         
         // add new line if end line is last line of javaDoc
-        adaptionLines = checkForCodeComment(selEndLine - 1, new String[] { "/*", "*/" });
+        adaptionLines = checkForCodeComment(selEndLine - 1, tags);
         if (adaptionLines[1] != -1 && lineContains(adaptionLines[0] + 1, "/**")) {
             int newEndLineOffset = document.getLineOffset(selEndLine + 1);
             int newEndLineLength = document.getLineLength(selEndLine + 1);
@@ -461,7 +437,6 @@ public class TagParser {
             // Write tag -> get start+end-tag for current file-ending, insert into file
             document.replace(insertOffset, 0, tags[0] + "-?" + commentTag + "?" + (startLineInserted || endLineInserted ? "-" : "") + tags[1]);
             
-            // VARIANT(return Position):result = new Position(document.getLineOffset(selStartLine),
             // document.getLineLength(selStartLine)-lineDelimiterLength);
         } else {
             // Calculate insert position for start line
@@ -483,10 +458,6 @@ public class TagParser {
             // Write tags -> get tags for current file-ending, insert second tag, insert first tag
             document.replace(insertEndOffset, 0, tags[0] + "-" + commentTag + "?" + (endLineInserted ? "-" : "") + tags[1]);
             document.replace(insertStartOffset, 0, tags[0] + "-?" + commentTag + (startLineInserted ? "-" : "") + tags[1]);
-            
-            // VARIANT(return Position):result = new Position(document.getLineOffset(selStartLine),
-            // VARIANT(return Position): document.getLineOffset(selEndLine) - document.getLineOffset(selStartLine) +
-            // document.getLineLength(selEndLine)-lineDelimiterLength);
         }
         
         // Save, so Eclipse save actions can take place before parsing  
@@ -592,31 +563,27 @@ public class TagParser {
         return lineContent.contains(string);
     }
     
-    public void removeCommentTags(Comment comment) throws BadLocationException, CoreException {
-        removeCommentsTags(new HashSet<Comment>(Arrays.asList(new Comment[] { comment })));
-    }
-    
-    public void removeCommentsTags(Set<Comment> comments) throws BadLocationException, CoreException {
+    /**
+     * Removes all tags in the parsers document related to the given tagId
+     * @param tagId comment id for which the tags should be removed
+     * @throws BadLocationException will be thrown if the cached tag locations are out of bounds from the current document
+     * @throws CoreException will be thrown during reparsing the document after tag deletion
+     * @author Malte Brunnlieb (26.11.2012)
+     */
+    public void removeTagsInDocument(String tagId) throws BadLocationException, CoreException {
         TreeSet<Position> tagPositions = new TreeSet<Position>();
-        String key;
-        HashSet<String> keyList = new HashSet<String>();
-        for (Comment c : comments) {
-            key = c.getId();
-            Position[] ps = idTagPositions.get(key);
-            if (ps != null) {
-                ArrayList<ComparablePosition> cp = new ArrayList<ComparablePosition>();
-                for (int i = 0; i < ps.length; i++) {
-                    cp.add(new ComparablePosition(ps[i]));
-                }
-                tagPositions.addAll(cp);
-                keyList.add(key);
+        
+        Position[] ps = idTagPositions.get(tagId);
+        if (ps != null) {
+            ArrayList<ComparablePosition> cp = new ArrayList<ComparablePosition>();
+            for (int i = 0; i < ps.length; i++) {
+                cp.add(new ComparablePosition(ps[i]));
             }
+            tagPositions.addAll(cp);
         }
         
-        // delete annotations and map entries
-        this.annotationModel.deleteAnnotations(keyList);
-        this.idTagPositions.keySet().removeAll(keyList);
-        this.idPositionMap.keySet().removeAll(keyList);
+        this.idTagPositions.keySet().remove(tagId);
+        this.idPositionMap.keySet().remove(tagId);
         
         Iterator<Position> it = tagPositions.descendingIterator();
         while (it.hasNext()) {

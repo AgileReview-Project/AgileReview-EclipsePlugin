@@ -11,7 +11,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.agilereview.core.external.definition.IEditorParser;
+import org.agilereview.core.external.exception.EditorCurrentlyNotOpenException;
+import org.agilereview.core.external.exception.EditorNotSupportedException;
 import org.agilereview.core.external.exception.FileNotSupportedException;
+import org.agilereview.core.external.exception.UnknownException;
 import org.agilereview.editorparser.itexteditor.prefs.FileSupportPreferencesFactory;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.ui.IEditorPart;
@@ -34,24 +37,39 @@ public class EditorParserExtension implements IEditorParser {
      * @author Malte Brunnlieb (22.11.2012)
      */
     @Override
-    public void addTags(IFile file, int startLine, int endLine, String tagId) throws FileNotSupportedException {
+    public void addTags(IFile file, int startLine, int endLine, String tagId) throws FileNotSupportedException, EditorNotSupportedException,
+            EditorCurrentlyNotOpenException, UnknownException {
         try {
-            if (file == null || !file.exists()) return;
+            if (file == null || !file.exists()) throw new FileNotSupportedException();
             
-            Map<String, String[]> fileendingToCommentTagsMap = FileSupportPreferencesFactory.createFileSupportMap();
-            IEditorPart editor = getOpenEditor(file).getEditor(true);
-            if (editor != null && editor instanceof ITextEditor && fileendingToCommentTagsMap.containsKey(file.getFileExtension())) {
-                String[] tags = fileendingToCommentTagsMap.get(file.getFullPath().getFileExtension());
-                if (tags == null) { throw new FileNotSupportedException(); }
-                if (!parserMap.containsKey(file)) {
-                    parserMap.put(file, new TagParser((ITextEditor) editor, tags));
+            if (!parserMap.containsKey(file)) {
+                IEditorPart editor = getOpenEditor(file).getEditor(true);
+                if (editor != null) {
+                    if (editor instanceof ITextEditor) {
+                        Map<String, String[]> fileendingToCommentTagsMap = FileSupportPreferencesFactory.createFileSupportMap();
+                        if (fileendingToCommentTagsMap.containsKey(file.getFileExtension())) {
+                            String[] tags = fileendingToCommentTagsMap.get(file.getFileExtension());
+                            if (tags == null) { throw new FileNotSupportedException(); }
+                            parserMap.put(file, new TagParser((ITextEditor) editor, tags));
+                        } else {
+                            throw new FileNotSupportedException();
+                        }
+                    } else {
+                        throw new EditorNotSupportedException();
+                    }
+                } else {
+                    throw new EditorCurrentlyNotOpenException();
                 }
-                parserMap.get(file).addTagsInDocument(tagId);
-            } else {
-                throw new FileNotSupportedException();
             }
+            parserMap.get(file).addTagsInDocument(tagId, startLine, endLine);
+        } catch (FileNotSupportedException e) {
+            throw e;
+        } catch (EditorNotSupportedException e) {
+            throw e;
+        } catch (EditorCurrentlyNotOpenException e) {
+            throw e;
         } catch (Throwable e) {
-            throw new FileNotSupportedException();
+            throw new UnknownException();
         }
     }
     
@@ -60,9 +78,44 @@ public class EditorParserExtension implements IEditorParser {
      * @author Malte Brunnlieb (11.11.2012)
      */
     @Override
-    public void addTagsToCurrentEditorSelection(String tagId) {
-        // TODO Auto-generated method stub
-        
+    public void addTagsToCurrentEditorSelection(String tagId) throws FileNotSupportedException, UnknownException, EditorNotSupportedException,
+            EditorCurrentlyNotOpenException {
+        try {
+            IEditorPart editor = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().getActiveEditor();
+            if (editor != null) {
+                IFile file = (IFile) editor.getAdapter(IFile.class);
+                if (file != null) {
+                    if (!parserMap.containsKey(file)) {
+                        if (editor instanceof ITextEditor) {
+                            Map<String, String[]> fileendingToCommentTagsMap = FileSupportPreferencesFactory.createFileSupportMap();
+                            if (fileendingToCommentTagsMap.containsKey(file.getFileExtension())) {
+                                String[] tags = fileendingToCommentTagsMap.get(file.getFullPath().getFileExtension());
+                                if (tags == null) { throw new FileNotSupportedException(); }
+                                parserMap.put(file, new TagParser((ITextEditor) editor, tags));
+                            } else {
+                                throw new FileNotSupportedException();
+                            }
+                        } else {
+                            throw new EditorNotSupportedException();
+                        }
+                    }
+                    parserMap.get(file).addTagsInDocument(tagId);
+                } else {
+                    // else should not occur
+                    throw new UnknownException();
+                }
+            } else {
+                throw new EditorCurrentlyNotOpenException();
+            }
+        } catch (FileNotSupportedException e) {
+            throw e;
+        } catch (EditorNotSupportedException e) {
+            throw e;
+        } catch (EditorCurrentlyNotOpenException e) {
+            throw e;
+        } catch (Throwable e) {
+            throw new UnknownException();
+        }
     }
     
     /* (non-Javadoc)
@@ -70,9 +123,39 @@ public class EditorParserExtension implements IEditorParser {
      * @author Malte Brunnlieb (11.11.2012)
      */
     @Override
-    public void removeTags(IFile file, String tagId) {
-        // TODO Auto-generated method stub
-        
+    public void removeTags(IFile file, String tagId) throws FileNotSupportedException, EditorNotSupportedException, EditorCurrentlyNotOpenException, UnknownException {
+        try {
+            if (file == null || !file.exists()) throw new FileNotSupportedException();
+            
+            if (!parserMap.containsKey(file)) {
+                IEditorPart editor = getOpenEditor(file).getEditor(true);
+                if (editor != null) {
+                    if (editor instanceof ITextEditor) {
+                        Map<String, String[]> fileendingToCommentTagsMap = FileSupportPreferencesFactory.createFileSupportMap();
+                        if (fileendingToCommentTagsMap.containsKey(file.getFileExtension())) {
+                            String[] tags = fileendingToCommentTagsMap.get(file.getFileExtension());
+                            if (tags == null) { throw new FileNotSupportedException(); }
+                            parserMap.put(file, new TagParser((ITextEditor) editor, tags));
+                        } else {
+                            throw new FileNotSupportedException();
+                        }
+                    } else {
+                        throw new EditorNotSupportedException();
+                    }
+                } else {
+                    throw new EditorCurrentlyNotOpenException();
+                }
+            }
+            parserMap.get(file).removeTagsInDocument(tagId);
+        } catch (FileNotSupportedException e) {
+            throw e;
+        } catch (EditorNotSupportedException e) {
+            throw e;
+        } catch (EditorCurrentlyNotOpenException e) {
+            throw e;
+        } catch (Throwable e) {
+            throw new UnknownException();
+        }
     }
     
     /* (non-Javadoc)
@@ -80,9 +163,44 @@ public class EditorParserExtension implements IEditorParser {
      * @author Malte Brunnlieb (11.11.2012)
      */
     @Override
-    public void removeTagsInCurrentEditor(String tagId) {
-        // TODO Auto-generated method stub
-        
+    public void removeTagsInCurrentEditor(String tagId) throws FileNotSupportedException, EditorNotSupportedException,
+            EditorCurrentlyNotOpenException, UnknownException {
+        try {
+            IEditorPart editor = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().getActiveEditor();
+            if (editor != null) {
+                IFile file = (IFile) editor.getAdapter(IFile.class);
+                if (file != null) {
+                    if (!parserMap.containsKey(file)) {
+                        if (editor instanceof ITextEditor) {
+                            Map<String, String[]> fileendingToCommentTagsMap = FileSupportPreferencesFactory.createFileSupportMap();
+                            if (fileendingToCommentTagsMap.containsKey(file.getFileExtension())) {
+                                String[] tags = fileendingToCommentTagsMap.get(file.getFullPath().getFileExtension());
+                                if (tags == null) { throw new FileNotSupportedException(); }
+                                parserMap.put(file, new TagParser((ITextEditor) editor, tags));
+                            } else {
+                                throw new FileNotSupportedException();
+                            }
+                        } else {
+                            throw new EditorNotSupportedException();
+                        }
+                    }
+                    parserMap.get(file).removeTagsInDocument(tagId);
+                } else {
+                    // else should not occur
+                    throw new UnknownException();
+                }
+            } else {
+                throw new EditorCurrentlyNotOpenException();
+            }
+        } catch (FileNotSupportedException e) {
+            throw e;
+        } catch (EditorNotSupportedException e) {
+            throw e;
+        } catch (EditorCurrentlyNotOpenException e) {
+            throw e;
+        } catch (Throwable e) {
+            throw new UnknownException();
+        }
     }
     
     /* (non-Javadoc)
