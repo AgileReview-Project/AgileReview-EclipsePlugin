@@ -67,7 +67,8 @@ public class DetailView extends AbstractReviewDataView {
      */
     @Override
     public void setFocus() {
-        commentDetail.setFocus();
+        if (commentDetail != null) {
+            commentDetail.setFocus();
+        }
     }
-    
 }

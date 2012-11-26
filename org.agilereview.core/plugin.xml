@@ -20,7 +20,7 @@
       <command
             categoryId="org.agilereview.core.commonCommands"
             description="Create a new review"
-            id="org.agilereview.core.newReview"
+            id="org.agilereview.core.new_review"
             name="New Review">
       </command>
       <command
@@ -39,7 +39,7 @@
    <extension
          point="org.eclipse.ui.commandImages">
       <image
-            commandId="org.agilereview.core.newReview"
+            commandId="org.agilereview.core.new_review"
             icon="icons/review_add.png">
       </image>
       <image
@@ -50,6 +50,13 @@
             commandId="org.agilereview.core.activateReview"
             icon="icons/review_activate.png">
       </image>
+   </extension>
+   <extension
+         point="org.agilereview.core.ReviewDataReceiver">
+      <ReviewDataReceiver
+            class="org.agilereview.core.external.storage.PojoFactory"
+            id="org.agilereview.core.PojoFactory">
+      </ReviewDataReceiver>
    </extension>
 
 </plugin>

@@ -7,6 +7,7 @@
  */
 package org.agilereview.ui.basic.detail;
 
+import java.beans.PropertyChangeEvent;
 import java.util.List;
 
 import org.agilereview.core.external.storage.Comment;
@@ -22,6 +23,8 @@ import org.agilereview.ui.basic.external.reviewDataReceiver.AbstractReviewDataVi
 public class DetailDataReceiver extends AbstractReviewDataReceiver {
     
     private static DetailDataReceiver instance;
+    
+    private Object currentlyShownObject;
     
     public DetailDataReceiver() {
         super();
@@ -52,14 +55,20 @@ public class DetailDataReceiver extends AbstractReviewDataReceiver {
             Review[] reviews = rawData.toArray(new Review[0]);
             if (reviews.length > 0) {
                 List<Comment> comments = reviews[0].getComments();
-                return comments.get(0);
+                currentlyShownObject = comments.get(0);
+                return currentlyShownObject;
             }
-            
-            //            Iterator<Review> it = rawData.iterator();
-            //            if (it.hasNext()) {
-            //                return it.next().getComments().get(0);
-            //            }
         }
         return null;
+    }
+    
+    /* (non-Javadoc)
+     * @see org.agilereview.ui.basic.external.reviewDataReceiver.AbstractReviewDataReceiver#triggerPropertyChange(java.beans.PropertyChangeEvent, org.agilereview.core.external.storage.ReviewSet)
+     * @author Thilo Rauch (26.11.2012)
+     */
+    @Override
+    protected boolean triggerPropertyChange(PropertyChangeEvent evt, ReviewSet data) {
+        // TODO: Better (and currenltyShownOnject==null)
+        return currentlyShownObject == null || evt.getSource().equals(currentlyShownObject);
     }
 }

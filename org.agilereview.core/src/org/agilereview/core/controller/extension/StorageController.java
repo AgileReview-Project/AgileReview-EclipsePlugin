@@ -99,7 +99,9 @@ public class StorageController extends AbstractController<IStorageClient> implem
         if (activeClient != null && activeClient.equals(name)) return;
         
         Set<String> extensions = getAvailableExtensions();
-        if (!extensions.contains(name)) { throw new ExtensionCreationException("The StorageClient with id " + name + " could not be found!"); }
+        if (!extensions.contains(name)) {
+            throw new ExtensionCreationException("The StorageClient with id " + name + " could not be found!");
+        }
         
         try {
             activeClient = getUniqueExtension(name);

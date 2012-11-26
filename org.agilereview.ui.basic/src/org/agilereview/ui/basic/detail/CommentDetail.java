@@ -230,7 +230,7 @@ public class CommentDetail extends Composite {
         replies = new Composite(replyScrolledWrapper, SWT.NONE);
         replyScrolledWrapper.setContent(replies);
         
-        // setPropertyConfigurations();
+        setPropertyConfigurations();
     }
     
     /**
@@ -429,25 +429,23 @@ public class CommentDetail extends Composite {
     //        return result;
     //    }
     //    
-    //    /**
-    //     * Sets the levels for the status and priority configuration of a comment.
-    //     */
-    //    private void setPropertyConfigurations() {
-    //        PropertiesManager pm = PropertiesManager.getInstance();
-    //        String value = pm.getInternalProperty(PropertiesManager.INTERNAL_KEYS.COMMENT_STATUS);
-    //        String[] levels = value.split(",");
-    //        statusDropDown.removeAll();
-    //        for (int i = 0; i < levels.length; i++) {
-    //            statusDropDown.add(levels[i]);
-    //        }
-    //        
-    //        value = pm.getInternalProperty(PropertiesManager.INTERNAL_KEYS.COMMENT_PRIORITIES);
-    //        levels = value.split(",");
-    //        priorityDropDown.removeAll();
-    //        for (int i = 0; i < levels.length; i++) {
-    //            priorityDropDown.add(levels[i]);
-    //        }
-    //    }
+    /**
+     * Sets the levels for the status and priority configuration of a comment.
+     */
+    private void setPropertyConfigurations() {
+        CommentProperties commentProps = new CommentProperties();
+        String[] levels = commentProps.getStatuses();
+        statusDropDown.removeAll();
+        for (int i = 0; i < levels.length; i++) {
+            statusDropDown.add(levels[i]);
+        }
+        
+        levels = commentProps.getPriorities();
+        priorityDropDown.removeAll();
+        for (int i = 0; i < levels.length; i++) {
+            priorityDropDown.add(levels[i]);
+        }
+    }
     //    
     //    /**
     //     * Generates the comment key for the given comment in the following scheme: reviewID|author|commendID

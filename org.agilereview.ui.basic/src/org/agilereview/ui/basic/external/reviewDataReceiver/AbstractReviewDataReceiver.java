@@ -7,10 +7,13 @@
  */
 package org.agilereview.ui.basic.external.reviewDataReceiver;
 
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.lang.reflect.Method;
 
 import org.agilereview.core.external.definition.IReviewDataReceiver;
 import org.agilereview.core.external.storage.ReviewSet;
+import org.eclipse.swt.widgets.Display;
 
 /**
  * This class is part of the framework for providing views with review information. Extend this abstract class and implement the abstract methods to
@@ -31,7 +34,7 @@ import org.agilereview.core.external.storage.ReviewSet;
  * 
  * @author Thilo Rauch (07.07.2012)
  */
-public abstract class AbstractReviewDataReceiver implements IReviewDataReceiver {
+public abstract class AbstractReviewDataReceiver implements IReviewDataReceiver, PropertyChangeListener {
     
     /**
      * Last review set provided by the extension point
@@ -60,7 +63,11 @@ public abstract class AbstractReviewDataReceiver implements IReviewDataReceiver 
     @Override
     public final void setReviewData(ReviewSet reviews) {
         // First set reviews
+        if (reviewData != null) {
+            reviewData.removePropertyChangeListener(this);
+        }
         reviewData = reviews;
+        reviewData.addPropertyChangeListener(this);
         
         // Now think about binding to View
         if (reviewData == null) {
@@ -150,4 +157,32 @@ public abstract class AbstractReviewDataReceiver implements IReviewDataReceiver 
             receiver.view.setInput(null);
         }
     }
+    
+    /* (non-Javadoc)
+     * @see java.beans.PropertyChangeListener#propertyChange(java.beans.PropertyChangeEvent)
+     * @author Thilo Rauch (26.11.2012)
+     */
+    @Override
+    public void propertyChange(PropertyChangeEvent evt) {
+        if (view != null && reviewData != null) {
+            if (triggerPropertyChange(evt, reviewData)) {
+                Display.getDefault().syncExec(new Runnable() {
+                    @Override
+                    public void run() {
+                        view.setInput(transformData(reviewData));
+                    }
+                });
+            }
+        }
+    }
+    
+    /**
+     * Determines when the built-in property change should be triggered. The event is registered on the ReviewSet and will refresh the input (and
+     * possibly transform it).
+     * @param evt PropertyChange event
+     * @param data ReviewSet for determining whether the property change should fire
+     * @return <code>true</code> if the property change should fire
+     * @author Thilo Rauch (26.11.2012)
+     */
+    protected abstract boolean triggerPropertyChange(PropertyChangeEvent evt, ReviewSet data);
 }

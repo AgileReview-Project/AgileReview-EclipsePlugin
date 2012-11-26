@@ -7,6 +7,8 @@
  */
 package org.agilereview.ui.basic.reviewExplorer;
 
+import java.beans.PropertyChangeEvent;
+
 import org.agilereview.core.external.storage.ReviewSet;
 import org.agilereview.ui.basic.external.reviewDataReceiver.AbstractReviewDataReceiver;
 import org.agilereview.ui.basic.external.reviewDataReceiver.AbstractReviewDataView;
@@ -16,12 +18,12 @@ import org.agilereview.ui.basic.external.reviewDataReceiver.AbstractReviewDataVi
  * @author Thilo Rauch (07.07.2012)
  */
 public class REDataReceiver extends AbstractReviewDataReceiver {
-
+    
     /**
      * Current Instance used by the ViewPart. Part of the ReviewDataView pattern.
      */
     private static REDataReceiver instance;
-
+    
     /**
      * Constructor used to capture the instance created by eclipse. Part of the ReviewDataView pattern.
      * @author Thilo Rauch (13.07.2012)
@@ -30,7 +32,7 @@ public class REDataReceiver extends AbstractReviewDataReceiver {
         super();
         instance = this;
     }
-
+    
     /**
      * GetInstance() method to provide access to the instance created by Eclipse. Part of the ReviewDataView pattern.
      * @return instance of this class created by eclipse
@@ -39,12 +41,12 @@ public class REDataReceiver extends AbstractReviewDataReceiver {
     public static AbstractReviewDataReceiver getInstance() {
         return instance;
     }
-
+    
     @Override
     protected Object transformData(ReviewSet rawData) {
         return super.transformData(rawData);
     }
-
+    
     /* (non-Javadoc)
      * @see org.agilereview.ui.basic.external.reviewDataReceiver.AbstractReviewDataReceiver#getReviewDataViewClass()
      * @author Thilo Rauch (08.07.2012)
@@ -53,5 +55,14 @@ public class REDataReceiver extends AbstractReviewDataReceiver {
     protected Class<? extends AbstractReviewDataView> getReviewDataViewClass() {
         return ReviewExplorerView.class;
     }
-
+    
+    /* (non-Javadoc)
+     * @see org.agilereview.ui.basic.external.reviewDataReceiver.AbstractReviewDataReceiver#triggerPropertyChange(java.beans.PropertyChangeEvent, org.agilereview.core.external.storage.ReviewSet)
+     * @author Thilo Rauch (26.11.2012)
+     */
+    @Override
+    protected boolean triggerPropertyChange(PropertyChangeEvent evt, ReviewSet data) {
+        return false;
+    }
+    
 }
