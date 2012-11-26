@@ -35,14 +35,17 @@ public interface IStorageClient {
     
     /**
      * @return A unique identifier for this {@link Comment} as it is required by the {@link IStorageClient}.
+     * @param author author of the new comment (might be interesting for some id generation mechanisms)
+     * @param review review the new comment is attached to (might be interesting for some id generation mechanisms)
      * @author Peter Reuter (28.04.2012)
      */
-    public String getNewCommentId();
+    public String getNewCommentId(String author, Review review);
     
     /**
      * @return A unique identifier for this {@link Reply} as it is required by the {@link IStorageClient}.
+     * @param parent parent object the reply is attached to (currently possible is a comment or another reply)
      * @author Peter Reuter (28.04.2012)
      */
-    public String getNewReplyId();
+    public String getNewReplyId(Object parent);
     
 }

@@ -15,6 +15,7 @@ import org.agilereview.core.exception.ExtensionCreationException;
 import org.agilereview.core.exception.NoStorageClientException;
 import org.agilereview.core.external.definition.IReviewDataReceiver;
 import org.agilereview.core.external.definition.IStorageClient;
+import org.agilereview.core.external.storage.Review;
 import org.agilereview.core.external.storage.ReviewSet;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.CoreException;
@@ -148,14 +149,14 @@ public class StorageController extends AbstractController<IStorageClient> implem
     }
     
     /**
-     * This method will be forwarded to {@link IStorageClient#getNewCommentId()} of the currently active {@link IStorageClient}
-     * @see org.agilereview.core.external.definition.IStorageClient#getNewCommentId()
+     * This method will be forwarded to {@link IStorageClient#getNewCommentId(String, Review)} of the currently active {@link IStorageClient}
+     * @see org.agilereview.core.external.definition.IStorageClient#getNewCommentId(String, Review)
      * @author Malte Brunnlieb (28.04.2012)
      */
     @Override
-    public String getNewCommentId() {
+    public String getNewCommentId(String author, Review review) {
         try {
-            String result = activeClient.getNewCommentId();
+            String result = activeClient.getNewCommentId(author, review);
             Assert.isNotNull(result);
             return result;
         } catch (Throwable ex) {
@@ -166,14 +167,14 @@ public class StorageController extends AbstractController<IStorageClient> implem
     }
     
     /**
-     * This method will be forwarded to {@link IStorageClient#getNewReplyId()} of the currently active {@link IStorageClient}
-     * @see org.agilereview.core.external.definition.IStorageClient#getNewReplyId()
+     * This method will be forwarded to {@link IStorageClient#getNewReplyId(Object)} of the currently active {@link IStorageClient}
+     * @see org.agilereview.core.external.definition.IStorageClient#getNewReplyId(Object)
      * @author Malte Brunnlieb (28.04.2012)
      */
     @Override
-    public String getNewReplyId() {
+    public String getNewReplyId(Object parent) {
         try {
-            String result = activeClient.getNewReplyId();
+            String result = activeClient.getNewReplyId(parent);
             Assert.isNotNull(result);
             return result;
         } catch (Throwable ex) {
