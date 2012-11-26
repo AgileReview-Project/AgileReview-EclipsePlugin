@@ -12,7 +12,6 @@ import java.util.Map;
 
 import org.agilereview.core.external.definition.IEditorParser;
 import org.agilereview.core.external.exception.EditorCurrentlyNotOpenException;
-import org.agilereview.core.external.exception.EditorNotSupportedException;
 import org.agilereview.core.external.exception.FileNotSupportedException;
 import org.agilereview.core.external.exception.UnknownException;
 import org.agilereview.editorparser.itexteditor.prefs.FileSupportPreferencesFactory;
@@ -37,8 +36,8 @@ public class EditorParserExtension implements IEditorParser {
      * @author Malte Brunnlieb (22.11.2012)
      */
     @Override
-    public void addTags(IFile file, int startLine, int endLine, String tagId) throws FileNotSupportedException, EditorNotSupportedException,
-            EditorCurrentlyNotOpenException, UnknownException {
+    public void addTags(IFile file, int startLine, int endLine, String tagId) throws FileNotSupportedException, EditorCurrentlyNotOpenException,
+            UnknownException {
         try {
             if (file == null || !file.exists()) throw new FileNotSupportedException();
             
@@ -55,7 +54,7 @@ public class EditorParserExtension implements IEditorParser {
                             throw new FileNotSupportedException();
                         }
                     } else {
-                        throw new EditorNotSupportedException();
+                        throw new UnknownException();
                     }
                 } else {
                     throw new EditorCurrentlyNotOpenException();
@@ -63,8 +62,6 @@ public class EditorParserExtension implements IEditorParser {
             }
             parserMap.get(file).addTagsInDocument(tagId, startLine, endLine);
         } catch (FileNotSupportedException e) {
-            throw e;
-        } catch (EditorNotSupportedException e) {
             throw e;
         } catch (EditorCurrentlyNotOpenException e) {
             throw e;
@@ -78,8 +75,7 @@ public class EditorParserExtension implements IEditorParser {
      * @author Malte Brunnlieb (11.11.2012)
      */
     @Override
-    public void addTagsToCurrentEditorSelection(String tagId) throws FileNotSupportedException, UnknownException, EditorNotSupportedException,
-            EditorCurrentlyNotOpenException {
+    public void addTagsToCurrentEditorSelection(String tagId) throws FileNotSupportedException, UnknownException, EditorCurrentlyNotOpenException {
         try {
             IEditorPart editor = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().getActiveEditor();
             if (editor != null) {
@@ -96,7 +92,7 @@ public class EditorParserExtension implements IEditorParser {
                                 throw new FileNotSupportedException();
                             }
                         } else {
-                            throw new EditorNotSupportedException();
+                            throw new UnknownException();
                         }
                     }
                     parserMap.get(file).addTagsInDocument(tagId);
@@ -108,8 +104,6 @@ public class EditorParserExtension implements IEditorParser {
                 throw new EditorCurrentlyNotOpenException();
             }
         } catch (FileNotSupportedException e) {
-            throw e;
-        } catch (EditorNotSupportedException e) {
             throw e;
         } catch (EditorCurrentlyNotOpenException e) {
             throw e;
@@ -123,7 +117,7 @@ public class EditorParserExtension implements IEditorParser {
      * @author Malte Brunnlieb (11.11.2012)
      */
     @Override
-    public void removeTags(IFile file, String tagId) throws FileNotSupportedException, EditorNotSupportedException, EditorCurrentlyNotOpenException, UnknownException {
+    public void removeTags(IFile file, String tagId) throws FileNotSupportedException, EditorCurrentlyNotOpenException, UnknownException {
         try {
             if (file == null || !file.exists()) throw new FileNotSupportedException();
             
@@ -140,7 +134,7 @@ public class EditorParserExtension implements IEditorParser {
                             throw new FileNotSupportedException();
                         }
                     } else {
-                        throw new EditorNotSupportedException();
+                        throw new UnknownException();
                     }
                 } else {
                     throw new EditorCurrentlyNotOpenException();
@@ -148,8 +142,6 @@ public class EditorParserExtension implements IEditorParser {
             }
             parserMap.get(file).removeTagsInDocument(tagId);
         } catch (FileNotSupportedException e) {
-            throw e;
-        } catch (EditorNotSupportedException e) {
             throw e;
         } catch (EditorCurrentlyNotOpenException e) {
             throw e;
@@ -163,8 +155,7 @@ public class EditorParserExtension implements IEditorParser {
      * @author Malte Brunnlieb (11.11.2012)
      */
     @Override
-    public void removeTagsInCurrentEditor(String tagId) throws FileNotSupportedException, EditorNotSupportedException,
-            EditorCurrentlyNotOpenException, UnknownException {
+    public void removeTagsInCurrentEditor(String tagId) throws FileNotSupportedException, EditorCurrentlyNotOpenException, UnknownException {
         try {
             IEditorPart editor = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().getActiveEditor();
             if (editor != null) {
@@ -181,7 +172,7 @@ public class EditorParserExtension implements IEditorParser {
                                 throw new FileNotSupportedException();
                             }
                         } else {
-                            throw new EditorNotSupportedException();
+                            throw new UnknownException();
                         }
                     }
                     parserMap.get(file).removeTagsInDocument(tagId);
@@ -193,8 +184,6 @@ public class EditorParserExtension implements IEditorParser {
                 throw new EditorCurrentlyNotOpenException();
             }
         } catch (FileNotSupportedException e) {
-            throw e;
-        } catch (EditorNotSupportedException e) {
             throw e;
         } catch (EditorCurrentlyNotOpenException e) {
             throw e;

@@ -19,4 +19,12 @@ public class UnknownException extends Exception {
      */
     private static final long serialVersionUID = -2592789689996301437L;
     
+    /**
+     * Creates a new {@link UnknownException} with the default message
+     * @author Malte Brunnlieb (26.11.2012)
+     */
+    public UnknownException() {
+        super("An unknown error occured. Please consider to save your current eclipse log file and write a bug report.");
+    }
+    
 }

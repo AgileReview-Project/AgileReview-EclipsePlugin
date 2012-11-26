@@ -1,5 +1,4 @@
 /**
- * Copyright (c) 2011, 2012 AgileReview Development Team and others.
  * All rights reserved. This program and the accompanying materials are made available under
  * the terms of the Eclipse Public License - v 1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
@@ -30,7 +29,11 @@ public class EditorParserController extends AbstractController<IEditorParser> {
     /**
      * A mapping of supported editor classes to the parser extension supporting the editor type
      */
-    public static final HashMap<Class<?>, String> editorParserMap = new HashMap<Class<?>, String>();
+    private static final HashMap<Class<?>, String> classToExtensionMap = new HashMap<Class<?>, String>();
+    /**
+     * A mapping of editor parser plug-in IDs to currently instantiated {@link IEditorParser} objects
+     */
+    private static final HashMap<String, IEditorParser> editorParserMap = new HashMap<String, IEditorParser>();
     
     /**
      * Creates a new instance of the {@link EditorParserController}
@@ -47,13 +50,17 @@ public class EditorParserController extends AbstractController<IEditorParser> {
      * @author Malte Brunnlieb (15.07.2012)
      */
     public IEditorParser createParser(Class<?> editorClass) {
-        synchronized (editorParserMap) {
-            for (Class<?> clazz : editorParserMap.keySet()) {
+        synchronized (classToExtensionMap) {
+            for (Class<?> clazz : classToExtensionMap.keySet()) {
                 if (clazz.isAssignableFrom(editorClass)) { //TODO check if this works
                     try {
-                        return createNewExtension(editorParserMap.get(clazz));
+                        String plugInID = classToExtensionMap.get(clazz);
+                        if (!editorParserMap.containsKey(plugInID)) {
+                            editorParserMap.put(plugInID, createNewExtension(classToExtensionMap.get(clazz)));
+                        }
+                        return editorParserMap.get(plugInID);
                     } catch (CoreException e) {
-                        ExceptionHandler.logAndNotifyUser("An error occurred while creating the EditorParser " + editorParserMap.get(clazz), e);
+                        ExceptionHandler.logAndNotifyUser("An error occurred while creating the EditorParser " + classToExtensionMap.get(clazz), e);
                         e.printStackTrace();
                     }
                 }
@@ -69,13 +76,13 @@ public class EditorParserController extends AbstractController<IEditorParser> {
      */
     @Override
     protected void doAfterCheckForClients() {
-        synchronized (editorParserMap) {
+        synchronized (classToExtensionMap) {
             Set<String> extensions = getAvailableExtensions();
-            editorParserMap.clear();
+            classToExtensionMap.clear();
             for (String extension : extensions) {
                 Class<?> clazz = getClass(extension, "editor");
                 if (clazz != null) {
-                    editorParserMap.put(clazz, extension);
+                    classToExtensionMap.put(clazz, extension);
                 }
             }
         }
@@ -106,5 +113,4 @@ public class EditorParserController extends AbstractController<IEditorParser> {
         }
         return null;
     }
-    
 }

@@ -554,7 +554,6 @@ public class TagParser {
      * @param string string to be searched for
      * @return true, if the string is contained in the given line ignoring AgileReview tags,<br> false otherwise
      * @throws BadLocationException if the given line could not be found in the current document
-     * 
      * @author Malte Brunnlieb (08.09.2012)
      */
     private boolean lineContains(int lineNumber, String string) throws BadLocationException {

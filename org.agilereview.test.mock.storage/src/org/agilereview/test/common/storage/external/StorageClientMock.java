@@ -8,8 +8,6 @@
 package org.agilereview.test.common.storage.external;
 
 import org.agilereview.core.external.definition.IStorageClient;
-import org.agilereview.core.external.storage.Comment;
-import org.agilereview.core.external.storage.Reply;
 import org.agilereview.core.external.storage.Review;
 import org.agilereview.core.external.storage.ReviewSet;
 
@@ -79,31 +77,31 @@ public class StorageClientMock implements IStorageClient {
     
     /**
      * Dummy implementation, returns always "newId"
-     * @see org.agilereview.core.external.definition.IStorageClient#getNewId(org.agilereview.core.external.storage.Review)
+     * @see org.agilereview.core.external.definition.IStorageClient#getNewReviewId()
      * @author Malte Brunnlieb (27.05.2012)
      */
     @Override
-    public String getNewId(Review review) {
+    public String getNewReviewId() {
         return "newId";
     }
     
     /**
      * Dummy implementation, returns always "newId"
-     * @see org.agilereview.core.external.definition.IStorageClient#getNewId(org.agilereview.core.external.storage.Comment)
+     * @see org.agilereview.core.external.definition.IStorageClient#getNewCommentId(String,Review)
      * @author Malte Brunnlieb (27.05.2012)
      */
     @Override
-    public String getNewId(Comment comment) {
+    public String getNewCommentId(String author, Review review) {
         return "newId";
     }
     
     /**
      * Dummy implementation, returns always "newId"
-     * @see org.agilereview.core.external.definition.IStorageClient#getNewId(org.agilereview.core.external.storage.Reply)
+     * @see org.agilereview.core.external.definition.IStorageClient#getNewReplyId(Object)
      * @author Malte Brunnlieb (27.05.2012)
      */
     @Override
-    public String getNewId(Reply reply) {
+    public String getNewReplyId(Object parent) {
         return "newId";
     }
 }

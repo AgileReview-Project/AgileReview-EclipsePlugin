@@ -8,7 +8,6 @@
 package org.agilereview.core.external.definition;
 
 import org.agilereview.core.external.exception.EditorCurrentlyNotOpenException;
-import org.agilereview.core.external.exception.EditorNotSupportedException;
 import org.agilereview.core.external.exception.FileNotSupportedException;
 import org.agilereview.core.external.exception.UnknownException;
 import org.eclipse.core.resources.IFile;
@@ -31,7 +30,7 @@ public interface IEditorParser {
      * @author Malte Brunnlieb (13.07.2012)
      */
     public void addTags(IFile file, int startLine, int endLine, String tagId) throws FileNotSupportedException, EditorCurrentlyNotOpenException,
-            EditorNotSupportedException, UnknownException;
+            UnknownException;
     
     /**
      * Adds comment tags to the current selection of the currently opened editor. The tags will capture the tagId as information.
@@ -40,8 +39,7 @@ public interface IEditorParser {
      *             parser
      * @author Malte Brunnlieb (15.07.2012)
      */
-    public void addTagsToCurrentEditorSelection(String tagId) throws FileNotSupportedException, EditorCurrentlyNotOpenException,
-            EditorNotSupportedException, UnknownException;
+    public void addTagsToCurrentEditorSelection(String tagId) throws FileNotSupportedException, EditorCurrentlyNotOpenException, UnknownException;
     
     /**
      * Removes all tags according to the given tagId
@@ -51,8 +49,7 @@ public interface IEditorParser {
      *             parser
      * @author Malte Brunnlieb (13.07.2012)
      */
-    public void removeTags(IFile file, String tagId) throws FileNotSupportedException, EditorCurrentlyNotOpenException, EditorNotSupportedException,
-            UnknownException;
+    public void removeTags(IFile file, String tagId) throws FileNotSupportedException, EditorCurrentlyNotOpenException, UnknownException;
     
     /**
      * Removes all tags according to the given tagId
@@ -61,8 +58,7 @@ public interface IEditorParser {
      *             parser
      * @author Malte Brunnlieb (13.07.2012)
      */
-    public void removeTagsInCurrentEditor(String tagId) throws FileNotSupportedException, EditorCurrentlyNotOpenException,
-            EditorNotSupportedException, UnknownException;
+    public void removeTagsInCurrentEditor(String tagId) throws FileNotSupportedException, EditorCurrentlyNotOpenException, UnknownException;
     
     /**
      * Deletes all Tags in the parsed editor
