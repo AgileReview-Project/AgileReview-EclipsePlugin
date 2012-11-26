@@ -15,8 +15,8 @@ import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.swt.widgets.Display;
 
@@ -35,11 +35,11 @@ public class SourceFolderManager {
 	/**
 	 * Nature of the Review Source Folder
 	 */
-	public static final String AGILEREVIEW_NATURE = "org.agilereview.sourcefolder";
+	public static final String AGILEREVIEW_NATURE = "org.agilereview.storage.xml.nature.sourcefolder";
 	/**
 	 * Nature of the active Review Source Folder
 	 */
-	public static final String AGILEREVIEW_ACTIVE_NATURE = "org.agilereview.sourcefolder.active";
+	public static final String AGILEREVIEW_ACTIVE_NATURE = "org.agilereview.storage.xml.nature.sourcefolder.active";
 	/**
 	 * The {@link IProject} that represents the current source folder
 	 */
@@ -49,7 +49,7 @@ public class SourceFolderManager {
 	 * @return The {@link IProject} that represents the current source folder
 	 * @author Peter Reuter (25.03.2012)
 	 */
-	static IProject getCurrentSourceFolder() {
+	public static IProject getCurrentSourceFolder() {
 		if (currentSourceFolder == null) {
 			setCurrentSourceFolderProject();
 		}
@@ -62,7 +62,7 @@ public class SourceFolderManager {
 	 */
 	static void setCurrentSourceFolderProject() {
 		IWorkspaceRoot workspaceRoot = ResourcesPlugin.getWorkspace().getRoot();
-		String projectName = Platform.getPreferencesService().getString(Activator.PLUGIN_ID, SourceFolderManager.SOURCEFOLDER_PROPERTYNAME, "", null);
+		String projectName = InstanceScope.INSTANCE.getNode(Activator.PLUGIN_ID).get(SourceFolderManager.SOURCEFOLDER_PROPERTYNAME, "");
 		if ("".equals(projectName)) {
 			currentSourceFolder = null;
 		} else {

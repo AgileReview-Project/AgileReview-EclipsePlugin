@@ -80,7 +80,7 @@ public class PojoConversion {
 		xmlBeansReview.setId(review.getId());
 		xmlBeansReview.setStatus(review.getStatus());
 		xmlBeansReview.setReferenceId(review.getReference());
-		xmlBeansReview.setReferenceId(review.getResponsibility());
+		xmlBeansReview.setResponsibility(review.getResponsibility());
 		xmlBeansReview.setDescription(review.getDescription());
 		return doc;
 	}
