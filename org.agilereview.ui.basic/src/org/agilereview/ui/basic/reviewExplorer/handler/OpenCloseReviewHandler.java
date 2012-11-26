@@ -5,7 +5,7 @@
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  * Contributors: Malte Brunnlieb, Philipp Diebold, Peter Reuter, Thilo Rauch
  */
-package org.agilereview.ui.basic.handler;
+package org.agilereview.ui.basic.reviewExplorer.handler;
 
 import org.agilereview.core.external.storage.Review;
 import org.eclipse.core.commands.AbstractHandler;

@@ -55,7 +55,7 @@
          allPopups="false"
          locationURI="toolbar:org.agilereview.ui.basic.reviewExplorerView">
       <command
-            commandId="org.agilereview.core.new_review"
+            commandId="org.agilereview.core.newReview"
             label="Create new review"
             style="push"
             tooltip="Create a new review">
@@ -112,7 +112,7 @@
          allPopups="true"
          locationURI="popup:org.agilereview.ui.basic.reviewExplorerView">
       <command
-            commandId="org.agilereview.core.new_review"
+            commandId="org.agilereview.core.newReview"
             label="Create new review"
             style="push"
             tooltip="Create a new review">
@@ -176,11 +176,21 @@
             style="push">
       </command>
    </menuContribution>
+   <menuContribution
+         allPopups="false"
+         locationURI="toolbar:org.agilereview.ui.basic.commentSummaryView">
+      <command
+            commandId="org.agilereview.core.newComment"
+            label="Add new Comment"
+            style="push"
+            tooltip="Add new Comment">
+      </command>
+   </menuContribution>
    </extension>
    <extension
          point="org.eclipse.ui.handlers">
       <handler
-            class="org.agilereview.ui.basic.reviewExplorer.RECollapseHandler"
+            class="org.agilereview.ui.basic.reviewExplorer.handler.RECollapseHandler"
             commandId="org.eclipse.ui.navigate.collapseAll">
          <enabledWhen>
             <with
@@ -209,7 +219,7 @@
          </activeWhen>
       </handler>
       <handler
-            class="org.agilereview.ui.basic.reviewExplorer.REExpandHandler"
+            class="org.agilereview.ui.basic.reviewExplorer.handler.REExpandHandler"
             commandId="org.eclipse.ui.navigate.expandAll">
          <enabledWhen>
             <with
@@ -238,7 +248,7 @@
          </activeWhen>
       </handler>
       <handler
-            class="org.agilereview.ui.basic.handler.OpenCloseReviewHandler"
+            class="org.agilereview.ui.basic.reviewExplorer.handler.OpenCloseReviewHandler"
             commandId="org.agilereview.core.openCloseReview">
          <activeWhen>
             <with
@@ -254,7 +264,7 @@
          </activeWhen>
       </handler>
       <handler
-            class="org.agilereview.ui.basic.handler.ActivateReviewHandler"
+            class="org.agilereview.ui.basic.reviewExplorer.handler.ActivateReviewHandler"
             commandId="org.agilereview.core.activateReview">
          <activeWhen>
             <with
@@ -270,8 +280,12 @@
          </activeWhen>
       </handler>
       <handler
-            class="org.agilereview.ui.basic.handler.NewReviewHandler"
-            commandId="org.agilereview.core.new_review">
+            class="org.agilereview.ui.basic.reviewExplorer.handler.NewReviewHandler"
+            commandId="org.agilereview.core.newReview">
+      </handler>
+      <handler
+            class="org.agilereview.ui.basic.commentSummary.handler.NewCommentHandler"
+            commandId="org.agilereview.core.newComment">
       </handler>
    </extension>
    <extension
@@ -319,7 +333,7 @@
       <command
             category="org.agilereview.ui.basic.commands"
             categoryId="org.agilereview.ui.basic.commands"
-            defaultHandler="org.agilereview.ui.basic.handler.LinkReviewExplorerHandler"
+            defaultHandler="org.agilereview.ui.basic.reviewExplorer.handler.LinkReviewExplorerHandler"
             description="Links the review explorer to the filtering mechanism"
             id="org.agilereview.ui.basic.linkReviewExplorer"
             name="Link ReviewExplorer">

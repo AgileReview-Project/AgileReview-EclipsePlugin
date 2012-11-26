@@ -1,4 +1,4 @@
-package org.agilereview.ui.basic.handler;
+package org.agilereview.ui.basic.reviewExplorer.handler;
 
 import org.agilereview.core.external.exception.NullArgumentException;
 import org.agilereview.core.external.storage.PojoFactory;

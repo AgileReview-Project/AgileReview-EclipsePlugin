@@ -1,4 +1,4 @@
-package org.agilereview.ui.basic.handler;
+package org.agilereview.ui.basic.reviewExplorer.handler;
 
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;

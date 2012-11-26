@@ -20,7 +20,7 @@
       <command
             categoryId="org.agilereview.core.commonCommands"
             description="Create a new review"
-            id="org.agilereview.core.new_review"
+            id="org.agilereview.core.newReview"
             name="New Review">
       </command>
       <command
@@ -35,11 +35,17 @@
             id="org.agilereview.core.activateReview"
             name="Activate Review">
       </command>
+      <command
+            categoryId="org.agilereview.core.commonCommands"
+            description="Create a new comment"
+            id="org.agilereview.core.newComment"
+            name="Add new Comment">
+      </command>
    </extension>
    <extension
          point="org.eclipse.ui.commandImages">
       <image
-            commandId="org.agilereview.core.new_review"
+            commandId="org.agilereview.core.newReview"
             icon="icons/review_add.png">
       </image>
       <image
@@ -49,6 +55,10 @@
       <image
             commandId="org.agilereview.core.activateReview"
             icon="icons/review_activate.png">
+      </image>
+      <image
+            commandId="org.agilereview.core.newComment"
+            icon="icons/comment_add.png">
       </image>
    </extension>
    <extension

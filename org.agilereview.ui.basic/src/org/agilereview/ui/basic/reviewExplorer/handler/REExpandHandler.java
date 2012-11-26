@@ -5,8 +5,9 @@
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  * Contributors: Malte Brunnlieb, Philipp Diebold, Peter Reuter, Thilo Rauch
  */
-package org.agilereview.ui.basic.reviewExplorer;
+package org.agilereview.ui.basic.reviewExplorer.handler;
 
+import org.agilereview.ui.basic.reviewExplorer.ReviewExplorerView;
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
@@ -16,11 +17,11 @@ import org.eclipse.jface.viewers.TreePath;
 import org.eclipse.ui.handlers.HandlerUtil;
 
 /**
- * This handler takes care of the command for selective collapse of all sub nodes
- * of a given node in the ReviewExplorer (CommandId: org.eclipse.ui.navigate.collapseAll)
+ * This handler takes care of the command for selective expand of all sub nodes
+ * of a given node in the ReviewExplorer (CommandId: org.eclipse.ui.navigate.expandAll)
  * @author Thilo Rauch (07.05.2012)
  */
-public class RECollapseHandler extends AbstractHandler {
+public class REExpandHandler extends AbstractHandler {
 
     /* (non-Javadoc)
      * @see org.eclipse.core.commands.IHandler#execute(org.eclipse.core.commands.ExecutionEvent)
@@ -32,9 +33,9 @@ public class RECollapseHandler extends AbstractHandler {
         ISelection selection = HandlerUtil.getCurrentSelection(event);
         if(selection != null) {
             if(selection instanceof ITreeSelection) {
-                // For each selected object, collapse all subnodes
+                // For each selected object, expand all subnodes
                 for(TreePath p : ((ITreeSelection) selection).getPaths()) {
-                    ReviewExplorerView.getInstance().collapseAllSubNodes(p);
+                    ReviewExplorerView.getInstance().expandAllSubNodes(p);
                 }
             }
         }

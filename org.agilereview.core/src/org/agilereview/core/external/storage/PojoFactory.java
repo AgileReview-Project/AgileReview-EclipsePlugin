@@ -39,14 +39,18 @@ public class PojoFactory implements IReviewDataReceiver {
         return review;
     }
     
-    public static Comment createComment(String author, Review review) throws FileNotSupportedException, EditorCurrentlyNotOpenException,
+    public static Comment createComment(String author, String reviewId) throws FileNotSupportedException, EditorCurrentlyNotOpenException,
             NullArgumentException, UnknownException {
-        if (review == null) throw new NullArgumentException("The Review argument cannot be set to null when creating a comment");
+        if (author == null || reviewId == null) throw new NullArgumentException("The given arguments cannot be set to null when creating a comment");
         
         IEditorPart part = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().getActiveEditor();
+        if (part == null) { throw new EditorCurrentlyNotOpenException(); }
         IFile file = (IFile) part.getAdapter(IFile.class);
         
         StorageController sController = (StorageController) ExtensionControllerFactory.getExtensionController(ExtensionPoint.StorageClient);
+        Review review = getReview(reviewId);
+        if (review == null) { throw new NullArgumentException(
+                "Comment could not be created. Currently no review data are provided by the StorageClient."); }
         String commentId = sController.getNewCommentId(author, review);
         Comment newComment = new Comment(commentId, file, review);
         
@@ -56,6 +60,20 @@ public class PojoFactory implements IReviewDataReceiver {
         parser.addTagsToCurrentEditorSelection(commentId);
         review.addComment(newComment);
         return newComment;
+    }
+    
+    /**
+     * Searches the Review with the given id in the current set of reviews.
+     * @param reviewId review id of the review which should be returned
+     * @return the review with the given id<br><code>null</code>, otherwise
+     * @author Malte Brunnlieb (26.11.2012)
+     */
+    private static Review getReview(String reviewId) {
+        if (reviewSet == null) return null;
+        for (Review r : reviewSet) {
+            if (r.getId().equals(reviewId)) { return r; }
+        }
+        return null;
     }
     
     /* (non-Javadoc)
