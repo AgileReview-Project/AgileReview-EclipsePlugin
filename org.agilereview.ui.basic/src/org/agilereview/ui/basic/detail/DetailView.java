@@ -46,8 +46,13 @@ public class DetailView extends AbstractReviewDataView {
      */
     @Override
     protected void buildUI(Composite parent, Object initalInput) {
-        commentDetail = new CommentDetail(parent, parent.getStyle());
-        commentDetail.fillContents((Comment) initalInput);
+        if (initalInput instanceof Comment) {
+            commentDetail = new CommentDetail(parent, parent.getStyle());
+            commentDetail.fillContents((Comment) initalInput);
+        } else {
+            clearParent();
+        }
+        
     }
     
     /* (non-Javadoc)

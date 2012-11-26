@@ -12,7 +12,9 @@ import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 
 import org.agilereview.core.external.definition.IReviewDataReceiver;
 
@@ -21,7 +23,7 @@ import org.agilereview.core.external.definition.IReviewDataReceiver;
  * @author Malte Brunnlieb (03.06.2012)
  */
 public final class ReviewSet extends HashSet<Review> implements PropertyChangeListener {
-
+    
     /**
      * Generated serial version UID
      */
@@ -30,7 +32,12 @@ public final class ReviewSet extends HashSet<Review> implements PropertyChangeLi
      * {@link PropertyChangeSupport} of this POJO, used for firing {@link PropertyChangeEvent}s on changes of fields.
      */
     private final PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(this);
-
+    
+    /**
+     * Map for storing generic values
+     */
+    private Map<String, Object> genericMap = new HashMap<String, Object>();
+    
     /**
      * {@inheritDoc} <br> Added {@link PropertyChangeSupport} for tracking changes by {@link IReviewDataReceiver}
      * @see java.util.ArrayList#add(java.lang.Object)
@@ -46,7 +53,7 @@ public final class ReviewSet extends HashSet<Review> implements PropertyChangeLi
         }
         return changed;
     }
-
+    
     /**
      * {@inheritDoc} <br> Added {@link PropertyChangeSupport} for tracking changes by {@link IReviewDataReceiver}
      * @see java.util.ArrayList#addAll(java.util.Collection)
@@ -64,7 +71,7 @@ public final class ReviewSet extends HashSet<Review> implements PropertyChangeLi
         }
         return changed;
     }
-
+    
     /**
      * {@inheritDoc} <br> Added {@link PropertyChangeSupport} for tracking changes by {@link IReviewDataReceiver}
      * @see java.util.ArrayList#remove(java.lang.Object)
@@ -75,13 +82,13 @@ public final class ReviewSet extends HashSet<Review> implements PropertyChangeLi
         HashSet<Review> oldValue = new HashSet<Review>(this);
         boolean success = super.remove(o);
         if (success) {
-        	((Review) o).setOpenReviewsPreference();
+            ((Review) o).setOpenReviewsPreference();
             ((Review) o).removePropertyChangeListener(this);
             propertyChangeSupport.firePropertyChange("reviews", oldValue, this);
         }
         return success;
     }
-
+    
     /**
      * {@inheritDoc} <br> Added {@link PropertyChangeSupport} for tracking changes by {@link IReviewDataReceiver}
      * @see java.util.AbstractCollection#removeAll(java.util.Collection)
@@ -93,14 +100,14 @@ public final class ReviewSet extends HashSet<Review> implements PropertyChangeLi
         boolean success = super.removeAll(c);
         if (success) {
             for (Object r : c) {
-            	((Review) r).setOpenReviewsPreference();
+                ((Review) r).setOpenReviewsPreference();
                 ((Review) r).removePropertyChangeListener(this);
             }
             propertyChangeSupport.firePropertyChange("reviews", oldValue, this);
         }
         return success;
     }
-
+    
     /**
      * {@inheritDoc} <br> Added {@link PropertyChangeSupport} for tracking changes by {@link IReviewDataReceiver}
      * @see java.util.AbstractCollection#retainAll(java.util.Collection)
@@ -114,14 +121,14 @@ public final class ReviewSet extends HashSet<Review> implements PropertyChangeLi
             ArrayList<Review> removedOnes = new ArrayList<Review>(oldValue);
             removedOnes.removeAll(c);
             for (Review r : removedOnes) {
-            	r.setOpenReviewsPreference();
+                r.setOpenReviewsPreference();
                 r.removePropertyChangeListener(this);
             }
             propertyChangeSupport.firePropertyChange("reviews", oldValue, this);
         }
         return success;
     }
-
+    
     /**
      * {@inheritDoc} <br> Added {@link PropertyChangeSupport} for tracking changes by {@link IReviewDataReceiver}
      * @see java.util.ArrayList#clear()
@@ -131,14 +138,40 @@ public final class ReviewSet extends HashSet<Review> implements PropertyChangeLi
     public void clear() {
         HashSet<Review> oldValue = new HashSet<Review>(this);
         for (Review r : this) {
-        	r.clearComments();
-        	r.setOpenReviewsPreference();
+            r.clearComments();
+            r.setOpenReviewsPreference();
             r.removePropertyChangeListener(this);
         }
         super.clear();
         propertyChangeSupport.firePropertyChange("reviews", oldValue, this);
     }
-
+    
+    /**
+     * Possibility to store generic values in the review set (including {@link PropertyChangeSupport})
+     * @param key key under which the value will be stored. The key is also the <i>propertyName</i> which will be used for propertyChange events
+     * @param value value to store
+     * @return old value stored under this key. Can be <code>null</code>.
+     * @author Thilo Rauch (26.11.2012)
+     */
+    public Object storeValue(String key, Object value) {
+        Object oldObject = genericMap.put(key, value);
+        propertyChangeSupport.firePropertyChange("reviews", oldObject, value);
+        return oldObject;
+    }
+    
+    /**
+     * Retrieve the value stored under this key.
+     * @param key key to retrieve
+     * @return <code>null</code> if the key is null or nothing (or null) is stored under this key
+     * @author Thilo Rauch (26.11.2012)
+     */
+    public Object getValue(String key) {
+        if (key == null) {
+            return null;
+        }
+        return genericMap.get(key);
+    }
+    
     /**
      * Adds a {@link PropertyChangeListener} to the list of listeners that are notified on {@link PropertyChangeEvent}s
      * @param listener
@@ -147,7 +180,7 @@ public final class ReviewSet extends HashSet<Review> implements PropertyChangeLi
     public void addPropertyChangeListener(PropertyChangeListener listener) {
         propertyChangeSupport.addPropertyChangeListener(listener);
     }
-
+    
     /**
      * Removes a {@link PropertyChangeListener} from the list of listeners that are notified on {@link PropertyChangeEvent}s
      * @param listener
@@ -156,7 +189,7 @@ public final class ReviewSet extends HashSet<Review> implements PropertyChangeLi
     public void removePropertyChangeListener(PropertyChangeListener listener) {
         propertyChangeSupport.removePropertyChangeListener(listener);
     }
-
+    
     /*
      * (non-Javadoc)
      * @see java.beans.PropertyChangeListener#propertyChange(java.beans.PropertyChangeEvent)

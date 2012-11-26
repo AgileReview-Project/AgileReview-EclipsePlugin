@@ -200,7 +200,7 @@ public abstract class AbstractReviewDataView extends ViewPart {
      * Disposes all children of the current parent, resetting the layout
      * @author Malte Brunnlieb (27.05.2012)
      */
-    private void clearParent() {
+    protected void clearParent() {
         for (Control child : parent.getChildren()) {
             child.dispose();
         }

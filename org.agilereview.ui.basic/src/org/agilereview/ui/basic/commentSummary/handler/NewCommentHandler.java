@@ -54,6 +54,7 @@ public class NewCommentHandler extends AbstractHandler {
                 ExceptionHandler.logAndNotifyUser(e.getMessage(), e);
             } catch (UnknownException e) {
                 ExceptionHandler.logAndNotifyUser(e.getMessage(), e);
+                e.printStackTrace();
             }
         }
         

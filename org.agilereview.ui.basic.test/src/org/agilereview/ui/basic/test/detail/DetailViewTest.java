@@ -94,12 +94,31 @@ public class DetailViewTest {
         
         StorageClientMock.getInstance().setStorageContent(reviews);
         
-        //perform UI test input (author)
         try {
-            Thread.sleep(60000);
+            Thread.sleep(5000);
         } catch (InterruptedException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
+        
+        reviews.storeValue("detail", c1);
+        
+        try {
+            Thread.sleep(5000);
+        } catch (InterruptedException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        
+        reviews.storeValue("detail", c2);
+        
+        //perform UI test input (author)
+        try {
+            Thread.sleep(1000000);
+        } catch (InterruptedException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        
     }
 }

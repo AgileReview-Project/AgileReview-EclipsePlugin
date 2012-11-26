@@ -2,7 +2,6 @@ package org.agilereview.ui.basic.reviewExplorer;
 
 import org.agilereview.core.external.preferences.AgileReviewPreferences;
 import org.agilereview.core.external.storage.Review;
-import org.agilereview.ui.basic.Activator;
 import org.agilereview.ui.basic.tools.PreferencesAccessor;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
@@ -14,7 +13,6 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.PlatformUI;
-import org.eclipse.ui.plugin.AbstractUIPlugin;
 
 /**
  * The LabelProvider specifies how the nodes of the tree viewer should be displayed
@@ -59,8 +57,9 @@ class RELabelProvider extends ColumnLabelProvider {
             if (!currentReview.getIsOpen()) {
                 result = PlatformUI.getWorkbench().getSharedImages().getImage(org.eclipse.ui.ide.IDE.SharedImages.IMG_OBJ_PROJECT_CLOSED);
             } else if (currentReview.getId().equals(this.props.get(AgileReviewPreferences.ACTIVE_REVIEW_ID))) {
-                String activeReviewIconPath = Activator.getDefault().getInternalProperty(Activator.Keys.ACTIVE_REVIEW_ICON);
-                result = AbstractUIPlugin.imageDescriptorFromPlugin(Activator.PLUGIN_ID, activeReviewIconPath).createImage();
+                // TODO Fix icon
+                //                String activeReviewIconPath = Activator.getDefault().getInternalProperty(Activator.Keys.ACTIVE_REVIEW_ICON);
+                //                result = AbstractUIPlugin.imageDescriptorFromPlugin(Activator.PLUGIN_ID, activeReviewIconPath).createImage();
             }
         } else if (element instanceof IProject) {
             result = PlatformUI.getWorkbench().getSharedImages().getImage(org.eclipse.ui.ide.IDE.SharedImages.IMG_OBJ_PROJECT);
@@ -89,7 +88,9 @@ class RELabelProvider extends ColumnLabelProvider {
     
     @Override
     public Color getForeground(Object element) {
-        if (!this.exists(element)) { return this.grey; }
+        if (!this.exists(element)) {
+            return this.grey;
+        }
         return null;
     }
 }

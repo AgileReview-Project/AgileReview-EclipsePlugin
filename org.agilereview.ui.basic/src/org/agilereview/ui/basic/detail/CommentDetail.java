@@ -288,6 +288,24 @@ public class CommentDetail extends Composite {
         replyScrolledWrapper.layout();
     }
     
+    /**
+     * Sets the levels for the status and priority configuration of a comment.
+     */
+    private void setPropertyConfigurations() {
+        CommentProperties commentProps = new CommentProperties();
+        String[] levels = commentProps.getStatuses();
+        statusDropDown.removeAll();
+        for (int i = 0; i < levels.length; i++) {
+            statusDropDown.add(levels[i]);
+        }
+        
+        levels = commentProps.getPriorities();
+        priorityDropDown.removeAll();
+        for (int i = 0; i < levels.length; i++) {
+            priorityDropDown.add(levels[i]);
+        }
+    }
+    
     //    /*
     //     * (non-Javadoc)
     //     * @see de.tukl.cs.softech.agilereview.view.detail.AbstractDetail#saveChanges()
@@ -429,23 +447,6 @@ public class CommentDetail extends Composite {
     //        return result;
     //    }
     //    
-    /**
-     * Sets the levels for the status and priority configuration of a comment.
-     */
-    private void setPropertyConfigurations() {
-        CommentProperties commentProps = new CommentProperties();
-        String[] levels = commentProps.getStatuses();
-        statusDropDown.removeAll();
-        for (int i = 0; i < levels.length; i++) {
-            statusDropDown.add(levels[i]);
-        }
-        
-        levels = commentProps.getPriorities();
-        priorityDropDown.removeAll();
-        for (int i = 0; i < levels.length; i++) {
-            priorityDropDown.add(levels[i]);
-        }
-    }
     //    
     //    /**
     //     * Generates the comment key for the given comment in the following scheme: reviewID|author|commendID

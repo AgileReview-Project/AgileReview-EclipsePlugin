@@ -48,7 +48,9 @@ public class EditorParserExtension implements IEditorParser {
                         Map<String, String[]> fileendingToCommentTagsMap = FileSupportPreferencesFactory.createFileSupportMap();
                         if (fileendingToCommentTagsMap.containsKey(file.getFileExtension())) {
                             String[] tags = fileendingToCommentTagsMap.get(file.getFileExtension());
-                            if (tags == null) { throw new FileNotSupportedException(); }
+                            if (tags == null) {
+                                throw new FileNotSupportedException();
+                            }
                             parserMap.put(file, new TagParser((ITextEditor) editor, tags));
                         } else {
                             throw new FileNotSupportedException();
@@ -79,14 +81,16 @@ public class EditorParserExtension implements IEditorParser {
         try {
             IEditorPart editor = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().getActiveEditor();
             if (editor != null) {
-                IFile file = (IFile) editor.getAdapter(IFile.class);
+                IFile file = (IFile) editor.getEditorInput().getAdapter(IFile.class);
                 if (file != null) {
                     if (!parserMap.containsKey(file)) {
                         if (editor instanceof ITextEditor) {
                             Map<String, String[]> fileendingToCommentTagsMap = FileSupportPreferencesFactory.createFileSupportMap();
                             if (fileendingToCommentTagsMap.containsKey(file.getFileExtension())) {
                                 String[] tags = fileendingToCommentTagsMap.get(file.getFullPath().getFileExtension());
-                                if (tags == null) { throw new FileNotSupportedException(); }
+                                if (tags == null) {
+                                    throw new FileNotSupportedException();
+                                }
                                 parserMap.put(file, new TagParser((ITextEditor) editor, tags));
                             } else {
                                 throw new FileNotSupportedException();
@@ -108,7 +112,7 @@ public class EditorParserExtension implements IEditorParser {
         } catch (EditorCurrentlyNotOpenException e) {
             throw e;
         } catch (Throwable e) {
-            throw new UnknownException();
+            throw new UnknownException(e);
         }
     }
     
@@ -128,7 +132,9 @@ public class EditorParserExtension implements IEditorParser {
                         Map<String, String[]> fileendingToCommentTagsMap = FileSupportPreferencesFactory.createFileSupportMap();
                         if (fileendingToCommentTagsMap.containsKey(file.getFileExtension())) {
                             String[] tags = fileendingToCommentTagsMap.get(file.getFileExtension());
-                            if (tags == null) { throw new FileNotSupportedException(); }
+                            if (tags == null) {
+                                throw new FileNotSupportedException();
+                            }
                             parserMap.put(file, new TagParser((ITextEditor) editor, tags));
                         } else {
                             throw new FileNotSupportedException();
@@ -166,7 +172,9 @@ public class EditorParserExtension implements IEditorParser {
                             Map<String, String[]> fileendingToCommentTagsMap = FileSupportPreferencesFactory.createFileSupportMap();
                             if (fileendingToCommentTagsMap.containsKey(file.getFileExtension())) {
                                 String[] tags = fileendingToCommentTagsMap.get(file.getFullPath().getFileExtension());
-                                if (tags == null) { throw new FileNotSupportedException(); }
+                                if (tags == null) {
+                                    throw new FileNotSupportedException();
+                                }
                                 parserMap.put(file, new TagParser((ITextEditor) editor, tags));
                             } else {
                                 throw new FileNotSupportedException();
@@ -223,7 +231,9 @@ public class EditorParserExtension implements IEditorParser {
         for (IEditorReference editor : editors) {
             try {
                 IFile editorFile = (IFile) editor.getEditorInput().getAdapter(IFile.class);
-                if (editorFile != null && editorFile.getFullPath().toOSString().equals(file.getFullPath().toOSString())) { return editor; }
+                if (editorFile != null && editorFile.getFullPath().toOSString().equals(file.getFullPath().toOSString())) {
+                    return editor;
+                }
             } catch (PartInitException e) {
                 // suppress as the editor has to be restarted manually, so we can manipulate the file directly
             }

@@ -8,10 +8,7 @@
 package org.agilereview.ui.basic.detail;
 
 import java.beans.PropertyChangeEvent;
-import java.util.List;
 
-import org.agilereview.core.external.storage.Comment;
-import org.agilereview.core.external.storage.Review;
 import org.agilereview.core.external.storage.ReviewSet;
 import org.agilereview.ui.basic.external.reviewDataReceiver.AbstractReviewDataReceiver;
 import org.agilereview.ui.basic.external.reviewDataReceiver.AbstractReviewDataView;
@@ -52,11 +49,11 @@ public class DetailDataReceiver extends AbstractReviewDataReceiver {
     protected Object transformData(ReviewSet rawData) {
         // TODO get the right object
         if (rawData != null) {
-            Review[] reviews = rawData.toArray(new Review[0]);
-            if (reviews.length > 0) {
-                List<Comment> comments = reviews[0].getComments();
-                currentlyShownObject = comments.get(0);
+            currentlyShownObject = rawData.getValue("detail");
+            if (currentlyShownObject != null) {
                 return currentlyShownObject;
+            } else {
+                return new Object();
             }
         }
         return null;
@@ -68,7 +65,7 @@ public class DetailDataReceiver extends AbstractReviewDataReceiver {
      */
     @Override
     protected boolean triggerPropertyChange(PropertyChangeEvent evt, ReviewSet data) {
-        // TODO: Better (and currenltyShownOnject==null)
-        return currentlyShownObject == null || evt.getSource().equals(currentlyShownObject);
+        // TODO: ReviewSetMap change
+        return currentlyShownObject == null || evt.getSource().equals(currentlyShownObject) || (evt.getPropertyName().equalsIgnoreCase("detail"));
     }
 }

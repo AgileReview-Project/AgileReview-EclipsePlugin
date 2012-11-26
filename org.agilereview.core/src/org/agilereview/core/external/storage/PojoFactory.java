@@ -44,13 +44,16 @@ public class PojoFactory implements IReviewDataReceiver {
         if (author == null || reviewId == null) throw new NullArgumentException("The given arguments cannot be set to null when creating a comment");
         
         IEditorPart part = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().getActiveEditor();
-        if (part == null) { throw new EditorCurrentlyNotOpenException(); }
-        IFile file = (IFile) part.getAdapter(IFile.class);
+        if (part == null) {
+            throw new EditorCurrentlyNotOpenException();
+        }
+        IFile file = (IFile) part.getEditorInput().getAdapter(IFile.class);
         
         StorageController sController = (StorageController) ExtensionControllerFactory.getExtensionController(ExtensionPoint.StorageClient);
         Review review = getReview(reviewId);
-        if (review == null) { throw new NullArgumentException(
-                "Comment could not be created. Currently no review data are provided by the StorageClient."); }
+        if (review == null) {
+            throw new NullArgumentException("Comment could not be created. Currently no review data are provided by the StorageClient.");
+        }
         String commentId = sController.getNewCommentId(author, review);
         Comment newComment = new Comment(commentId, file, review);
         
@@ -71,7 +74,9 @@ public class PojoFactory implements IReviewDataReceiver {
     private static Review getReview(String reviewId) {
         if (reviewSet == null) return null;
         for (Review r : reviewSet) {
-            if (r.getId().equals(reviewId)) { return r; }
+            if (r.getId().equals(reviewId)) {
+                return r;
+            }
         }
         return null;
     }

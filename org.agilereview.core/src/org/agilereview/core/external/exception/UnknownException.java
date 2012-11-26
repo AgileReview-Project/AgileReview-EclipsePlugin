@@ -27,4 +27,9 @@ public class UnknownException extends Exception {
         super("An unknown error occured. Please consider to save your current eclipse log file and write a bug report.");
     }
     
+    public UnknownException(Throwable e) {
+        super("An unknown error occured. Please consider to save your current eclipse log file and write a bug report.", e);
+        
+    }
+    
 }
