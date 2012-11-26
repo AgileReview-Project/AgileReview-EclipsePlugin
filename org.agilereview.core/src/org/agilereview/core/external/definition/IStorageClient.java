@@ -32,20 +32,20 @@ public interface IStorageClient {
      * @return A unique identifier for this {@link Review} as it is required by the {@link IStorageClient}.
      * @author Peter Reuter (28.04.2012)
      */
-    public String getNewId(Review review);
+    public Review createNewReview(Review review);
     
     /**
      * @param comment the {@link Comment} for which a new ID is requested
      * @return A unique identifier for this {@link Comment} as it is required by the {@link IStorageClient}.
      * @author Peter Reuter (28.04.2012)
      */
-    public String getNewId(Comment comment);
+    public Comment createNewComment(Comment comment);
     
     /**
      * @param reply the {@link Reply} for which a new ID is requested
      * @return A unique identifier for this {@link Reply} as it is required by the {@link IStorageClient}.
      * @author Peter Reuter (28.04.2012)
      */
-    public String getNewId(Reply reply);
+    public Reply createNewReply(Reply reply);
     
 }
