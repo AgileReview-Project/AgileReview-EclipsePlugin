@@ -15,7 +15,7 @@ import org.agilereview.core.external.storage.Review;
 import org.agilereview.core.external.storage.ReviewSet;
 
 /**
- * Interface that has to be implemeted by AgileReview storage clients.
+ * Interface that has to be implemented by AgileReview storage clients.
  * @author Peter Reuter (19.02.2012)
  */
 public interface IStorageClient {
@@ -28,24 +28,21 @@ public interface IStorageClient {
     public ReviewSet getAllReviews();
     
     /**
-     * @param review the {@link Review} for which a new ID is requested
      * @return A unique identifier for this {@link Review} as it is required by the {@link IStorageClient}.
      * @author Peter Reuter (28.04.2012)
      */
-    public Review createNewReview(Review review);
+    public Review createNewReview();
     
     /**
-     * @param comment the {@link Comment} for which a new ID is requested
      * @return A unique identifier for this {@link Comment} as it is required by the {@link IStorageClient}.
      * @author Peter Reuter (28.04.2012)
      */
-    public Comment createNewComment(Comment comment);
+    public Comment createNewComment();
     
     /**
-     * @param reply the {@link Reply} for which a new ID is requested
      * @return A unique identifier for this {@link Reply} as it is required by the {@link IStorageClient}.
      * @author Peter Reuter (28.04.2012)
      */
-    public Reply createNewReply(Reply reply);
+    public Reply createNewReply();
     
 }
