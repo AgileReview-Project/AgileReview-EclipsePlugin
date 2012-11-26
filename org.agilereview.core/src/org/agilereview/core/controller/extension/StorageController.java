@@ -15,9 +15,6 @@ import org.agilereview.core.exception.ExtensionCreationException;
 import org.agilereview.core.exception.NoStorageClientException;
 import org.agilereview.core.external.definition.IReviewDataReceiver;
 import org.agilereview.core.external.definition.IStorageClient;
-import org.agilereview.core.external.storage.Comment;
-import org.agilereview.core.external.storage.Reply;
-import org.agilereview.core.external.storage.Review;
 import org.agilereview.core.external.storage.ReviewSet;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.CoreException;
@@ -133,14 +130,14 @@ public class StorageController extends AbstractController<IStorageClient> implem
     }
     
     /**
-     * This method will be forwarded to {@link IStorageClient#createNewReview()} of the currently active {@link IStorageClient}
-     * @see org.agilereview.core.external.definition.IStorageClient#createNewReview()
+     * This method will be forwarded to {@link IStorageClient#getNewReviewId()} of the currently active {@link IStorageClient}
+     * @see org.agilereview.core.external.definition.IStorageClient#getNewReviewId()
      * @author Malte Brunnlieb (28.04.2012)
      */
     @Override
-    public Review createNewReview() {
+    public String getNewReviewId() {
         try {
-            Review result = activeClient.createNewReview();
+            String result = activeClient.getNewReviewId();
             Assert.isNotNull(result);
             return result;
         } catch (Throwable ex) {
@@ -151,14 +148,14 @@ public class StorageController extends AbstractController<IStorageClient> implem
     }
     
     /**
-     * This method will be forwarded to {@link IStorageClient#createNewComment()} of the currently active {@link IStorageClient}
-     * @see org.agilereview.core.external.definition.IStorageClient#createNewComment()
+     * This method will be forwarded to {@link IStorageClient#getNewCommentId()} of the currently active {@link IStorageClient}
+     * @see org.agilereview.core.external.definition.IStorageClient#getNewCommentId()
      * @author Malte Brunnlieb (28.04.2012)
      */
     @Override
-    public Comment createNewComment() {
+    public String getNewCommentId() {
         try {
-            Comment result = activeClient.createNewComment();
+            String result = activeClient.getNewCommentId();
             Assert.isNotNull(result);
             return result;
         } catch (Throwable ex) {
@@ -169,14 +166,14 @@ public class StorageController extends AbstractController<IStorageClient> implem
     }
     
     /**
-     * This method will be forwarded to {@link IStorageClient#createNewReply()} of the currently active {@link IStorageClient}
-     * @see org.agilereview.core.external.definition.IStorageClient#createNewReply()
+     * This method will be forwarded to {@link IStorageClient#getNewReplyId()} of the currently active {@link IStorageClient}
+     * @see org.agilereview.core.external.definition.IStorageClient#getNewReplyId()
      * @author Malte Brunnlieb (28.04.2012)
      */
     @Override
-    public Reply createNewReply() {
+    public String getNewReplyId() {
         try {
-            Reply result = activeClient.createNewReply();
+            String result = activeClient.getNewReplyId();
             Assert.isNotNull(result);
             return result;
         } catch (Throwable ex) {
