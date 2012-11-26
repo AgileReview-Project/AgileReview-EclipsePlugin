@@ -72,14 +72,11 @@ public class ExtensionControllerFactory {
      * @author Malte Brunnlieb (11.07.2012)
      */
     private static IExtensionController getController(ExtensionPoint ex, Class<?> clazz) {
-        Object o;
         try {
-            o = clazz.newInstance();
-            IExtensionController ec = (IExtensionController) o;
-            if (extensionControllerMap.get(ex) == null) {
-                extensionControllerMap.put(ex, ec);
+            if (!extensionControllerMap.containsKey(ex)) {
+                extensionControllerMap.put(ex, (IExtensionController) clazz.newInstance());
             }
-            return ec;
+            return extensionControllerMap.get(ex);
         } catch (InstantiationException e) {
             // should not occur by construction
             e.printStackTrace();

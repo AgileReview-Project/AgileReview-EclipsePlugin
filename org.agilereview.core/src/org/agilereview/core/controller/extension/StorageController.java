@@ -37,6 +37,10 @@ public class StorageController extends AbstractController<IStorageClient> implem
      * Currently active {@link IStorageClient} on which all operations will be called
      */
     private IStorageClient activeClient = null;
+    /**
+     * The id of the active {@link IStorageClient}
+     */
+    private String activeClientId = "";
     
     /**
      * Creates a new instance of the {@link StorageController}
@@ -65,7 +69,7 @@ public class StorageController extends AbstractController<IStorageClient> implem
             if (PlatformUI.getPreferenceStore().getBoolean("org.agilereview.testrunner.mock.storage")) { //TODO if client can be set via preferences -> use this
                 setStorageClient("StorageMock");
             } else if (getFirstExtension() != null) {
-                setStorageClient(getFirstExtension()); //TODO do not use last, but manage to set this client via preferences
+                setStorageClient(getFirstExtension()); //TODO do not use first, but manage to set this client via preferences
             }
         } catch (ExtensionCreationException e) {
             ExceptionHandler.logAndNotifyUser(e.getLocalizedMessage(), e);
@@ -96,15 +100,14 @@ public class StorageController extends AbstractController<IStorageClient> implem
      * @author Malte Brunnlieb (27.05.2012)
      */
     public void setStorageClient(String name) throws ExtensionCreationException {
-        if (activeClient != null && activeClient.equals(name)) return;
+        if (activeClient != null && activeClientId.equals(name)) return;
         
         Set<String> extensions = getAvailableExtensions();
-        if (!extensions.contains(name)) {
-            throw new ExtensionCreationException("The StorageClient with id " + name + " could not be found!");
-        }
+        if (!extensions.contains(name)) { throw new ExtensionCreationException("The StorageClient with id " + name + " could not be found!"); }
         
         try {
             activeClient = getUniqueExtension(name);
+            activeClientId = name;
         } catch (CoreException e) {
             e.printStackTrace();
             throw new ExtensionCreationException("The StorageClient with id " + name + " could not be intantiated!");
