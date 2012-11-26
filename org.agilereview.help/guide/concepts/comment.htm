@@ -1,0 +1,41 @@
+<html>
+
+<head>
+	<meta http-equiv="Content-Language" content="en-us">
+	<meta http-equiv="Content-Type" content="text/html; charset=windows-1252">
+	<link rel="STYLESHEET" href="book.css" charset="ISO-8859-1" type="text/css">
+	<title>Comment concept</title>
+</head>
+
+<body>
+  <h1>Comment concept</h1>
+  <h3><a name="definition">Definition of "comment" in context of the AgileReview plugin</a></h3>
+  <em><p align=justify>A comment is a set of information regarding a file or one or more lines of 
+  code of a file that is part of a project of the Eclipse workspace. It is 
+  related to exactly one file and exactly one review. A comment consists of the 
+  following information:</p>
+   <ul>
+    <li><b>ID</b> - the comment's ID (unique in context of an author and a review)</li>
+    <li><b>Author</b> - the comment's author</li>
+    <li><b>Status</b> - the comment's actual status (open, closed)</li>
+    <li><b>Priority</b> - the comment's priority (high, medium, low)</li>
+    <li><b>Recipient</b> - the person that this comment is addressed to</li>
+    <li><b>Description</b> - a short description of the issue marked by this comment</li>
+    <li><b>Replies</b> - a list of replies that were added by the author and other reviewers</li>
+   </ul>
+   A comment can always be identified by the triple (review ID,author,ID).
+   </em>
+  
+  <h3><a name="linebound">Code line bound comments</a></h3>
+    <p align=justify>A comment that is related to one or more lines of code of a
+    file is called "line bound". It will be highlighted in the editor containing
+    the file and show up in the table of the "Comments Summary" view.</p>
+   
+  <h3><a name="global">Global comments</a></h3>
+    <p align=justify>A comment that is solely related to a file is called 
+    "global". It will not be highlighted in the editor containing the file, but 
+    show up in the table of the "Comments Summary" view. Global comments will be
+    created for file types that are not supported (XML, Java).</p>
+</body>
+
+</html>

@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<cheatsheet title="Insert Comment">
+<intro>
+<description>This cheatsheet guides you through the creation a comment.</description>
+</intro>
+<item
+      skip="false"
+      title="Open perspective">
+<description>Open the AgileReview perspective.
+</description>
+<command
+      required="false"
+      serialization="org.eclipse.ui.perspectives.showPerspective(org.eclipse.ui.perspectives.showPerspective.perspectiveId=de.tukl.cs.softech.agilereview.view.AgileReviewPerspective)"/>
+</item>
+<item
+      skip="false"
+      title="Open a file">
+   <description>
+      To create a comment it is necessary to have a file opened in an editor. Comments that are bound to lines of code can only be added to &quot;.java&quot; and &quot;.xml&quot; files. Comments for other files will be treated as &quot;global&quot; comments.
+   </description>
+   <command
+         required="false"
+         serialization="org.eclipse.ui.navigate.openResource"/>
+</item>
+<item title="Add comment" skip="false">
+<description>Select a range of source code. Adding a comment can be accomplished in two ways. <b>Press</b> the <b>&quot;Add new comment&quot;</b> button in the &quot;Comments Summary&quot; view or use the following shortkey &quot;CTRL+Shift++&quot;.
+</description>
+</item>
+<item
+      title="Insert content">
+   <description>
+      After creating the comment, it will be shown in the &quot;Comment Detail&quot; view. Insert the required and optional data. Some data might be preset. The comment will be <b>saved automatically</b> when leaving the &quot;Comment Detail&quot; view.
+   </description>
+</item>
+</cheatsheet>

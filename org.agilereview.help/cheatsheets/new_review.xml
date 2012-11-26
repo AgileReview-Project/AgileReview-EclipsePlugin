@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<cheatsheet title="Insert Review">
+<intro>
+<description>This cheatsheets guides you through the creation of a review.</description>
+</intro>
+<item
+      skip="true"
+      title="Review Explorer">
+<description>Go to the <b>Review Explorer</b>.
+</description>
+<command
+      required="false"
+      serialization="org.eclipse.ui.views.showView(org.eclipse.ui.views.showView.viewId=de.tukl.cs.softech.agilereview.view.reviewnavigator.view)"/>
+</item>
+<item
+      title="Create Review">
+   <description>
+      Create a new review by pressing the <b>&quot;Create a new review&quot;</b> button or by using the <b>New-Wizard</b> (CTRL+N, File-&gt;New-&gt;Other) and selecting &quot;Review&quot; from the &quot;AgileReview&quot; category. The &quot;New Review&quot; wizard will open. Enter the required (and optional) data. Click &quot;Finish&quot;.
+   </description>
+   <command
+         required="false"
+         serialization="de.tukl.cs.softech.agilereview.views.reviewexplorer.createNewReview"/>
+</item>
+<item
+      title="Finish">
+   <description>
+      The new review is set &quot;active&quot;. All new comments are assigned to this review.
+   </description>
+</item>
+</cheatsheet>

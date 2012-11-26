@@ -1,0 +1,31 @@
+<html>
+
+<head>
+	<meta http-equiv="Content-Language" content="en-us">
+	<meta http-equiv="Content-Type" content="text/html; charset=windows-1252">
+	<link rel="STYLESHEET" href="book.css" charset="ISO-8859-1" type="text/css">
+	<title>Storage concept</title>
+</head>
+
+<body>
+  <h1>Storage concept</h1>
+    <p aling=justify>All review data is stored in the AgileReview project 
+    located in the workspace of Eclipse.</p>
+    <h3>Storage of <a href="review.htm">reviews</a></h3>
+      <p align=justify>The AgileReview project folder contains a sub-folder for 
+      each <a href="review.htm">review</a>. This sub-folder contains the 
+      "review.xml" that stores the information related to the 
+      <a href="review.htm">review</a>.</p>
+    <h3>Storage of <a href="comment.htm">comments</a></h3>
+      <p align=justify><a href="comment.htm">Comments</a> are stored on a per-
+      author base in the sub-folder representing the <a href="review.htm">review</a>. For each author a file "author_$AUTHORNAME.xml" is created that 
+      stores the authors <a href="comment.htm">comments</a>.</p>
+    <h3>Sharing <a href="review.htm">reviews</a></h3>
+      <p align=justify><a href="review.htm">Reviews</a> can be shared by sharing the AgileReviews project
+       folder e.g. via content versioning systems such as SVN oder git.<br>
+      <b>ATTENTION</b>: When commenting files, also the files that were 
+      commented have to be commited as otherwise the newly created <a href="comment.htm">comments</a> will
+       be treated as <a href="comment.htm#global">global comments</a>.</p>
+</body>
+
+</html>

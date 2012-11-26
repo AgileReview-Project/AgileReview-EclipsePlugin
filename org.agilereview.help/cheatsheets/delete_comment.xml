@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<cheatsheet title="Delete Comment">
+   <intro>
+		<description>This cheatsheet guides you through the steps required for deleting a comment.</description>
+	</intro>
+   <item
+         title="Select comment">
+      <description>
+         Go to &quot;Comments Summary&quot; view and select a comment via clicking on it. Alternatively select a comment by moving the cursor in the currently open editor to the comments annotation and select it via shortkey &quot;CTRL+Shift+#&quot;.
+      </description>
+   </item>
+   <item
+         title="Delete Comment">
+      <description>
+         <b>Press</b> the <b>&quot;Delete comment(s)&quot;</b> button in the &quot;Comments Summary&quot; view. Alternatively go the highlighted range of a comment in the editor and use the shortkey &quot;CTRL+Shift+-&quot;.
+      </description>
+   </item>
+</cheatsheet>

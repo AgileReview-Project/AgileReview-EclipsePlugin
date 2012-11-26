@@ -1,0 +1,110 @@
+<html>
+
+<head>
+	<meta http-equiv="Content-Language" content="en-us">
+	<meta name="GENERATOR" content="Microsoft FrontPage 5.0">
+	<meta name="ProgId" content="FrontPage.Editor.Document">
+	<meta http-equiv="Content-Type" content="text/html; charset=windows-1252">
+	<link rel="STYLESHEET" href="book.css" charset="ISO-8859-1" type="text/css">
+	<title>Quickstart</title>
+</head>
+
+<body>
+	<h1>Quickstart</h1>
+<p style="text-align: justify;">The following is a quick start guide to the AgileReview plugin. It is meant to walk you through the basic steps to  use the plugin easily.</p>
+//Insert Screencast here
+<h2 style="text-align: justify;">Short Introduction</h2>
+<p style="text-align: justify;">This plugin is used to do code reviewing in your development environment. So it is possible to switch between the development perspective and  the code-reviewing perspective as quickly as possible. This reduces effort in setting up your review environment.</p>
+<p style="text-align: justify;">Reviewing code is done in two steps:</p>
+
+<ul style="text-align: justify;">
+    <li><strong>creating a review:</strong> comments are grouped in reviews, so for commenting code, a review has to be created first (see also: definition of <a href="./concepts/review.htm">review</a>).</li>
+    <li><strong>commenting code:</strong>
+The AgileReview plugin allows to add/modify/delete code based comments. This means that a comment can be added to a selected range of code. After that the corresponding lines will be highlighted and e.g. comment text, recipient, or the priority can be set. By selecting an already existing comment it's details are shown and can be modified or the selected comment(s) can be deleted.</li>
+</ul>
+<h2 style="text-align: justify;">Views of AgileReview</h2>
+<p>This section includes a short graphical introduction into the different important views.</p>
+<h3><a href="concepts/views/reviewexplorer.htm">ReviewExplorer</a></h3>
+<center><a href="../images/RE.png"><img src="../images/RE.png" width="280" height="200"></a></center>
+<h3><a href="concepts/views/summaryview.htm">CommentSummary view</a></h3>
+<center><a href="../images/CSV.png"><img src="../images/CSV.png" width="280" height="200"></a></center>
+<h3><a href="concepts/views/detailview.htm">Detail view</a></h3>
+<center><a href="../images/CD.png"><img src="../images/CD.png" width="280" height="200"></a></center>
+<h3>Editor</h3>
+<center><a href="../images/Editor.png"><img src="../images/Editor.png" width="280" height="200"></a></center>
+<h2 style="text-align: justify;">Using Agilereview</h2>
+<p style="text-align: justify;">Notice: A cheatsheet for all of the now mentioned actions in the  help section is provided.</p>
+<p style="text-align: justify;">For all actions it is necessary to open the AgileReview perspective.</p>
+
+<h3 style="text-align: justify;">Create new Review</h3>
+<ol style="text-align: justify;">
+    <li>Option 1
+<ol>
+    <li>Go to the ReviewExplorer</li>
+    <li>Click on the "Create new Review" button, or select "Create new Review" from the context menu. This will open the "New Review" wizard</li>
+    <li>Insert data for the review (especially the ReviewName can not be empty)</li>
+    <li>Confirm this data with <em>Finish</em></li>
+</ol>
+</li>
+    <li>Option 2
+<ol>
+    <li>Open the "New" Menu via CTRL+N or File-&gt;New-&gt;Other</li>
+    <li>Select from the category "AgileReview" the entry "Review"</li>
+    <li>perform steps 3 and 4 of option 1</li>
+</ol>
+</li>
+</ol>
+<p style="text-align: justify;">Now the Review is created and shown in the ReviewExplorer as  the active review. Detailed data can be seen and modified in the Detail View.</p>
+
+<h3 style="text-align: justify;">Change Review Information</h3>
+<ol style="text-align: justify;">
+    <li>Go to the ReviewExplorer</li>
+    <li>Select the review you want to change. This displays the review information in the detail view.</li>
+    <li>Go into the detail view</li>
+    <li>Change the data</li>
+</ol>
+<p style="text-align: justify;">All changes will be saved automatically when leaving the detail view.</p>
+
+<h3 style="text-align: justify;">Delete Review</h3>
+<ol style="text-align: justify;">
+    <li>Go to the ReviewExplorer</li>
+    <li>Select the review(s) you want to delete</li>
+    <li>Press <em>DEL</em> key or select "Delete" from the context menu</li>
+</ol>
+<h3 style="text-align: justify;">Create new Comment</h3>
+<ol style="text-align: justify;">
+    <li>If no review is set to "active", activate a review in the ReviewExplorer</li>
+    <li>Select the code line(s)/section where the comment should be placed. If the filetype is not of type "xml" or "java", the comment will be a <a href="./concepts/comment.htm#global">"global" comment</a> that is not related to a piece of code, but only to the actually opened file.</li>
+    <li>Add a comment
+<ol>
+    <li>Option 1: Click "Add new comment" in the top right corner of the comments summary view</li>
+    <li>Option 2: Press CTRL+Shift+"+"</li>
+</ol>
+</li>
+    <li>The new comment is displayed in the detail view and it's data can be modified</li>
+</ol>
+<p style="text-align: justify;">All changes will be saved automatically when leaving the detail view.</p>
+
+<h3 style="text-align: justify;">Change Comment</h3>
+<ol style="text-align: justify;">
+    <li>Select the comment you want to change via
+<ol>
+    <li>Option 1: selecting it in the comments summary view</li>
+    <li>Option 2: pressing CTRL+Shift+"#" in the editor that contains the comment while the cursor is in the highlighted range of the comment.</li>
+</ol>
+</li>
+    <li>The comment's details will be shown in the detail view. Data can be changed in this view</li>
+</ol>
+<p style="text-align: justify;">All changes will be saved automatically when leaving the detail view.</p>
+
+<h3 style="text-align: justify;">Delete Comment</h3>
+<ol style="text-align: justify;">
+    <li>Go to the comments summary view</li>
+    <li>Select the comment(s) you want to delete</li>
+    <li>Press <em>DEL</em> or the Click "Delete comment(s)" in the top right corner of the comments summary view</li>
+</ol>
+
+//Relocate Comment
+</body>
+
+</html>
