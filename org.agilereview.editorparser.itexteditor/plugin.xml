@@ -9,5 +9,12 @@
             id="org.agilereview.editorparser.itexteditor.EditorParser">
       </EditorParser>
    </extension>
+   <extension
+         point="org.agilereview.core.ReviewDataReceiver">
+      <ReviewDataReceiver
+            class="org.agilereview.editorparser.itexteditor.control.DataManager"
+            id="org.agilereview.editorparser.itexteditor.DataReceiver">
+      </ReviewDataReceiver>
+   </extension>
 
 </plugin>

@@ -24,7 +24,6 @@ import org.agilereview.ui.basic.commentSummary.filter.SearchFilter;
 import org.agilereview.ui.basic.commentSummary.table.Column;
 import org.agilereview.ui.basic.reviewExplorer.ReviewExplorerView;
 import org.agilereview.ui.basic.tools.ExceptionHandler;
-import org.eclipse.core.commands.Command;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.ISelection;
@@ -146,9 +145,9 @@ public class FilterController extends SelectionAdapter implements Listener, KeyL
                 return;
             }
             
-            Command linkExplorerCommand = cmdService.getCommand("org.eclipse.ui.navigate.linkWithEditor"); // TODO check command ID
-            Object state = linkExplorerCommand.getState("org.eclipse.ui.commands.toggleState").getValue();
-            
+            //Command linkExplorerCommand = cmdService.getCommand("org.eclipse.ui.navigate.linkWithEditor"); // TODO check command ID
+            //Object state = linkExplorerCommand.getState("org.eclipse.ui.commands.toggleState").getValue();
+            Object state = false;
             if ((Boolean) state) {
                 ITreeSelection sel = (ITreeSelection) selection;
                 List<String> reviewIDs = getReviewIDs(sel);

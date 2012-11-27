@@ -34,6 +34,10 @@ public class EditorParserController extends AbstractController<IEditorParser> {
      * A mapping of editor parser plug-in IDs to currently instantiated {@link IEditorParser} objects
      */
     private static final HashMap<String, IEditorParser> editorParserMap = new HashMap<String, IEditorParser>();
+    /**
+     * Flag indicating whether all issues for initialization are finished
+     */
+    private volatile boolean initialized = false;
     
     /**
      * Creates a new instance of the {@link EditorParserController}
@@ -41,6 +45,7 @@ public class EditorParserController extends AbstractController<IEditorParser> {
      */
     EditorParserController() {
         super(IEDITORPARSER_ID);
+        checkForNewClients();
     }
     
     /**
@@ -50,6 +55,8 @@ public class EditorParserController extends AbstractController<IEditorParser> {
      * @author Malte Brunnlieb (15.07.2012)
      */
     public IEditorParser createParser(Class<?> editorClass) {
+        while (!initialized) {
+        }
         synchronized (classToExtensionMap) {
             for (Class<?> clazz : classToExtensionMap.keySet()) {
                 if (clazz.isAssignableFrom(editorClass)) { //TODO check if this works
@@ -86,6 +93,7 @@ public class EditorParserController extends AbstractController<IEditorParser> {
                 }
             }
         }
+        initialized = true;
     }
     
     /**

@@ -25,51 +25,41 @@ public class AuthorPreferencesPojo {
     /**
      * IDEUser (injected by JSON)
      */
-    @SuppressWarnings("unused")
-    private String IDEUser;
+    public String IDEUser;
     /**
      * Author 2 (injected by JSON)
      */
-    @SuppressWarnings("unused")
-    private String Author2;
+    public String Author2;
     /**
      * Author 3 (injected by JSON)
      */
-    @SuppressWarnings("unused")
-    private String Author3;
+    public String Author3;
     /**
      * Author 4 (injected by JSON)
      */
-    @SuppressWarnings("unused")
-    private String Author4;
+    public String Author4;
     /**
      * Author 5 (injected by JSON)
      */
-    @SuppressWarnings("unused")
-    private String Author5;
+    public String Author5;
     /**
      * Author 6 (injected by JSON)
      */
-    @SuppressWarnings("unused")
-    private String Author6;
+    public String Author6;
     /**
      * Author 7 (injected by JSON)
      */
-    @SuppressWarnings("unused")
-    private String Author7;
+    public String Author7;
     /**
      * Author 8 (injected by JSON)
      */
-    @SuppressWarnings("unused")
-    private String Author8;
+    public String Author8;
     /**
      * Author 9 (injected by JSON)
      */
-    @SuppressWarnings("unused")
-    private String Author9;
+    public String Author9;
     /**
      * Author 10 (injected by JSON)
      */
-    @SuppressWarnings("unused")
-    private String Author10;
+    public String Author10;
 }

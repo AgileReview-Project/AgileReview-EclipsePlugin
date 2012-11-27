@@ -95,6 +95,20 @@ public class AnnotationManager {
      * Deletes all annotations correlating to the given comment keys
      * @param commentKeys unique tag keys of the comment annotations which should be deleted
      */
+    void deleteAnnotation(String tagId) {
+        HashSet<Annotation> annotationsToRemove = new HashSet<Annotation>();
+        Annotation a = annotationMap.remove(tagId);
+        if (a != null) {
+            a.markDeleted(true);
+            annotationsToRemove.add(a);
+        }
+        annotationModel.replaceAnnotations(annotationsToRemove.toArray(new Annotation[0]), null);
+    }
+    
+    /**
+     * Deletes all annotations correlating to the given comment keys
+     * @param commentKeys unique tag keys of the comment annotations which should be deleted
+     */
     void deleteAnnotations(Set<String> commentKeys) {
         HashSet<Annotation> annotationsToRemove = new HashSet<Annotation>();
         Annotation a;

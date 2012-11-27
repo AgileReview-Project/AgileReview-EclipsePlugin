@@ -9,6 +9,8 @@ package org.agilereview.editorparser.itexteditor.control;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.agilereview.core.external.definition.IReviewDataReceiver;
 import org.agilereview.core.external.storage.Comment;
@@ -76,6 +78,7 @@ public class DataManager implements IReviewDataReceiver, PropertyChangeListener 
      * @author Malte Brunnlieb (22.11.2012)
      */
     public Comment getComment(String id) {
+        Set<Review> reviews = new HashSet<Review>(this.reviews);
         for (Review r : reviews) {
             for (Comment c : r.getComments()) {
                 if (c.getId().equals(id)) { return c; }

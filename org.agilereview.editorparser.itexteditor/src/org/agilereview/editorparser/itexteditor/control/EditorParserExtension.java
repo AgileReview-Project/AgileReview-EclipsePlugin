@@ -28,7 +28,8 @@ import org.eclipse.ui.texteditor.ITextEditor;
  */
 public class EditorParserExtension implements IEditorParser {
     
-    private HashMap<IFile, TagParser> parserMap = new HashMap<IFile, TagParser>();
+    private HashMap<IEditorPart, TagParser> parserMap = new HashMap<IEditorPart, TagParser>();
+    private HashMap<IEditorPart, AnnotationManager> annotationManagerMap = new HashMap<IEditorPart, AnnotationManager>();
     
     /*
      * (non-Javadoc)
@@ -41,17 +42,16 @@ public class EditorParserExtension implements IEditorParser {
         try {
             if (file == null || !file.exists()) throw new FileNotSupportedException();
             
-            if (!parserMap.containsKey(file)) {
-                IEditorPart editor = getOpenEditor(file).getEditor(true);
+            IEditorPart editor = getOpenEditor(file).getEditor(true);
+            if (!parserMap.containsKey(editor)) {
                 if (editor != null) {
                     if (editor instanceof ITextEditor) {
                         Map<String, String[]> fileendingToCommentTagsMap = FileSupportPreferencesFactory.createFileSupportMap();
                         if (fileendingToCommentTagsMap.containsKey(file.getFileExtension())) {
                             String[] tags = fileendingToCommentTagsMap.get(file.getFileExtension());
-                            if (tags == null) {
-                                throw new FileNotSupportedException();
-                            }
-                            parserMap.put(file, new TagParser((ITextEditor) editor, tags));
+                            if (tags == null) { throw new FileNotSupportedException(); }
+                            parserMap.put(editor, new TagParser((ITextEditor) editor, tags));
+                            annotationManagerMap.put(editor, new AnnotationManager(editor));
                         } else {
                             throw new FileNotSupportedException();
                         }
@@ -62,7 +62,8 @@ public class EditorParserExtension implements IEditorParser {
                     throw new EditorCurrentlyNotOpenException();
                 }
             }
-            parserMap.get(file).addTagsInDocument(tagId, startLine, endLine);
+            parserMap.get(editor).addTagsInDocument(tagId, startLine, endLine);
+            annotationManagerMap.get(editor).addAnnotation(tagId, parserMap.get(editor).getPosition(tagId));
         } catch (FileNotSupportedException e) {
             throw e;
         } catch (EditorCurrentlyNotOpenException e) {
@@ -83,15 +84,14 @@ public class EditorParserExtension implements IEditorParser {
             if (editor != null) {
                 IFile file = (IFile) editor.getEditorInput().getAdapter(IFile.class);
                 if (file != null) {
-                    if (!parserMap.containsKey(file)) {
+                    if (!parserMap.containsKey(editor)) {
                         if (editor instanceof ITextEditor) {
                             Map<String, String[]> fileendingToCommentTagsMap = FileSupportPreferencesFactory.createFileSupportMap();
                             if (fileendingToCommentTagsMap.containsKey(file.getFileExtension())) {
                                 String[] tags = fileendingToCommentTagsMap.get(file.getFullPath().getFileExtension());
-                                if (tags == null) {
-                                    throw new FileNotSupportedException();
-                                }
-                                parserMap.put(file, new TagParser((ITextEditor) editor, tags));
+                                if (tags == null) { throw new FileNotSupportedException(); }
+                                parserMap.put(editor, new TagParser((ITextEditor) editor, tags));
+                                annotationManagerMap.put(editor, new AnnotationManager(editor));
                             } else {
                                 throw new FileNotSupportedException();
                             }
@@ -99,7 +99,8 @@ public class EditorParserExtension implements IEditorParser {
                             throw new UnknownException();
                         }
                     }
-                    parserMap.get(file).addTagsInDocument(tagId);
+                    parserMap.get(editor).addTagsInDocument(tagId);
+                    annotationManagerMap.get(editor).addAnnotation(tagId, parserMap.get(editor).getPosition(tagId));
                 } else {
                     // else should not occur
                     throw new UnknownException();
@@ -125,17 +126,16 @@ public class EditorParserExtension implements IEditorParser {
         try {
             if (file == null || !file.exists()) throw new FileNotSupportedException();
             
-            if (!parserMap.containsKey(file)) {
-                IEditorPart editor = getOpenEditor(file).getEditor(true);
+            IEditorPart editor = getOpenEditor(file).getEditor(true);
+            if (!parserMap.containsKey(editor)) {
                 if (editor != null) {
                     if (editor instanceof ITextEditor) {
                         Map<String, String[]> fileendingToCommentTagsMap = FileSupportPreferencesFactory.createFileSupportMap();
                         if (fileendingToCommentTagsMap.containsKey(file.getFileExtension())) {
                             String[] tags = fileendingToCommentTagsMap.get(file.getFileExtension());
-                            if (tags == null) {
-                                throw new FileNotSupportedException();
-                            }
-                            parserMap.put(file, new TagParser((ITextEditor) editor, tags));
+                            if (tags == null) { throw new FileNotSupportedException(); }
+                            parserMap.put(editor, new TagParser((ITextEditor) editor, tags));
+                            annotationManagerMap.put(editor, new AnnotationManager(editor));
                         } else {
                             throw new FileNotSupportedException();
                         }
@@ -146,7 +146,8 @@ public class EditorParserExtension implements IEditorParser {
                     throw new EditorCurrentlyNotOpenException();
                 }
             }
-            parserMap.get(file).removeTagsInDocument(tagId);
+            parserMap.get(editor).removeTagsInDocument(tagId);
+            annotationManagerMap.get(editor).deleteAnnotation(tagId);
         } catch (FileNotSupportedException e) {
             throw e;
         } catch (EditorCurrentlyNotOpenException e) {
@@ -167,15 +168,14 @@ public class EditorParserExtension implements IEditorParser {
             if (editor != null) {
                 IFile file = (IFile) editor.getAdapter(IFile.class);
                 if (file != null) {
-                    if (!parserMap.containsKey(file)) {
+                    if (!parserMap.containsKey(editor)) {
                         if (editor instanceof ITextEditor) {
                             Map<String, String[]> fileendingToCommentTagsMap = FileSupportPreferencesFactory.createFileSupportMap();
                             if (fileendingToCommentTagsMap.containsKey(file.getFileExtension())) {
                                 String[] tags = fileendingToCommentTagsMap.get(file.getFullPath().getFileExtension());
-                                if (tags == null) {
-                                    throw new FileNotSupportedException();
-                                }
-                                parserMap.put(file, new TagParser((ITextEditor) editor, tags));
+                                if (tags == null) { throw new FileNotSupportedException(); }
+                                parserMap.put(editor, new TagParser((ITextEditor) editor, tags));
+                                annotationManagerMap.put(editor, new AnnotationManager(editor));
                             } else {
                                 throw new FileNotSupportedException();
                             }
@@ -183,7 +183,8 @@ public class EditorParserExtension implements IEditorParser {
                             throw new UnknownException();
                         }
                     }
-                    parserMap.get(file).removeTagsInDocument(tagId);
+                    parserMap.get(editor).removeTagsInDocument(tagId);
+                    annotationManagerMap.get(editor).deleteAnnotation(tagId);
                 } else {
                     // else should not occur
                     throw new UnknownException();
@@ -231,9 +232,7 @@ public class EditorParserExtension implements IEditorParser {
         for (IEditorReference editor : editors) {
             try {
                 IFile editorFile = (IFile) editor.getEditorInput().getAdapter(IFile.class);
-                if (editorFile != null && editorFile.getFullPath().toOSString().equals(file.getFullPath().toOSString())) {
-                    return editor;
-                }
+                if (editorFile != null && editorFile.getFullPath().toOSString().equals(file.getFullPath().toOSString())) { return editor; }
             } catch (PartInitException e) {
                 // suppress as the editor has to be restarted manually, so we can manipulate the file directly
             }

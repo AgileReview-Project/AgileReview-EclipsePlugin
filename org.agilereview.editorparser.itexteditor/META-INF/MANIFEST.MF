@@ -15,3 +15,5 @@ Import-Package: org.agilereview.core.external.definition,
  org.agilereview.core.external.exception,
  org.agilereview.core.external.preferences,
  org.agilereview.core.external.storage
+Bundle-ClassPath: lib/google-gson-2.2.2/gson-2.2.2.jar,
+ .

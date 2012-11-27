@@ -85,6 +85,7 @@ public class TagParser {
         
         tagRegex = Pattern.quote(commentTags[0]) + RAW_TAG_REGEX + Pattern.quote(commentTags[1]);
         tagPattern = Pattern.compile(tagRegex);
+        tags = commentTags;
         
         this.editor = editor;
         
@@ -466,7 +467,6 @@ public class TagParser {
         
         if (isAgileReviewPerspectiveOpen()) {
             new AuthorReservationPreferences().addReservation(DataManager.getInstance().getComment(tagId).getAuthor());
-            this.annotationModel.addAnnotation(tagId, this.idPositionMap.get(tagId));
         }
     }
     
@@ -627,6 +627,16 @@ public class TagParser {
             positions.add(new ComparablePosition(position));
         }
         return positions.higher(new ComparablePosition(current));
+    }
+    
+    /**
+     * Returns the position of the annotation for the given tag
+     * @param tagId tag id of the tag whose position should be returned
+     * @return a {@link Position} on which any annotation for the tag can be performed
+     * @author Malte Brunnlieb (27.11.2012)
+     */
+    public Position getPosition(String tagId) {
+        return idPositionMap.get(tagId);
     }
     
     //    public void relocateComment(Comment comment, boolean display) throws BadLocationException {
