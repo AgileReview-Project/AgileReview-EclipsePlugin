@@ -30,8 +30,8 @@ public class PojoConversionTest {
 	private static final Calendar date = Calendar.getInstance();
 	private static final String author = "Piet";
 	private static final IFile file = ResourcesPlugin.getWorkspace().getRoot().getFile(new Path("/org.agilereview.storage.xml/src/org/agilereview/storage/xml/conversion/PojoConversion.java"));
-	private static String[] commentIds = { "c0", "c1" };
-	private static String[] replyIds = { "r0", reviewId};
+	private static final String[] commentIds = { "c0", "c1" };
+	private static final String[] replyIds = { "r0", reviewId};
 
 	@Test
 	public void testGetXmlBeansCommentsDocument() {

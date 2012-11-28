@@ -55,12 +55,25 @@ public class SourceFolderManager {
 		}
 		return currentSourceFolder;
 	}
+	
+	/**
+	 * Returns the name of the current Source Folder.
+	 * @return The name of the current Source Folder.
+	 * @author Peter Reuter (26.11.2012)
+	 */
+	public static String getCurrentSourceFolderName() {
+		if (currentSourceFolder == null) {
+			return "null";
+		} else {
+			return currentSourceFolder.getName();	
+		}		
+	}
 
 	/**
 	 * Loads the the current source folder specified by the name. The name is loaded from the preferences.
 	 * @author Peter Reuter (28.04.2012)
 	 */
-	static void setCurrentSourceFolderProject() {
+	public static void setCurrentSourceFolderProject() {
 		IWorkspaceRoot workspaceRoot = ResourcesPlugin.getWorkspace().getRoot();
 		String projectName = InstanceScope.INSTANCE.getNode(Activator.PLUGIN_ID).get(SourceFolderManager.SOURCEFOLDER_PROPERTYNAME, "");
 		if ("".equals(projectName)) {
@@ -81,9 +94,11 @@ public class SourceFolderManager {
 					}
 				});
 			} else {
-				setProjectNatures(currentSourceFolder, new String[] { AGILEREVIEW_NATURE });
+				if (currentSourceFolder != null) {
+					setProjectNatures(currentSourceFolder, new String[] { AGILEREVIEW_NATURE });	
+				}
+				setProjectNatures(p, new String[] { AGILEREVIEW_NATURE, AGILEREVIEW_ACTIVE_NATURE });
 				currentSourceFolder = p;
-				setProjectNatures(currentSourceFolder, new String[] { AGILEREVIEW_NATURE, AGILEREVIEW_ACTIVE_NATURE });
 			}
 		}
 	}
@@ -163,7 +178,7 @@ public class SourceFolderManager {
 	 * @param author
 	 * @return {@link IFile} for the given parameter pair
 	 */
-	static IFile getCommentFile(String reviewId, String author) {
+	public static IFile getCommentFile(String reviewId, String author) {
 		IFile file = getReviewFolder(reviewId).getFile("author_" + author + ".xml");
 		if (!file.exists()) {
 			try {
@@ -184,7 +199,7 @@ public class SourceFolderManager {
 	 * @param reviewId
 	 * @return {@link IFolder} for this review
 	 */
-	static IFolder getReviewFolder(String reviewId) {
+	public static IFolder getReviewFolder(String reviewId) {
 		IFolder folder = getCurrentSourceFolder().getFolder("review." + reviewId);
 		if (!folder.exists()) {
 			try {
@@ -205,7 +220,7 @@ public class SourceFolderManager {
 	 * @param reviewId
 	 * @return {@link IFile} for this review
 	 */
-	static IFile getReviewFile(String reviewId) {
+	public static IFile getReviewFile(String reviewId) {
 		IFile file = getReviewFolder(reviewId).getFile("review.xml");
 		if (!file.exists()) {
 			try {
@@ -225,7 +240,7 @@ public class SourceFolderManager {
 	 * @param reviewId the ID of the review that is to be deleted within the file system.
 	 * @author Peter Reuter (24.06.2012)
 	 */
-	static void deleteReviewContents(String reviewId) {
+	public static void deleteReviewContents(String reviewId) {
 		IFolder reviewFolder = getReviewFolder(reviewId);
 		try {
 			reviewFolder.delete(true, null);
@@ -240,7 +255,7 @@ public class SourceFolderManager {
 	 * @param author The author of the comments contained in this file.
 	 * @author Peter Reuter (18.07.2012)
 	 */
-	static void deleteCommentFile(String reviewId, String author) {
+	public static void deleteCommentFile(String reviewId, String author) {
 		IFile commentFile = getCommentFile(reviewId, author);
 		try {
 			commentFile.delete(true, null);

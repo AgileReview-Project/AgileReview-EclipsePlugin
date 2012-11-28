@@ -102,9 +102,11 @@ public class XmlStorageClient implements IStorageClient, IPreferenceChangeListen
 		// update sourcefolder, load new data
 		if (SourceFolderManager.getCurrentSourceFolder() != null) {
 			loadReviews();
-			List<String> reviewIds = Arrays.asList(Platform.getPreferencesService()
-					.getString("org.agilereview.core", AgileReviewPreferences.OPEN_REVIEWS, "", null).split(","));
-			loadComments(reviewIds);
+			String openReviewIdsList = Platform.getPreferencesService().getString("org.agilereview.core", AgileReviewPreferences.OPEN_REVIEWS, "", null);
+			if (!(openReviewIdsList == null) && !openReviewIdsList.equals("")) {
+				List<String> openReviewIds = Arrays.asList(openReviewIdsList.split(","));
+				loadComments(openReviewIds);
+			}			
 		}
 		// reenable propertychangelistener
 		reviewSet.addPropertyChangeListener(this);
@@ -160,7 +162,11 @@ public class XmlStorageClient implements IStorageClient, IPreferenceChangeListen
 			Comment comment = XmlBeansConversion.getComment(review, xmlBeansComment);
 			this.idReviewMap.get(reviewId).addComment(comment);
 			this.idCommentMap.put(comment.getId(), comment);
-			comment.setReplies(XmlBeansConversion.getReplyList(comment, xmlBeansComment.getReplies().getReplyArray()));
+			if (xmlBeansComment.getReplies() != null && xmlBeansComment.getReplies().getReplyArray() != null) {
+				List<Reply> replies = XmlBeansConversion.getReplyList(comment, xmlBeansComment.getReplies().getReplyArray());
+				addReplies(replies);
+				comment.setReplies(replies);
+			}
 		}
 	}
 
@@ -242,7 +248,7 @@ public class XmlStorageClient implements IStorageClient, IPreferenceChangeListen
 		List<org.agilereview.xmlSchema.review.ReviewDocument.Review> result = new ArrayList<org.agilereview.xmlSchema.review.ReviewDocument.Review>();
 		try {
 			IResource[] allFolders = SourceFolderManager.getCurrentSourceFolder().members();
-			LinkedList<IResource> errorFiles = new LinkedList<IResource>();
+			LinkedList<String> errors = new LinkedList<String>();
 			for (IResource currFolder : allFolders) {
 				if (currFolder instanceof IFolder) {
 					IFile reviewFile = ((IFolder) currFolder).getFile("review.xml");
@@ -250,16 +256,16 @@ public class XmlStorageClient implements IStorageClient, IPreferenceChangeListen
 						ReviewDocument doc = ReviewDocument.Factory.parse(reviewFile.getContents());
 						result.add(doc.getReview());
 					} catch (XmlException e) {
-						errorFiles.add(reviewFile);
+						errors.add(reviewFile.getLocation().toOSString() + " ("+e.getLocalizedMessage()+")");
 					} catch (IOException e) {
-						errorFiles.add(reviewFile);
+						errors.add(reviewFile.getLocation().toOSString() + " ("+e.getLocalizedMessage()+")");
 					}
 				}
 			}
-			if (!errorFiles.isEmpty()) {
+			if (!errors.isEmpty()) {
 				String message = "AgileReview could not load the following review files:\n\n";
-				for (IResource file : errorFiles) {
-					message += file.getLocation().toOSString() + "\n";
+				for (String error : errors) {
+					message += error + "\n";
 				}
 				message += "\nThese files may be corrupted (e.g. empty). Please check them.\nComments of a review cannot be loaded without working review file.";
 				ExceptionHandler.notifyUser(new DataLoadingException(message));
@@ -283,7 +289,7 @@ public class XmlStorageClient implements IStorageClient, IPreferenceChangeListen
 		List<org.agilereview.xmlSchema.author.CommentDocument.Comment> result = new ArrayList<org.agilereview.xmlSchema.author.CommentDocument.Comment>();
 		try {
 			IFolder reviewFolder = SourceFolderManager.getReviewFolder(reviewId);
-			LinkedList<IResource> errorFiles = new LinkedList<IResource>();
+			LinkedList<String> errors = new LinkedList<String>();
 			IResource[] resources = reviewFolder.members();
 			for (IResource commentFile : resources) {
 				if (commentFile instanceof IFile && !commentFile.getName().equals("review.xml")) {
@@ -291,17 +297,17 @@ public class XmlStorageClient implements IStorageClient, IPreferenceChangeListen
 						CommentsDocument doc = CommentsDocument.Factory.parse(((IFile) commentFile).getContents());
 						result.addAll(Arrays.asList(doc.getComments().getCommentArray()));
 					} catch (XmlException e) {
-						errorFiles.add(commentFile);
+						errors.add(commentFile.getLocation().toOSString() + " ("+e.getLocalizedMessage()+")");
 					} catch (IOException e) {
-						errorFiles.add(commentFile);
+						errors.add(commentFile.getLocation().toOSString() + " ("+e.getLocalizedMessage()+")");
 					}
 				}
 
 			}
-			if (!errorFiles.isEmpty()) {
+			if (!errors.isEmpty()) {
 				String message = "AgileReview could not load the following review files:\n\n";
-				for (IResource file : errorFiles) {
-					message += file.getLocation().toOSString() + "\n";
+				for (String error : errors) {
+					message += error + "\n";
 				}
 				message += "\nThese files may be corrupted (e.g. empty). Please check them.\nComments of a review cannot be loaded without working review file.";
 				ExceptionHandler.notifyUser(new DataLoadingException(message));
