@@ -14,7 +14,9 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
-import org.eclipse.core.runtime.Platform;
+import org.agilereview.core.Activator;
+import org.agilereview.core.external.preferences.AgileReviewPreferences;
+import org.eclipse.core.runtime.preferences.InstanceScope;
 
 /**
  * A class that is used to store replies that were added to a comment. 
@@ -23,18 +25,13 @@ import org.eclipse.core.runtime.Platform;
 public final class Reply implements PropertyChangeListener {
 	
 	/**
-	 * Name of the property which stores the name of the author
-	 */
-	private static final String AUTHOR_PROPERTYNAME = "author";
-	
-	/**
 	 * Unique ID of this {@link Reply}
 	 */
 	private String id;
 	/**
 	 * The author of the reply 
 	 */ //TODO maybe seperate author object for sync with color?
-	private String author = Platform.getPreferencesService().getString("org.agilereview.core", AUTHOR_PROPERTYNAME, System.getProperty("user.name"), null);;
+	private String author = InstanceScope.INSTANCE.getNode(Activator.PLUGIN_ID).get(AgileReviewPreferences.AUTHOR, System.getProperty("user.name"));
 	/**
 	 * The date when the reply was create initially 
 	 */

@@ -17,7 +17,6 @@ import java.util.List;
 
 import org.agilereview.core.Activator;
 import org.agilereview.core.external.preferences.AgileReviewPreferences;
-import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.preferences.InstanceScope;
 
 /**
@@ -78,7 +77,7 @@ public class Review implements PropertyChangeListener {
      * @param isOpen indicates whether comments for this review are loaded or not
      */
     public Review(String id, int status, String reference, String responsibility, String description, boolean isOpen) {
-        this(id);
+        this.id = id;
         this.status = status;
         this.reference = reference;
         this.responsibility = responsibility;
@@ -275,8 +274,13 @@ public class Review implements PropertyChangeListener {
      * @author Peter Reuter (26.06.2012)
      */
     void setOpenReviewsPreference() {
-        List<String> reviewIds = new ArrayList<String>(Arrays.asList(Platform.getPreferencesService().getString(Activator.PLUGIN_ID, AgileReviewPreferences.OPEN_REVIEWS,
-                "", null).split(",")));
+        String reviewIdsPref = InstanceScope.INSTANCE.getNode(Activator.PLUGIN_ID).get(AgileReviewPreferences.OPEN_REVIEWS, "");
+        List<String> reviewIds;
+        if ("".equals(reviewIdsPref)) {
+        	reviewIds = new ArrayList<String>();
+        } else {
+        	reviewIds = Arrays.asList(reviewIdsPref.split(","));	
+        }    	
         if (this.isOpen) {
             if (!reviewIds.contains(this.id)) {
                 reviewIds.add(this.id);
@@ -284,7 +288,7 @@ public class Review implements PropertyChangeListener {
         } else {
             reviewIds.remove(this.id);
         }
-        String reviewIdsPref = "";
+        reviewIdsPref = "";
         Iterator<String> i = reviewIds.iterator();
         for (;;) {
             reviewIdsPref += i.next();

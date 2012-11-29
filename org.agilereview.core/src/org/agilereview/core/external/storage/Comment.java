@@ -14,20 +14,17 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
+import org.agilereview.core.Activator;
 import org.agilereview.core.external.definition.IStorageClient;
+import org.agilereview.core.external.preferences.AgileReviewPreferences;
 import org.eclipse.core.resources.IFile;
-import org.eclipse.core.runtime.Platform;
+import org.eclipse.core.runtime.preferences.InstanceScope;
 
 /**
  * A class that stores data and a list of replies of a comment.
  * @author Peter Reuter (19.02.2012)
  */
 public final class Comment implements PropertyChangeListener {
-	
-	/**
-	 * Name of the property which stores the name of the author
-	 */// TODO move static fields to externally available class
-	private static final String AUTHOR_PROPERTYNAME = "author";
 	
 	/**
 	 * The id of the comment that is retrieved from an {@link IStorageClient}
@@ -44,8 +41,7 @@ public final class Comment implements PropertyChangeListener {
 	/**
 	 * The author of the comment
 	 */ //TODO maybe seperate author object for sync with color?
-	//TODO change propertyname to static field
-	private String author = Platform.getPreferencesService().getString("org.agilereview.core", AUTHOR_PROPERTYNAME, System.getProperty("user.name"), null);
+	private String author = InstanceScope.INSTANCE.getNode(Activator.PLUGIN_ID).get(AgileReviewPreferences.AUTHOR, System.getProperty("user.name"));
 	/**
 	 * The date when the comment was created initially
 	 */
