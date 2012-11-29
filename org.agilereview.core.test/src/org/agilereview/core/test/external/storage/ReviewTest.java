@@ -7,7 +7,9 @@
  */
 package org.agilereview.core.test.external.storage;
 
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -18,10 +20,12 @@ import java.util.Random;
 
 import junit.framework.AssertionFailedError;
 
+import org.agilereview.core.external.preferences.AgileReviewPreferences;
 import org.agilereview.core.external.storage.Comment;
 import org.agilereview.core.external.storage.Review;
 import org.agilereview.core.test.utils.HelperClass;
 import org.eclipse.core.runtime.AssertionFailedException;
+import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.junit.Test;
 
 /**
@@ -320,15 +324,22 @@ public class ReviewTest {
 	@Test
 	public final void testSetIsOpen() {
 		//TODO check also for correct "open_reviews" property
-		Review review = new Review("");
+		String id = "TestReviewSetIsOpen";
+		Review review = new Review(id);
 		HelperPropertyChangeListener pcl = new HelperPropertyChangeListener("isOpen");
 		review.addPropertyChangeListener(pcl);
+		
+		String openReviewIds = InstanceScope.INSTANCE.getNode("org.agilereview.core").get(AgileReviewPreferences.OPEN_REVIEWS, id);
+		assertTrue(openReviewIds.contains(id));
 		
 		review.setIsOpen(false);
 
 		if (!(review.getIsOpen() == false) || !pcl.getPropertyChanged()) {
 			throw new AssertionFailedError("Review property isOpen could not be set successfully!");
 		}
+		
+		openReviewIds = InstanceScope.INSTANCE.getNode("org.agilereview.core").get(AgileReviewPreferences.OPEN_REVIEWS, id);
+		assertFalse(openReviewIds.contains(id));
 	}
 	
 	/**
