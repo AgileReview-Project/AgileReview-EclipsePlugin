@@ -329,7 +329,7 @@ public class ReviewTest {
 		HelperPropertyChangeListener pcl = new HelperPropertyChangeListener("isOpen");
 		review.addPropertyChangeListener(pcl);
 		
-		String openReviewIds = InstanceScope.INSTANCE.getNode("org.agilereview.core").get(AgileReviewPreferences.OPEN_REVIEWS, id);
+		String openReviewIds = InstanceScope.INSTANCE.getNode(AgileReviewPreferences.CORE_PLUGIN_ID).get(AgileReviewPreferences.OPEN_REVIEWS, id);
 		assertTrue(openReviewIds.contains(id));
 		
 		review.setIsOpen(false);
@@ -338,7 +338,7 @@ public class ReviewTest {
 			throw new AssertionFailedError("Review property isOpen could not be set successfully!");
 		}
 		
-		openReviewIds = InstanceScope.INSTANCE.getNode("org.agilereview.core").get(AgileReviewPreferences.OPEN_REVIEWS, id);
+		openReviewIds = InstanceScope.INSTANCE.getNode(AgileReviewPreferences.CORE_PLUGIN_ID).get(AgileReviewPreferences.OPEN_REVIEWS, id);
 		assertFalse(openReviewIds.contains(id));
 	}
 	

@@ -1,5 +1,6 @@
 package org.agilereview.storage.xml.handler;
 
+import org.agilereview.core.external.preferences.AgileReviewPreferences;
 import org.agilereview.storage.xml.SourceFolderManager;
 import org.agilereview.storage.xml.exception.ExceptionHandler;
 import org.eclipse.core.commands.AbstractHandler;
@@ -30,7 +31,7 @@ public class ActivateSourceProjectHandler extends AbstractHandler {
 				if (o instanceof IProject) {
 						IProject project = (IProject) o;
 						if (project.hasNature(SourceFolderManager.AGILEREVIEW_NATURE)){
-							InstanceScope.INSTANCE.getNode("org.agilereview.core").put(SourceFolderManager.SOURCEFOLDER_PROPERTYNAME, project.getName());
+							InstanceScope.INSTANCE.getNode(AgileReviewPreferences.CORE_PLUGIN_ID).put(SourceFolderManager.SOURCEFOLDER_PROPERTYNAME, project.getName());
 						} else {
 							error = true;
 						}

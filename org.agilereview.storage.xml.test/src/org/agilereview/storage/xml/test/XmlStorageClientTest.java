@@ -1,6 +1,8 @@
 package org.agilereview.storage.xml.test;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -59,7 +61,9 @@ public class XmlStorageClientTest {
 	
 	@BeforeClass
 	public static void setUpWorkspace() throws CoreException, IOException {
-		r = new Review(reviewId, status, reviewReference, recipient, reviewText, true);
+		// set up test data
+		r = new Review(reviewId, status, reviewReference, recipient, reviewText, false);
+		r.setIsOpen(true);
 		ArrayList<Comment> comments = new ArrayList<Comment>();
 		for (int i=0; i<commentIds.length; i++) {
 			Comment c = new Comment(commentIds[i], author, file, r, date, date, recipient, prio, status, ctext);
@@ -71,10 +75,10 @@ public class XmlStorageClientTest {
 					Reply subrp = new Reply(replyIds[k], recipient, date, date, rtext, rp);
 					rp.addReply(subrp);
 				}
-			}			
+			}
 		}
 		
-		
+		// convert test data to XmlBeans objects
 		CommentsDocument cDoc = PojoConversion.getXmlBeansCommentsDocument(comments);
 		ReviewDocument rDoc = PojoConversion.getXmlBeansReviewDocument(r);
 		
@@ -107,6 +111,7 @@ public class XmlStorageClientTest {
 		af.create(new ByteArrayInputStream("".getBytes()), IResource.NONE, null);
 		while (!af.exists()) {}
 		
+		// save test data XmlBeans objects to the newly created source folder
 		cDoc.save(af.getLocation().toFile(), new XmlOptions().setSavePrettyPrint());
 		rDoc.save(rf.getLocation().toFile(), new XmlOptions().setSavePrettyPrint());
 		
@@ -119,21 +124,33 @@ public class XmlStorageClientTest {
 		
 		preferencesNode.put("source_folder", "");
 		assertEquals(SourceFolderManager.getCurrentSourceFolder(), null);
+		XmlStorageClient xmlStorage = new XmlStorageClient();
+		ReviewSet reviews = xmlStorage.getAllReviews();
+		assertEquals(0, reviews.size());
 		
 		preferencesNode.put("source_folder", SourceFolderName);
-		assertEquals(SourceFolder, SourceFolderManager.getCurrentSourceFolder());		
+		assertEquals(SourceFolder, SourceFolderManager.getCurrentSourceFolder());
+		xmlStorage = new XmlStorageClient();
+		reviews = xmlStorage.getAllReviews();
+		assertEquals(1, reviews.size());
+		
+		preferencesNode.put("source_folder", "");
+		assertEquals(SourceFolderManager.getCurrentSourceFolder(), null);
+		reviews = xmlStorage.getAllReviews();
+		assertEquals(0, reviews.size());
 	}
 	
 	@Test
 	public void testgetReviewSet() {
-		InstanceScope.INSTANCE.getNode("org.agilereview.core").put(AgileReviewPreferences.OPEN_REVIEWS, reviewId);
 		
-		IEclipsePreferences preferencesNode = InstanceScope.INSTANCE.getNode(Activator.PLUGIN_ID);
-		preferencesNode.put("source_folder", SourceFolderName);
+		// prepare Current Source Folder
+		InstanceScope.INSTANCE.getNode(Activator.PLUGIN_ID).put("source_folder", SourceFolderName);
 		
+		// get review data
 		XmlStorageClient xmlStorage = new XmlStorageClient();
 		ReviewSet reviews = xmlStorage.getAllReviews();
 		
+		// check basic criteria of loading, full check done by tests for conversion classes
 		assertEquals(1, reviews.size());
 		
 		List<Comment> comments = ((Review) reviews.toArray()[0]).getComments();
@@ -144,6 +161,72 @@ public class XmlStorageClientTest {
 				assertEquals(2, comments.get(i).getReplies().get(j).getReplies().size());		
 			}
 		}
+		
+		// clean up
+		InstanceScope.INSTANCE.getNode(Activator.PLUGIN_ID).put("source_folder", "");
+	}
+	
+	@Test
+	public void testPersistence() throws InterruptedException {
+		InstanceScope.INSTANCE.getNode(AgileReviewPreferences.CORE_PLUGIN_ID).put(AgileReviewPreferences.AUTHOR, author);
+		
+		// prepare Current Source Folder
+		InstanceScope.INSTANCE.getNode(Activator.PLUGIN_ID).put("source_folder", SourceFolderName);
+
+		// get review data
+		XmlStorageClient xmlStorage = new XmlStorageClient();
+		ReviewSet reviews = xmlStorage.getAllReviews();
+		
+		// update review data
+		String newReviewDescription = "Review changed.";
+		String newCommentText = "Comment changed.";
+		String newReplyText = "Reply changed.";
+		
+		Review rLoaded = ((Review)reviews.toArray()[0]); 
+		rLoaded.setDescription(newReviewDescription);
+		rLoaded.getComments().get(0).setText(newCommentText);
+		rLoaded.getComments().get(0).getReplies().get(0).setText(newReplyText);
+		rLoaded.addComment(new Comment("c3", file, rLoaded));
+		rLoaded.getComments().get(2).addReply(new Reply("r7", rLoaded.getComments().get(2)));
+		
+		// force reload
+		InstanceScope.INSTANCE.getNode(Activator.PLUGIN_ID).put("source_folder", "");
+		assertEquals(0, xmlStorage.getAllReviews().size());
+		InstanceScope.INSTANCE.getNode(Activator.PLUGIN_ID).put("source_folder", SourceFolderName);
+		assertEquals(1, xmlStorage.getAllReviews().size());
+		
+		// check if manipulations + added comments/replies were stored
+		xmlStorage = new XmlStorageClient();
+		reviews = xmlStorage.getAllReviews();
+		rLoaded = ((Review)reviews.toArray()[0]);
+		assertEquals(newReviewDescription, rLoaded.getDescription());
+		assertEquals(newCommentText, rLoaded.getComments().get(0).getText());
+		assertEquals(newReplyText, rLoaded.getComments().get(0).getReplies().get(0).getText());
+		assertEquals(3, rLoaded.getComments().size());
+		assertEquals(1, rLoaded.getComments().get(2).getReplies().size());
+		
+		// add new comments for new author
+		String newAuthor = "DeletingGuy";
+		InstanceScope.INSTANCE.getNode(AgileReviewPreferences.CORE_PLUGIN_ID).put(AgileReviewPreferences.AUTHOR, newAuthor);
+		Comment newComment = new Comment("c0", file, rLoaded);
+		rLoaded.addComment(newComment);
+		// check if new file was created
+		assertTrue(SourceFolder.getFolder("review." + reviewId).getFile("author_" + newAuthor + ".xml").exists());
+		// remove comments from new author
+		rLoaded.deleteComment(newComment);
+		// check if author file was deleted and comment was removed
+		assertFalse(SourceFolder.getFolder("review." + reviewId).getFile("author_" + newAuthor + ".xml").exists());
+		assertFalse(rLoaded.getComments().contains(newComment));
+		
+		rLoaded.setIsOpen(false);
+		assertEquals(0, rLoaded.getComments().size());
+		assertTrue(SourceFolder.getFolder("review." + reviewId).getFile("author_" + author + ".xml").exists());
+		
+		rLoaded.setIsOpen(true);
+		assertEquals(3, rLoaded.getComments().size());
+		
+		// clean up
+		InstanceScope.INSTANCE.getNode(Activator.PLUGIN_ID).put("source_folder", "");
 	}
 	
 	@AfterClass

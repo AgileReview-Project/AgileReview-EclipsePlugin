@@ -275,11 +275,11 @@ public class Review implements PropertyChangeListener {
      */
     void setOpenReviewsPreference() {
         String reviewIdsPref = InstanceScope.INSTANCE.getNode(Activator.PLUGIN_ID).get(AgileReviewPreferences.OPEN_REVIEWS, "");
-        List<String> reviewIds;
+        ArrayList<String> reviewIds;
         if ("".equals(reviewIdsPref)) {
         	reviewIds = new ArrayList<String>();
         } else {
-        	reviewIds = Arrays.asList(reviewIdsPref.split(","));	
+        	reviewIds = new ArrayList<String>(Arrays.asList(reviewIdsPref.split(",")));	
         }    	
         if (this.isOpen) {
             if (!reviewIds.contains(this.id)) {
@@ -289,12 +289,14 @@ public class Review implements PropertyChangeListener {
             reviewIds.remove(this.id);
         }
         reviewIdsPref = "";
-        Iterator<String> i = reviewIds.iterator();
-        for (;;) {
-            reviewIdsPref += i.next();
-            if (!i.hasNext()) break;
-            reviewIdsPref += (",");
-        }
+        if (reviewIds.size() > 0) {
+        	Iterator<String> i = reviewIds.iterator();
+            for (;;) {
+            	    reviewIdsPref += i.next();
+                    if (!i.hasNext()) break;
+                    reviewIdsPref += (",");         
+            }	
+        }        
         InstanceScope.INSTANCE.getNode(Activator.PLUGIN_ID).put(AgileReviewPreferences.OPEN_REVIEWS, reviewIdsPref);
     }
     

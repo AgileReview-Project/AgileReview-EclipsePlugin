@@ -1,5 +1,6 @@
 package org.agilereview.storage.xml;
 
+import org.agilereview.core.external.preferences.AgileReviewPreferences;
 import org.agilereview.storage.xml.exception.ExceptionHandler;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
@@ -86,7 +87,7 @@ public class CloseProjectResourceListener implements IResourceChangeListener {
 						MessageDialog.openInformation(currentShell, "'Agile Review Source Project' deleted", msg);
 //						deletedProjectPath = null; // needed for correct wizard behavior
 						//XXX check whether this fails --> in case, use a private function to open NoReviewSourceWizard
-						InstanceScope.INSTANCE.getNode("org.agilereview.core").put(SourceFolderManager.SOURCEFOLDER_PROPERTYNAME, "");
+						InstanceScope.INSTANCE.getNode(AgileReviewPreferences.CORE_PLUGIN_ID).put(SourceFolderManager.SOURCEFOLDER_PROPERTYNAME, "");
 						break;
 					}
 				}
@@ -132,7 +133,7 @@ public class CloseProjectResourceListener implements IResourceChangeListener {
 								if (MessageDialog.openQuestion(Display.getCurrent().getActiveShell(), "Warning: AgileReview Source Project", msg)) {
 									try {
 										oldSourceProject.open(null); // TODO use progressmonitor?
-										InstanceScope.INSTANCE.getNode("org.agilereview.core").put(SourceFolderManager.SOURCEFOLDER_PROPERTYNAME, oldSourceProject.getName());
+										InstanceScope.INSTANCE.getNode(AgileReviewPreferences.CORE_PLUGIN_ID).put(SourceFolderManager.SOURCEFOLDER_PROPERTYNAME, oldSourceProject.getName());
 									} catch (final CoreException e) {
 										String message = "An exception occured while reopening the closed Review Source Project "
 												+ oldSourceProject.getName() + "!" + e.getLocalizedMessage();
@@ -141,7 +142,7 @@ public class CloseProjectResourceListener implements IResourceChangeListener {
 									}
 								} else {
 									//XXX check whether this fails --> in case, use a private function to open NoReviewSourceWizard
-									InstanceScope.INSTANCE.getNode("org.agilereview.core").put(SourceFolderManager.SOURCEFOLDER_PROPERTYNAME, "");
+									InstanceScope.INSTANCE.getNode(AgileReviewPreferences.CORE_PLUGIN_ID).put(SourceFolderManager.SOURCEFOLDER_PROPERTYNAME, "");
 								}
 							}
 						});

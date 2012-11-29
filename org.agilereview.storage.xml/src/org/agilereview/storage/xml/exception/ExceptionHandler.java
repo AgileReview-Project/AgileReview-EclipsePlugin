@@ -27,7 +27,7 @@ public class ExceptionHandler {
 			
 			@Override
 			public void run() {
-				MessageDialog.openError(Display.getCurrent().getActiveShell(), "An error occured", ex.toString() + ": " + ex.getMessage());
+				MessageDialog.openError(Display.getCurrent().getActiveShell(), "An error occured", ex.getMessage());
 			}
 		});
 	}

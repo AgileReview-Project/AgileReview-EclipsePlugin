@@ -30,7 +30,6 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent;
@@ -65,7 +64,9 @@ public class XmlStorageClient implements IStorageClient, IPreferenceChangeListen
 	 * Map of {@link Reply} IDs to {@link Reply} objects.
 	 */
 	private Map<String, Reply> idReplyMap = new HashMap<String, Reply>();
-
+	/**
+	 * Preferences for the XMLStorage plugin 
+	 */
 	private IEclipsePreferences preferencesNode = InstanceScope.INSTANCE.getNode(Activator.PLUGIN_ID);
 
 	///////////////////////////////////////////////////////
@@ -102,7 +103,7 @@ public class XmlStorageClient implements IStorageClient, IPreferenceChangeListen
 		// update sourcefolder, load new data
 		if (SourceFolderManager.getCurrentSourceFolder() != null) {
 			loadReviews();
-			String openReviewIdsList = Platform.getPreferencesService().getString("org.agilereview.core", AgileReviewPreferences.OPEN_REVIEWS, "", null);
+			String openReviewIdsList = InstanceScope.INSTANCE.getNode(AgileReviewPreferences.CORE_PLUGIN_ID).get(AgileReviewPreferences.OPEN_REVIEWS, "");
 			if (!(openReviewIdsList == null) && !openReviewIdsList.equals("")) {
 				List<String> openReviewIds = Arrays.asList(openReviewIdsList.split(","));
 				loadComments(openReviewIds);
@@ -157,10 +158,12 @@ public class XmlStorageClient implements IStorageClient, IPreferenceChangeListen
 	 */
 	private void loadComments(String reviewId) {
 		List<org.agilereview.xmlSchema.author.CommentDocument.Comment> xmlBeansComments = loadAllXmlBeansComment(reviewId);
+		Review review = this.idReviewMap.get(reviewId);
+		ArrayList<Comment> comments = new ArrayList<Comment>();
 		for (org.agilereview.xmlSchema.author.CommentDocument.Comment xmlBeansComment : xmlBeansComments) {
-			Review review = this.idReviewMap.get(xmlBeansComment.getReviewID());
 			Comment comment = XmlBeansConversion.getComment(review, xmlBeansComment);
-			this.idReviewMap.get(reviewId).addComment(comment);
+			// check if comment in map (just for unit tests --> XmlStorage is create twice, so it loads twice...
+			comments.add(comment);
 			this.idCommentMap.put(comment.getId(), comment);
 			if (xmlBeansComment.getReplies() != null && xmlBeansComment.getReplies().getReplyArray() != null) {
 				List<Reply> replies = XmlBeansConversion.getReplyList(comment, xmlBeansComment.getReplies().getReplyArray());
@@ -168,6 +171,7 @@ public class XmlStorageClient implements IStorageClient, IPreferenceChangeListen
 				comment.setReplies(replies);
 			}
 		}
+		review.setComments(comments);
 	}
 
 	/**
@@ -221,6 +225,7 @@ public class XmlStorageClient implements IStorageClient, IPreferenceChangeListen
 			unloadReplies(c.getReplies());
 			this.idCommentMap.remove(c);
 		}
+		comments.clear();
 	}
 
 	/**
@@ -271,7 +276,7 @@ public class XmlStorageClient implements IStorageClient, IPreferenceChangeListen
 				ExceptionHandler.notifyUser(new DataLoadingException(message));
 			}
 		} catch (final CoreException e) {
-			String message = "Error while reading data from current Review Source Folder. The folder does not exists or is closed.";
+			String message = "Error while reading data from current Review Source Folder. The Review Source Folder '"+SourceFolderManager.getCurrentSourceFolderName()+"' does not exists or is closed.";
 			ExceptionHandler.notifyUser(new DataLoadingException(message));
 		}
 
@@ -313,7 +318,7 @@ public class XmlStorageClient implements IStorageClient, IPreferenceChangeListen
 				ExceptionHandler.notifyUser(new DataLoadingException(message));
 			}
 		} catch (final CoreException e) {
-			String message = "Error while reading data from current Review Source Folder. The folder does not exists or is closed.";
+			String message = "Error while reading data from current Review Source Folder. The Review Source Folder '"+SourceFolderManager.getCurrentSourceFolderName()+"' does not exists or is closed.";
 			ExceptionHandler.notifyUser(new DataLoadingException(message));
 		}
 
@@ -329,9 +334,14 @@ public class XmlStorageClient implements IStorageClient, IPreferenceChangeListen
 	 * @param doc the {@link XmlTokenSource} to save
 	 */
 	private void saveXmlDocument(IFile file, XmlTokenSource doc) {
-		// TODO check whether file is empty --> delete if exists file
 		try {
 			doc.save(file.getLocation().toFile(), new XmlOptions().setSavePrettyPrint());
+			try {
+				file.refreshLocal(IFile.DEPTH_INFINITE, null);
+			} catch (CoreException e) {
+				String message = "Error while refreshing file "+file.getFullPath().toOSString()+"!";
+				ExceptionHandler.notifyUser(new DataLoadingException(message));
+			}
 		} catch (IOException e) {
 			ExceptionHandler.notifyUser(e);
 		}
@@ -389,9 +399,38 @@ public class XmlStorageClient implements IStorageClient, IPreferenceChangeListen
 				Review review = ((Review) evt.getSource());
 				unloadComments(review.getComments());
 			}
+		} else if ("comments".equals(evt.getPropertyName())) {
+			@SuppressWarnings("unchecked")
+			ArrayList<Comment> oldValue = new ArrayList<Comment>((ArrayList<Comment>)evt.getOldValue());
+			@SuppressWarnings("unchecked")
+			ArrayList<Comment> newValue = new ArrayList<Comment>((ArrayList<Comment>)evt.getNewValue());
+			if (oldValue.size() > newValue.size() && ((Review)evt.getSource()).getIsOpen()) {
+				// comments were remove from review
+				oldValue.removeAll(newValue);
+				for (Comment c: oldValue) {
+					unloadReplies(c.getReplies());
+					ArrayList<Comment> authorCommentsForReview = getComments(c.getReview(), c.getAuthor());
+					if (authorCommentsForReview.size() > 0) {
+						store(c);
+					} else {
+						IFile commentFile = SourceFolderManager.getCommentFile(c.getReview().getId(), c.getAuthor());
+						try {
+							commentFile.delete(true, null);
+						} catch (CoreException e) {
+							String message = "Error while deleting file '"+commentFile.getFullPath().toOSString()+"'.";
+							ExceptionHandler.notifyUser(new DataLoadingException(message));
+						}
+					}
+				}
+			} else {
+				// comments were added to review
+				newValue.removeAll(oldValue);
+				for (Comment c: newValue) {
+					store(c);
+				}
+			}
 		} else {
 			store((Review) evt.getSource());
-			//TODO check if comments were added or removed --> handle this!
 		}
 	}
 
@@ -437,13 +476,13 @@ public class XmlStorageClient implements IStorageClient, IPreferenceChangeListen
 
 	@Override
 	public void propertyChange(java.beans.PropertyChangeEvent evt) {
-		if (evt.getSource() instanceof ReviewSet) {
-			propertyChangeOfReviewSet(evt);
-		} else if (evt.getSource() instanceof Review) {
-			propertyChangeOfReview(evt);
-		} else if (evt.getSource() instanceof Comment || evt.getSource() instanceof Reply) {
-			propertyChangeOfCommentOrReply(evt);
-		}
+			if (evt.getSource() instanceof ReviewSet) {
+				propertyChangeOfReviewSet(evt);
+			} else if (evt.getSource() instanceof Review) {
+				propertyChangeOfReview(evt);
+			} else if ((evt.getSource() instanceof Comment || evt.getSource() instanceof Reply) && !"modificationDate".equals(evt.getPropertyName())) {
+				propertyChangeOfCommentOrReply(evt);
+			}	
 	}
 
 	///////////////////////////////////////
