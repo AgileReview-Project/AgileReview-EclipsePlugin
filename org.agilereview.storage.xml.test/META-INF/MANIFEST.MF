@@ -5,4 +5,6 @@ Bundle-SymbolicName: org.agilereview.storage.xml.test
 Bundle-Version: 1.0.0.qualifier
 Fragment-Host: org.agilereview.storage.xml;bundle-version="0.9.0"
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
-Require-Bundle: org.junit
+Require-Bundle: org.junit,
+ org.eclipse.swtbot.eclipse.finder;bundle-version="2.0.5",
+ org.eclipse.swtbot.forms.finder;bundle-version="2.0.5"
