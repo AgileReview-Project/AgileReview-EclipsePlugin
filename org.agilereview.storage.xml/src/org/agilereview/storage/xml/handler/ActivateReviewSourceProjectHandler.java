@@ -17,9 +17,8 @@ import org.eclipse.ui.handlers.HandlerUtil;
 /**
  * Handler for activating the currently selected AgileReview Source project.
  */
-public class ActivateSourceProjectHandler extends AbstractHandler {
+public class ActivateReviewSourceProjectHandler extends AbstractHandler {
 
-	@SuppressWarnings("deprecation")
 	@Override
 	public Object execute(ExecutionEvent event) throws ExecutionException {
 		try {

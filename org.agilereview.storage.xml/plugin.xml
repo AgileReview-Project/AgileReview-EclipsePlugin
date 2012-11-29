@@ -31,4 +31,89 @@
       </run>
    </runtime>
 </extension>
+<extension
+      point="org.eclipse.ui.menus">
+   <menuContribution
+         allPopups="false"
+         locationURI="toolbar:org.agilereview.ui.basic.reviewExplorerView?after=org.agilereview.ui.basic.reviewexplorer.toolbar.separator5">
+      <command
+            commandId="org.agilereview.storage.xml.SwitchReviewSourceProject"
+            label="Switch Review Source Project"
+            style="push"
+            tooltip="Switch Review Source Project">
+      </command>
+      <separator
+            name="org.agilereview.storage.xml.separator1"
+            visible="true">
+      </separator>
+   </menuContribution>
+   <menuContribution
+         allPopups="false"
+         locationURI="popup:org.eclipse.jdt.ui.PackageExplorer">
+      <command
+            commandId="org.agilereview.storage.xml.ActivateReviewSourceProject"
+            label="Activate Review Source Project"
+            style="push"
+            tooltip="Activate Review Source Project">
+      </command>
+   </menuContribution>
+</extension>
+<extension
+      point="org.eclipse.ui.commands">
+   <command
+         category="org.agilereview.storage.xml.commands"
+         categoryId="org.agilereview.storage.xml.commands"
+         defaultHandler="org.agilereview.storage.xml.handler.SwitchReviewSourceProjectHandler"
+         description="Switch Review Source Project"
+         id="org.agilereview.storage.xml.SwitchReviewSourceProject"
+         name="Switch Review Source Project">
+   </command>
+   <category
+         description="XMLStorage Client Commands"
+         id="org.agilereview.storage.xml.commands"
+         name="XMLStorage Client Commands">
+   </category>
+   <command
+         category="org.agilereview.storage.xml.commands"
+         categoryId="org.agilereview.storage.xml.commands"
+         defaultHandler="org.agilereview.storage.xml.handler.ActivateReviewSourceProjectHandler"
+         description="Activate Review Source Project"
+         id="org.agilereview.storage.xml.ActivateReviewSourceProject"
+         name="Activate Review Source Project">
+   </command>
+</extension>
+<extension
+      point="org.eclipse.ui.handlers">
+   <handler
+         class="org.agilereview.storage.xml.handler.ActivateReviewSourceProjectHandler"
+         commandId="org.agilereview.storage.xml.ActivateReviewSourceProject">
+         <activeWhen>
+            <with
+                  variable="activePart">
+               <instanceof
+                     value="org.eclipse.jdt.ui.PackageExplorer">
+               </instanceof>
+            </with>
+         </activeWhen>
+   </handler>
+   <handler
+         class="org.agilereview.storage.xml.handler.SwitchReviewSourceProjectHandler"
+         commandId="org.agilereview.storage.xml.SwitchReviewSourceProject">
+         <activeWhen>
+            <with
+                  variable="activePart">
+               <instanceof
+                     value="org.agilereview.ui.basic.reviewExplorer.ReviewExplorerView">
+               </instanceof>
+            </with>
+         </activeWhen>
+   </handler>
+</extension>
+<extension
+      point="org.eclipse.ui.commandImages">
+   <image
+         commandId="org.agilereview.storage.xml.SwitchReviewSourceProject"
+         icon="resources/icons/switch_source_15x15.png">
+   </image>
+</extension>
 </plugin>

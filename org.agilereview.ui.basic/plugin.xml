@@ -107,6 +107,10 @@
             label="Link Review Explorer for filtering"
             style="toggle">
       </command>
+      <separator
+            name="org.agilereview.ui.basic.reviewexplorer.toolbar.separator5"
+            visible="true">
+      </separator>
    </menuContribution>
    <menuContribution
          allPopups="true"
