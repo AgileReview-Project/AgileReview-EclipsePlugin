@@ -7,6 +7,7 @@
  */
 package org.agilereview.core.external.preferences;
 
+import org.agilereview.core.Activator;
 import org.agilereview.core.external.storage.Review;
 
 /**
@@ -14,7 +15,11 @@ import org.agilereview.core.external.storage.Review;
  * @author Malte Brunnlieb (28.04.2012)
  */
 public interface AgileReviewPreferences {
-    
+	
+	/**
+	 * Plugin ID made available for other plugins to read/write preferences for this plugin
+	 */
+	public static final String CORE_PLUGIN_ID = Activator.PLUGIN_ID;    
     /**
      * Comma separated list of comment status
      */
