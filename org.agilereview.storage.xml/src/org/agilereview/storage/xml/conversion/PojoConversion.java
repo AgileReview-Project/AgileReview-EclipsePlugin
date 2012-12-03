@@ -78,6 +78,7 @@ public class PojoConversion {
 		ReviewDocument doc = ReviewDocument.Factory.newInstance();
 		org.agilereview.xmlSchema.review.ReviewDocument.Review xmlBeansReview = doc.addNewReview();
 		xmlBeansReview.setId(review.getId());
+		xmlBeansReview.setName(review.getName());
 		xmlBeansReview.setStatus(review.getStatus());
 		xmlBeansReview.setReferenceId(review.getReference());
 		xmlBeansReview.setResponsibility(review.getResponsibility());

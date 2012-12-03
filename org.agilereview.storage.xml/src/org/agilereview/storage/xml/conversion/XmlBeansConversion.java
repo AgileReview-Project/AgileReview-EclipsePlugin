@@ -28,6 +28,7 @@ public class XmlBeansConversion {
 	 */
 	public static Review getReview(org.agilereview.xmlSchema.review.ReviewDocument.Review xmlBeansReview) {
 		String id = xmlBeansReview.getId();
+		String name = xmlBeansReview.getName();
 		int status = xmlBeansReview.getStatus();
 		String reference = xmlBeansReview.getReferenceId();
 		String responsibility = xmlBeansReview.getResponsibility();
@@ -35,7 +36,7 @@ public class XmlBeansConversion {
 		List<String> reviewIds = Arrays.asList(Platform.getPreferencesService().getString(AgileReviewPreferences.CORE_PLUGIN_ID, AgileReviewPreferences.OPEN_REVIEWS, "", null).split(","));
 		boolean isOpen = reviewIds.contains(id);
 		
-		Review review = new Review(id, status, reference, responsibility, description, isOpen);
+		Review review = new Review(id, name, status, reference, responsibility, description, isOpen);
 
 		return review;
 	}

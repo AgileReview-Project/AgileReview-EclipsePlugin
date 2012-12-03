@@ -22,6 +22,7 @@ public class PojoConversionTest {
 	private static final String reviewText = "Test review";
 	private static final String reviewReference = "http://www.google.de/";
 	private static final String reviewId = "r1";
+	private static final String reviewName = "TestReview";
 	private static final String rtext = "Reply text";
 	private static final String ctext = "Foobar Blubber....";
 	private static final int status = 1;
@@ -86,7 +87,7 @@ public class PojoConversionTest {
 	
 	@Test
 	public void testGetXmlBeansReviewDocument() {
-		Review r = new Review(reviewId, status, reviewReference, recipient, reviewText, true);
+		Review r = new Review(reviewId, reviewName, status, reviewReference, recipient, reviewText, true);
 		
 		ReviewDocument rDoc = PojoConversion.getXmlBeansReviewDocument(r);
 		

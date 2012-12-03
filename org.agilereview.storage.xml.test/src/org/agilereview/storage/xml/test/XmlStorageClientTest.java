@@ -46,6 +46,7 @@ public class XmlStorageClientTest {
 	private static final String reviewText = "Test review";
 	private static final String reviewReference = "http://www.google.de/";
 	private static final String reviewId = "r1";
+	private static final String reviewName = "TestReview";
 	private static final String rtext = "Reply text";
 	private static final String ctext = "Foobar Blubber....";
 	private static final int status = 1;
@@ -62,7 +63,7 @@ public class XmlStorageClientTest {
 	@BeforeClass
 	public static void setUpWorkspace() throws CoreException, IOException {
 		// set up test data
-		r = new Review(reviewId, status, reviewReference, recipient, reviewText, false);
+		r = new Review(reviewId, reviewName, status, reviewReference, recipient, reviewText, false);
 		r.setIsOpen(true);
 		ArrayList<Comment> comments = new ArrayList<Comment>();
 		for (int i=0; i<commentIds.length; i++) {

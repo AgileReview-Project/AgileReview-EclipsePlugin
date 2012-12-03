@@ -33,6 +33,11 @@ public class Review implements PropertyChangeListener {
      */
     private final String id;
     /**
+     * The name of the review, more understandable for humans than the generated
+     * ID. 
+     */
+    private String name = "";
+    /**
      * The status of the {@link Review}
      */
     private int status = 0;
@@ -73,14 +78,16 @@ public class Review implements PropertyChangeListener {
     /**
      * Constructor that should be used if a {@link Review} is reconstructed from storage
      * @param id the id of the {@link Review}
+     * @param name the name of the {@link Review}
      * @param status the status of the {@link Review}
      * @param reference e.g. a reference to a bug tracker
      * @param responsibility the person that is in charge for this {@link Review}
      * @param description a text describing the e.g. the content or scope of this {@link Review}
      * @param isOpen indicates whether comments for this review are loaded or not
      */
-    public Review(String id, int status, String reference, String responsibility, String description, boolean isOpen) {
+    public Review(String id, String name, int status, String reference, String responsibility, String description, boolean isOpen) {
         this.id = id;
+        this.name = name;
         this.status = status;
         this.reference = reference;
         this.responsibility = responsibility;
@@ -93,6 +100,22 @@ public class Review implements PropertyChangeListener {
      */
     public String getId() {
         return id;
+    }
+    
+    /**
+     * @return the name of the {@link Review}
+     */
+    public String getName() {
+        return name;
+    }
+    
+    /**
+     * @param name the new name of the {@link Review} 
+     */
+    public void setName(String name) {
+        String oldValue = this.name;
+    	this.name = name;
+        propertyChangeSupport.firePropertyChange("name", oldValue, this.name);
     }
     
     /**
