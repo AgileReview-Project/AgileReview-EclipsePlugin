@@ -16,8 +16,11 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.agilereview.core.Activator;
+import org.agilereview.core.exception.ExceptionHandler;
 import org.agilereview.core.external.preferences.AgileReviewPreferences;
+import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.core.runtime.preferences.InstanceScope;
+import org.osgi.service.prefs.BackingStoreException;
 
 /**
  * A class that stores review data and a list of comments belonging to the review.
@@ -274,7 +277,8 @@ public class Review implements PropertyChangeListener {
      * @author Peter Reuter (26.06.2012)
      */
     void setOpenReviewsPreference() {
-        String reviewIdsPref = InstanceScope.INSTANCE.getNode(Activator.PLUGIN_ID).get(AgileReviewPreferences.OPEN_REVIEWS, "");
+        IEclipsePreferences preferences = InstanceScope.INSTANCE.getNode(Activator.PLUGIN_ID);
+		String reviewIdsPref = preferences.get(AgileReviewPreferences.OPEN_REVIEWS, "");
         ArrayList<String> reviewIds;
         if ("".equals(reviewIdsPref)) {
         	reviewIds = new ArrayList<String>();
@@ -297,7 +301,13 @@ public class Review implements PropertyChangeListener {
                     reviewIdsPref += (",");         
             }	
         }        
-        InstanceScope.INSTANCE.getNode(Activator.PLUGIN_ID).put(AgileReviewPreferences.OPEN_REVIEWS, reviewIdsPref);
+        preferences.put(AgileReviewPreferences.OPEN_REVIEWS, reviewIdsPref);
+        try {
+			preferences.flush();
+		} catch (BackingStoreException e) {
+			String message = "AgileReview could not persistently set list of open Reviews.";
+			ExceptionHandler.logAndNotifyUser(message, e);
+		}
     }
     
 }

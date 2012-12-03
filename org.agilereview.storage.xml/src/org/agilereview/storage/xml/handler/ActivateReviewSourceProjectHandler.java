@@ -1,6 +1,6 @@
 package org.agilereview.storage.xml.handler;
 
-import org.agilereview.core.external.preferences.AgileReviewPreferences;
+import org.agilereview.storage.xml.Activator;
 import org.agilereview.storage.xml.SourceFolderManager;
 import org.agilereview.storage.xml.exception.ExceptionHandler;
 import org.eclipse.core.commands.AbstractHandler;
@@ -8,11 +8,13 @@ import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.ui.handlers.HandlerUtil;
+import org.osgi.service.prefs.BackingStoreException;
 
 /**
  * Handler for activating the currently selected AgileReview Source project.
@@ -30,7 +32,14 @@ public class ActivateReviewSourceProjectHandler extends AbstractHandler {
 				if (o instanceof IProject) {
 						IProject project = (IProject) o;
 						if (project.hasNature(SourceFolderManager.AGILEREVIEW_NATURE)){
-							InstanceScope.INSTANCE.getNode(AgileReviewPreferences.CORE_PLUGIN_ID).put(SourceFolderManager.SOURCEFOLDER_PROPERTYNAME, project.getName());
+							IEclipsePreferences preferences = InstanceScope.INSTANCE.getNode(Activator.PLUGIN_ID);
+							preferences.put(SourceFolderManager.SOURCEFOLDER_PROPERTYNAME, project.getName());
+							try {
+								preferences.flush();
+							} catch (BackingStoreException e) {
+								String message = "AgileReview could not persistently set Review Source Folder.";
+								ExceptionHandler.notifyUser(message);
+							}
 						} else {
 							error = true;
 						}

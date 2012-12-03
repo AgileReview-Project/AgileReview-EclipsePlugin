@@ -2,10 +2,13 @@ package org.agilereview.storage.xml.wizards.noreviewsource;
 
 import org.agilereview.storage.xml.Activator;
 import org.agilereview.storage.xml.SourceFolderManager;
+import org.agilereview.storage.xml.exception.ExceptionHandler;
+import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.wizard.IWizard;
 import org.eclipse.jface.wizard.Wizard;
+import org.osgi.service.prefs.BackingStoreException;
 
 /**
  * Wizard for choosing a AgileReview Source Project if non is existent
@@ -55,13 +58,19 @@ public class NoReviewSourceProjectWizard extends Wizard implements IWizard {
 		addPage(page);
 	}
 
-	@SuppressWarnings("deprecation")
 	@Override
 	public boolean performFinish() {
 		chosenProjectName = page.getReviewSourceName();
 		boolean result = chosenProjectName != null;
 		if (result && setDirectly) {
-			InstanceScope.INSTANCE.getNode(Activator.PLUGIN_ID).put(SourceFolderManager.SOURCEFOLDER_PROPERTYNAME, chosenProjectName);
+			IEclipsePreferences preferences = InstanceScope.INSTANCE.getNode(Activator.PLUGIN_ID);
+			preferences.put(SourceFolderManager.SOURCEFOLDER_PROPERTYNAME, chosenProjectName);
+			try {
+				preferences.flush();
+			} catch (BackingStoreException e) {
+				String message = "AgileReview could not persistently set Review Source Folder.";
+				ExceptionHandler.notifyUser(message);
+			}			
 		}
 		return result;
 	}

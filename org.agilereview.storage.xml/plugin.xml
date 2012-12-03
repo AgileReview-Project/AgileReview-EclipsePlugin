@@ -116,4 +116,19 @@
          icon="resources/icons/switch_source_15x15.png">
    </image>
 </extension>
+<extension
+      point="org.eclipse.ui.newWizards">
+   <category
+         id="org.agilereview.storage.xml.wizards.AgileReview"
+         name="AgileReview">
+   </category>
+   <wizard
+         category="org.agilereview.storage.xml.wizards.AgileReview"
+         class="org.agilereview.storage.xml.wizards.newreviewsource.NewReviewSourceProjectWizard"
+         hasPages="true"
+         id="org.agilereview.storage.xml.NewReviewSourceProject"
+         name="New Review Source Project"
+         project="true">
+   </wizard>
+</extension>
 </plugin>

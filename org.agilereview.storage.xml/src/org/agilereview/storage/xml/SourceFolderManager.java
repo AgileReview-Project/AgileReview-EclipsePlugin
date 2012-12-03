@@ -4,6 +4,7 @@ import java.io.ByteArrayInputStream;
 
 import org.agilereview.core.external.storage.Comment;
 import org.agilereview.core.external.storage.Review;
+import org.agilereview.storage.xml.exception.DataLoadingException;
 import org.agilereview.storage.xml.exception.ExceptionHandler;
 import org.agilereview.storage.xml.wizards.noreviewsource.NoReviewSourceProjectWizard;
 import org.eclipse.core.resources.IFile;
@@ -99,6 +100,17 @@ public class SourceFolderManager {
 				}
 				setProjectNatures(p, new String[] { AGILEREVIEW_NATURE, AGILEREVIEW_ACTIVE_NATURE });
 				currentSourceFolder = p;
+				if (currentSourceFolder.isSynchronized(IResource.DEPTH_INFINITE)) {
+					try {
+						currentSourceFolder.refreshLocal(IResource.DEPTH_INFINITE, null);
+						while (!currentSourceFolder.isSynchronized(IResource.DEPTH_INFINITE)) {
+							
+						}
+					} catch (CoreException e) {
+						String message = "Error while refreshing Review Source Project '"+getCurrentSourceFolderName()+"'!";
+						ExceptionHandler.notifyUser(new DataLoadingException(message));
+					}	 
+				}				
 			}
 		}
 	}
@@ -176,63 +188,75 @@ public class SourceFolderManager {
 	 * is create if it does not exist.
 	 * @param reviewId
 	 * @param author
-	 * @return {@link IFile} for the given parameter pair
+	 * @return {@link IFile} for the given parameter pair if a Review Source Folder is available, <code>null</code> else.
 	 */
 	public static IFile getCommentFile(String reviewId, String author) {
-		IFile file = getReviewFolder(reviewId).getFile("author_" + author + ".xml");
-		if (!file.exists()) {
-			try {
-				// TODO maybe use ProgressMonitor here?
-				file.create(new ByteArrayInputStream("".getBytes()), IResource.NONE, null);
-				while (!file.exists()) {
+		if (currentSourceFolder == null) {
+			return null;
+		} else {
+			IFile file = getReviewFolder(reviewId).getFile("author_" + author + ".xml");
+			if (!file.exists()) {
+				try {
+					// TODO maybe use ProgressMonitor here?
+					file.create(new ByteArrayInputStream("".getBytes()), IResource.NONE, null);
+					while (!file.exists()) {
+					}
+				} catch (final CoreException e) {
+					ExceptionHandler.notifyUser(e);
 				}
-			} catch (final CoreException e) {
-				ExceptionHandler.notifyUser(e);
 			}
+			return file;
 		}
-		return file;
 	}
 
 	/**
 	 * Returns an {@link IFolder} object which represents the folder of the {@link Review} given by its ID. The folder is created if it does not
 	 * exists.
 	 * @param reviewId
-	 * @return {@link IFolder} for this review
+	 * @return {@link IFolder} for this review if a Review Source Folder is available, <code>null</code> else.
 	 */
 	public static IFolder getReviewFolder(String reviewId) {
-		IFolder folder = getCurrentSourceFolder().getFolder("review." + reviewId);
-		if (!folder.exists()) {
-			try {
-				// TODO maybe use progressmonitor here?
-				folder.create(IResource.NONE, true, null);
-				while (!folder.exists()) {
+		if (currentSourceFolder == null) {
+			return null;
+		} else {
+			IFolder folder = currentSourceFolder.getFolder("review." + reviewId);
+			if (!folder.exists()) {
+				try {
+					// TODO maybe use progressmonitor here?
+					folder.create(IResource.NONE, true, null);
+					while (!folder.exists()) {
+					}
+				} catch (final CoreException e) {
+					ExceptionHandler.notifyUser(e);
 				}
-			} catch (final CoreException e) {
-				ExceptionHandler.notifyUser(e);
 			}
+			return folder;
 		}
-		return folder;
 	}
 
 	/**
 	 * Returns an {@link IFile} object which represents the the review-file of the {@link Review} given by its ID. The file and its review folder are
 	 * created if they do not exist.
 	 * @param reviewId
-	 * @return {@link IFile} for this review
+	 * @return {@link IFile} for this review if a Review Source Folder is available, <code>null</code> else.
 	 */
 	public static IFile getReviewFile(String reviewId) {
-		IFile file = getReviewFolder(reviewId).getFile("review.xml");
-		if (!file.exists()) {
-			try {
-				// TODO maybe use ProgressMonitor here?
-				file.create(new ByteArrayInputStream("".getBytes()), IResource.NONE, null);
-				while (!file.exists()) {
+		if (currentSourceFolder == null) {
+			return null;
+		} else {
+			IFile file = getReviewFolder(reviewId).getFile("review.xml");
+			if (!file.exists()) {
+				try {
+					// TODO maybe use ProgressMonitor here?
+					file.create(new ByteArrayInputStream("".getBytes()), IResource.NONE, null);
+					while (!file.exists()) {
+					}
+				} catch (final CoreException e) {
+					ExceptionHandler.notifyUser(e);
 				}
-			} catch (final CoreException e) {
-				ExceptionHandler.notifyUser(e);
 			}
+			return file;
 		}
-		return file;
 	}
 
 	/**
@@ -241,11 +265,13 @@ public class SourceFolderManager {
 	 * @author Peter Reuter (24.06.2012)
 	 */
 	public static void deleteReviewContents(String reviewId) {
-		IFolder reviewFolder = getReviewFolder(reviewId);
-		try {
-			reviewFolder.delete(true, null);
-		} catch (CoreException e) {
-			ExceptionHandler.notifyUser(e);
+		if (currentSourceFolder != null) {
+			IFolder reviewFolder = getReviewFolder(reviewId);
+			try {
+				reviewFolder.delete(true, null);
+			} catch (CoreException e) {
+				ExceptionHandler.notifyUser(e);
+			}	
 		}
 	}
 	
@@ -256,11 +282,13 @@ public class SourceFolderManager {
 	 * @author Peter Reuter (18.07.2012)
 	 */
 	public static void deleteCommentFile(String reviewId, String author) {
-		IFile commentFile = getCommentFile(reviewId, author);
-		try {
-			commentFile.delete(true, null);
-		} catch (CoreException e) {
-			ExceptionHandler.notifyUser(e);
+		if (currentSourceFolder != null) {
+			IFile commentFile = getCommentFile(reviewId, author);
+			try {
+				commentFile.delete(true, null);
+			} catch (CoreException e) {
+				ExceptionHandler.notifyUser(e);
+			}
 		}
 	}
 

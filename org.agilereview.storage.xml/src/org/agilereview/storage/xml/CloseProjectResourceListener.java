@@ -11,10 +11,12 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
+import org.osgi.service.prefs.BackingStoreException;
 
 /**
  * This class handles the case of closing the active review source folder.
@@ -87,7 +89,7 @@ public class CloseProjectResourceListener implements IResourceChangeListener {
 						MessageDialog.openInformation(currentShell, "'Agile Review Source Project' deleted", msg);
 //						deletedProjectPath = null; // needed for correct wizard behavior
 						//XXX check whether this fails --> in case, use a private function to open NoReviewSourceWizard
-						InstanceScope.INSTANCE.getNode(AgileReviewPreferences.CORE_PLUGIN_ID).put(SourceFolderManager.SOURCEFOLDER_PROPERTYNAME, "");
+						InstanceScope.INSTANCE.getNode(Activator.PLUGIN_ID).put(SourceFolderManager.SOURCEFOLDER_PROPERTYNAME, "");
 						break;
 					}
 				}
@@ -133,7 +135,15 @@ public class CloseProjectResourceListener implements IResourceChangeListener {
 								if (MessageDialog.openQuestion(Display.getCurrent().getActiveShell(), "Warning: AgileReview Source Project", msg)) {
 									try {
 										oldSourceProject.open(null); // TODO use progressmonitor?
-										InstanceScope.INSTANCE.getNode(AgileReviewPreferences.CORE_PLUGIN_ID).put(SourceFolderManager.SOURCEFOLDER_PROPERTYNAME, oldSourceProject.getName());
+										IEclipsePreferences preferences = InstanceScope.INSTANCE.getNode(Activator.PLUGIN_ID);
+										preferences.put(SourceFolderManager.SOURCEFOLDER_PROPERTYNAME, oldSourceProject.getName());
+										try {
+											preferences.flush();
+										} catch (BackingStoreException e) {
+											String message = "AgileReview could not persistently set Review Source Folder.";
+											ExceptionHandler.notifyUser(message);
+										}
+										
 									} catch (final CoreException e) {
 										String message = "An exception occured while reopening the closed Review Source Project "
 												+ oldSourceProject.getName() + "!" + e.getLocalizedMessage();
