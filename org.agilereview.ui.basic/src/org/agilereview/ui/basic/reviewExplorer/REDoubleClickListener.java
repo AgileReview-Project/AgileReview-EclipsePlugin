@@ -62,11 +62,11 @@ public class REDoubleClickListener implements IDoubleClickListener {
                         } else {
                             // case 1.1.1
                             // Review is open -> activate it
-                            executeCommand("org.agilereview.activateReview"); // TODO String auslagern?
+                            executeCommand("org.agilereview.core.activateReview"); // TODO String auslagern?
                         }
                     } else {
                         // case 1.2: If the review is closed -> open it
-                        executeCommand("org.agilereview.openCloseReview"); // TODO String auslagern?
+                        executeCommand("org.agilereview.core.openCloseReview"); // TODO String auslagern?
                     }
                 } else if (o instanceof IFile) {
                     // case 2: An IFile is selected --> open it

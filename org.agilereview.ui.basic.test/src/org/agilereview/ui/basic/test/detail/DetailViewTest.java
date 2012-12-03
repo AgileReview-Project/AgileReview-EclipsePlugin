@@ -46,7 +46,7 @@ public class DetailViewTest {
     @BeforeClass
     public static void setupTestClass() {
         PlatformUI.getPreferenceStore().setValue("org.agilereview.testrunner.active", true);
-        PlatformUI.getPreferenceStore().setValue("org.agilereview.testrunner.mock.storage", true); //TODO if client can be set via preferences -> use this
+        PlatformUI.getPreferenceStore().setValue("org.agilereview.testrunner.mock.storage", false); //TODO if client can be set via preferences -> use this
     }
     
     /**
@@ -91,6 +91,7 @@ public class DetailViewTest {
         
         ReviewSet reviews = new ReviewSet();
         reviews.add(review);
+        reviews.add(new Review("2"));
         
         StorageClientMock.getInstance().setStorageContent(reviews);
         

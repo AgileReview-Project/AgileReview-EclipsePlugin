@@ -266,6 +266,16 @@
                </iterate>
             </with>
          </activeWhen>
+         <enabledWhen>
+            <with
+                  variable="selection">
+               <and>
+                  <count
+                        value="1">
+                  </count>
+               </and>
+            </with>
+         </enabledWhen>
       </handler>
       <handler
             class="org.agilereview.ui.basic.reviewExplorer.handler.ActivateReviewHandler"
@@ -282,6 +292,16 @@
                </iterate>
             </with>
          </activeWhen>
+         <enabledWhen>
+            <with
+                  variable="selection">
+               <and>
+                  <count
+                        value="1">
+                  </count>
+               </and>
+            </with>
+         </enabledWhen>
       </handler>
       <handler
             class="org.agilereview.ui.basic.reviewExplorer.handler.NewReviewHandler"
