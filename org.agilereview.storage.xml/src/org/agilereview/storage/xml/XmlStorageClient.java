@@ -99,7 +99,7 @@ public class XmlStorageClient implements IStorageClient, IPreferenceChangeListen
 		if (SourceFolderManager.getCurrentSourceFolder() != null) {
 			loadReviews();
 			String openReviewIdsList = InstanceScope.INSTANCE.getNode(AgileReviewPreferences.CORE_PLUGIN_ID).get(AgileReviewPreferences.OPEN_REVIEWS, "");
-			if (!(openReviewIdsList == null) && !openReviewIdsList.equals("")) {
+			if (!openReviewIdsList.equals("")) {
 				List<String> openReviewIds = Arrays.asList(openReviewIdsList.split(","));
 				loadComments(openReviewIds);
 			}			
@@ -147,29 +147,6 @@ public class XmlStorageClient implements IStorageClient, IPreferenceChangeListen
 	//////////////////////////////////////////////////////
 
 	/**
-	 * Loads all {@link Comment} objects of the {@link Review} given by its ID.
-	 * @param reviewId The ID of the {@link Review}.
-	 * @author Peter Reuter (04.04.2012)
-	 */
-	private void loadComments(String reviewId) {
-		List<org.agilereview.xmlSchema.author.CommentDocument.Comment> xmlBeansComments = loadAllXmlBeansComment(reviewId);
-		Review review = this.idReviewMap.get(reviewId);
-		ArrayList<Comment> comments = new ArrayList<Comment>();
-		for (org.agilereview.xmlSchema.author.CommentDocument.Comment xmlBeansComment : xmlBeansComments) {
-			Comment comment = XmlBeansConversion.getComment(review, xmlBeansComment);
-			// check if comment in map (just for unit tests --> XmlStorage is create twice, so it loads twice...
-			comments.add(comment);
-			this.idCommentMap.put(comment.getId(), comment);
-			if (xmlBeansComment.getReplies() != null && xmlBeansComment.getReplies().getReplyArray() != null) {
-				List<Reply> replies = XmlBeansConversion.getReplyList(comment, xmlBeansComment.getReplies().getReplyArray());
-				addReplies(replies);
-				comment.setReplies(replies);
-			}
-		}
-		review.setComments(comments);
-	}
-
-	/**
 	 * Loads all {@link Review} objects and adds a {@link PropertyChangeListener} to each of them.
 	 * @author Peter Reuter (04.04.2012)
 	 */
@@ -180,6 +157,31 @@ public class XmlStorageClient implements IStorageClient, IPreferenceChangeListen
 			this.idReviewMap.put(review.getId(), review);
 		}
 		this.reviewSet.addAll(idReviewMap.values());
+	}
+
+	/**
+	 * Loads all {@link Comment} objects of the {@link Review} given by its ID.
+	 * @param reviewId The ID of the {@link Review}.
+	 * @author Peter Reuter (04.04.2012)
+	 */
+	private void loadComments(String reviewId) {
+		List<org.agilereview.xmlSchema.author.CommentDocument.Comment> xmlBeansComments = loadAllXmlBeansComment(reviewId);
+		Review review = this.idReviewMap.get(reviewId);
+		if (review != null) {
+			ArrayList<Comment> comments = new ArrayList<Comment>();
+			for (org.agilereview.xmlSchema.author.CommentDocument.Comment xmlBeansComment : xmlBeansComments) {
+				Comment comment = XmlBeansConversion.getComment(review, xmlBeansComment);
+				// check if comment in map (just for unit tests --> XmlStorage is create twice, so it loads twice...
+				comments.add(comment);
+				this.idCommentMap.put(comment.getId(), comment);
+				if (xmlBeansComment.getReplies() != null && xmlBeansComment.getReplies().getReplyArray() != null) {
+					List<Reply> replies = XmlBeansConversion.getReplyList(comment, xmlBeansComment.getReplies().getReplyArray());
+					addReplies(replies);
+					comment.setReplies(replies);
+				}
+			}
+			review.setComments(comments);	
+		}		
 	}
 
 	/**
