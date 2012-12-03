@@ -36,7 +36,7 @@ public class TagParser {
     /**
      * Core Regular Expression to find the core tag structure
      */
-    public static String RAW_TAG_REGEX = "/\\*-?(\\?)?" + Pattern.quote(keySeparator) + "(.+?)" + Pattern.quote(keySeparator) + "(\\?)?(-)?\\*/";
+    public static String RAW_TAG_REGEX = "-?(\\?)?" + Pattern.quote(keySeparator) + "(.+?)" + Pattern.quote(keySeparator) + "(\\?)?(-)?";
     /**
      * Commenting tags for this instance
      */
@@ -296,7 +296,7 @@ public class TagParser {
      */
     private void rewriteTagLocationForLineAdaption(Matcher matcher, IRegion tagRegion, boolean startLine) throws BadLocationException {
         String key = matcher.group(2).trim();
-        if (matcher.group(4).equals("-")) {
+        if ("-".equals(matcher.group(4))) {
             // set the position such that the line break beforehand will be removed too when replacing this position with the empty string
             int currLine = document.getLineOfOffset(tagRegion.getOffset());
             String lineToDelete = document.get(document.getLineOffset(currLine), document.getLineLength(currLine)
