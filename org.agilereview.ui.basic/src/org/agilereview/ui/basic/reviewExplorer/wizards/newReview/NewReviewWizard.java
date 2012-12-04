@@ -51,6 +51,7 @@ public class NewReviewWizard extends Wizard implements INewWizard {
         try {
         	Review newRev = PojoFactory.createReview();
             if (newRev != null) {
+            	newRev.setName(this.page1.getReviewName());
                 newRev.setReference(this.page1.getReviewReference());
                 newRev.setDescription(this.page1.getReviewDescription());
                 newRev.setResponsibility(this.page1.getReviewResponsibility());

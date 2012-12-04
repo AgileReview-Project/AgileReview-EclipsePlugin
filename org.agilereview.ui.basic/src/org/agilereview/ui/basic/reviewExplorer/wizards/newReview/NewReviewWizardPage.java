@@ -18,7 +18,7 @@ public class NewReviewWizardPage extends WizardPage implements ModifyListener {
     /**
      * the text field for retrieving the id
      */
-    private Text id;
+    private Text name;
     /**
      * the text field for retrieving the reference
      */
@@ -54,12 +54,10 @@ public class NewReviewWizardPage extends WizardPage implements ModifyListener {
         lReviewId.setText("Review name*:");
         
         // TODO: New concept: ID != name?
-        id = new Text(container, SWT.BORDER | SWT.SINGLE);
-        id.setText("");
-        id.setToolTipText("Review name must be set.");
-        id.addModifyListener(this);
-        // TODO: New concept: ID != name? 
-        id.setEnabled(false);
+        name = new Text(container, SWT.BORDER | SWT.SINGLE);
+        name.setText("");
+        name.setToolTipText("Review name must be set.");
+        name.addModifyListener(this);
         
         // external reference
         Label lReference = new Label(container, SWT.NULL);
@@ -78,7 +76,7 @@ public class NewReviewWizardPage extends WizardPage implements ModifyListener {
         description = new Text(container, SWT.BORDER | SWT.H_SCROLL | SWT.MULTI);
         
         GridData gd = new GridData(GridData.FILL_HORIZONTAL);
-        id.setLayoutData(gd);
+        name.setLayoutData(gd);
         reference.setLayoutData(gd);
         responsibility.setLayoutData(gd);
         description.setLayoutData(new GridData(GridData.FILL_BOTH));
@@ -91,8 +89,8 @@ public class NewReviewWizardPage extends WizardPage implements ModifyListener {
     /**
      * @return the review ID entered
      */
-    protected String getReviewID() {
-        return this.id.getText().trim();
+    protected String getReviewName() {
+        return this.name.getText();
     }
     
     /**
@@ -119,16 +117,14 @@ public class NewReviewWizardPage extends WizardPage implements ModifyListener {
     @Override
     public void modifyText(ModifyEvent e) {
     	
-    	// TODO: Better checking. Needed? Review-Name != Review-ID
-//    	if (id.getText().isEmpty()) {
-//    		setErrorMessage("* Value must not be empty");
-//    		setPageComplete(false);
-//    	} else {
-//            setErrorMessage(null);
-//            setPageComplete(true);
-//    	}
-      setErrorMessage(null);
-      setPageComplete(true);
+    	// TODO: Better checking?
+    	if (name.getText().isEmpty()) {
+    		setErrorMessage("* Value must not be empty");
+    		setPageComplete(false);
+    	} else {
+            setErrorMessage(null);
+            setPageComplete(true);
+    	}
     	
 //        String validMessage = PropertiesManager.getInstance().isValid(id.getText());
 //        if (validMessage == null) {

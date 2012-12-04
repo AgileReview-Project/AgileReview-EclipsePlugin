@@ -1,4 +1,4 @@
-package org.agilereview.ui.basic;
+package org.agilereview.core;
 
 import org.eclipse.ui.IPageLayout;
 import org.eclipse.ui.IPerspectiveFactory;

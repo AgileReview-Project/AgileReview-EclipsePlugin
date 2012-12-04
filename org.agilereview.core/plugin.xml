@@ -68,5 +68,13 @@
             id="org.agilereview.core.PojoFactory">
       </ReviewDataReceiver>
    </extension>
+   <extension
+         point="org.eclipse.ui.perspectives">
+      <perspective
+            class="org.agilereview.core.AgileReviewPerspective"
+            id="org.agilereview.perspective"
+            name="AgileReview">
+      </perspective>
+   </extension>
 
 </plugin>

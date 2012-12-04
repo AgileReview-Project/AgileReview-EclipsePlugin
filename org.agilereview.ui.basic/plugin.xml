@@ -313,17 +313,9 @@
       </handler>
    </extension>
    <extension
-         point="org.eclipse.ui.perspectives">
-      <perspective
-            class="org.agilereview.ui.basic.AgileReviewPerspective"
-            id="org.agilereview.ui.basic.perspective"
-            name="AgileReview BasicUI">
-      </perspective>
-   </extension>
-   <extension
          point="org.eclipse.ui.perspectiveExtensions">
       <perspectiveExtension
-            targetID="org.agilereview.ui.basic.perspective">
+            targetID="org.agilereview.perspective">
          <view
                id="org.agilereview.ui.basic.reviewExplorerView"
                minimized="false"
@@ -341,7 +333,7 @@
          <view
                id="org.agilereview.ui.basic.detailView"
                minimized="false"
-               ratio="0.2f"
+               ratio="0.8f"
                relationship="right"
                relative="org.eclipse.ui.editorss">
          </view>
