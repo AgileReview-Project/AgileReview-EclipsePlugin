@@ -95,6 +95,7 @@ public class XmlStorageClient implements IStorageClient, IPreferenceChangeListen
 	 * @author Peter Reuter (04.04.2012)
 	 */
 	private void initialize() {
+		
 		// disable propertychangelistener
 		reviewSet.removePropertyChangeListener(this);
 
@@ -493,10 +494,18 @@ public class XmlStorageClient implements IStorageClient, IPreferenceChangeListen
 
 	@Override
 	public void propertyChange(java.beans.PropertyChangeEvent evt) {
-		if (SourceFolderManager.getCurrentReviewSourceProject() == null && !userNotified ) {
+		if (SourceFolderManager.getCurrentReviewSourceProject() == null && !userNotified) {
+			
 			userNotified = true;
-			String message = "No Review Source Project available. All changes will not be stored persistently. Please create and/or activate a Review Source Folder to persistently store Review data.";
+			
+			String message = "No Review Source Project available. All changes will be discarded when Eclipse shuts down or a Review Source Project is created and/or activated. Please create and/or activate a Review Source Folder to persistently store Review data.";
 			ExceptionHandler.notifyUser(message);
+			
+			// backup data that was inserted until now
+			ReviewSet backup = new ReviewSet();
+			backup.addAll(this.reviewSet);
+			
+			// allow user to create and/or activate Review Source Project
 			Display.getCurrent().syncExec(new Runnable() {
 				@Override
 				public void run() {
@@ -506,15 +515,29 @@ public class XmlStorageClient implements IStorageClient, IPreferenceChangeListen
 					wDialog.open();
 				}
 			});
-		} else {
-			if (evt.getSource() instanceof ReviewSet) {
-				propertyChangeOfReviewSet(evt);
-			} else if (evt.getSource() instanceof Review) {
-				propertyChangeOfReview(evt);
-			} else if ((evt.getSource() instanceof Comment || evt.getSource() instanceof Reply) && !"modificationDate".equals(evt.getPropertyName())) {
-				propertyChangeOfCommentOrReply(evt);
+
+			// add backup data to ReviewSet and thereby to new Review Source Project
+			if (SourceFolderManager.getCurrentReviewSourceProject() != null) {
+				this.reviewSet.addAll(backup);
 			}
+			
+		} else {
+			processPropertyChange(evt);
 		}				
+	}
+
+	/**
+	 * @param evt
+	 * @author Peter Reuter (04.12.2012)
+	 */
+	private void processPropertyChange(java.beans.PropertyChangeEvent evt) {
+		if (evt.getSource() instanceof ReviewSet) {
+			propertyChangeOfReviewSet(evt);
+		} else if (evt.getSource() instanceof Review) {
+			propertyChangeOfReview(evt);
+		} else if ((evt.getSource() instanceof Comment || evt.getSource() instanceof Reply) && !"modificationDate".equals(evt.getPropertyName())) {
+			propertyChangeOfCommentOrReply(evt);
+		}
 	}
 
 	///////////////////////////////////////
