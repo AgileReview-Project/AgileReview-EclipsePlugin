@@ -12,8 +12,8 @@
       </StorageClient>
    </extension>
 <extension
-      id="org.agilereview.storage.xml.nature.sourcefolder"
-      name="AgileReview Source Folder"
+      id="org.agilereview.storage.xml.nature.reviewsourceproject"
+      name="Review Source Project"
       point="org.eclipse.core.resources.natures">
    <runtime>
       <run
@@ -22,8 +22,8 @@
    </runtime>
 </extension>
 <extension
-      id="org.agilereview.storage.xml.nature.sourcefolder.active"
-      name="Active AgileReview Source Folder"
+      id="org.agilereview.storage.xml.nature.reviewsourceproject.active"
+      name="Active Review Source Project"
       point="org.eclipse.core.resources.natures">
    <runtime>
       <run

@@ -37,7 +37,7 @@ public class ActivateReviewSourceProjectHandler extends AbstractHandler {
 							try {
 								preferences.flush();
 							} catch (BackingStoreException e) {
-								String message = "AgileReview could not persistently set Review Source Folder.";
+								String message = "AgileReview could not persistently set Review Source Project.";
 								ExceptionHandler.notifyUser(message);
 							}
 						} else {
@@ -50,7 +50,7 @@ public class ActivateReviewSourceProjectHandler extends AbstractHandler {
 				error = true;
 			}
 			
-			if (error) ExceptionHandler.notifyUser("Current selection is not an AgileReview Source Folder!");
+			if (error) ExceptionHandler.notifyUser("Current selection is not an Review Source Project!");
 			
 		} catch (CoreException e) { // CoreException presented to the user via the ExecutionException
 			throw new ExecutionException("Closed or non-existent project selected.", e);

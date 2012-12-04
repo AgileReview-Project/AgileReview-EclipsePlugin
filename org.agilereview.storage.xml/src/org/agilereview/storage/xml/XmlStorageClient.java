@@ -21,6 +21,7 @@ import org.agilereview.storage.xml.conversion.PojoConversion;
 import org.agilereview.storage.xml.conversion.XmlBeansConversion;
 import org.agilereview.storage.xml.exception.DataLoadingException;
 import org.agilereview.storage.xml.exception.ExceptionHandler;
+import org.agilereview.storage.xml.wizards.noreviewsource.NoReviewSourceProjectWizard;
 import org.agilereview.xmlSchema.author.CommentsDocument;
 import org.agilereview.xmlSchema.review.ReviewDocument;
 import org.apache.xmlbeans.XmlException;
@@ -34,6 +35,8 @@ import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent;
 import org.eclipse.core.runtime.preferences.InstanceScope;
+import org.eclipse.jface.wizard.WizardDialog;
+import org.eclipse.swt.widgets.Display;
 
 /**
  * {@link IStorageClient} that stores review data in XML files.
@@ -63,6 +66,10 @@ public class XmlStorageClient implements IStorageClient, IPreferenceChangeListen
 	 * Preferences for the XMLStorage plugin 
 	 */
 	private IEclipsePreferences preferencesNode = InstanceScope.INSTANCE.getNode(Activator.PLUGIN_ID);
+	/**
+	 * Indicates whether the user was notified that no Review Source Project is available. 
+	 */
+	private boolean userNotified = false;
 
 	///////////////////////////////////////////////////////
 	// additional methods needed by the XmlStorageClient //
@@ -96,13 +103,16 @@ public class XmlStorageClient implements IStorageClient, IPreferenceChangeListen
 		// clear pojos
 		this.reviewSet.clear();
 		// update sourcefolder, load new data
-		if (SourceFolderManager.getCurrentSourceFolder() != null) {
+		if (SourceFolderManager.getCurrentReviewSourceProject() != null) {
 			loadReviews();
 			String openReviewIdsList = InstanceScope.INSTANCE.getNode(AgileReviewPreferences.CORE_PLUGIN_ID).get(AgileReviewPreferences.OPEN_REVIEWS, "");
 			if (!openReviewIdsList.equals("")) {
 				List<String> openReviewIds = Arrays.asList(openReviewIdsList.split(","));
 				loadComments(openReviewIds);
 			}			
+		} else {
+			// no source folder available
+			userNotified = false;
 		}
 		// reenable propertychangelistener
 		reviewSet.addPropertyChangeListener(this);
@@ -249,7 +259,7 @@ public class XmlStorageClient implements IStorageClient, IPreferenceChangeListen
 	private List<org.agilereview.xmlSchema.review.ReviewDocument.Review> loadAllXmlBeansReview() {
 		List<org.agilereview.xmlSchema.review.ReviewDocument.Review> result = new ArrayList<org.agilereview.xmlSchema.review.ReviewDocument.Review>();
 		try {
-			IResource[] allFolders = SourceFolderManager.getCurrentSourceFolder().members();
+			IResource[] allFolders = SourceFolderManager.getCurrentReviewSourceProject().members();
 			LinkedList<String> errors = new LinkedList<String>();
 			for (IResource currFolder : allFolders) {
 				if (currFolder instanceof IFolder) {
@@ -274,7 +284,7 @@ public class XmlStorageClient implements IStorageClient, IPreferenceChangeListen
 				ExceptionHandler.notifyUser(new DataLoadingException(message));
 			}
 		} catch (final CoreException e) {
-			String message = "Error while reading data from current Review Source Folder. The Review Source Folder '"+SourceFolderManager.getCurrentSourceFolderName()+"' does not exists or is closed.";
+			String message = "Error while reading data from current Review Source Project. The Review Source Project '"+SourceFolderManager.getCurrentReviewSourceProjectName()+"' does not exists or is closed.";
 			ExceptionHandler.notifyUser(new DataLoadingException(message));
 		}
 
@@ -319,7 +329,7 @@ public class XmlStorageClient implements IStorageClient, IPreferenceChangeListen
 				}
 			}
 		} catch (final CoreException e) {
-			String message = "Error while reading data from current Review Source Folder. The Review Source Folder '"+SourceFolderManager.getCurrentSourceFolderName()+"' does not exists or is closed.";
+			String message = "Error while reading data from current Review Source Project. The Review Source Project '"+SourceFolderManager.getCurrentReviewSourceProjectName()+"' does not exists or is closed.";
 			ExceptionHandler.notifyUser(new DataLoadingException(message));
 		}
 
@@ -483,9 +493,19 @@ public class XmlStorageClient implements IStorageClient, IPreferenceChangeListen
 
 	@Override
 	public void propertyChange(java.beans.PropertyChangeEvent evt) {
-		if (SourceFolderManager.getCurrentSourceFolder() == null) {
-			String message = "No Review Source Folder available. All changes will not be stored persistently. Please create and/or activate a Review Source Folder to persistently store Review data.";
+		if (SourceFolderManager.getCurrentReviewSourceProject() == null && !userNotified ) {
+			userNotified = true;
+			String message = "No Review Source Project available. All changes will not be stored persistently. Please create and/or activate a Review Source Folder to persistently store Review data.";
 			ExceptionHandler.notifyUser(message);
+			Display.getCurrent().syncExec(new Runnable() {
+				@Override
+				public void run() {
+					NoReviewSourceProjectWizard dialog = new NoReviewSourceProjectWizard();
+					WizardDialog wDialog = new WizardDialog(Display.getCurrent().getActiveShell(), dialog);
+					wDialog.setBlockOnOpen(true);
+					wDialog.open();
+				}
+			});
 		} else {
 			if (evt.getSource() instanceof ReviewSet) {
 				propertyChangeOfReviewSet(evt);

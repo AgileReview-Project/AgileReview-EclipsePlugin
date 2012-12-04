@@ -104,7 +104,7 @@ public class CloseProjectResourceListener implements IResourceChangeListener {
 	 * @author Peter Reuter (24.05.2012)
 	 */
 	private void handlePreDelete(final IResource resource) {
-		oldSourceProject = SourceFolderManager.getCurrentSourceFolder();
+		oldSourceProject = SourceFolderManager.getCurrentReviewSourceProject();
 		if (oldSourceProject != null) {
 			if (oldSourceProject.equals(resource)) {
 				deletedProjectPath = oldSourceProject.getLocation();
@@ -140,7 +140,7 @@ public class CloseProjectResourceListener implements IResourceChangeListener {
 										try {
 											preferences.flush();
 										} catch (BackingStoreException e) {
-											String message = "AgileReview could not persistently set Review Source Folder.";
+											String message = "AgileReview could not persistently set Review Source Project.";
 											ExceptionHandler.notifyUser(message);
 										}
 										
@@ -170,7 +170,7 @@ public class CloseProjectResourceListener implements IResourceChangeListener {
 	 */
 	private void handlePreClose(final IResource resource) {
 		preCloseOccured = true;
-		oldSourceProject = SourceFolderManager.getCurrentSourceFolder();
+		oldSourceProject = SourceFolderManager.getCurrentReviewSourceProject();
 		// Remove active nature, if needed
 		if (oldSourceProject != null) {
 			if (oldSourceProject.equals(resource)) {

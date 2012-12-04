@@ -124,19 +124,19 @@ public class XmlStorageClientTest {
 		IEclipsePreferences preferencesNode = InstanceScope.INSTANCE.getNode(Activator.PLUGIN_ID);
 		
 		preferencesNode.put("source_folder", "");
-		assertEquals(SourceFolderManager.getCurrentSourceFolder(), null);
+		assertEquals(SourceFolderManager.getCurrentReviewSourceProject(), null);
 		XmlStorageClient xmlStorage = new XmlStorageClient();
 		ReviewSet reviews = xmlStorage.getAllReviews();
 		assertEquals(0, reviews.size());
 		
 		preferencesNode.put("source_folder", SourceFolderName);
-		assertEquals(SourceFolder, SourceFolderManager.getCurrentSourceFolder());
+		assertEquals(SourceFolder, SourceFolderManager.getCurrentReviewSourceProject());
 		xmlStorage = new XmlStorageClient();
 		reviews = xmlStorage.getAllReviews();
 		assertEquals(1, reviews.size());
 		
 		preferencesNode.put("source_folder", "");
-		assertEquals(SourceFolderManager.getCurrentSourceFolder(), null);
+		assertEquals(SourceFolderManager.getCurrentReviewSourceProject(), null);
 		reviews = xmlStorage.getAllReviews();
 		assertEquals(0, reviews.size());
 	}

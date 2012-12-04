@@ -34,13 +34,13 @@ public class SourceFolderManager {
 	 */
 	public static final String SOURCEFOLDER_PROPERTYNAME = "source_folder";
 	/**
-	 * Nature of the Review Source Folder
+	 * Nature of the Review Source Project
 	 */
-	public static final String AGILEREVIEW_NATURE = "org.agilereview.storage.xml.nature.sourcefolder";
+	public static final String AGILEREVIEW_NATURE = "org.agilereview.storage.xml.nature.reviewsourceproject";
 	/**
-	 * Nature of the active Review Source Folder
+	 * Nature of the active Review Source Project
 	 */
-	public static final String AGILEREVIEW_ACTIVE_NATURE = "org.agilereview.storage.xml.nature.sourcefolder.active";
+	public static final String AGILEREVIEW_ACTIVE_NATURE = "org.agilereview.storage.xml.nature.reviewsourceproject.active";
 	/**
 	 * The {@link IProject} that represents the current source folder
 	 */
@@ -50,7 +50,7 @@ public class SourceFolderManager {
 	 * @return The {@link IProject} that represents the current source folder
 	 * @author Peter Reuter (25.03.2012)
 	 */
-	public static IProject getCurrentSourceFolder() {
+	public static IProject getCurrentReviewSourceProject() {
 		if (currentSourceFolder == null) {
 			setCurrentSourceFolderProject();
 		}
@@ -58,11 +58,11 @@ public class SourceFolderManager {
 	}
 	
 	/**
-	 * Returns the name of the current Source Folder.
-	 * @return The name of the current Source Folder.
+	 * Returns the name of the current Review Source Project.
+	 * @return The name of the current Review Source Project.
 	 * @author Peter Reuter (26.11.2012)
 	 */
-	public static String getCurrentSourceFolderName() {
+	public static String getCurrentReviewSourceProjectName() {
 		if (currentSourceFolder == null) {
 			return "null";
 		} else {
@@ -82,7 +82,7 @@ public class SourceFolderManager {
 		} else {
 			IProject p = workspaceRoot.getProject(projectName);
 			if (!p.exists() || !p.isOpen()) {
-				String message = "Selected Source Folder does not exist or is not open.";
+				String message = "Selected Review Source Project does not exist or is not open. Please open the selected Review Source Project or create a new one.";
 				Activator.getDefault().getLog().log(new Status(IStatus.ERROR, Activator.PLUGIN_ID, message));
 				ExceptionHandler.notifyUser(message);
 				Display.getCurrent().syncExec(new Runnable() {
@@ -107,7 +107,7 @@ public class SourceFolderManager {
 							
 						}
 					} catch (CoreException e) {
-						String message = "Error while refreshing Review Source Project '"+getCurrentSourceFolderName()+"'!";
+						String message = "Error while refreshing Review Source Project '"+getCurrentReviewSourceProjectName()+"'!";
 						ExceptionHandler.notifyUser(new DataLoadingException(message));
 					}	 
 				}				
@@ -116,7 +116,7 @@ public class SourceFolderManager {
 	}
 
 	/**
-	 * Creates and opens the given AgileReview Source Folder (if not existent or closed)
+	 * Creates and opens the given Review Source Project (if not existent or closed)
 	 * @param projectName project name
 	 * @return <i>true</i> if everything worked,<i>false</i> if something went wrong
 	 */
@@ -188,7 +188,7 @@ public class SourceFolderManager {
 	 * is create if it does not exist.
 	 * @param reviewId
 	 * @param author
-	 * @return {@link IFile} for the given parameter pair if a Review Source Folder is available, <code>null</code> else.
+	 * @return {@link IFile} for the given parameter pair if a Review Source Project is available, <code>null</code> else.
 	 */
 	public static IFile getCommentFile(String reviewId, String author) {
 		if (currentSourceFolder == null) {
@@ -213,7 +213,7 @@ public class SourceFolderManager {
 	 * Returns an {@link IFolder} object which represents the folder of the {@link Review} given by its ID. The folder is created if it does not
 	 * exists.
 	 * @param reviewId
-	 * @return {@link IFolder} for this review if a Review Source Folder is available, <code>null</code> else.
+	 * @return {@link IFolder} for this review if a Review Source Project is available, <code>null</code> else.
 	 */
 	public static IFolder getReviewFolder(String reviewId) {
 		if (currentSourceFolder == null) {
@@ -238,7 +238,7 @@ public class SourceFolderManager {
 	 * Returns an {@link IFile} object which represents the the review-file of the {@link Review} given by its ID. The file and its review folder are
 	 * created if they do not exist.
 	 * @param reviewId
-	 * @return {@link IFile} for this review if a Review Source Folder is available, <code>null</code> else.
+	 * @return {@link IFile} for this review if a Review Source Project is available, <code>null</code> else.
 	 */
 	public static IFile getReviewFile(String reviewId) {
 		if (currentSourceFolder == null) {

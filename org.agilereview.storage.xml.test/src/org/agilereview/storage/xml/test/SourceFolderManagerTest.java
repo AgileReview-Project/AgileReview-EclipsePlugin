@@ -55,7 +55,7 @@ public class SourceFolderManagerTest {
 	public void testSetCurrentSourceFolderProject() throws CoreException {
 		initCurrentSourceFolder();
 		
-		assertEquals(SourceFolderManager.getCurrentSourceFolderName(), sourcefolder.getName());
+		assertEquals(SourceFolderManager.getCurrentReviewSourceProjectName(), sourcefolder.getName());
 		assertArrayEquals(sourcefolder.getDescription().getNatureIds(), new String[] { SourceFolderManager.AGILEREVIEW_NATURE, SourceFolderManager.AGILEREVIEW_ACTIVE_NATURE });
 	}
 	

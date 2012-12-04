@@ -85,7 +85,7 @@ public class NewReviewSourceProjectWizard extends Wizard implements INewWizard {
 			try {
 				preferences.flush();
 			} catch (BackingStoreException e) {
-				String message = "AgileReview could not persistently set Review Source Folder.";
+				String message = "AgileReview could not persistently set Review Source Project.";
 				ExceptionHandler.notifyUser(message);
 			}			
 		}
