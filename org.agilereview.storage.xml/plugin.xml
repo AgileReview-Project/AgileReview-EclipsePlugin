@@ -50,12 +50,18 @@
    <menuContribution
          allPopups="false"
          locationURI="popup:org.eclipse.jdt.ui.PackageExplorer">
+      <separator
+            name="org.agilereview.storage.xml.separator1">
+      </separator>
       <command
             commandId="org.agilereview.storage.xml.ActivateReviewSourceProject"
             label="Activate Review Source Project"
             style="push"
             tooltip="Activate Review Source Project">
       </command>
+      <separator
+            name="org.agilereview.storage.xml.separator2">
+      </separator>
    </menuContribution>
 </extension>
 <extension
@@ -87,14 +93,44 @@
    <handler
          class="org.agilereview.storage.xml.handler.ActivateReviewSourceProjectHandler"
          commandId="org.agilereview.storage.xml.ActivateReviewSourceProject">
-         <activeWhen>
-            <with
-                  variable="activePart">
-               <instanceof
-                     value="org.eclipse.jdt.ui.PackageExplorer">
-               </instanceof>
-            </with>
-         </activeWhen>
+     <activeWhen>
+         <with
+               variable="selection">
+              <count
+                     value="1">
+               </count>
+            
+         </with>
+      </activeWhen>
+      <enabledWhen>
+         <with
+               variable="selection">
+            <and>
+               <count
+                     value="1">
+               </count>
+               <iterate
+                     ifEmpty="false"
+                     operator="and">
+                  <adapt
+                        type="org.eclipse.core.resources.IProject">
+                     <and>
+                        <test
+                              property="org.eclipse.core.resources.projectNature"
+                              value="org.agilereview.storage.xml.nature.reviewsourceproject">
+                        </test>
+                        <not>
+                           <test
+                                 property="org.eclipse.core.resources.projectNature"
+                                 value="org.agilereview.storage.xml.nature.reviewsourceproject.active">
+                           </test>
+                        </not>
+                     </and>
+                  </adapt>
+               </iterate>
+            </and>
+         </with>
+      </enabledWhen>
    </handler>
    <handler
          class="org.agilereview.storage.xml.handler.SwitchReviewSourceProjectHandler"

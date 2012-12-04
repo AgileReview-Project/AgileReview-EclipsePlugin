@@ -175,9 +175,9 @@ public class XmlStorageClient implements IStorageClient, IPreferenceChangeListen
 	 * @author Peter Reuter (04.04.2012)
 	 */
 	private void loadComments(String reviewId) {
-		List<org.agilereview.xmlSchema.author.CommentDocument.Comment> xmlBeansComments = loadAllXmlBeansComment(reviewId);
 		Review review = this.idReviewMap.get(reviewId);
 		if (review != null) {
+			List<org.agilereview.xmlSchema.author.CommentDocument.Comment> xmlBeansComments = loadAllXmlBeansComment(reviewId);
 			ArrayList<Comment> comments = new ArrayList<Comment>();
 			for (org.agilereview.xmlSchema.author.CommentDocument.Comment xmlBeansComment : xmlBeansComments) {
 				Comment comment = XmlBeansConversion.getComment(review, xmlBeansComment);
@@ -217,9 +217,9 @@ public class XmlStorageClient implements IStorageClient, IPreferenceChangeListen
 	private void unloadReviews(HashSet<Review> reviews) {
 		for (Review r : reviews) {
 			unloadComments(r.getComments());
-			this.reviewSet.remove(r);
-			this.idReviewMap.remove(r.getId());
 		}
+		this.reviewSet.clear();
+		this.idReviewMap.clear();
 	}
 
 	/**
