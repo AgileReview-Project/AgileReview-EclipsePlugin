@@ -63,6 +63,8 @@ public class EditorParserController extends AbstractController<IEditorParser> im
         super(IEDITORPARSER_ID);
         perspectiveOpen = "org.agilereview.perspective".equals(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().getPerspective()
                 .getId());
+        PlatformUI.getWorkbench().getActiveWorkbenchWindow().addPerspectiveListener(this);
+        PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().addPartListener(this);
         checkForNewClients();
     }
     
@@ -185,6 +187,17 @@ public class EditorParserController extends AbstractController<IEditorParser> im
         return null;
     }
     
+    /* (non-Javadoc)
+     * @see java.lang.Object#finalize()
+     * @author Malte Brunnlieb (05.12.2012)
+     */
+    @Override
+    protected void finalize() throws Throwable {
+        PlatformUI.getWorkbench().getActiveWorkbenchWindow().removePerspectiveListener(this);
+        PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().removePartListener(this);
+        super.finalize();
+    }
+    
     //################################################
     //############## IPartListener ###################
     //################################################
@@ -257,7 +270,7 @@ public class EditorParserController extends AbstractController<IEditorParser> im
      */
     @Override
     public void perspectiveActivated(IWorkbenchPage page, IPerspectiveDescriptor perspective) {
-        if ("org.agilereview.perspective".equals(perspective)) {
+        if ("org.agilereview.perspective".equals(perspective.getId())) {
             perspectiveOpen = true;
             IEditorPart editor = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().getActiveEditor();
             if (editor != null) {

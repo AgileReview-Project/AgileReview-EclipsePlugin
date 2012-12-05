@@ -15,11 +15,11 @@ import org.agilereview.core.external.storage.Review;
  * @author Malte Brunnlieb (28.04.2012)
  */
 public interface AgileReviewPreferences {
-	
-	/**
-	 * Plugin ID made available for other plugins to read/write preferences for this plugin
-	 */
-	public static final String CORE_PLUGIN_ID = Activator.PLUGIN_ID;    
+    
+    /**
+     * Plugin ID made available for other plugins to read/write preferences for this plugin
+     */
+    public static final String CORE_PLUGIN_ID = Activator.PLUGIN_ID;
     /**
      * Comma separated list of comment status
      */
@@ -49,12 +49,6 @@ public interface AgileReviewPreferences {
     public static final String SUPPORTED_FILES = "org.agilereview.preferences.supported_files";
     
     /**
-     * Author colors encoded in JSON syntax as follows:<br>{ 'IDEUser':'R,G,B', 'Author2':'R,G,B', 'Author3':'R,G,B', 'Author4':'R,G,B',
-     * 'Author5':'R,G,B', 'Author6':'R,G,B', 'Author7':'R,G,B', 'Author8':'R,G,B', 'Author9':'R,G,B', 'Author10':'R,G,B' }
-     */
-    public static final String AUTHOR_COLORS = "org.agilereview.preferences.author_colors";
-    
-    /**
      * Author color allocation encoded in JSON syntax as follows:<br>{ 'IDEUser':'hans', 'Author2':'hugo', 'Author3':'erwin', 'Author4':'',
      * 'Author5':'', 'Author6':'', 'Author7':'', 'Author8':'', 'Author9':'', 'Author10':'' }
      */
@@ -63,7 +57,17 @@ public interface AgileReviewPreferences {
     /**
      * Default comment color if multi color support is disabled (format: R,G,B)
      */
-    public static final String AUTHOR_COLOR_DEFAULT = "org.agilereview.preferences.author_color_default";
+    public static final String AUTHOR_COLOR_DEFAULT = "org.agilereview.preferences.author_color";
+    
+    /**
+     * Author colors (format: R,G,B)
+     */
+    public static final String[] AUTHOR_COLORS = { "org.agilereview.preferences.author_color_IDEUser",
+            "org.agilereview.preferences.author_color_Author2", "org.agilereview.preferences.author_color_Author3",
+            "org.agilereview.preferences.author_color_Author4", "org.agilereview.preferences.author_color_Author5",
+            "org.agilereview.preferences.author_color_Author6", "org.agilereview.preferences.author_color_Author7",
+            "org.agilereview.preferences.author_color_Author8", "org.agilereview.preferences.author_color_Author9",
+            "org.agilereview.preferences.author_color_Author10" };
     
     /**
      * A Boolean value which states whether the author should be distinguishable by their comment color or not

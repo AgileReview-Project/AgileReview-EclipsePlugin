@@ -39,17 +39,7 @@ public class EditorParserExtension implements IEditorParser {
         IFile file = (IFile) editor.getEditorInput().getAdapter(IFile.class);
         if (file != null) {
             if (!parserMap.containsKey(editor)) {
-                Map<String, String[]> fileendingToCommentTagsMap = FileSupportPreferencesFactory.createFileSupportMap();
-                String[] tags = fileendingToCommentTagsMap.get(file.getFullPath().getFileExtension());
-                try {
-                    parserMap.put(editor, new TagParser((ITextEditor) editor, tags));
-                    annotationManagerMap.put(editor, new AnnotationManager(editor));
-                } catch (NoDocumentFoundException e) {
-                    ExceptionHandler.logAndNotifyUser("Parsing error of the ITextEditor parser: No document found for the current editor.", e,
-                            Activator.PLUGIN_ID);
-                } catch (CoreException e) {
-                    ExceptionHandler.logAndNotifyUser("Parsing error of the ITextEditor parser: Internal eclipse exception.", e, Activator.PLUGIN_ID);
-                }
+                addInstance(editor);
             }
             try {
                 parserMap.get(editor).addTagsInDocument(tagId);
@@ -60,7 +50,7 @@ public class EditorParserExtension implements IEditorParser {
                 ExceptionHandler.logAndNotifyUser("Parsing error of the ITextEditor parser: Internal eclipse exception.", e, Activator.PLUGIN_ID);
             }
         } else {
-            ExceptionHandler.warnUser("The comment could not be added to the document.");
+            ExceptionHandler.warnUser("The comment could not be added to the document as the underlying file could not be retreived.");
         }
     }
     
@@ -71,31 +61,20 @@ public class EditorParserExtension implements IEditorParser {
     @Override
     public void removeTagsInEditor(IEditorPart editor, String tagId, String[] multiLineCommentTags) {
         IFile file = (IFile) editor.getAdapter(IFile.class);
-        if (!parserMap.containsKey(editor)) {
-            if (editor instanceof ITextEditor) {
-                Map<String, String[]> fileendingToCommentTagsMap = FileSupportPreferencesFactory.createFileSupportMap();
-                if (fileendingToCommentTagsMap.containsKey(file.getFileExtension())) {
-                    String[] tags = fileendingToCommentTagsMap.get(file.getFullPath().getFileExtension());
-                    try {
-                        parserMap.put(editor, new TagParser((ITextEditor) editor, tags));
-                        annotationManagerMap.put(editor, new AnnotationManager(editor));
-                    } catch (NoDocumentFoundException e) {
-                        ExceptionHandler.logAndNotifyUser("Parsing error of the ITextEditor parser: No document found for the current editor.", e,
-                                Activator.PLUGIN_ID);
-                    } catch (CoreException e) {
-                        ExceptionHandler.logAndNotifyUser("Parsing error of the ITextEditor parser: Internal eclipse exception.", e,
-                                Activator.PLUGIN_ID);
-                    }
-                }
+        if (file != null) {
+            if (!parserMap.containsKey(editor)) {
+                addInstance(editor);
             }
-        }
-        try {
-            parserMap.get(editor).removeTagsInDocument(tagId);
-            annotationManagerMap.get(editor).deleteAnnotation(tagId);
-        } catch (BadLocationException e) {
-            ExceptionHandler.logAndNotifyUser("Parsing error of the ITextEditor parser: Invalid comment position.", e, Activator.PLUGIN_ID);
-        } catch (CoreException e) {
-            ExceptionHandler.logAndNotifyUser("Parsing error of the ITextEditor parser: Internal eclipse exception.", e, Activator.PLUGIN_ID);
+            try {
+                parserMap.get(editor).removeTagsInDocument(tagId);
+                annotationManagerMap.get(editor).deleteAnnotation(tagId);
+            } catch (BadLocationException e) {
+                ExceptionHandler.logAndNotifyUser("Parsing error of the ITextEditor parser: Invalid comment position.", e, Activator.PLUGIN_ID);
+            } catch (CoreException e) {
+                ExceptionHandler.logAndNotifyUser("Parsing error of the ITextEditor parser: Internal eclipse exception.", e, Activator.PLUGIN_ID);
+            }
+        } else {
+            ExceptionHandler.warnUser("The comment could not be removed from document as the underlying file could not be retreived.");
         }
     }
     
@@ -125,8 +104,11 @@ public class EditorParserExtension implements IEditorParser {
      */
     @Override
     public void removeAllInstances() {
-        // TODO Auto-generated method stub
-        
+        parserMap.clear();
+        for (AnnotationManager am : annotationManagerMap.values()) {
+            am.clearAnnotations();
+        }
+        annotationManagerMap.clear();
     }
     
     /* (non-Javadoc)
@@ -135,8 +117,9 @@ public class EditorParserExtension implements IEditorParser {
      */
     @Override
     public void removeParser(IEditorPart editor) {
-        // TODO Auto-generated method stub
-        
+        parserMap.remove(editor);
+        AnnotationManager am = annotationManagerMap.remove(editor);
+        am.clearAnnotations();
     }
     
     /* (non-Javadoc)
@@ -145,8 +128,24 @@ public class EditorParserExtension implements IEditorParser {
      */
     @Override
     public void addInstance(IEditorPart editor) {
-        // TODO Auto-generated method stub
-        
+        IFile file = (IFile) editor.getEditorInput().getAdapter(IFile.class);
+        if (file != null) {
+            if (!parserMap.containsKey(editor)) {
+                Map<String, String[]> fileendingToCommentTagsMap = FileSupportPreferencesFactory.createFileSupportMap();
+                String[] tags = fileendingToCommentTagsMap.get(file.getFullPath().getFileExtension());
+                try {
+                    parserMap.put(editor, new TagParser((ITextEditor) editor, tags));
+                    annotationManagerMap.put(editor, new AnnotationManager(editor));
+                } catch (NoDocumentFoundException e) {
+                    ExceptionHandler.logAndNotifyUser("Parsing error of the ITextEditor parser: No document found for the current editor.", e,
+                            Activator.PLUGIN_ID);
+                } catch (CoreException e) {
+                    ExceptionHandler.logAndNotifyUser("Parsing error of the ITextEditor parser: Internal eclipse exception.", e, Activator.PLUGIN_ID);
+                }
+            }
+        } else {
+            ExceptionHandler.warnUser("The comment could not be added to the document as the underlying file could not be retreived.");
+        }
     }
     
 }

@@ -6,6 +6,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import org.agilereview.core.external.preferences.AgileReviewPreferences;
 import org.agilereview.core.external.storage.Comment;
 import org.agilereview.editorparser.itexteditor.prefs.AuthorReservationPreferences;
 import org.eclipse.jface.text.Position;
@@ -44,11 +45,21 @@ public class AnnotationManager {
     }
     
     /**
+     * Clears all annotations for the attached editor
+     * @author Malte Brunnlieb (05.12.2012)
+     */
+    void clearAnnotations() {
+        displayAnnotations(null);
+    }
+    
+    /**
      * Displays the given positions as annotations in the provided editor. Therefore annotations which should not be displayed any more will be
      * removed and not yet drawn annotations will be added to the annotation model.
      * @param keyPositionMap a map of Positions which should be annotated and the comment keys correlated to the positions
      */
     void displayAnnotations(Map<String, Position> keyPositionMap) {
+        if (keyPositionMap == null) keyPositionMap = new HashMap<String, Position>();
+        
         //add annotations that are not already displayed
         Map<Annotation, Position> annotationsToAdd = new HashMap<Annotation, Position>();
         for (String s : keyPositionMap.keySet()) {
@@ -93,16 +104,14 @@ public class AnnotationManager {
     
     /**
      * Deletes all annotations correlating to the given comment keys
-     * @param commentKeys unique tag keys of the comment annotations which should be deleted
+     * @param tagId unique tag key of the comment annotation which should be deleted
      */
     void deleteAnnotation(String tagId) {
-        HashSet<Annotation> annotationsToRemove = new HashSet<Annotation>();
         Annotation a = annotationMap.remove(tagId);
         if (a != null) {
             a.markDeleted(true);
-            annotationsToRemove.add(a);
         }
-        annotationModel.replaceAnnotations(annotationsToRemove.toArray(new Annotation[0]), null);
+        annotationModel.replaceAnnotations(new Annotation[] { a }, null);
     }
     
     /**
@@ -148,9 +157,9 @@ public class AnnotationManager {
         String annotationType;
         Comment comment = DataManager.getInstance().getComment(commentKey);
         if (colorManager.isMultiColorEnabled() && colorManager.hasCustomizedColor(comment.getAuthor())) {
-            annotationType = "AgileReview.comment.annotation." + new AuthorReservationPreferences().getAuthorTag(comment.getAuthor());
+            annotationType = AgileReviewPreferences.AUTHOR_COLOR_DEFAULT + "_" + new AuthorReservationPreferences().getAuthorTag(comment.getAuthor());
         } else {
-            annotationType = "AgileReview.comment.annotation";
+            annotationType = AgileReviewPreferences.AUTHOR_COLOR_DEFAULT;
         }
         Annotation annotation = new Annotation(annotationType, true, "Review: " + comment.getReview().getId() + ", Author: " + comment.getAuthor()
                 + ", Comment-ID: " + comment.getId());

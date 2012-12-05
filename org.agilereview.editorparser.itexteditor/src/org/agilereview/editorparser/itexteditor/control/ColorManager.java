@@ -1,7 +1,6 @@
 package org.agilereview.editorparser.itexteditor.control;
 
 import org.agilereview.core.external.preferences.AgileReviewPreferences;
-import org.agilereview.editorparser.itexteditor.prefs.AuthorColorPreferences;
 import org.agilereview.editorparser.itexteditor.prefs.AuthorPreferencesPojo.AuthorTag;
 import org.agilereview.editorparser.itexteditor.prefs.AuthorReservationPreferences;
 import org.eclipse.core.runtime.Platform;
@@ -22,10 +21,6 @@ public class ColorManager {
      * Author color reservation preferences
      */
     private AuthorReservationPreferences reservationPrefs = new AuthorReservationPreferences();
-    /**
-     * Author color preferences
-     */
-    private AuthorColorPreferences colorPrefs = new AuthorColorPreferences();
     
     /**
      * Reserves a new color for a given author when some is available and the author has not been registered yet.
@@ -47,13 +42,25 @@ public class ColorManager {
         String prop;
         AuthorTag authorTag = reservationPrefs.getAuthorTag(author);
         if (isMultiColorEnabled() && authorTag != null) {
-            prop = colorPrefs.getColor(authorTag);
+            prop = getColor(authorTag);
         } else {
             IScopeContext[] scopes = new IScopeContext[] { InstanceScope.INSTANCE, DefaultScope.INSTANCE };
             prop = Platform.getPreferencesService().getString("org.agilereview.core", AgileReviewPreferences.AUTHOR_COLOR_DEFAULT, "", scopes);
         }
         String[] rgb = prop.split(",");
         return new Color(PlatformUI.getWorkbench().getDisplay(), Integer.parseInt(rgb[0]), Integer.parseInt(rgb[1]), Integer.parseInt(rgb[2]));
+    }
+    
+    /**
+     * Returns the current color for the given {@link AuthorTag}
+     * @param author {@link AuthorTag} whose color should be returned
+     * @return the current color for the given {@link AuthorTag} in R,G,B format
+     * @author Malte Brunnlieb (20.11.2012)
+     */
+    private String getColor(AuthorTag author) {
+        IScopeContext[] scopes = new IScopeContext[] { InstanceScope.INSTANCE, DefaultScope.INSTANCE };
+        return Platform.getPreferencesService().getString("org.agilereview.core", "org.agilereview.preferences.author_color_" + author.toString(),
+                AgileReviewPreferences.AUTHOR_COLOR_ALLOCATION, scopes);
     }
     
     /**
