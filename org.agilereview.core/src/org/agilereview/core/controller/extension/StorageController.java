@@ -9,8 +9,9 @@ package org.agilereview.core.controller.extension;
 
 import java.util.Set;
 
+import org.agilereview.common.exception.ExceptionHandler;
+import org.agilereview.core.Activator;
 import org.agilereview.core.controller.extension.ExtensionControllerFactory.ExtensionPoint;
-import org.agilereview.core.exception.ExceptionHandler;
 import org.agilereview.core.exception.ExtensionCreationException;
 import org.agilereview.core.exception.NoStorageClientException;
 import org.agilereview.core.external.definition.IReviewDataReceiver;
@@ -56,7 +57,7 @@ public class StorageController extends AbstractController<IStorageClient> implem
      */
     @Override
     protected void handleNoExtensionAvailable() {
-        ExceptionHandler.logAndNotifyUser(new NoStorageClientException("No StorageClient available"));
+        ExceptionHandler.logAndNotifyUser(new NoStorageClientException("No StorageClient available"), Activator.PLUGIN_ID);
     }
     
     /* (non-Javadoc)
@@ -72,7 +73,7 @@ public class StorageController extends AbstractController<IStorageClient> implem
                 setStorageClient(getFirstExtension()); //TODO do not use first, but manage to set this client via preferences
             }
         } catch (ExtensionCreationException e) {
-            ExceptionHandler.logAndNotifyUser(e.getLocalizedMessage(), e);
+            ExceptionHandler.logAndNotifyUser(e.getLocalizedMessage(), e, Activator.PLUGIN_ID);
             e.printStackTrace();
         }
     }
@@ -130,7 +131,7 @@ public class StorageController extends AbstractController<IStorageClient> implem
             return result;
         } catch (Throwable ex) {
             ExceptionHandler.logAndNotifyUser("An unknown exception occured in StorageClient '" + activeClient + "' while retrieving all comments",
-                    ex);
+                    ex, Activator.PLUGIN_ID);
         }
         return null;
     }
@@ -148,7 +149,7 @@ public class StorageController extends AbstractController<IStorageClient> implem
             return result;
         } catch (Throwable ex) {
             ExceptionHandler.logAndNotifyUser("An unknown exception occured in StorageClient '" + activeClient
-                    + "' while retrieving an ID for new review", ex);
+                    + "' while retrieving an ID for new review", ex, Activator.PLUGIN_ID);
         }
         return null;
     }
@@ -166,7 +167,7 @@ public class StorageController extends AbstractController<IStorageClient> implem
             return result;
         } catch (Throwable ex) {
             ExceptionHandler.logAndNotifyUser("An unknown exception occured in StorageClient '" + activeClient
-                    + "' while retrieving an ID for new comment", ex);
+                    + "' while retrieving an ID for new comment", ex, Activator.PLUGIN_ID);
         }
         return null;
     }
@@ -184,7 +185,7 @@ public class StorageController extends AbstractController<IStorageClient> implem
             return result;
         } catch (Throwable ex) {
             ExceptionHandler.logAndNotifyUser("An unknown exception occured in StorageClient '" + activeClient
-                    + "' while retrieving an ID for new reply", ex);
+                    + "' while retrieving an ID for new reply", ex, Activator.PLUGIN_ID);
         }
         return null;
     }

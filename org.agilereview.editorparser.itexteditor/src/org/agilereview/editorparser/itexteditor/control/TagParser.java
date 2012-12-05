@@ -8,8 +8,9 @@ import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.agilereview.common.exception.ExceptionHandler;
+import org.agilereview.editorparser.itexteditor.Activator;
 import org.agilereview.editorparser.itexteditor.data.ComparablePosition;
-import org.agilereview.editorparser.itexteditor.exception.ExceptionHandler;
 import org.agilereview.editorparser.itexteditor.exception.NoDocumentFoundException;
 import org.agilereview.editorparser.itexteditor.prefs.AuthorReservationPreferences;
 import org.eclipse.core.runtime.CoreException;
@@ -191,7 +192,7 @@ public class TagParser {
         } catch (BadLocationException e) {
             if (startOffset != 0) { // otherwise file out of sync or other reasons, so eclipse cannot open file till refresh --> suppress Exception
                 ExceptionHandler.logAndNotifyUser("BadLocationException occurs while parsing the editor: " + editor.getTitle()
-                        + "\nPlease consider to write a bug report if this problem holds on.", e);
+                        + "\nPlease consider to write a bug report if this problem holds on.", e, Activator.PLUGIN_ID);
             }
         }
         

@@ -5,8 +5,8 @@ import java.io.InputStream;
 import java.util.Enumeration;
 import java.util.Properties;
 
+import org.agilereview.common.exception.ExceptionHandler;
 import org.agilereview.core.Activator;
-import org.agilereview.core.exception.ExceptionHandler;
 import org.agilereview.core.external.preferences.AgileReviewPreferences;
 import org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer;
 import org.eclipse.core.runtime.preferences.DefaultScope;
@@ -51,7 +51,7 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
             pref.load(stream);
         } catch (IOException e) {
             ExceptionHandler.logAndNotifyUser("The default preferences for AgileReview could not be initialized."
-                    + "Please try restarting Eclipse and consider to write a bug report.", e);
+                    + "Please try restarting Eclipse and consider to write a bug report.", e, Activator.PLUGIN_ID);
             return null;
         }
         return pref;

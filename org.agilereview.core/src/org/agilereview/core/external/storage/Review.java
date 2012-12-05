@@ -15,8 +15,8 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
+import org.agilereview.common.exception.ExceptionHandler;
 import org.agilereview.core.Activator;
-import org.agilereview.core.exception.ExceptionHandler;
 import org.agilereview.core.external.preferences.AgileReviewPreferences;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.core.runtime.preferences.InstanceScope;
@@ -33,8 +33,7 @@ public class Review implements PropertyChangeListener {
      */
     private final String id;
     /**
-     * The name of the review, more understandable for humans than the generated
-     * ID. 
+     * The name of the review, more understandable for humans than the generated ID.
      */
     private String name = "";
     /**
@@ -110,11 +109,11 @@ public class Review implements PropertyChangeListener {
     }
     
     /**
-     * @param name the new name of the {@link Review} 
+     * @param name the new name of the {@link Review}
      */
     public void setName(String name) {
         String oldValue = this.name;
-    	this.name = name;
+        this.name = name;
         propertyChangeSupport.firePropertyChange("name", oldValue, this.name);
     }
     
@@ -301,13 +300,13 @@ public class Review implements PropertyChangeListener {
      */
     void setOpenReviewsPreference() {
         IEclipsePreferences preferences = InstanceScope.INSTANCE.getNode(Activator.PLUGIN_ID);
-		String reviewIdsPref = preferences.get(AgileReviewPreferences.OPEN_REVIEWS, "");
+        String reviewIdsPref = preferences.get(AgileReviewPreferences.OPEN_REVIEWS, "");
         ArrayList<String> reviewIds;
         if ("".equals(reviewIdsPref)) {
-        	reviewIds = new ArrayList<String>();
+            reviewIds = new ArrayList<String>();
         } else {
-        	reviewIds = new ArrayList<String>(Arrays.asList(reviewIdsPref.split(",")));	
-        }    	
+            reviewIds = new ArrayList<String>(Arrays.asList(reviewIdsPref.split(",")));
+        }
         if (this.isOpen) {
             if (!reviewIds.contains(this.id)) {
                 reviewIds.add(this.id);
@@ -317,20 +316,20 @@ public class Review implements PropertyChangeListener {
         }
         reviewIdsPref = "";
         if (reviewIds.size() > 0) {
-        	Iterator<String> i = reviewIds.iterator();
+            Iterator<String> i = reviewIds.iterator();
             for (;;) {
-            	    reviewIdsPref += i.next();
-                    if (!i.hasNext()) break;
-                    reviewIdsPref += (",");         
-            }	
-        }        
+                reviewIdsPref += i.next();
+                if (!i.hasNext()) break;
+                reviewIdsPref += (",");
+            }
+        }
         preferences.put(AgileReviewPreferences.OPEN_REVIEWS, reviewIdsPref);
         try {
-			preferences.flush();
-		} catch (BackingStoreException e) {
-			String message = "AgileReview could not persistently set list of open Reviews.";
-			ExceptionHandler.logAndNotifyUser(message, e);
-		}
+            preferences.flush();
+        } catch (BackingStoreException e) {
+            String message = "AgileReview could not persistently set list of open Reviews.";
+            ExceptionHandler.logAndNotifyUser(message, e, Activator.PLUGIN_ID);
+        }
     }
     
 }

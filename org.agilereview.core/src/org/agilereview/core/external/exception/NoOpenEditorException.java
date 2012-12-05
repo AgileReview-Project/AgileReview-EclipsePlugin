@@ -8,11 +8,11 @@
 package org.agilereview.core.external.exception;
 
 /**
- * In general this exception will occur if comment tags are added via the interface for adding new tags to an open editor, but the intended editor is
- * not open
+ * In general this exception will occur if comment tags are added via the interface for adding new tags to an open editor, but there currently there
+ * is no open editor
  * @author Malte Brunnlieb (26.11.2012)
  */
-public class EditorCurrentlyNotOpenException extends Exception {
+public class NoOpenEditorException extends Exception {
     
     /**
      * Generated UID

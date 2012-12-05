@@ -78,7 +78,9 @@ Export-Package: org.agilereview.test.common.utils,
  org.objenesis.instantiator.gcj,
  org.objenesis.instantiator.jrockit,
  org.objenesis.instantiator.sun,
- org.objenesis.strategy
+ org.objenesis.strategy,
+ org.powermock.reflect
 Import-Package: org.eclipse.ui.plugin
 Bundle-ClassPath: libs/mockito-1.9.0/mockito-all-1.9.0.jar,
- .
+ .,
+ libs/powermock-mockito-1.5-full.jar

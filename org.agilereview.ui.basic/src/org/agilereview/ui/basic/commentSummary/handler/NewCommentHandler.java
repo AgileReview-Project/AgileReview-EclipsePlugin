@@ -7,13 +7,12 @@
  */
 package org.agilereview.ui.basic.commentSummary.handler;
 
-import org.agilereview.core.external.exception.EditorCurrentlyNotOpenException;
-import org.agilereview.core.external.exception.FileNotSupportedException;
+import org.agilereview.common.exception.ExceptionHandler;
+import org.agilereview.core.external.exception.NoOpenEditorException;
 import org.agilereview.core.external.exception.NullArgumentException;
-import org.agilereview.core.external.exception.UnknownException;
 import org.agilereview.core.external.preferences.AgileReviewPreferences;
 import org.agilereview.core.external.storage.PojoFactory;
-import org.agilereview.ui.basic.tools.ExceptionHandler;
+import org.agilereview.ui.basic.Activator;
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
@@ -21,7 +20,6 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.preferences.DefaultScope;
 import org.eclipse.core.runtime.preferences.IScopeContext;
 import org.eclipse.core.runtime.preferences.InstanceScope;
-import org.eclipse.jface.dialogs.MessageDialog;
 
 /**
  * 
@@ -41,20 +39,14 @@ public class NewCommentHandler extends AbstractHandler {
         String activeReview = Platform.getPreferencesService().getString("org.agilereview.core", AgileReviewPreferences.ACTIVE_REVIEW_ID, "", scopes);
         
         if (author.trim().isEmpty() || activeReview.trim().isEmpty()) {
-            ExceptionHandler.notifyUser(MessageDialog.WARNING,
-                    "You cannot create a new comment as currently there is no active review or author specified."); //TODO offer support (create/activate new review or specify author)
+            ExceptionHandler.warnUser("You cannot create a new comment as currently there is no active review or author specified."); //TODO offer support (create/activate new review or specify author)
         } else {
             try {
                 PojoFactory.createComment(author, activeReview);
-            } catch (FileNotSupportedException e) {
-                ExceptionHandler.notifyUser(MessageDialog.WARNING, "The current file is not supported for commenting with multi line comments."); //TODO offer support for file support specification
-            } catch (EditorCurrentlyNotOpenException e) {
-                ExceptionHandler.notifyUser(MessageDialog.WARNING, "There is currently no editor open for commenting anything.");
+            } catch (NoOpenEditorException e) {
+                ExceptionHandler.warnUser("There is currently no editor open for commenting anything.");
             } catch (NullArgumentException e) {
-                ExceptionHandler.logAndNotifyUser(e.getMessage(), e);
-            } catch (UnknownException e) {
-                ExceptionHandler.logAndNotifyUser(e.getMessage(), e);
-                e.printStackTrace();
+                ExceptionHandler.logAndNotifyUser(e.getMessage(), e, Activator.PLUGIN_ID);
             }
         }
         

@@ -11,12 +11,9 @@ import org.agilereview.core.controller.extension.EditorParserController;
 import org.agilereview.core.controller.extension.ExtensionControllerFactory;
 import org.agilereview.core.controller.extension.ExtensionControllerFactory.ExtensionPoint;
 import org.agilereview.core.controller.extension.StorageController;
-import org.agilereview.core.external.definition.IEditorParser;
 import org.agilereview.core.external.definition.IReviewDataReceiver;
-import org.agilereview.core.external.exception.EditorCurrentlyNotOpenException;
-import org.agilereview.core.external.exception.FileNotSupportedException;
+import org.agilereview.core.external.exception.NoOpenEditorException;
 import org.agilereview.core.external.exception.NullArgumentException;
-import org.agilereview.core.external.exception.UnknownException;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.PlatformUI;
@@ -39,12 +36,13 @@ public class PojoFactory implements IReviewDataReceiver {
         return review;
     }
     
-    public static Comment createComment(String author, String reviewId) throws FileNotSupportedException, EditorCurrentlyNotOpenException,
-            NullArgumentException, UnknownException {
+    public static Comment createComment(String author, String reviewId) throws NoOpenEditorException, NullArgumentException {
         if (author == null || reviewId == null) throw new NullArgumentException("The given arguments cannot be set to null when creating a comment");
+        IEditorPart editor = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().getActiveEditor();
+        if (editor == null) throw new NoOpenEditorException();
         
         IEditorPart part = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().getActiveEditor();
-        if (part == null) { throw new EditorCurrentlyNotOpenException(); }
+        if (part == null) { throw new NoOpenEditorException(); }
         IFile file = (IFile) part.getEditorInput().getAdapter(IFile.class);
         
         StorageController sController = (StorageController) ExtensionControllerFactory.getExtensionController(ExtensionPoint.StorageClient);
@@ -52,13 +50,12 @@ public class PojoFactory implements IReviewDataReceiver {
         if (review == null) { throw new NullArgumentException(
                 "Comment could not be created. Currently no review data are provided by the StorageClient."); }
         String commentId = sController.getNewCommentId(author, review);
+        
         Comment newComment = new Comment(commentId, file, review);
+        review.addComment(newComment);
         
         EditorParserController eController = (EditorParserController) ExtensionControllerFactory.getExtensionController(ExtensionPoint.EditorParser);
-        IEditorParser parser = eController.createParser(part.getClass());
-        
-        review.addComment(newComment);
-        parser.addTagsToCurrentEditorSelection(commentId);
+        eController.addTagsToEditorSelection(editor, commentId);
         return newComment;
     }
     

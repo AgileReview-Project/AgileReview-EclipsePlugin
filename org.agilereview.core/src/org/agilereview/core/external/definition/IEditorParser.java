@@ -7,10 +7,7 @@
  */
 package org.agilereview.core.external.definition;
 
-import org.agilereview.core.external.exception.EditorCurrentlyNotOpenException;
-import org.agilereview.core.external.exception.FileNotSupportedException;
-import org.agilereview.core.external.exception.UnknownException;
-import org.eclipse.core.resources.IFile;
+import org.eclipse.ui.IEditorPart;
 
 /**
  * An {@link IEditorParser} manages to parse a concrete editor type e.g. ITextEditor, sets comment tags and marks them according to current ui
@@ -20,57 +17,54 @@ import org.eclipse.core.resources.IFile;
 public interface IEditorParser {
     
     /**
-     * Adds comment tags to the selection defined by the given offset and length. The tags will capture the tagId as information.
-     * @param file {@link IFile} which should be annotated
-     * @param startLine start of the annotation
-     * @param endLine end of the annotation
-     * @param tagId id for identifying the connected comment
-     * @throws FileNotSupportedException occurs when there are not comment tags defined for the file or the editor is not supported itself by the
-     *             parser
-     * @author Malte Brunnlieb (13.07.2012)
-     */
-    public void addTags(IFile file, int startLine, int endLine, String tagId) throws FileNotSupportedException, EditorCurrentlyNotOpenException,
-            UnknownException;
-    
-    /**
      * Adds comment tags to the current selection of the currently opened editor. The tags will capture the tagId as information.
      * @param tagId id for identifying the connected comment
-     * @throws FileNotSupportedException occurs when there are not comment tags defined for the file or the editor is not supported itself by the
-     *             parser
+     * @param editor {@link IEditorPart} in which the tags should be added
+     * @param multiLineCommentTags a two-dimensional array containing the begin and end tag which should be used for inserting the comment anchor
      * @author Malte Brunnlieb (15.07.2012)
      */
-    public void addTagsToCurrentEditorSelection(String tagId) throws FileNotSupportedException, EditorCurrentlyNotOpenException, UnknownException;
-    
-    /**
-     * Removes all tags according to the given tagId
-     * @param file {@link IFile} in which the tags should be removed
-     * @param tagId id of the comment to be removed
-     * @throws FileNotSupportedException occurs when there are not comment tags defined for the file or the editor is not supported itself by the
-     *             parser
-     * @author Malte Brunnlieb (13.07.2012)
-     */
-    public void removeTags(IFile file, String tagId) throws FileNotSupportedException, EditorCurrentlyNotOpenException, UnknownException;
+    public void addTagsToEditorSelection(IEditorPart editor, String tagId, String[] multiLineCommentTags);
     
     /**
      * Removes all tags according to the given tagId
      * @param tagId id of the comment to be removed
-     * @throws FileNotSupportedException occurs when there are not comment tags defined for the file or the editor is not supported itself by the
-     *             parser
+     * @param editor {@link IEditorPart} in which the tags with the given id should be removed
+     * @param multiLineCommentTags a two-dimensional array containing the begin and end tag which should be used for inserting the comment anchor
      * @author Malte Brunnlieb (13.07.2012)
      */
-    public void removeTagsInCurrentEditor(String tagId) throws FileNotSupportedException, EditorCurrentlyNotOpenException, UnknownException;
+    public void removeTagsInEditor(IEditorPart editor, String tagId, String[] multiLineCommentTags);
     
     /**
      * Deletes all Tags in the parsed editor
-     * @throws FileNotSupportedException occurs when there are not comment tags defined for the file or the editor is not supported itself by the
-     *             parser
      * @author Malte Brunnlieb (16.11.2012)
      */
-    public void clearAllTags() throws FileNotSupportedException;
+    public void clearAllTags();
     
     /**
      * Forces the editor parser to reparse its contents<br>This will be necessary after every kind of refactoring
      * @author Malte Brunnlieb (16.11.2012)
      */
     public void reparse();
+    
+    /**
+     * Disables the parser plug-in and all parsers created by this instance. In this method you should also remove all annotations and other
+     * AgileReview specific features. Will be called if the AgileReview perspective is disabled.
+     * @author Malte Brunnlieb (03.12.2012)
+     */
+    public void removeAllInstances();
+    
+    /**
+     * Removes the parser for the given editor. This method is called iff the respective {@link IEditorPart} has been closed in order to free
+     * resources and do not work on invalid references.
+     * @param editor {@link IEditorPart} for which the parser should be removed
+     * @author Malte Brunnlieb (04.12.2012)
+     */
+    public void removeParser(IEditorPart editor);
+    
+    /**
+     * Adds a parser to the given editor. All ui supported improvements like annotations should also be instantiated.
+     * @param editor {@link IEditorPart} for which the parser should be added
+     * @author Malte Brunnlieb (03.12.2012)
+     */
+    public void addInstance(IEditorPart editor);
 }

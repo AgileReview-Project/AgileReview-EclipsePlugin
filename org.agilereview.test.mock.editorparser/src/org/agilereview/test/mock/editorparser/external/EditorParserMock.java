@@ -8,7 +8,7 @@
 package org.agilereview.test.mock.editorparser.external;
 
 import org.agilereview.core.external.definition.IEditorParser;
-import org.eclipse.core.resources.IFile;
+import org.eclipse.ui.IEditorPart;
 
 /**
  * Mock for an {@link IEditorParser} extension
@@ -40,42 +40,6 @@ public class EditorParserMock implements IEditorParser {
     }
     
     /* (non-Javadoc)
-     * @see org.agilereview.core.external.definition.IEditorParser#addTags(org.agilereview.core.external.definition.IFile, int, int, java.lang.String)
-     * @author Malte Brunnlieb (15.07.2012)
-     */
-    @Override
-    public void addTags(IFile file, int startLine, int endLine, String tagId) {
-        // do nothing for the moment
-    }
-    
-    /* (non-Javadoc)
-     * @see org.agilereview.core.external.definition.IEditorParser#addTagsToCurrentEditorSelection(java.lang.String)
-     * @author Malte Brunnlieb (15.07.2012)
-     */
-    @Override
-    public void addTagsToCurrentEditorSelection(String tagId) {
-        // do nothing for the moment
-    }
-    
-    /* (non-Javadoc)
-     * @see org.agilereview.core.external.definition.IEditorParser#removeTags(org.agilereview.core.external.definition.IFile, java.lang.String)
-     * @author Malte Brunnlieb (15.07.2012)
-     */
-    @Override
-    public void removeTags(IFile file, String tagId) {
-        // do nothing for the moment
-    }
-    
-    /* (non-Javadoc)
-     * @see org.agilereview.core.external.definition.IEditorParser#removeTagsInCurrentEditor(java.lang.String)
-     * @author Malte Brunnlieb (15.07.2012)
-     */
-    @Override
-    public void removeTagsInCurrentEditor(String tagId) {
-        // do nothing for the moment
-    }
-    
-    /* (non-Javadoc)
      * @see org.agilereview.core.external.definition.IEditorParser#clearAllTags()
      * @author Malte Brunnlieb (20.11.2012)
      */
@@ -90,6 +54,51 @@ public class EditorParserMock implements IEditorParser {
      */
     @Override
     public void reparse() {
+        // do nothing for the moment
+    }
+    
+    /* (non-Javadoc)
+     * @see org.agilereview.core.external.definition.IEditorParser#addTagsToEditorSelection(org.eclipse.ui.IEditorPart, java.lang.String, java.lang.String[])
+     * @author Malte Brunnlieb (05.12.2012)
+     */
+    @Override
+    public void addTagsToEditorSelection(IEditorPart editor, String tagId, String[] multiLineCommentTags) {
+        // do nothing for the moment
+    }
+    
+    /* (non-Javadoc)
+     * @see org.agilereview.core.external.definition.IEditorParser#removeTagsInEditor(org.eclipse.ui.IEditorPart, java.lang.String, java.lang.String[])
+     * @author Malte Brunnlieb (05.12.2012)
+     */
+    @Override
+    public void removeTagsInEditor(IEditorPart editor, String tagId, String[] multiLineCommentTags) {
+        // do nothing for the moment
+    }
+    
+    /* (non-Javadoc)
+     * @see org.agilereview.core.external.definition.IEditorParser#removeAllInstances()
+     * @author Malte Brunnlieb (05.12.2012)
+     */
+    @Override
+    public void removeAllInstances() {
+        // do nothing for the moment
+    }
+    
+    /* (non-Javadoc)
+     * @see org.agilereview.core.external.definition.IEditorParser#removeParser(org.eclipse.ui.IEditorPart)
+     * @author Malte Brunnlieb (05.12.2012)
+     */
+    @Override
+    public void removeParser(IEditorPart editor) {
+        // do nothing for the moment
+    }
+    
+    /* (non-Javadoc)
+     * @see org.agilereview.core.external.definition.IEditorParser#addInstance(org.eclipse.ui.IEditorPart)
+     * @author Malte Brunnlieb (05.12.2012)
+     */
+    @Override
+    public void addInstance(IEditorPart editor) {
         // do nothing for the moment
     }
     

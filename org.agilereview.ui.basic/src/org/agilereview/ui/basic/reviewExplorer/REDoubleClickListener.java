@@ -7,10 +7,10 @@
  */
 package org.agilereview.ui.basic.reviewExplorer;
 
+import org.agilereview.common.exception.ExceptionHandler;
 import org.agilereview.core.external.preferences.AgileReviewPreferences;
 import org.agilereview.core.external.storage.Review;
 import org.agilereview.ui.basic.Activator;
-import org.agilereview.ui.basic.tools.ExceptionHandler;
 import org.agilereview.ui.basic.tools.PreferencesAccessor;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.commands.NotEnabledException;
@@ -19,7 +19,6 @@ import org.eclipse.core.commands.common.NotDefinedException;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.ISelection;
@@ -38,7 +37,7 @@ import org.eclipse.ui.ide.IDE;
  * @author Thilo Rauch (12.05.2012)
  */
 public class REDoubleClickListener implements IDoubleClickListener {
-
+    
     /* (non-Javadoc)
      * @see org.eclipse.jface.viewers.IDoubleClickListener#doubleClick(org.eclipse.jface.viewers.DoubleClickEvent)
      * @author Thilo Rauch (12.05.2012)
@@ -79,7 +78,7 @@ public class REDoubleClickListener implements IDoubleClickListener {
             }
         }
     }
-
+    
     /**
      * Opens the given {@link IFile} in an editor.
      * @param file File to open
@@ -90,18 +89,18 @@ public class REDoubleClickListener implements IDoubleClickListener {
             try {
                 IDE.openEditor(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage(), file);
             } catch (PartInitException e) {
-                ExceptionHandler.logAndNotifyUser(e);
+                ExceptionHandler.logAndNotifyUser(e, Activator.PLUGIN_ID);
             } catch (NullPointerException e) {
                 // A NullPointer may occur, if the workbench window (or page) is currently not accessible
-                ExceptionHandler.notifyUser(MessageDialog.ERROR,
-                        "The file could not be opened. Please make sure the eclipse main window has the focus");
+                ExceptionHandler.logAndNotifyUser("The file could not be opened. Please make sure the eclipse main window has the focus", e,
+                        Activator.PLUGIN_ID);
             }
         } else {
-            ExceptionHandler.notifyUser(MessageDialog.ERROR, "Could not open file '" + file.getFullPath()
+            ExceptionHandler.warnUser("Could not open file '" + file.getFullPath()
                     + "'!\nFile not existent in workspace or respective project may be closed!");
         }
     }
-
+    
     /**
      * Executes the given command and handles the exceptions
      * @param commandId command to execute
@@ -126,7 +125,7 @@ public class REDoubleClickListener implements IDoubleClickListener {
             Activator.getDefault().getLog().log(new Status(IStatus.ERROR, Activator.PLUGIN_ID, msg, e));
         }
     }
-
+    
     /**
      * Helper method to expand or collapse (based on the current state) the given element of the given TreeViewer
      * @param treeViewer TreeViewer in which the element is displayed
@@ -140,5 +139,5 @@ public class REDoubleClickListener implements IDoubleClickListener {
             treeViewer.expandToLevel(element, 1);
         }
     }
-
+    
 }

@@ -9,7 +9,8 @@ package org.agilereview.core.controller.extension;
 
 import java.util.Set;
 
-import org.agilereview.core.exception.ExceptionHandler;
+import org.agilereview.common.exception.ExceptionHandler;
+import org.agilereview.core.Activator;
 import org.agilereview.core.external.definition.IReviewDataReceiver;
 import org.agilereview.core.external.storage.Review;
 import org.agilereview.core.external.storage.ReviewSet;
@@ -42,7 +43,6 @@ public class RDRController extends AbstractController<IReviewDataReceiver> {
      * @author Malte Brunnlieb (28.03.2012)
      */
     void notifyClient(IReviewDataReceiver rdr, ReviewSet newData) {
-        System.out.println("Set review data " + rdr.getClass().getName() + " - ReviewSize = " + newData.size());
         rdr.setReviewData(newData);
     }
     
@@ -53,16 +53,14 @@ public class RDRController extends AbstractController<IReviewDataReceiver> {
      */
     void notifyAllClients(ReviewSet newData) {
         Set<String> clients = getAvailableExtensions();
-        System.out.println("Clients Length = " + clients.size());
         for (String client : clients) {
             try {
                 notifyClient(getUniqueExtension(client), newData);
             } catch (CoreException e) {
                 ExceptionHandler.logAndNotifyUser("The ReviewDataReceiver '" + client
-                        + "' could not be instantiated! This can lead to inconsistent data views.", e);
+                        + "' could not be instantiated! This can lead to inconsistent data views.", e, Activator.PLUGIN_ID);
                 e.printStackTrace();
             }
         }
     }
-    
 }

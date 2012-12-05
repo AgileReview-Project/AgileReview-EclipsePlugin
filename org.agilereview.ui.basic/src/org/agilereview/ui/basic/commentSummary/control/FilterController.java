@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.agilereview.common.exception.ExceptionHandler;
 import org.agilereview.core.external.storage.Review;
 import org.agilereview.ui.basic.commentSummary.CSTableViewer;
 import org.agilereview.ui.basic.commentSummary.CSToolBar;
@@ -23,9 +24,7 @@ import org.agilereview.ui.basic.commentSummary.filter.OpenFilter;
 import org.agilereview.ui.basic.commentSummary.filter.SearchFilter;
 import org.agilereview.ui.basic.commentSummary.table.Column;
 import org.agilereview.ui.basic.reviewExplorer.ReviewExplorerView;
-import org.agilereview.ui.basic.tools.ExceptionHandler;
 import org.eclipse.core.resources.IResource;
-import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ITreeSelection;
 import org.eclipse.jface.viewers.TreePath;
@@ -141,7 +140,7 @@ public class FilterController extends SelectionAdapter implements Listener, KeyL
             
             ICommandService cmdService = (ICommandService) PlatformUI.getWorkbench().getService(ICommandService.class);
             if (cmdService == null) {
-                ExceptionHandler.notifyUser(MessageDialog.WARNING, "The Service ICommandService could not be determined.");
+                ExceptionHandler.warnUser("The Service ICommandService could not be determined.");
                 return;
             }
             
