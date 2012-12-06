@@ -259,6 +259,7 @@ public class Review implements PropertyChangeListener, IPreferenceChangeListener
         boolean oldValue = this.isOpen;
         this.isOpen = isOpen;
         setOpenReviewsPreference();
+        setIsActive(false);
         propertyChangeSupport.firePropertyChange("isOpen", oldValue, this.isOpen);
     }
     
@@ -275,14 +276,36 @@ public class Review implements PropertyChangeListener, IPreferenceChangeListener
      * @author Peter Reuter (06.12.2012)
      */
     public void setToActive() {
-    	IEclipsePreferences preferences = InstanceScope.INSTANCE.getNode(Activator.PLUGIN_ID);
-		preferences.put(AgileReviewPreferences.ACTIVE_REVIEW_ID, this.id);
-    	try {
-			preferences.flush();
-		} catch (BackingStoreException e) {
-			String message = "AgileReview could not persistently save the ID of the active review.";
-			ExceptionHandler.logAndNotifyUser(e, message);
-		}
+    	setIsActive(true);
+    }
+    
+    /**
+     * Sets the review state to active or resets the {@link AgileReviewPreferences#ACTIVE_REVIEW_ID} preference.
+     * @param isActive value indicating whether the review will be the active one or no review at all.
+     * @author Peter Reuter (06.12.2012)
+     */
+    private void setIsActive(boolean isActive) {
+    	String id = null;
+    	if (isActive) {
+    		// current review will be the active one
+    		id = this.id;
+    	} else {
+    		// current review was active, now should no longer be the active one --> no active review available
+    		if (this.isActive) {
+    			id = "";
+    		}
+    	}
+    	
+    	if (id != null) {
+    		IEclipsePreferences preferences = InstanceScope.INSTANCE.getNode(Activator.PLUGIN_ID);
+    		preferences.put(AgileReviewPreferences.ACTIVE_REVIEW_ID, this.id);
+        	try {
+    			preferences.flush();
+    		} catch (BackingStoreException e) {
+    			String message = "AgileReview could not persistently save the ID of the active review.";
+    			ExceptionHandler.logAndNotifyUser(e, message);
+    		}	
+    	}
     }
     
     /**
