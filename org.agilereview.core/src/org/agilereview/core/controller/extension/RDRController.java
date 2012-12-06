@@ -59,7 +59,6 @@ public class RDRController extends AbstractController<IReviewDataReceiver> {
             } catch (CoreException e) {
                 ExceptionHandler.logAndNotifyUser("The ReviewDataReceiver '" + client
                         + "' could not be instantiated! This can lead to inconsistent data views.", e, Activator.PLUGIN_ID);
-                e.printStackTrace();
             }
         }
     }

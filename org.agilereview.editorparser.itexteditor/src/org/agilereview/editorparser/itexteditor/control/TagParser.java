@@ -1,14 +1,17 @@
 package org.agilereview.editorparser.itexteditor.control;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.agilereview.common.exception.ExceptionHandler;
+import org.agilereview.core.external.storage.Comment;
 import org.agilereview.editorparser.itexteditor.Activator;
 import org.agilereview.editorparser.itexteditor.data.ComparablePosition;
 import org.agilereview.editorparser.itexteditor.exception.NoDocumentFoundException;
@@ -102,38 +105,13 @@ public class TagParser {
     }
     
     /**
-     * Saves the current document
-     * @author Thilo Rauch (06.09.2012)
-     * @throws CoreException
-     */
-    private void saveDocument() throws CoreException {
-        // Save the current document before parsing, so automatic formatting can take place
-        //        try {
-        editor.getDocumentProvider().saveDocument(null, editor.getEditorInput(), document, true);
-        //        } catch (CoreException e) {
-        //            PluginLogger.logError(this.getClass().toString(), "saveDocument", "CoreException occurs while saving document of editor: "
-        //                    + editor.getTitle(), e);
-        //            Display.getDefault().asyncExec(new Runnable() {
-        //                
-        //                @Override
-        //                public void run() {
-        //                    MessageDialog.openError(Display.getDefault().getActiveShell(), "CoreException",
-        //                            "An eclipse internal error occured when saving the current document!\n"
-        //                                    + "Please try to do this by hand in order to save the inserted comment tags.");
-        //                }
-        //                
-        //            });
-        //        }
-    }
-    
-    /**
      * Parses all comment tags and saves them with their {@link Position}
      * @throws CoreException
      */
     private void parseInput() throws CoreException {
         this.document = editor.getDocumentProvider().getDocument(editor.getEditorInput());
         
-        saveDocument();
+        editor.getDocumentProvider().saveDocument(null, editor.getEditorInput(), document, true);
         
         idPositionMap.clear();
         idTagPositions.clear();
@@ -198,7 +176,7 @@ public class TagParser {
         
         // Save the current document to save the tags
         // TODO only save document if there are changes made by the parser
-        saveDocument();
+        editor.getDocumentProvider().saveDocument(null, editor.getEditorInput(), document, true);
         
         // update annotations in order to recognize moved tags
         TreeMap<String, Position> annotationsToUpdate = new TreeMap<String, Position>();
@@ -329,6 +307,13 @@ public class TagParser {
         idTagPositions.put(key, oldPos);
     }
     
+    /**
+     * Adds comment tags with the given id to the current editor document selection
+     * @param tagId for the comment which should be added
+     * @throws BadLocationException
+     * @throws CoreException
+     * @author Malte Brunnlieb (06.12.2012)
+     */
     public void addTagsInDocument(String tagId) throws BadLocationException, CoreException {
         ISelection selection = editor.getSelectionProvider().getSelection();
         if (selection instanceof ITextSelection) {
@@ -463,11 +448,14 @@ public class TagParser {
         }
         
         // Save, so Eclipse save actions can take place before parsing  
-        saveDocument();
+        editor.getDocumentProvider().saveDocument(null, editor.getEditorInput(), document, true);
         parseInput();
         
-        if (isAgileReviewPerspectiveOpen()) {
-            new AuthorReservationPreferences().addReservation(DataManager.getInstance().getComment(tagId).getAuthor());
+        if (isAgileReviewPerspectiveOpen()) {//TODO only reserve if this comment should also be displayed
+            Comment c = DataManager.getInstance().getComment(tagId);
+            if (c != null) {
+                new AuthorReservationPreferences().addReservation(c.getAuthor());
+            }
         }
     }
     
@@ -478,7 +466,7 @@ public class TagParser {
      */
     private boolean isAgileReviewPerspectiveOpen() {
         String perspectiveID = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().getPerspective().getId();
-        return perspectiveID != null && perspectiveID.equals("org.agilereview.ui.basic.perspective"); //TODO should be configurable or compared in a more extensible way
+        return "org.agilereview.perspective".equals(perspectiveID); //TODO should be configurable or compared in a more extensible way
     }
     
     /**
@@ -613,6 +601,15 @@ public class TagParser {
      */
     public String[] getCommentsByPosition(Position p) {
         return this.annotationModel.getCommentsByPosition(p);
+    }
+    
+    /**
+     * Returns a map of all observed comments in the attached document to its positions
+     * @return a {@link Map} of comment IDs which are observed during parsing the document to the position of the comments
+     * @author Malte Brunnlieb (06.12.2012)
+     */
+    public Map<String, Position> getObservedComments() {
+        return new HashMap<String, Position>(idPositionMap);
     }
     
     /**

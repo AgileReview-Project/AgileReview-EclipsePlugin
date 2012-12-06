@@ -13,7 +13,7 @@
          point="org.agilereview.core.ReviewDataReceiver">
       <ReviewDataReceiver
             class="org.agilereview.editorparser.itexteditor.control.DataManager"
-            id="org.agilereview.editorparser.itexteditor.DataReceiver">
+            id="org.agilereview.editorparser.itexteditor.control.DataManager">
       </ReviewDataReceiver>
    </extension>
 </plugin>

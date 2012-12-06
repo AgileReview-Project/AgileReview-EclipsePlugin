@@ -11,15 +11,18 @@ import java.util.Map;
 import java.util.Set;
 
 import org.agilereview.common.exception.ExceptionHandler;
+import org.agilereview.common.ui.PlatformUITools;
 import org.agilereview.core.Activator;
 import org.agilereview.core.external.definition.IEditorParser;
 import org.agilereview.core.parser.NullParser;
+import org.agilereview.core.preferences.PreferenceInitializer;
 import org.agilereview.core.preferences.dataprocessing.FileSupportPreferencesFactory;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.InvalidRegistryObjectException;
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IPartListener;
 import org.eclipse.ui.IPerspectiveDescriptor;
@@ -61,10 +64,40 @@ public class EditorParserController extends AbstractController<IEditorParser> im
      */
     EditorParserController() {
         super(IEDITORPARSER_ID);
-        perspectiveOpen = "org.agilereview.perspective".equals(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().getPerspective()
-                .getId());
-        PlatformUI.getWorkbench().getActiveWorkbenchWindow().addPerspectiveListener(this);
-        PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().addPartListener(this);
+        new Thread(new Runnable() {
+            
+            @Override
+            public void run() {
+                while (!PreferenceInitializer.isInitialized) {
+                }
+                Display.getDefault().syncExec(new Runnable() {
+                    @Override
+                    public void run() {
+                        IPerspectiveDescriptor perspective = PlatformUITools.getActiveWorkbenchPage().getPerspective();
+                        if (perspective != null) {
+                            perspectiveOpen = "org.agilereview.perspective".equals(perspective.getId());
+                        } else {
+                            perspectiveOpen = false;
+                        }
+                        PlatformUITools.getActiveWorkbenchWindow().addPerspectiveListener(EditorParserController.this);
+                        PlatformUITools.getActiveWorkbenchPage().addPartListener(EditorParserController.this);
+                        
+                        //initially call broughtToTop for already existing editor
+                        final IEditorPart editor = PlatformUITools.getActiveWorkbenchPage().getActiveEditor();
+                        if (editor != null) {
+                            new Thread(new Runnable() {
+                                
+                                @Override
+                                public void run() {
+                                    partBroughtToTop(editor);
+                                }
+                            }).start();
+                        }
+                    }
+                });
+            }
+        }).start();
+        
         checkForNewClients();
     }
     
@@ -218,8 +251,15 @@ public class EditorParserController extends AbstractController<IEditorParser> im
     public void partBroughtToTop(IWorkbenchPart part) {
         if (perspectiveOpen && part instanceof IEditorPart) {
             IEditorParser parser = getParser(part.getClass());
+            Map<String, String[]> fileSupportMap = FileSupportPreferencesFactory.createFileSupportMap();
+            IFile file = (IFile) ((IEditorPart) part).getEditorInput().getAdapter(IFile.class);
             try {
-                parser.addInstance((IEditorPart) part);
+                String[] fileendings = fileSupportMap.get(file.getFileExtension());
+                if (fileendings != null) {
+                    parser.addInstance((IEditorPart) part, fileendings);
+                } else {
+                    // No annotations supported TODO: perhaps notify with "remember my answer"
+                }
             } catch (Throwable e) {
                 ExceptionHandler.logAndNotifyUser("An unknown exception was thrown by an editor plugin while adding a parser instance. "
                         + "Try to reopen the editor. If the error occurs regularily please consider to write a bug report.", e, Activator.PLUGIN_ID);
@@ -275,7 +315,14 @@ public class EditorParserController extends AbstractController<IEditorParser> im
             IEditorPart editor = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().getActiveEditor();
             if (editor != null) {
                 IEditorParser parser = getParser(editor.getClass());
-                parser.addInstance(editor);
+                Map<String, String[]> fileSupportMap = FileSupportPreferencesFactory.createFileSupportMap();
+                IFile file = (IFile) editor.getEditorInput().getAdapter(IFile.class);
+                String[] fileendings = fileSupportMap.get(file.getFileExtension());
+                if (fileendings != null) {
+                    parser.addInstance(editor, fileendings);
+                } else {
+                    // No annotations supported TODO: perhaps notify with "remember my answer"
+                }
             }
         } else {
             perspectiveOpen = false;

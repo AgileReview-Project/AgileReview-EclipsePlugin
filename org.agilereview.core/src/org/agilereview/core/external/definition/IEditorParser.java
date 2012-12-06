@@ -64,7 +64,8 @@ public interface IEditorParser {
     /**
      * Adds a parser to the given editor. All ui supported improvements like annotations should also be instantiated.
      * @param editor {@link IEditorPart} for which the parser should be added
+     * @param multiLineCommentTags a two-dimensional array containing the begin and end tag which should be used for inserting the comment anchor
      * @author Malte Brunnlieb (03.12.2012)
      */
-    public void addInstance(IEditorPart editor);
+    public void addInstance(IEditorPart editor, String[] multiLineCommentTags);
 }

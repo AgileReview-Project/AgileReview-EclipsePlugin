@@ -81,7 +81,7 @@
       name="AgileReview Comment Specification"
       point="org.eclipse.ui.editors.markerAnnotationSpecification">
        <specification
-             annotationType="org.agilereview.comment.annotation"
+             annotationType="org.agilereview.preferences.author_color"
              colorPreferenceKey="org.agilereview.preferences.author_color"
              colorPreferenceValue="0,0,0"
              contributesToHeader="false"
@@ -100,7 +100,7 @@
              verticalRulerPreferenceKey="org.agilereview.comment.annotation.verticalruler"
              verticalRulerPreferenceValue="true">
        </specification><specification
-             annotationType="org.agilereview.comment.annotation.IDEUser"
+             annotationType="org.agilereview.preferences.author_color_IDEUser"
              colorPreferenceKey="org.agilereview.preferences.author_color_IDEUser"
              colorPreferenceValue="0,0,0"
              contributesToHeader="false"
@@ -119,8 +119,8 @@
              verticalRulerPreferenceKey="org.agilereview.comment.annotation.verticalruler.IDEUser"
              verticalRulerPreferenceValue="true">
        </specification><specification
-             annotationType="org.agilereview.comment.annotation.Author2"
-             colorPreferenceKey="org.agilereview.preferences.author_color_Author9"
+             annotationType="org.agilereview.preferences.author_color_Author2"
+             colorPreferenceKey="org.agilereview.preferences.author_color_Author2"
              colorPreferenceValue="0,0,0"
              contributesToHeader="false"
              highlightPreferenceKey="org.agilereview.comment.annotation.highlight.Author2"
@@ -138,7 +138,7 @@
              verticalRulerPreferenceKey="org.agilereview.comment.annotation.verticalruler.Author2"
              verticalRulerPreferenceValue="true">
        </specification><specification
-             annotationType="org.agilereview.comment.annotation.Author3"
+             annotationType="org.agilereview.preferences.author_color_Author3"
              colorPreferenceKey="org.agilereview.preferences.author_color_Author3"
              colorPreferenceValue="0,0,0"
              contributesToHeader="false"
@@ -157,7 +157,7 @@
              verticalRulerPreferenceKey="org.agilereview.comment.annotation.verticalruler.Author3"
              verticalRulerPreferenceValue="true">
        </specification><specification
-             annotationType="org.agilereview.comment.annotation.Author4"
+             annotationType="org.agilereview.preferences.author_color_Author4"
              colorPreferenceKey="org.agilereview.preferences.author_color_Author4"
              colorPreferenceValue="0,0,0"
              contributesToHeader="false"
@@ -176,7 +176,7 @@
              verticalRulerPreferenceKey="org.agilereview.comment.annotation.verticalruler.Author4"
              verticalRulerPreferenceValue="true">
        </specification><specification
-             annotationType="org.agilereview.comment.annotation.Author5"
+             annotationType="org.agilereview.preferences.author_color_Author5"
              colorPreferenceKey="org.agilereview.preferences.author_color_Author5"
              colorPreferenceValue="0,0,0"
              contributesToHeader="false"
@@ -195,7 +195,7 @@
              verticalRulerPreferenceKey="org.agilereview.comment.annotation.verticalruler.Author5"
              verticalRulerPreferenceValue="true">
        </specification><specification
-             annotationType="org.agilereview.comment.annotation.Author6"
+             annotationType="org.agilereview.preferences.author_color_Author6"
              colorPreferenceKey="org.agilereview.preferences.author_color_Author6"
              colorPreferenceValue="0,0,0"
              contributesToHeader="false"
@@ -214,7 +214,7 @@
              verticalRulerPreferenceKey="org.agilereview.comment.annotation.verticalruler.Author6"
              verticalRulerPreferenceValue="true">
        </specification><specification
-             annotationType="org.agilereview.comment.annotation.Author7"
+             annotationType="org.agilereview.preferences.author_color_Author7"
              colorPreferenceKey="org.agilereview.preferences.author_color_Author7"
              colorPreferenceValue="0,0,0"
              contributesToHeader="false"
@@ -233,7 +233,7 @@
              verticalRulerPreferenceKey="org.agilereview.comment.annotation.verticalruler.Author7"
              verticalRulerPreferenceValue="true">
        </specification><specification
-             annotationType="org.agilereview.comment.annotation.Author8"
+             annotationType="org.agilereview.preferences.author_color_Author8"
              colorPreferenceKey="org.agilereview.preferences.author_color_Author8"
              colorPreferenceValue="0,0,0"
              contributesToHeader="false"
@@ -253,7 +253,7 @@
              verticalRulerPreferenceValue="true">
        </specification>
        <specification
-             annotationType="org.agilereview.comment.annotation.Author9"
+             annotationType="org.agilereview.preferences.author_color_Author9"
              colorPreferenceKey="org.agilereview.preferences.author_color_Author9"
              colorPreferenceValue="0,0,0"
              contributesToHeader="false"
@@ -273,7 +273,7 @@
              verticalRulerPreferenceValue="true">
        </specification>
        <specification
-             annotationType="org.agilereview.comment.annotation.Author10"
+             annotationType="org.agilereview.preferences.author_color_Author10"
              colorPreferenceKey="org.agilereview.preferences.author_color_Author10"
              colorPreferenceValue="0,0,0"
              contributesToHeader="false"

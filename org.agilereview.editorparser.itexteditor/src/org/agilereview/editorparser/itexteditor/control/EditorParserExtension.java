@@ -14,10 +14,10 @@ import org.agilereview.common.exception.ExceptionHandler;
 import org.agilereview.core.external.definition.IEditorParser;
 import org.agilereview.editorparser.itexteditor.Activator;
 import org.agilereview.editorparser.itexteditor.exception.NoDocumentFoundException;
-import org.agilereview.editorparser.itexteditor.prefs.FileSupportPreferencesFactory;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.text.BadLocationException;
+import org.eclipse.jface.text.Position;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.texteditor.ITextEditor;
 
@@ -39,7 +39,7 @@ public class EditorParserExtension implements IEditorParser {
         IFile file = (IFile) editor.getEditorInput().getAdapter(IFile.class);
         if (file != null) {
             if (!parserMap.containsKey(editor)) {
-                addInstance(editor);
+                addInstance(editor, multiLineCommentTags);
             }
             try {
                 parserMap.get(editor).addTagsInDocument(tagId);
@@ -63,7 +63,7 @@ public class EditorParserExtension implements IEditorParser {
         IFile file = (IFile) editor.getAdapter(IFile.class);
         if (file != null) {
             if (!parserMap.containsKey(editor)) {
-                addInstance(editor);
+                addInstance(editor, multiLineCommentTags);
             }
             try {
                 parserMap.get(editor).removeTagsInDocument(tagId);
@@ -119,7 +119,9 @@ public class EditorParserExtension implements IEditorParser {
     public void removeParser(IEditorPart editor) {
         parserMap.remove(editor);
         AnnotationManager am = annotationManagerMap.remove(editor);
-        am.clearAnnotations();
+        if (am != null) {
+            am.clearAnnotations();
+        }
     }
     
     /* (non-Javadoc)
@@ -127,15 +129,15 @@ public class EditorParserExtension implements IEditorParser {
      * @author Malte Brunnlieb (04.12.2012)
      */
     @Override
-    public void addInstance(IEditorPart editor) {
+    public void addInstance(IEditorPart editor, String[] multiLineCommentTags) {
         IFile file = (IFile) editor.getEditorInput().getAdapter(IFile.class);
         if (file != null) {
             if (!parserMap.containsKey(editor)) {
-                Map<String, String[]> fileendingToCommentTagsMap = FileSupportPreferencesFactory.createFileSupportMap();
-                String[] tags = fileendingToCommentTagsMap.get(file.getFullPath().getFileExtension());
                 try {
-                    parserMap.put(editor, new TagParser((ITextEditor) editor, tags));
+                    parserMap.put(editor, new TagParser((ITextEditor) editor, multiLineCommentTags));
+                    Map<String, Position> observedComments = parserMap.get(editor).getObservedComments();
                     annotationManagerMap.put(editor, new AnnotationManager(editor));
+                    annotationManagerMap.get(editor).displayAnnotations(observedComments);
                 } catch (NoDocumentFoundException e) {
                     ExceptionHandler.logAndNotifyUser("Parsing error of the ITextEditor parser: No document found for the current editor.", e,
                             Activator.PLUGIN_ID);
@@ -147,5 +149,4 @@ public class EditorParserExtension implements IEditorParser {
             ExceptionHandler.warnUser("The comment could not be added to the document as the underlying file could not be retreived.");
         }
     }
-    
 }

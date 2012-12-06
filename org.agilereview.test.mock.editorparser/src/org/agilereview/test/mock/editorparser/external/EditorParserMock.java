@@ -98,7 +98,7 @@ public class EditorParserMock implements IEditorParser {
      * @author Malte Brunnlieb (05.12.2012)
      */
     @Override
-    public void addInstance(IEditorPart editor) {
+    public void addInstance(IEditorPart editor, String[] multiLineCommentTags) {
         // do nothing for the moment
     }
     

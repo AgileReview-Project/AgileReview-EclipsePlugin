@@ -30,7 +30,7 @@ public class DataManager implements IReviewDataReceiver, PropertyChangeListener 
     /**
      * Instance created by the AgileReview core plug-in
      */
-    private static DataManager instance;
+    private static volatile DataManager instance;
     
     /**
      * Constructor which saves the current created instance for further usage
@@ -47,6 +47,12 @@ public class DataManager implements IReviewDataReceiver, PropertyChangeListener 
      */
     public static DataManager getInstance() {
         while (instance == null) {
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
         }
         return instance;
     }

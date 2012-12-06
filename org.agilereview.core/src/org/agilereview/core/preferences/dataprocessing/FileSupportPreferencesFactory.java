@@ -63,8 +63,7 @@ public class FileSupportPreferencesFactory {
      */
     private static FileSupportEntry[] load() {
         IScopeContext[] scopes = new IScopeContext[] { InstanceScope.INSTANCE, DefaultScope.INSTANCE };
-        String pref = Platform.getPreferencesService().getString("org.agilereview.core", AgileReviewPreferences.SUPPORTED_FILES,
-                AgileReviewPreferences.SUPPORTED_FILES, scopes);
+        String pref = Platform.getPreferencesService().getString("org.agilereview.core", AgileReviewPreferences.SUPPORTED_FILES, "[]", scopes);
         Gson gson = new Gson();
         return gson.fromJson(pref, FileSupportEntry[].class);
     }

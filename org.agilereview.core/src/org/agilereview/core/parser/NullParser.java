@@ -69,7 +69,7 @@ public class NullParser implements IEditorParser {
      * @author Malte Brunnlieb (04.12.2012)
      */
     @Override
-    public void addInstance(IEditorPart editor) {
+    public void addInstance(IEditorPart editor, String[] multiLineCommentTags) {
     }
     
 }

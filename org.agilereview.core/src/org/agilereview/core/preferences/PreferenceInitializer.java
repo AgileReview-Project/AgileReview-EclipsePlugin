@@ -11,6 +11,8 @@ import org.agilereview.core.external.preferences.AgileReviewPreferences;
 import org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer;
 import org.eclipse.core.runtime.preferences.DefaultScope;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
+import org.eclipse.core.runtime.preferences.InstanceScope;
+import org.eclipse.swt.widgets.Display;
 
 /**
  * Class used to initialize default preference values.
@@ -18,10 +20,12 @@ import org.eclipse.core.runtime.preferences.IEclipsePreferences;
  */
 public class PreferenceInitializer extends AbstractPreferenceInitializer {
     
+    public static volatile boolean isInitialized = false;
+    
     @Override
     public void initializeDefaultPreferences() {
         
-        Properties pref = loadDefaultProperties();
+        final Properties pref = loadDefaultProperties();
         if (pref == null) return;
         
         IEclipsePreferences preferences = DefaultScope.INSTANCE.getNode(Activator.PLUGIN_ID);
@@ -31,11 +35,25 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
         preferences.put(AgileReviewPreferences.AUTHOR_COLOR_ALLOCATION, "{ 'IDEUser':'" + System.getProperty("user.name")
                 + "','Author2':'','Author3':'','Author4':'','Author5':'','Author6':'" + "','Author7':'','Author8':'','Author9':'','Author10':'' }");
         
+        Display.getDefault().syncExec(new Runnable() {
+            
+            @Override
+            public void run() {
+                InstanceScope.INSTANCE.getNode("org.eclipse.ui.editors").put(AgileReviewPreferences.AUTHOR_COLOR_DEFAULT,
+                        pref.getProperty(AgileReviewPreferences.AUTHOR_COLOR_DEFAULT));
+                for (String key : AgileReviewPreferences.AUTHOR_COLORS) {
+                    InstanceScope.INSTANCE.getNode("org.eclipse.ui.editors").put(key, pref.getProperty(key));
+                }
+            }
+        });
+        
         Enumeration<String> properties = (Enumeration<String>) pref.propertyNames();
         while (properties.hasMoreElements()) {
             String next = properties.nextElement();
             preferences.put(next, pref.getProperty(next));
         }
+        
+        isInitialized = true;
     }
     
     /**
