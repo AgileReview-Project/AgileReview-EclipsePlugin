@@ -11,4 +11,5 @@ Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ClassPath: lib/google-gson-2.2.2/gson-2.2.2.jar,
  .
 Export-Package: com.google.gson,
- org.agilereview.common.exception
+ org.agilereview.common.exception,
+ org.agilereview.common.ui
