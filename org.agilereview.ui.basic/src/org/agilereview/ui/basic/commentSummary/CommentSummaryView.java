@@ -7,46 +7,29 @@
  */
 package org.agilereview.ui.basic.commentSummary;
 
-import org.agilereview.core.external.definition.IStorageClient;
-import org.agilereview.ui.basic.Activator;
 import org.agilereview.ui.basic.commentSummary.control.FilterController;
 import org.agilereview.ui.basic.commentSummary.control.ViewController;
 import org.agilereview.ui.basic.commentSummary.filter.ColumnComparator;
 import org.agilereview.ui.basic.commentSummary.filter.SearchFilter;
 import org.agilereview.ui.basic.commentSummary.table.ContentProvider;
+import org.agilereview.ui.basic.external.reviewDataReceiver.AbstractReviewDataReceiver;
+import org.agilereview.ui.basic.external.reviewDataReceiver.AbstractReviewDataView;
 import org.eclipse.jface.viewers.TableViewer;
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.ToolBar;
-import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.part.ViewPart;
 
 /**
  * {@link ViewPart} representing the {@link CommentSummaryView}
  * @author Malte Brunnlieb (08.04.2012)
  */
-public class CommentSummaryView extends ViewPart {
+public class CommentSummaryView extends AbstractReviewDataView {
     
     /**
-     * The values describe the currently shown content of the {@link CommentSummaryView}
-     * @author Malte Brunnlieb (30.05.2012)
+     * Unique instance of the {@link CommentSummaryView}
      */
-    private enum ViewContent {
-        /**
-         * Stays for the state "No StorageClient connected"
-         */
-        DISCONNECTED,
-        /**
-         * Stays for the state where a StorageClient is available and review content will be shown
-         */
-        CONNECTED
-    };
-    
+    private static CommentSummaryView instance = null;
     /**
      * The {@link ToolBar} for this ViewPart
      */
@@ -56,148 +39,25 @@ public class CommentSummaryView extends ViewPart {
      */
     private CSTableViewer viewer;
     /**
-     * The content provider for the {@link TableViewer}
-     */
-    private ContentProvider contentProvider;
-    /**
      * The {@link FilterController} which manages all filter actions
      */
     private FilterController filterController;
-    /**
-     * Parent of this {@link ViewPart}
-     */
-    private Composite parent;
-    /**
-     * Identifies the current state of the UI
-     */
-    private ViewContent content;
     
     /**
-     * {@inheritDoc}
-     * @see org.eclipse.ui.part.WorkbenchPart#createPartControl(org.eclipse.swt.widgets.Composite)
-     * @author Malte Brunnlieb (08.04.2012)
+     * Creates a new {@link CommentSummaryView}
+     * @author Malte Brunnlieb (06.12.2012)
      */
-    @Override
-    public void createPartControl(Composite parent) {
-        this.parent = parent;
-        parent.setLayout(new GridLayout());
-        ContentProvider.bind(this);
-        
-        synchronized (this.parent) {
-            if (contentProvider == null) {
-                displayStorageDisconnected();
-            } else {
-                buildWorkingUI();
-            }
-        }
-        
-        //add help context
-        PlatformUI.getWorkbench().getHelpSystem().setHelp(parent, Activator.PLUGIN_ID + ".TableView"); //TODO adapt help context
+    public CommentSummaryView() {
+        instance = this;
     }
     
     /**
-     * Binds the given {@link ContentProvider} to the {@link CSTableViewer} instance of this view. If the parameter is net to null, the
-     * {@link CommentSummaryView} will display a no {@link IStorageClient} registered message instead of a table
-     * @param tableModel model for the {@link CSTableViewer}
-     * @return The TableViewer the model was bound to. Will be null if the parameter has been set to null.
-     * @author Malte Brunnlieb (27.05.2012)
+     * Returns the unique instance created by the framework
+     * @return the instance created by the framework
+     * @author Malte Brunnlieb (06.12.2012)
      */
-    public TableViewer bindTableModel(ContentProvider tableModel) {
-        synchronized (parent) {
-            contentProvider = tableModel;
-            if (contentProvider != null) {
-                if (viewer == null) {
-                    buildWorkingUI();
-                }
-            } else {
-                displayStorageDisconnected();
-            }
-            return viewer;
-        }
-    }
-    
-    /**
-     * Creates the full functional view using the {@link CSToolBar} and {@link CSTableViewer}
-     * @author Malte Brunnlieb (27.05.2012)
-     */
-    private void buildWorkingUI() {
-        Display.getDefault().syncExec(new Runnable() {
-            
-            @Override
-            public void run() {
-                if (content == ViewContent.CONNECTED) return;
-                clearParent();
-                content = ViewContent.CONNECTED;
-                
-                toolBar = new CSToolBar(parent);
-                
-                viewer = new CSTableViewer(parent);
-                viewer.setContentProvider(contentProvider);
-                ColumnComparator comparator = new ColumnComparator();
-                viewer.setComparator(comparator);
-                SearchFilter commentFilter = new SearchFilter(null);
-                viewer.addFilter(commentFilter);
-                
-                viewer.addDoubleClickListener(new ViewController(viewer));
-                getSite().setSelectionProvider(viewer);
-                
-                filterController = new FilterController(toolBar, viewer, commentFilter);
-                toolBar.setListeners(filterController);
-                getSite().getWorkbenchWindow().getSelectionService().addSelectionListener("org.agilereview.ui.basic.reviewExplorerView",
-                        filterController);
-                parent.layout();
-            }
-        });
-    }
-    
-    /**
-     * Displays a message as no {@link IStorageClient} provides data
-     * @author Malte Brunnlieb (27.05.2012)
-     */
-    private void displayStorageDisconnected() {
-        Display.getDefault().syncExec(new Runnable() {
-            
-            @Override
-            public void run() {
-                if (content == ViewContent.DISCONNECTED) return;
-                clearParent();
-                content = ViewContent.DISCONNECTED;
-                
-                Label label = new Label(parent, SWT.CENTER);
-                label.setText("No data available as currently no StorageClient is connected.");
-                GridData gd = new GridData();
-                gd.grabExcessHorizontalSpace = true;
-                gd.grabExcessVerticalSpace = true;
-                gd.horizontalAlignment = GridData.CENTER;
-                gd.verticalAlignment = GridData.CENTER;
-                gd.widthHint = parent.getMonitor().getClientArea().width;
-                label.setLayoutData(gd);
-                parent.pack();
-            }
-        });
-    }
-    
-    /**
-     * Disposes all children of the current parent.
-     * @author Malte Brunnlieb (27.05.2012)
-     */
-    private void clearParent() {
-        Display.getDefault().syncExec(new Runnable() {
-            
-            @Override
-            public void run() {
-                if (filterController != null) {
-                    getSite().getWorkbenchWindow().getSelectionService().removeSelectionListener("org.agilereview.ui.basic.reviewExplorerView",
-                            filterController);
-                }
-                toolBar = null;
-                viewer = null;
-                for (Control child : parent.getChildren()) {
-                    child.dispose();
-                }
-                parent.layout();
-            }
-        });
+    public static CommentSummaryView getInstance() {
+        return instance;
     }
     
     /**
@@ -225,4 +85,48 @@ public class CommentSummaryView extends ViewPart {
             toolBar.setFocus();
         }
     }
+    
+    /* (non-Javadoc)
+     * @see org.agilereview.ui.basic.external.reviewDataReceiver.AbstractReviewDataView#getReviewDataReceiverClass()
+     * @author Malte Brunnlieb (06.12.2012)
+     */
+    @Override
+    protected Class<? extends AbstractReviewDataReceiver> getReviewDataReceiverClass() {
+        return ContentProvider.class;
+    }
+    
+    /* (non-Javadoc)
+     * @see org.agilereview.ui.basic.external.reviewDataReceiver.AbstractReviewDataView#buildUI(org.eclipse.swt.widgets.Composite, java.lang.Object)
+     * @author Malte Brunnlieb (06.12.2012)
+     */
+    @Override
+    protected void buildUI(Composite parent, Object initalInput) {
+        parent.setLayout(new GridLayout());
+        toolBar = new CSToolBar(parent);
+        
+        viewer = new CSTableViewer(parent);
+        viewer.setContentProvider(ContentProvider.getInstance());
+        ColumnComparator comparator = new ColumnComparator();
+        viewer.setComparator(comparator);
+        SearchFilter commentFilter = new SearchFilter(null);
+        viewer.addFilter(commentFilter);
+        
+        viewer.addDoubleClickListener(new ViewController(viewer));
+        getSite().setSelectionProvider(viewer);
+        
+        filterController = new FilterController(toolBar, viewer, commentFilter);
+        toolBar.setListeners(filterController);
+        getSite().getWorkbenchWindow().getSelectionService().addSelectionListener("org.agilereview.ui.basic.reviewExplorerView", filterController);
+        parent.layout();
+    }
+    
+    /* (non-Javadoc)
+     * @see org.agilereview.ui.basic.external.reviewDataReceiver.AbstractReviewDataView#refreshInput(java.lang.Object)
+     * @author Malte Brunnlieb (06.12.2012)
+     */
+    @Override
+    protected void refreshInput(Object reviewData) {
+        viewer.setInput(reviewData);
+    }
+    
 }
