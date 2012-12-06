@@ -458,34 +458,38 @@ public class XmlStorageClient implements IStorageClient, IPreferenceChangeListen
 	 * @author Peter Reuter (18.07.2012)
 	 */
 	private void propertyChangeOfReviewSet(java.beans.PropertyChangeEvent evt) {
-		@SuppressWarnings("unchecked")
-		HashSet<Review> oldValue = (HashSet<Review>) evt.getOldValue();
-		@SuppressWarnings("unchecked")
-		HashSet<Review> newValue = (HashSet<Review>) evt.getNewValue();
-		if (newValue.size() >= oldValue.size()) {
-			// reviews added
-			HashSet<Review> diff = new HashSet<Review>(newValue);
-			diff.removeAll(oldValue);
-			for (Review review : diff) {
-				this.idReviewMap.put(review.getId(), review);
-				this.reviewSet.add(review);
-				for (Comment comment : review.getComments()) {
-					this.idCommentMap.put(comment.getId(), comment);
-					addReplies(comment.getReplies());
+		if ("reviews".equals(evt.getPropertyName())) {
+			@SuppressWarnings("unchecked")
+			HashSet<Review> oldValue = (HashSet<Review>) evt.getOldValue();
+			@SuppressWarnings("unchecked")
+			HashSet<Review> newValue = (HashSet<Review>) evt.getNewValue();
+			if (newValue.size() >= oldValue.size()) {
+				// reviews added
+				HashSet<Review> diff = new HashSet<Review>(newValue);
+				diff.removeAll(oldValue);
+				for (Review review : diff) {
+					this.idReviewMap.put(review.getId(), review);
+					this.reviewSet.add(review);
+					for (Comment comment : review.getComments()) {
+						this.idCommentMap.put(comment.getId(), comment);
+						addReplies(comment.getReplies());
+					}
+					store(review);
 				}
-				store(review);
-			}
+			} else {
+				// reviews removed
+				HashSet<Review> diff = new HashSet<Review>(oldValue);
+				diff.removeAll(newValue);
+				for (Review review : diff) {
+					this.idReviewMap.remove(review.getId());
+					this.reviewSet.remove(review);
+					unloadComments(review.getComments());
+					SourceFolderManager.deleteReviewContents(review.getId());
+				}
+			}	
 		} else {
-			// reviews removed
-			HashSet<Review> diff = new HashSet<Review>(oldValue);
-			diff.removeAll(newValue);
-			for (Review review : diff) {
-				this.idReviewMap.remove(review.getId());
-				this.reviewSet.remove(review);
-				unloadComments(review.getComments());
-				SourceFolderManager.deleteReviewContents(review.getId());
-			}
-		}
+			// nothing to do here
+		}		
 	}
 
 	//////////////////////////////////////
