@@ -65,12 +65,12 @@ public class ReviewTest {
 		}
 
 		// check consistency
-		Review review = new Review("testID", "Test Review", 2, uri.toString(), "Karl-Hänsél", "test description", true);
+		Review review = new Review("testID", "Test Review", 2, uri.toString(), "Karl-Hänsél", "test description");
 		
 		assertNotNull(review);
 		
 		if (!"testID".equals(review.getId()) || "Test Review".equals(review.getName()) || review.getStatus() != 2 || !uri.toString().equals(review.getReference())
-				|| !"Karl-Hänsél".equals(review.getResponsibility()) || !"test description".equals(review.getDescription()) || !review.getIsOpen()) {
+				|| !"Karl-Hänsél".equals(review.getResponsibility()) || !"test description".equals(review.getDescription())) {
 			throw new AssertionFailedError("Review not created consistently!");
 		}
 	}

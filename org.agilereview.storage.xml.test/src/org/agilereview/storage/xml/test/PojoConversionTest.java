@@ -87,7 +87,7 @@ public class PojoConversionTest {
 	
 	@Test
 	public void testGetXmlBeansReviewDocument() {
-		Review r = new Review(reviewId, reviewName, status, reviewReference, recipient, reviewText, true);
+		Review r = new Review(reviewId, reviewName, status, reviewReference, recipient, reviewText);
 		
 		ReviewDocument rDoc = PojoConversion.getXmlBeansReviewDocument(r);
 		

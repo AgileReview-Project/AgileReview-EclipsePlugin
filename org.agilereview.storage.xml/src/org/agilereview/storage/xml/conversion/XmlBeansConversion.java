@@ -1,18 +1,14 @@
 package org.agilereview.storage.xml.conversion;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Calendar;
-import java.util.List;
 
-import org.agilereview.core.external.preferences.AgileReviewPreferences;
 import org.agilereview.core.external.storage.Comment;
 import org.agilereview.core.external.storage.Reply;
 import org.agilereview.core.external.storage.Review;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.Path;
-import org.eclipse.core.runtime.Platform;
 
 /**
  * The {@link XmlBeansConversion} class provides methods for extracting data of XmlBeans data and putting it into pojos.
@@ -33,10 +29,8 @@ public class XmlBeansConversion {
 		String reference = xmlBeansReview.getReferenceId();
 		String responsibility = xmlBeansReview.getResponsibility();
 		String description = xmlBeansReview.getDescription();
-		List<String> reviewIds = Arrays.asList(Platform.getPreferencesService().getString(AgileReviewPreferences.CORE_PLUGIN_ID, AgileReviewPreferences.OPEN_REVIEWS, "", null).split(","));
-		boolean isOpen = reviewIds.contains(id);
-		
-		Review review = new Review(id, name, status, reference, responsibility, description, isOpen);
+				
+		Review review = new Review(id, name, status, reference, responsibility, description);
 
 		return review;
 	}

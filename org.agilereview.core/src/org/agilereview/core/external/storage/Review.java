@@ -19,6 +19,8 @@ import org.agilereview.common.exception.ExceptionHandler;
 import org.agilereview.core.Activator;
 import org.agilereview.core.external.preferences.AgileReviewPreferences;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
+import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener;
+import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent;
 import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.osgi.service.prefs.BackingStoreException;
 
@@ -26,7 +28,7 @@ import org.osgi.service.prefs.BackingStoreException;
  * A class that stores review data and a list of comments belonging to the review.
  * @author Peter Reuter (19.02.2012)
  */
-public class Review implements PropertyChangeListener {
+public class Review implements PropertyChangeListener, IPreferenceChangeListener {
     
     /**
      * The unique name of the review entered by the user
@@ -61,17 +63,22 @@ public class Review implements PropertyChangeListener {
      */
     private boolean isOpen = true;
     /**
+     * Indicates whether new comments will be added to this review {@link Review}.
+     */
+    private boolean isActive = false;
+    /**
      * {@link PropertyChangeSupport} of this POJO, used for firing {@link PropertyChangeEvent}s on changes of fields.
      */
     private final PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(this);
     
     /**
-     * Constructor that should be used if a new {@link Review}w is created.
-     * @param id a unique name for the {@link Review} entered by the user
+     * Constructor that should be used if a new {@link Review}w is created. The {@link Review} will be added to the list of open reviews.
+     * @param id a unique identifier for the {@link Review} computed by the current IStorageClient.
      */
     public Review(String id) {
         this.id = id;
         setOpenReviewsPreference();
+        InstanceScope.INSTANCE.getNode(Activator.PLUGIN_ID).addPreferenceChangeListener(this);
     }
     
     /**
@@ -82,17 +89,25 @@ public class Review implements PropertyChangeListener {
      * @param reference e.g. a reference to a bug tracker
      * @param responsibility the person that is in charge for this {@link Review}
      * @param description a text describing the e.g. the content or scope of this {@link Review}
-     * @param isOpen indicates whether comments for this review are loaded or not
      */
-    public Review(String id, String name, int status, String reference, String responsibility, String description, boolean isOpen) {
+    public Review(String id, String name, int status, String reference, String responsibility, String description) {
         this.id = id;
         this.name = name;
         this.status = status;
         this.reference = reference;
         this.responsibility = responsibility;
         this.description = description;
-        this.isOpen = isOpen;
+        IEclipsePreferences preferences = InstanceScope.INSTANCE.getNode(Activator.PLUGIN_ID);
+        this.isOpen = preferences.get(AgileReviewPreferences.OPEN_REVIEWS, "").contains(this.id);
+        this.isActive = this.id.equals(preferences.get(AgileReviewPreferences.ACTIVE_REVIEW_ID, ""));
+        preferences.addPreferenceChangeListener(this);
     }
+    
+    protected void finalize() throws Throwable {
+    	InstanceScope.INSTANCE.getNode(Activator.PLUGIN_ID).removePreferenceChangeListener(this);
+    	super.finalize();
+    }
+    
     
     /**
      * @return the ID of the {@link Review}
@@ -248,6 +263,29 @@ public class Review implements PropertyChangeListener {
     }
     
     /**
+     * @return <code>true</code> if the {@link Review} is the current active one, <code>false</code> otherwise.
+     * @author Peter Reuter (06.12.2012)
+     */
+    public boolean getIsActive() {
+    	return this.isActive;
+    }
+    
+    /**
+     * Sets this {@link Review} as the current active one.
+     * @author Peter Reuter (06.12.2012)
+     */
+    public void setToActive() {
+    	IEclipsePreferences preferences = InstanceScope.INSTANCE.getNode(Activator.PLUGIN_ID);
+		preferences.put(AgileReviewPreferences.ACTIVE_REVIEW_ID, this.id);
+    	try {
+			preferences.flush();
+		} catch (BackingStoreException e) {
+			String message = "AgileReview could not persistently save the ID of the active review.";
+			ExceptionHandler.logAndNotifyUser(e, message);
+		}
+    }
+    
+    /**
      * @return the current description of the {@link Review}
      */
     public String getDescription() {
@@ -325,11 +363,26 @@ public class Review implements PropertyChangeListener {
         }
         preferences.put(AgileReviewPreferences.OPEN_REVIEWS, reviewIdsPref);
         try {
-            preferences.flush();
-        } catch (BackingStoreException e) {
-            String message = "AgileReview could not persistently set list of open Reviews.";
-            ExceptionHandler.logAndNotifyUser(message, e, Activator.PLUGIN_ID);
-        }
+			preferences.flush();
+		} catch (BackingStoreException e) {
+			String message = "AgileReview could not persistently save list of open Reviews.";
+			ExceptionHandler.logAndNotifyUser(e, message);
+		}
     }
+
+	//////////////////////////////////////////
+	// methods of IPreferenceChangeListener //
+	//////////////////////////////////////////
+    
+	@Override
+	public void preferenceChange(PreferenceChangeEvent event) {
+		if (AgileReviewPreferences.ACTIVE_REVIEW_ID.equals(event.getKey())) {
+			boolean oldValue = this.isActive;
+			this.isActive = this.id.equals(event.getNewValue());
+			if (this.isActive != oldValue) {
+				propertyChangeSupport.firePropertyChange("isActive", oldValue, this.isActive);	
+			}			
+		}			
+	}
     
 }

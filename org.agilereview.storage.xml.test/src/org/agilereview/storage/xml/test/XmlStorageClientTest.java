@@ -63,7 +63,7 @@ public class XmlStorageClientTest {
 	@BeforeClass
 	public static void setUpWorkspace() throws CoreException, IOException {
 		// set up test data
-		r = new Review(reviewId, reviewName, status, reviewReference, recipient, reviewText, false);
+		r = new Review(reviewId, reviewName, status, reviewReference, recipient, reviewText);
 		r.setIsOpen(true);
 		ArrayList<Comment> comments = new ArrayList<Comment>();
 		for (int i=0; i<commentIds.length; i++) {
