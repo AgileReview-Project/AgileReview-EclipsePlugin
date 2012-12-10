@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<site>
+   <feature url="features/org.agilereview.feature.basic_1.0.0.201212101253.jar" id="org.agilereview.feature.basic" version="1.0.0.201212101253">
+      <category name="org.agilereview.updatesite.basic"/>
+   </feature>
+   <category-def name="org.agilereview.updatesite.basic" label="AgileReview Basic UpdateSite"/>
+</site>
