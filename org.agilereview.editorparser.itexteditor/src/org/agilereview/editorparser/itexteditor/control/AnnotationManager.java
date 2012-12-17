@@ -64,8 +64,10 @@ public class AnnotationManager {
         Map<Annotation, Position> annotationsToAdd = new HashMap<Annotation, Position>();
         for (String s : keyPositionMap.keySet()) {
             if (!annotationMap.containsKey(s)) {
-                createNewAnnotation(s);
-                annotationsToAdd.put(annotationMap.get(s), keyPositionMap.get(s));
+                Annotation annotation = createNewAnnotation(s);
+                if (annotation != null) {
+                    annotationsToAdd.put(annotation, keyPositionMap.get(s));
+                }
             }
         }
         //remove annotations that should not be displayed
@@ -99,7 +101,10 @@ public class AnnotationManager {
      * @param p The position to add the annotation on.
      */
     void addAnnotation(String commentKey, Position p) {
-        ((IAnnotationModel) this.annotationModel).addAnnotation(createNewAnnotation(commentKey), p);
+        Annotation annotation = createNewAnnotation(commentKey);
+        if (annotation != null) {
+            ((IAnnotationModel) this.annotationModel).addAnnotation(annotation, p);
+        }
     }
     
     /**
@@ -151,11 +156,12 @@ public class AnnotationManager {
     /**
      * Creates a new annotation for a given comment key
      * @param commentKey for which an annotation will be created
-     * @return created annotation
+     * @return created annotation or<br>null, if the comment is not known
      */
     private Annotation createNewAnnotation(String commentKey) {
         String annotationType;
         Comment comment = DataManager.getInstance().getComment(commentKey);
+        if (comment == null) return null;
         if (colorManager.isMultiColorEnabled() && colorManager.hasCustomizedColor(comment.getAuthor())) {
             annotationType = AgileReviewPreferences.AUTHOR_COLOR_DEFAULT + "_" + new AuthorReservationPreferences().getAuthorTag(comment.getAuthor());
         } else {

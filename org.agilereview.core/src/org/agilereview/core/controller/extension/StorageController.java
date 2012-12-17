@@ -42,6 +42,14 @@ public class StorageController extends AbstractController<IStorageClient> implem
      * The id of the active {@link IStorageClient}
      */
     private String activeClientId = "";
+    /**
+     * Cached {@link ReviewSet}
+     */
+    private ReviewSet cachedReviewSet = null;
+    /**
+     * Boolean flag which indicates a changed {@link IStorageClient} in order to refresh the cached {@link ReviewSet}
+     */
+    private boolean storageClientChanged = true;
     
     /**
      * Creates a new instance of the {@link StorageController}
@@ -109,6 +117,7 @@ public class StorageController extends AbstractController<IStorageClient> implem
         try {
             activeClient = getUniqueExtension(name);
             activeClientId = name;
+            storageClientChanged = true;
         } catch (CoreException e) {
             e.printStackTrace();
             throw new ExtensionCreationException("The StorageClient with id " + name + " could not be intantiated!");
@@ -126,7 +135,11 @@ public class StorageController extends AbstractController<IStorageClient> implem
     @Override
     public ReviewSet getAllReviews() {
         try {
-            ReviewSet result = activeClient.getAllReviews();
+            if (storageClientChanged) {
+                cachedReviewSet = activeClient.getAllReviews();
+                storageClientChanged = false;
+            }
+            ReviewSet result = cachedReviewSet;
             Assert.isNotNull(result);
             return result;
         } catch (Throwable ex) {

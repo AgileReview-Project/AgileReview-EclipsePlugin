@@ -41,6 +41,12 @@
             id="org.agilereview.core.newComment"
             name="Add new Comment">
       </command>
+      <command
+            categoryId="org.agilereview.core.commonCommands"
+            description="Delete selected Comment(s)"
+            id="org.agilereview.core.deleteComment"
+            name="Delete Comment">
+      </command>
    </extension>
    <extension
          point="org.eclipse.ui.commandImages">
@@ -60,13 +66,10 @@
             commandId="org.agilereview.core.newComment"
             icon="icons/comment_add.png">
       </image>
-   </extension>
-   <extension
-         point="org.agilereview.core.ReviewDataReceiver">
-      <ReviewDataReceiver
-            class="org.agilereview.core.external.storage.PojoFactory"
-            id="org.agilereview.core.PojoFactory">
-      </ReviewDataReceiver>
+      <image
+            commandId="org.agilereview.core.deleteComment"
+            icon="icons/comment_del.png">
+      </image>
    </extension>
    <extension
          point="org.eclipse.ui.perspectives">

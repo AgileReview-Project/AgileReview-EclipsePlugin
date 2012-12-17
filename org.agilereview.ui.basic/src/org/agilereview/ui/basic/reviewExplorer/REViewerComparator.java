@@ -1,8 +1,8 @@
 package org.agilereview.ui.basic.reviewExplorer;
 
+import org.agilereview.common.preferences.PreferencesAccessor;
 import org.agilereview.core.external.preferences.AgileReviewPreferences;
 import org.agilereview.core.external.storage.Review;
-import org.agilereview.ui.basic.tools.PreferencesAccessor;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.jface.viewers.Viewer;

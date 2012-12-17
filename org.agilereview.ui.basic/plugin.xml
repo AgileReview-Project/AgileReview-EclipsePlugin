@@ -189,6 +189,12 @@
             style="push"
             tooltip="Add new Comment">
       </command>
+      <command
+            commandId="org.agilereview.core.deleteComment"
+            label="Delete selected Comment(s)"
+            style="push"
+            tooltip="Delete selected Comment(s)">
+      </command>
    </menuContribution>
    </extension>
    <extension
@@ -310,6 +316,34 @@
       <handler
             class="org.agilereview.ui.basic.commentSummary.handler.NewCommentHandler"
             commandId="org.agilereview.core.newComment">
+      </handler>
+      <handler
+            class="org.agilereview.ui.basic.commentSummary.handler.DeleteCommentHandler"
+            commandId="org.agilereview.core.deleteComment">
+         <activeWhen>
+            <with
+                  variable="selection">
+               <iterate
+                     ifEmpty="false"
+                     operator="or">
+                  <instanceof
+                        value="org.agilereview.core.external.storage.Comment">
+                  </instanceof>
+               </iterate>
+            </with>
+         </activeWhen>
+         <enabledWhen>
+            <with
+                  variable="selection">
+               <iterate
+                     ifEmpty="false"
+                     operator="and">
+                  <instanceof
+                        value="org.agilereview.core.external.storage.Comment">
+                  </instanceof>
+               </iterate>
+            </with>
+         </enabledWhen>
       </handler>
    </extension>
    <extension

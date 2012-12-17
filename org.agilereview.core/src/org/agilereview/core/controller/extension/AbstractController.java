@@ -86,7 +86,7 @@ public abstract class AbstractController<T> implements IExtensionController {
      * @param id the name of the extension which should be loaded
      * @return the {@link IStorageClient} instance loaded from the extension or null if the extension could not be instantiated
      * @author Malte Brunnlieb (31.05.2012)
-     * @throws CoreException
+     * @throws CoreException if an instance of the executable extension could not be created for any reason
      */
     @SuppressWarnings("unchecked")
     private T loadExtension(String id) throws CoreException {

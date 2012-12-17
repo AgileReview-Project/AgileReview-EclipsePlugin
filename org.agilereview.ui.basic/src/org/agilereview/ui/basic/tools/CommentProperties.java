@@ -7,6 +7,7 @@
  */
 package org.agilereview.ui.basic.tools;
 
+import org.agilereview.common.preferences.PreferencesAccessor;
 import org.agilereview.core.external.preferences.AgileReviewPreferences;
 
 /**

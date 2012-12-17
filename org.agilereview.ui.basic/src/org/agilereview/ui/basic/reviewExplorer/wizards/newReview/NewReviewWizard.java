@@ -1,10 +1,7 @@
 package org.agilereview.ui.basic.reviewExplorer.wizards.newReview;
 
-import org.agilereview.common.exception.ExceptionHandler;
-import org.agilereview.core.external.exception.NullArgumentException;
-import org.agilereview.core.external.storage.PojoFactory;
+import org.agilereview.core.external.storage.CommentingAPI;
 import org.agilereview.core.external.storage.Review;
-import org.agilereview.ui.basic.Activator;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.ui.INewWizard;
@@ -47,19 +44,14 @@ public class NewReviewWizard extends Wizard implements INewWizard {
     @Override
     public boolean performFinish() {
         boolean result = false;
-        try {
-            Review newRev = PojoFactory.createReview();
-            if (newRev != null) {
-                newRev.setName(this.page1.getReviewName());
-                newRev.setReference(this.page1.getReviewReference());
-                newRev.setDescription(this.page1.getReviewDescription());
-                newRev.setResponsibility(this.page1.getReviewResponsibility());
-                result = true;
-            }
-        } catch (NullArgumentException e) {
-            ExceptionHandler.logAndNotifyUser(e, Activator.PLUGIN_ID);
+        Review newRev = new CommentingAPI().createReview();
+        if (newRev != null) {
+            newRev.setName(this.page1.getReviewName());
+            newRev.setReference(this.page1.getReviewReference());
+            newRev.setDescription(this.page1.getReviewDescription());
+            newRev.setResponsibility(this.page1.getReviewResponsibility());
+            result = true;
         }
-        
         return result;
     }
     

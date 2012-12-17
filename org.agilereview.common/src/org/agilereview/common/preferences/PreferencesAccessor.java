@@ -5,7 +5,7 @@
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  * Contributors: Malte Brunnlieb, Philipp Diebold, Peter Reuter, Thilo Rauch
  */
-package org.agilereview.ui.basic.tools;
+package org.agilereview.common.preferences;
 
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.preferences.DefaultScope;

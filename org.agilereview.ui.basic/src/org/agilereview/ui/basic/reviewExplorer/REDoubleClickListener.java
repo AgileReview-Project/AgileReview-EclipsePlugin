@@ -8,10 +8,10 @@
 package org.agilereview.ui.basic.reviewExplorer;
 
 import org.agilereview.common.exception.ExceptionHandler;
+import org.agilereview.common.preferences.PreferencesAccessor;
 import org.agilereview.core.external.preferences.AgileReviewPreferences;
 import org.agilereview.core.external.storage.Review;
 import org.agilereview.ui.basic.Activator;
-import org.agilereview.ui.basic.tools.PreferencesAccessor;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.commands.NotEnabledException;
 import org.eclipse.core.commands.NotHandledException;

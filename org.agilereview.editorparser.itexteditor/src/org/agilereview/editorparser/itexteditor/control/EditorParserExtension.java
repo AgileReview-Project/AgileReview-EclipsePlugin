@@ -27,7 +27,13 @@ import org.eclipse.ui.texteditor.ITextEditor;
  */
 public class EditorParserExtension implements IEditorParser {
     
+    /**
+     * Map which holds a parser for each opened editor
+     */
     private HashMap<IEditorPart, TagParser> parserMap = new HashMap<IEditorPart, TagParser>();
+    /**
+     * Map which holds an {@link AnnotationManager} for each opened editor
+     */
     private HashMap<IEditorPart, AnnotationManager> annotationManagerMap = new HashMap<IEditorPart, AnnotationManager>();
     
     /* (non-Javadoc)
@@ -60,7 +66,7 @@ public class EditorParserExtension implements IEditorParser {
      */
     @Override
     public void removeTagsInEditor(IEditorPart editor, String tagId, String[] multiLineCommentTags) {
-        IFile file = (IFile) editor.getAdapter(IFile.class);
+        IFile file = (IFile) editor.getEditorInput().getAdapter(IFile.class);
         if (file != null) {
             if (!parserMap.containsKey(editor)) {
                 addInstance(editor, multiLineCommentTags);

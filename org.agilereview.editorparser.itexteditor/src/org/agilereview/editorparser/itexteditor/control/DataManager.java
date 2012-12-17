@@ -47,12 +47,6 @@ public class DataManager implements IReviewDataReceiver, PropertyChangeListener 
      */
     public static DataManager getInstance() {
         while (instance == null) {
-            try {
-                Thread.sleep(1000);
-            } catch (InterruptedException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }
         }
         return instance;
     }

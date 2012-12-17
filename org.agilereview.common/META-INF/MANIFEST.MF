@@ -12,4 +12,5 @@ Bundle-ClassPath: lib/google-gson-2.2.2/gson-2.2.2.jar,
  .
 Export-Package: com.google.gson,
  org.agilereview.common.exception,
+ org.agilereview.common.preferences,
  org.agilereview.common.ui
