@@ -1,8 +1,7 @@
 package org.agilereview.ui.basic.reviewExplorer;
 
-import org.agilereview.common.preferences.PreferencesAccessor;
-import org.agilereview.core.external.preferences.AgileReviewPreferences;
 import org.agilereview.core.external.storage.Review;
+import org.agilereview.ui.basic.Activator;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
@@ -20,21 +19,17 @@ import org.eclipse.ui.PlatformUI;
 class RELabelProvider extends ColumnLabelProvider {
     
     /**
-     * Standard grey color for displaying not exisitng resources
+     * Standard grey color for displaying not existing resources
      */
     private final Color grey = Display.getDefault().getSystemColor(SWT.COLOR_GRAY);
-    /**
-     * Preference query interface of the core plugin
-     */
-    private final PreferencesAccessor props = new PreferencesAccessor();
     
     /**
      * Empty Constructor
      */
     public RELabelProvider() {
         super();
-    }
-    
+    }   
+   
     /**
      * Checks whether the file represented by the given AbstractMultipleWrapper exists
      * @param o AbstractMultipleWrapper to check
@@ -56,10 +51,9 @@ class RELabelProvider extends ColumnLabelProvider {
             // A closed review cannot be active
             if (!currentReview.getIsOpen()) {
                 result = PlatformUI.getWorkbench().getSharedImages().getImage(org.eclipse.ui.ide.IDE.SharedImages.IMG_OBJ_PROJECT_CLOSED);
-            } else if (currentReview.getId().equals(this.props.get(AgileReviewPreferences.ACTIVE_REVIEW_ID))) {
-                // TODO Fix icon
-                //                String activeReviewIconPath = Activator.getDefault().getInternalProperty(Activator.Keys.ACTIVE_REVIEW_ICON);
-                //                result = AbstractUIPlugin.imageDescriptorFromPlugin(Activator.PLUGIN_ID, activeReviewIconPath).createImage();
+           // } else if (currentReview.getId().equals(this.props.get(AgileReviewPreferences.ACTIVE_REVIEW_ID))) {
+            } else if (currentReview.getIsActive()) {
+            	result = Activator.getDefault().getImageRegistry().get(Activator.ISharedImages.ACTIVE_REVIEW_ICON);
             }
         } else if (element instanceof IProject) {
             result = PlatformUI.getWorkbench().getSharedImages().getImage(org.eclipse.ui.ide.IDE.SharedImages.IMG_OBJ_PROJECT);
@@ -75,11 +69,11 @@ class RELabelProvider extends ColumnLabelProvider {
         String result = "unknown object";
         if (element instanceof Review) {
             Review review = (Review) element;
-            result = review.getId();
-            // Check whether this review is active
-            if (review.getId().equals(this.props.get(AgileReviewPreferences.ACTIVE_REVIEW_ID))) {
-                result += " (active)";
-            }
+            result = review.getName();
+//            // Check whether this review is active
+//            if (review.getIsActive()) {
+//                result += " (active)";
+//            }
         } else if (element instanceof IResource) {
             result = ((IResource) element).getName();
         }

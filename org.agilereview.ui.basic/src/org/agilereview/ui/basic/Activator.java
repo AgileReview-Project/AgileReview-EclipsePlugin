@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 
+import org.eclipse.jface.resource.ImageRegistry;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 
@@ -12,11 +13,16 @@ import org.osgi.framework.BundleContext;
  */
 public class Activator extends AbstractUIPlugin {
     
-	public class Keys {
+	public static class ISharedImages {
+		// TODO: Maybe AR icon is not needed?
 		/**
-		 * Path of the Active-Review-Icon
+		 * AgileReview icon
 		 */
-		public static final String ACTIVE_REVIEW_ICON = "icon_review_ok";
+		public static final String AGILEREVIEW_ICON = "agilereview_icon";
+		/**
+		 * Active review icon
+		 */
+		public static final String ACTIVE_REVIEW_ICON = "active_review_icon";
 		
 	}
 	
@@ -84,5 +90,13 @@ public class Activator extends AbstractUIPlugin {
     public String getInternalProperty(String key) {
     	return internalProps.getProperty(key);
     }
+    
+    @Override
+    protected void initializeImageRegistry(ImageRegistry registry) {
+    	super.initializeImageRegistry(registry);
+    	String coreId = "org.agilereview.core";
+    	registry.put(ISharedImages.AGILEREVIEW_ICON, AbstractUIPlugin.imageDescriptorFromPlugin(coreId, "icons/agilereview_icon.png"));
+        registry.put(ISharedImages.ACTIVE_REVIEW_ICON, AbstractUIPlugin.imageDescriptorFromPlugin(coreId, "icons/review_activate.png"));
+     }
     
 }

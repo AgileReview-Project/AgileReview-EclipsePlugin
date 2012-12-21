@@ -20,8 +20,9 @@ public class ActivateReviewHandler extends AbstractHandler {
             if (sel instanceof IStructuredSelection) {
                 for (Object o : ((IStructuredSelection) sel).toArray()) {
                     if (o instanceof Review && ((Review) o).getIsOpen()) {
-                        IEclipsePreferences preferences = InstanceScope.INSTANCE.getNode("org.agilereview.core");
-                        preferences.put(AgileReviewPreferences.ACTIVE_REVIEW_ID, ((Review) o).getId());
+                    	((Review) o).setToActive();
+//                        IEclipsePreferences preferences = InstanceScope.INSTANCE.getNode("org.agilereview.core");
+//                        preferences.put(AgileReviewPreferences.ACTIVE_REVIEW_ID, ((Review) o).getId());
                     }
                 }
             }

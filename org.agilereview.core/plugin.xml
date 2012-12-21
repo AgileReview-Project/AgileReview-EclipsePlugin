@@ -75,6 +75,7 @@
          point="org.eclipse.ui.perspectives">
       <perspective
             class="org.agilereview.core.AgileReviewPerspective"
+            icon="icons/agilereview_icon.png"
             id="org.agilereview.perspective"
             name="AgileReview">
       </perspective>

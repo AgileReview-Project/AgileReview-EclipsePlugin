@@ -20,6 +20,7 @@ import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChange
 import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jface.viewers.ITreePathContentProvider;
 import org.eclipse.jface.viewers.TreePath;
+import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.widgets.Display;
 
@@ -38,7 +39,7 @@ public class REContentProvider implements ITreePathContentProvider, PropertyChan
     /**
      * The tree viewer of the RevieExlorer
      */
-    private Viewer viewer;
+    private TreeViewer viewer;
     
     
     REContentProvider() {
@@ -53,7 +54,7 @@ public class REContentProvider implements ITreePathContentProvider, PropertyChan
     @Override
     public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
         // Capture viewer
-        this.viewer = viewer;
+        this.viewer = (TreeViewer)viewer;
         
         // Deregister listener
         if (oldInput instanceof ReviewSet) {
@@ -178,7 +179,7 @@ public class REContentProvider implements ITreePathContentProvider, PropertyChan
 	        Display.getDefault().syncExec(new Runnable() {
 	            @Override
 	            public void run() {
-	                viewer.refresh();
+	                viewer.refresh(false);
 	            }
 	        });
     	}
