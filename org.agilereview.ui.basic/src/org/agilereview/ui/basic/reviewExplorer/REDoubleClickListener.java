@@ -8,17 +8,9 @@
 package org.agilereview.ui.basic.reviewExplorer;
 
 import org.agilereview.common.exception.ExceptionHandler;
-import org.agilereview.common.preferences.PreferencesAccessor;
-import org.agilereview.core.external.preferences.AgileReviewPreferences;
 import org.agilereview.core.external.storage.Review;
 import org.agilereview.ui.basic.Activator;
-import org.eclipse.core.commands.ExecutionException;
-import org.eclipse.core.commands.NotEnabledException;
-import org.eclipse.core.commands.NotHandledException;
-import org.eclipse.core.commands.common.NotDefinedException;
 import org.eclipse.core.resources.IFile;
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.ISelection;
@@ -27,7 +19,6 @@ import org.eclipse.jface.viewers.TreePath;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
-import org.eclipse.ui.handlers.IHandlerService;
 import org.eclipse.ui.ide.IDE;
 
 /**
@@ -52,20 +43,20 @@ public class REDoubleClickListener implements IDoubleClickListener {
                 TreeViewer treeViewer = (TreeViewer) event.getViewer();
                 // case 1: A Review is clicked
                 if (o instanceof Review) {
-                    if (((Review) o).getIsOpen()) {
+                    Review r = (Review) o;
+                    if (r.getIsOpen()) {
                         // case 1.1 The review is open
-                        String activeReview = new PreferencesAccessor().get(AgileReviewPreferences.ACTIVE_REVIEW_ID);
-                        if (activeReview.equals(((Review) o).getId())) {
+                        if (r.getIsActive()) {
                             // case 1.1.2
                             expandOrCollapse(treeViewer, o);
                         } else {
                             // case 1.1.1
                             // Review is open -> activate it
-                            executeCommand("org.agilereview.core.activateReview"); // TODO String auslagern?
+                            r.setToActive();
                         }
                     } else {
                         // case 1.2: If the review is closed -> open it
-                        executeCommand("org.agilereview.core.openCloseReview"); // TODO String auslagern?
+                        r.setIsOpen(true);
                     }
                 } else if (o instanceof IFile) {
                     // case 2: An IFile is selected --> open it
@@ -98,31 +89,6 @@ public class REDoubleClickListener implements IDoubleClickListener {
         } else {
             ExceptionHandler.warnUser("Could not open file '" + file.getFullPath()
                     + "'!\nFile not existent in workspace or respective project may be closed!");
-        }
-    }
-    
-    /**
-     * Executes the given command and handles the exceptions
-     * @param commandId command to execute
-     * @author Thilo Rauch (12.05.2012)
-     */
-    private void executeCommand(String commandId) {
-        // Execute activation command
-        try {
-            IHandlerService handlerService = (IHandlerService) PlatformUI.getWorkbench().getService(IHandlerService.class);
-            handlerService.executeCommand(commandId, null);
-        } catch (ExecutionException e) {
-            String msg = "Problems occured executing command \"" + commandId + "\", after double-click in ReviewExplorer";
-            Activator.getDefault().getLog().log(new Status(IStatus.ERROR, Activator.PLUGIN_ID, msg, e));
-        } catch (NotDefinedException e) {
-            String msg = "Command \"" + commandId + "\" is not defined, after double-click in ReviewExplorer";
-            Activator.getDefault().getLog().log(new Status(IStatus.ERROR, Activator.PLUGIN_ID, msg, e));
-        } catch (NotEnabledException e) {
-            String msg = "Command  \"" + commandId + "\" is not enabled, after double-click in ReviewExplorer";
-            Activator.getDefault().getLog().log(new Status(IStatus.ERROR, Activator.PLUGIN_ID, msg, e));
-        } catch (NotHandledException e) {
-            String msg = "Command  \"" + commandId + "\" is not handled, after double-click in ReviewExplorer";
-            Activator.getDefault().getLog().log(new Status(IStatus.ERROR, Activator.PLUGIN_ID, msg, e));
         }
     }
     

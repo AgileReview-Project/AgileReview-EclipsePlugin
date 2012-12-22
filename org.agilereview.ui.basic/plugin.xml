@@ -313,6 +313,34 @@
             class="org.agilereview.ui.basic.reviewExplorer.handler.NewReviewHandler"
             commandId="org.agilereview.core.newReview">
       </handler>
+            <handler
+            class="org.agilereview.ui.basic.reviewExplorer.handler.DeleteReviewHandler"
+            commandId="org.eclipse.ui.edit.delete">
+         <activeWhen>
+            <with
+                  variable="selection">
+               <iterate
+                     ifEmpty="false"
+                     operator="or">
+                  <instanceof
+                        value="org.agilereview.core.external.storage.Review">
+                  </instanceof>
+               </iterate>
+            </with>
+         </activeWhen>
+         <enabledWhen>
+            <with
+                  variable="selection">
+               <iterate
+                     ifEmpty="false"
+                     operator="and">
+                  <instanceof
+                        value="org.agilereview.core.external.storage.Review">
+                  </instanceof>
+               </iterate>
+            </with>
+         </enabledWhen>
+      </handler>
       <handler
             class="org.agilereview.ui.basic.commentSummary.handler.NewCommentHandler"
             commandId="org.agilereview.core.newComment">

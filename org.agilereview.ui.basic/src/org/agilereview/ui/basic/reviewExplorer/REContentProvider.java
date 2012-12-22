@@ -6,7 +6,6 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.agilereview.core.external.preferences.AgileReviewPreferences;
 import org.agilereview.core.external.storage.Comment;
 import org.agilereview.core.external.storage.Review;
 import org.agilereview.core.external.storage.ReviewSet;
@@ -15,9 +14,6 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener;
-import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent;
-import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jface.viewers.ITreePathContentProvider;
 import org.eclipse.jface.viewers.TreePath;
 import org.eclipse.jface.viewers.TreeViewer;
@@ -29,7 +25,7 @@ import org.eclipse.swt.widgets.Display;
  * 
  * @author Thilo Rauch (28.03.2012)
  */
-public class REContentProvider implements ITreePathContentProvider, PropertyChangeListener, IPreferenceChangeListener {
+public class REContentProvider implements ITreePathContentProvider, PropertyChangeListener {
     
     /**
      * Reviews received from the core
@@ -41,20 +37,17 @@ public class REContentProvider implements ITreePathContentProvider, PropertyChan
      */
     private TreeViewer viewer;
     
-    
     REContentProvider() {
-    	InstanceScope.INSTANCE.getNode("org.agilereview.core").addPreferenceChangeListener(this);
     }
     
     @Override
     public void dispose() {
-    	InstanceScope.INSTANCE.getNode("org.agilereview.core").removePreferenceChangeListener(this);
     }
     
     @Override
     public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
         // Capture viewer
-        this.viewer = (TreeViewer)viewer;
+        this.viewer = (TreeViewer) viewer;
         
         // Deregister listener
         if (oldInput instanceof ReviewSet) {
@@ -67,9 +60,7 @@ public class REContentProvider implements ITreePathContentProvider, PropertyChan
             reviews.addPropertyChangeListener(this);
             
             // Now refresh the data and the viewer
-            if (viewer != null) {
-                viewer.refresh();
-            }
+            updateViewer();
         }
     }
     
@@ -93,7 +84,6 @@ public class REContentProvider implements ITreePathContentProvider, PropertyChan
             result = filterResourcesWithComment(ResourcesPlugin.getWorkspace().getRoot().getProjects(), (Review) elem);
         } else if (elem instanceof IContainer) {
             try {
-                // XXX Somehow find out which review the requested node belongs to
                 result = filterResourcesWithComment(((IContainer) elem).members(), (Review) parentPath.getFirstSegment());
             } catch (CoreException e) {
                 // if the element is not existent or not open, we also show no children (but should not happen)
@@ -146,7 +136,8 @@ public class REContentProvider implements ITreePathContentProvider, PropertyChan
      */
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
-        if ((evt.getSource() instanceof Review && (evt.getPropertyName().equals("comments") || evt.getPropertyName().equals("isOpen")))
+        if ((evt.getSource() instanceof Review && (evt.getPropertyName().equals("comments") || evt.getPropertyName().equals("isOpen") || evt
+                .getPropertyName().equals("isActive")))
                 || (evt.getSource() instanceof ReviewSet && evt.getPropertyName().equals("reviews"))
                 || (evt.getSource() instanceof Comment && evt.getPropertyName().equals("commentedFile"))) {
             // Update viewer
@@ -175,21 +166,13 @@ public class REContentProvider implements ITreePathContentProvider, PropertyChan
     }
     
     private void updateViewer() {
-    	if (viewer != null) {
-	        Display.getDefault().syncExec(new Runnable() {
-	            @Override
-	            public void run() {
-	                viewer.refresh(false);
-	            }
-	        });
-    	}
+        if (viewer != null) {
+            Display.getDefault().syncExec(new Runnable() {
+                @Override
+                public void run() {
+                    viewer.refresh(true);
+                }
+            });
+        }
     }
-
-	@Override
-	public void preferenceChange(PreferenceChangeEvent event) {
-		if (event.getKey().equals(AgileReviewPreferences.ACTIVE_REVIEW_ID)
-				|| event.getKey().equals(AgileReviewPreferences.OPEN_REVIEWS)) {
-			updateViewer();
-		}
-	}
 }

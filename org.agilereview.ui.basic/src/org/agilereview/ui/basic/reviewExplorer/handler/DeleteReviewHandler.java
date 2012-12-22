@@ -8,7 +8,7 @@ import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.ui.handlers.HandlerUtil;
 
-public class ActivateReviewHandler extends AbstractHandler {
+public class DeleteReviewHandler extends AbstractHandler {
     
     @Override
     public Object execute(ExecutionEvent event) throws ExecutionException {
@@ -16,12 +16,15 @@ public class ActivateReviewHandler extends AbstractHandler {
         if (sel != null) {
             if (sel instanceof IStructuredSelection) {
                 for (Object o : ((IStructuredSelection) sel).toArray()) {
-                    if (o instanceof Review && ((Review) o).getIsOpen()) {
-                        ((Review) o).setToActive();
+                    if (o instanceof Review) {
+                        Review r = (Review) o;
+                        // TODO ReviewSet connection needed to delete Review
+                        // Or CommentingAPI?
                     }
                 }
             }
         }
+        
         return null;
     }
     

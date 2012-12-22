@@ -28,8 +28,8 @@ class RELabelProvider extends ColumnLabelProvider {
      */
     public RELabelProvider() {
         super();
-    }   
-   
+    }
+    
     /**
      * Checks whether the file represented by the given AbstractMultipleWrapper exists
      * @param o AbstractMultipleWrapper to check
@@ -51,9 +51,8 @@ class RELabelProvider extends ColumnLabelProvider {
             // A closed review cannot be active
             if (!currentReview.getIsOpen()) {
                 result = PlatformUI.getWorkbench().getSharedImages().getImage(org.eclipse.ui.ide.IDE.SharedImages.IMG_OBJ_PROJECT_CLOSED);
-           // } else if (currentReview.getId().equals(this.props.get(AgileReviewPreferences.ACTIVE_REVIEW_ID))) {
             } else if (currentReview.getIsActive()) {
-            	result = Activator.getDefault().getImageRegistry().get(Activator.ISharedImages.ACTIVE_REVIEW_ICON);
+                result = Activator.getDefault().getImageRegistry().get(Activator.ISharedImages.ACTIVE_REVIEW_ICON);
             }
         } else if (element instanceof IProject) {
             result = PlatformUI.getWorkbench().getSharedImages().getImage(org.eclipse.ui.ide.IDE.SharedImages.IMG_OBJ_PROJECT);
@@ -70,10 +69,6 @@ class RELabelProvider extends ColumnLabelProvider {
         if (element instanceof Review) {
             Review review = (Review) element;
             result = review.getName();
-//            // Check whether this review is active
-//            if (review.getIsActive()) {
-//                result += " (active)";
-//            }
         } else if (element instanceof IResource) {
             result = ((IResource) element).getName();
         }
