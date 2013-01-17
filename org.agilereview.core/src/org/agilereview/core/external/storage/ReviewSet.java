@@ -166,9 +166,7 @@ public final class ReviewSet extends HashSet<Review> implements PropertyChangeLi
      * @author Thilo Rauch (26.11.2012)
      */
     public Object getValue(String key) {
-        if (key == null) {
-            return null;
-        }
+        if (key == null) { return null; }
         return genericMap.get(key);
     }
     
@@ -198,5 +196,27 @@ public final class ReviewSet extends HashSet<Review> implements PropertyChangeLi
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
         propertyChangeSupport.firePropertyChange(evt);
+    }
+    
+    /* (non-Javadoc)
+     * @see java.lang.Object#equals(java.lang.Object)
+     * @author Malte Brunnlieb (17.01.2013)
+     */
+    @Override
+    public boolean equals(Object obj) {
+        if (obj != null) {
+            return hashCode() == obj.hashCode();
+        } else {
+            return false;
+        }
+    }
+    
+    /* (non-Javadoc)
+     * @see java.lang.Object#hashCode()
+     * @author Malte Brunnlieb (17.01.2013)
+     */
+    @Override
+    public int hashCode() {
+        return (int) (super.hashCode() ^ serialVersionUID);
     }
 }

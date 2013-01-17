@@ -104,10 +104,9 @@ public class Review implements PropertyChangeListener, IPreferenceChangeListener
     }
     
     protected void finalize() throws Throwable {
-    	InstanceScope.INSTANCE.getNode(Activator.PLUGIN_ID).removePreferenceChangeListener(this);
-    	super.finalize();
+        InstanceScope.INSTANCE.getNode(Activator.PLUGIN_ID).removePreferenceChangeListener(this);
+        super.finalize();
     }
-    
     
     /**
      * @return the ID of the {@link Review}
@@ -268,7 +267,7 @@ public class Review implements PropertyChangeListener, IPreferenceChangeListener
      * @author Peter Reuter (06.12.2012)
      */
     public boolean getIsActive() {
-    	return this.isActive;
+        return this.isActive;
     }
     
     /**
@@ -276,7 +275,7 @@ public class Review implements PropertyChangeListener, IPreferenceChangeListener
      * @author Peter Reuter (06.12.2012)
      */
     public void setToActive() {
-    	setIsActive(true);
+        setIsActive(true);
     }
     
     /**
@@ -285,27 +284,27 @@ public class Review implements PropertyChangeListener, IPreferenceChangeListener
      * @author Peter Reuter (06.12.2012)
      */
     private void setIsActive(boolean isActive) {
-    	String id = null;
-    	if (isActive) {
-    		// current review will be the active one
-    		id = this.id;
-    	} else {
-    		// current review was active, now should no longer be the active one --> no active review available
-    		if (this.isActive) {
-    			id = "";
-    		}
-    	}
-    	
-    	if (id != null) {
-    		IEclipsePreferences preferences = InstanceScope.INSTANCE.getNode(Activator.PLUGIN_ID);
-    		preferences.put(AgileReviewPreferences.ACTIVE_REVIEW_ID, this.id);
-        	try {
-    			preferences.flush();
-    		} catch (BackingStoreException e) {
-    			String message = "AgileReview could not persistently save the ID of the active review.";
-    			ExceptionHandler.logAndNotifyUser(e, message);
-    		}	
-    	}
+        String id = null;
+        if (isActive) {
+            // current review will be the active one
+            id = this.id;
+        } else {
+            // current review was active, now should no longer be the active one --> no active review available
+            if (this.isActive) {
+                id = "";
+            }
+        }
+        
+        if (id != null) {
+            IEclipsePreferences preferences = InstanceScope.INSTANCE.getNode(Activator.PLUGIN_ID);
+            preferences.put(AgileReviewPreferences.ACTIVE_REVIEW_ID, this.id);
+            try {
+                preferences.flush();
+            } catch (BackingStoreException e) {
+                String message = "AgileReview could not persistently save the ID of the active review.";
+                ExceptionHandler.logAndNotifyUser(e, message);
+            }
+        }
     }
     
     /**
@@ -378,59 +377,49 @@ public class Review implements PropertyChangeListener, IPreferenceChangeListener
         }
         preferences.put(AgileReviewPreferences.OPEN_REVIEWS, reviewIdsPref);
         try {
-			preferences.flush();
-		} catch (BackingStoreException e) {
-			String message = "AgileReview could not persistently save list of open Reviews.";
-			ExceptionHandler.logAndNotifyUser(e, message);
-		}
-    }
-
-	//////////////////////////////////////////
-	// methods of IPreferenceChangeListener //
-	//////////////////////////////////////////
-    
-	/* (non-Javadoc)
-	 * @see org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener#preferenceChange(org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent)
-	 * @author Peter Reuter (17.01.2013)
-	 */
-	@Override
-	public void preferenceChange(PreferenceChangeEvent event) {
-		if (AgileReviewPreferences.ACTIVE_REVIEW_ID.equals(event.getKey())) {
-			boolean oldValue = this.isActive;
-			this.isActive = this.id.equals(event.getNewValue());
-			if (this.isActive != oldValue) {
-				propertyChangeSupport.firePropertyChange("isActive", oldValue, this.isActive);	
-			}			
-		}			
-	}
-	
-	/* (non-Javadoc)
-	 * @see java.lang.Object#hashCode()
-	 * @author Peter Reuter (17.01.2013)
-	 */
-	@Override
-	public int hashCode() {
-		return (this.getId()).hashCode();
-	}
-	
-	/* (non-Javadoc)
-	 * @see java.lang.Object#equals(java.lang.Object)
-	 * @author Peter Reuter (17.01.2013)
-	 */
-	@Override
-	public boolean equals(Object o) {
-		if (o == null) {
-			return false;
-		}
-		if (o.getClass() != getClass()) {
-            return false;
+            preferences.flush();
+        } catch (BackingStoreException e) {
+            String message = "AgileReview could not persistently save list of open Reviews.";
+            ExceptionHandler.logAndNotifyUser(e, message);
         }
-		Review reviewToCompare = (Review) o;
-		if (this.getId().equals(reviewToCompare.getId())) {
-			return true;
-		}
-		return false;
-	}
+    }
+    
+    /* (non-Javadoc)
+     * @see org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener#preferenceChange(org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent)
+     * @author Peter Reuter (17.01.2013)
+     */
+    @Override
+    public void preferenceChange(PreferenceChangeEvent event) {
+        if (AgileReviewPreferences.ACTIVE_REVIEW_ID.equals(event.getKey())) {
+            boolean oldValue = this.isActive;
+            this.isActive = this.id.equals(event.getNewValue());
+            if (this.isActive != oldValue) {
+                propertyChangeSupport.firePropertyChange("isActive", oldValue, this.isActive);
+            }
+        }
+    }
+    
+    /* (non-Javadoc)
+     * @see java.lang.Object#hashCode()
+     * @author Peter Reuter (17.01.2013)
+     */
+    @Override
+    public int hashCode() {
+        return (this.getId()).hashCode();
+    }
+    
+    /* (non-Javadoc)
+     * @see java.lang.Object#equals(java.lang.Object)
+     * @author Peter Reuter (17.01.2013)
+     */
+    @Override
+    public boolean equals(Object o) {
+        if (o == null) { return false; }
+        if (o.getClass() != getClass()) { return false; }
+        Review reviewToCompare = (Review) o;
+        if (this.getId().equals(reviewToCompare.getId())) { return true; }
+        return false;
+    }
     
     /* (non-Javadoc)
      * @see java.lang.Object#toString()

@@ -202,7 +202,7 @@ public class TagParser {
     private boolean parseStartTag(HashSet<String> corruptedCommentKeys, Matcher matcher, IRegion tagRegion) throws BadLocationException {
         boolean tagDeleted = false;
         Position[] tagPositions;
-        if (matcher.group(1).equals("?")) {
+        if (matcher.group(1) != null && matcher.group(1).equals("?")) {
             String key = matcher.group(2).trim();
             tagPositions = idTagPositions.get(key);
             // begin tag
@@ -232,7 +232,7 @@ public class TagParser {
     private boolean parseEndTag(HashSet<String> corruptedCommentKeys, Matcher matcher, IRegion tagRegion) throws BadLocationException {
         boolean tagDeleted = false;
         Position[] tagPositions;
-        if (matcher.group(3).equals("?")) {
+        if (matcher.group(3) != null && matcher.group(3).equals("?")) {
             String key = matcher.group(2).trim();
             tagPositions = idTagPositions.get(key);
             // end tag

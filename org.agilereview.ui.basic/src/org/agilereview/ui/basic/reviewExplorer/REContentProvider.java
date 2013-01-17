@@ -21,7 +21,7 @@ import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.widgets.Display;
 
 /**
- * The ReviewExplorerContentProvider provides the content for the tree viewer of the {@link ReviewExplorer}
+ * The ReviewExplorerContentProvider provides the content for the tree viewer of the {@link ReviewExplorerView}
  * 
  * @author Thilo Rauch (28.03.2012)
  */
@@ -37,7 +37,13 @@ public class REContentProvider implements ITreePathContentProvider, PropertyChan
      */
     private TreeViewer viewer;
     
-    REContentProvider() {
+    /**
+     * Creates a new instance of the {@link REContentProvider} for the given {@link TreeViewer}
+     * @param viewer {@link TreeViewer} for which this {@link REContentProvider} should deliver contents
+     * @author Malte Brunnlieb (17.01.2013)
+     */
+    REContentProvider(TreeViewer viewer) {
+        this.viewer = viewer;
     }
     
     @Override
@@ -46,9 +52,6 @@ public class REContentProvider implements ITreePathContentProvider, PropertyChan
     
     @Override
     public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
-        // Capture viewer
-        this.viewer = (TreeViewer) viewer;
-        
         // Deregister listener
         if (oldInput instanceof ReviewSet) {
             ((ReviewSet) oldInput).removePropertyChangeListener(this);
@@ -58,9 +61,6 @@ public class REContentProvider implements ITreePathContentProvider, PropertyChan
             reviews = (ReviewSet) newInput;
             // Add PropertyChangeListener
             reviews.addPropertyChangeListener(this);
-            
-            // Now refresh the data and the viewer
-            updateViewer();
         }
     }
     
@@ -140,7 +140,6 @@ public class REContentProvider implements ITreePathContentProvider, PropertyChan
                 .getPropertyName().equals("isActive")))
                 || (evt.getSource() instanceof ReviewSet && evt.getPropertyName().equals("reviews"))
                 || (evt.getSource() instanceof Comment && evt.getPropertyName().equals("commentedFile"))) {
-            // Update viewer
             updateViewer();
         }
     }
@@ -165,12 +164,17 @@ public class REContentProvider implements ITreePathContentProvider, PropertyChan
         return result.toArray();
     }
     
+    /**
+     * Updates the viewer by setting the contents again. Due to the lifecycle of the used ReviewSet, it might happen that the objects are recreated.
+     * Only refreshing the tree will cause widget disposed exceptions.
+     * @author Malte Brunnlieb (17.01.2013)
+     */
     private void updateViewer() {
         if (viewer != null) {
             Display.getDefault().syncExec(new Runnable() {
                 @Override
                 public void run() {
-                    viewer.refresh(true);
+                    viewer.setInput(reviews);
                 }
             });
         }

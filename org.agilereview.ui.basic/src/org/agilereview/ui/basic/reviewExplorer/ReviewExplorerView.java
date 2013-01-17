@@ -65,7 +65,7 @@ public class ReviewExplorerView extends AbstractReviewDataView {
     protected void buildUI(final Composite parent, final Object initialInput) {
         // Create the treeview MULTI, H_SCROLL, V_SCROLL, and BORDER
         treeViewer = new TreeViewer(parent);
-        treeViewer.setContentProvider(new REContentProvider());
+        treeViewer.setContentProvider(new REContentProvider(treeViewer));
         treeViewer.setLabelProvider(new RELabelProvider());
         treeViewer.setComparator(new REViewerComparator());
         // Needed so expanding/collapsing of IResources which are displayed multiple times works
