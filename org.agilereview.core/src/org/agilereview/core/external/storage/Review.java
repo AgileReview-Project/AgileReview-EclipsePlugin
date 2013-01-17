@@ -324,14 +324,6 @@ public class Review implements PropertyChangeListener, IPreferenceChangeListener
         propertyChangeSupport.firePropertyChange("description", oldValue, this.description);
     }
     
-    /* (non-Javadoc)
-     * @see java.lang.Object#toString()
-     */
-    @Override
-    public String toString() {
-        return id;
-    }
-    
     /**
      * Adds a {@link PropertyChangeListener} to the list of listeners that are notified on {@link PropertyChangeEvent}s
      * @param listener
@@ -407,5 +399,33 @@ public class Review implements PropertyChangeListener, IPreferenceChangeListener
 			}			
 		}			
 	}
+	
+	@Override
+	public int hashCode() {
+		return (this.getId()).hashCode();
+	}
+	
+	@Override
+	public boolean equals(Object o) {
+		if (o == null) {
+			return false;
+		}
+		if (o.getClass() != getClass()) {
+            return false;
+        }
+		Review reviewToCompare = (Review) o;
+		if (this.getId().equals(reviewToCompare.getId())) {
+			return true;
+		}
+		return false;
+	}
+    
+    /* (non-Javadoc)
+     * @see java.lang.Object#toString()
+     */
+    @Override
+    public String toString() {
+        return "Review '" + this.getName() + "'";
+    }
     
 }

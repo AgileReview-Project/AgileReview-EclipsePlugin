@@ -333,4 +333,31 @@ public final class Comment implements PropertyChangeListener {
 		propertyChangeSupport.firePropertyChange(evt);
 	}
 	
+	@Override
+	public int hashCode() {
+		return (this.getReview().getId() + this.getAuthor() + this.getId()).hashCode();
+	}
+	
+	@Override
+	public boolean equals(Object o) {
+		if (o == null) {
+			return false;
+		}
+		if (o.getClass() != getClass()) {
+            return false;
+        }
+		Comment commentToCompare = (Comment) o;
+		if (this.getReview().equals(commentToCompare.getReview()) 
+				&& this.author.equals(commentToCompare.getAuthor()) 
+				&& this.getId().equals(commentToCompare.getId())) {
+			return true;
+		}
+		return false;
+	}
+		
+	@Override
+	public String toString() {
+		return "Comment '" + this.getId() + "' of author '" + this.getAuthor() + "' in " + this.getReview().toString(); 
+	}
+	
 }

@@ -240,4 +240,42 @@ public final class Reply implements PropertyChangeListener {
 		propertyChangeSupport.firePropertyChange(evt);
 	}
 	
+	@Override
+	public int hashCode() {
+		Object stringForHash = this.getId();
+		
+		Object parentN = this.parent;
+		while (!(parentN instanceof Comment)) {
+			Reply parentReply = (Reply) parentN;
+			stringForHash = parentReply.getId() + stringForHash;
+			parentN = parentReply.getParent();
+		}
+		
+		Comment comment = (Comment) parentN;
+		
+		stringForHash = comment.getReview().getId()+comment.getId()+stringForHash;
+		
+		return stringForHash.hashCode();
+	}
+	
+	@Override
+	public boolean equals(Object o) {
+		if (o == null) {
+			return false;
+		}
+		if (o.getClass() != getClass()) {
+            return false;
+        }
+		Reply replyToCompare = (Reply) o;
+		if (this.getId().equals(replyToCompare.getId()) && this.parent.equals(replyToCompare.parent)) {
+			return true;
+		}
+		return false;
+	}
+	
+	@Override
+	public String toString() {
+		return "Reply '" + this.getId() + "' of author '" + this.getAuthor() + "', in reply to " + this.parent.toString(); 
+	}
+	
 }
