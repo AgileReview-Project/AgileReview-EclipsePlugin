@@ -235,11 +235,19 @@ public final class Reply implements PropertyChangeListener {
         propertyChangeSupport.removePropertyChangeListener(listener);
     }
 
+	/* (non-Javadoc)
+	 * @see java.beans.PropertyChangeListener#propertyChange(java.beans.PropertyChangeEvent)
+	 * @author Peter Reuter (17.01.2013)
+	 */
 	@Override
 	public void propertyChange(PropertyChangeEvent evt) {
 		propertyChangeSupport.firePropertyChange(evt);
 	}
 	
+	/* (non-Javadoc)
+	 * @see java.lang.Object#hashCode()
+	 * @author Peter Reuter (17.01.2013)
+	 */
 	@Override
 	public int hashCode() {
 		Object stringForHash = this.getId();
@@ -258,6 +266,10 @@ public final class Reply implements PropertyChangeListener {
 		return stringForHash.hashCode();
 	}
 	
+	/* (non-Javadoc)
+	 * @see java.lang.Object#equals(java.lang.Object)
+	 * @author Peter Reuter (17.01.2013)
+	 */
 	@Override
 	public boolean equals(Object o) {
 		if (o == null) {
@@ -273,6 +285,10 @@ public final class Reply implements PropertyChangeListener {
 		return false;
 	}
 	
+	/* (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 * @author Peter Reuter (17.01.2013)
+	 */
 	@Override
 	public String toString() {
 		return "Reply '" + this.getId() + "' of author '" + this.getAuthor() + "', in reply to " + this.parent.toString(); 

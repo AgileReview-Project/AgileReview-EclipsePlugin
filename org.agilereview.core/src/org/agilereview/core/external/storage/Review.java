@@ -389,6 +389,10 @@ public class Review implements PropertyChangeListener, IPreferenceChangeListener
 	// methods of IPreferenceChangeListener //
 	//////////////////////////////////////////
     
+	/* (non-Javadoc)
+	 * @see org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener#preferenceChange(org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent)
+	 * @author Peter Reuter (17.01.2013)
+	 */
 	@Override
 	public void preferenceChange(PreferenceChangeEvent event) {
 		if (AgileReviewPreferences.ACTIVE_REVIEW_ID.equals(event.getKey())) {
@@ -400,11 +404,19 @@ public class Review implements PropertyChangeListener, IPreferenceChangeListener
 		}			
 	}
 	
+	/* (non-Javadoc)
+	 * @see java.lang.Object#hashCode()
+	 * @author Peter Reuter (17.01.2013)
+	 */
 	@Override
 	public int hashCode() {
 		return (this.getId()).hashCode();
 	}
 	
+	/* (non-Javadoc)
+	 * @see java.lang.Object#equals(java.lang.Object)
+	 * @author Peter Reuter (17.01.2013)
+	 */
 	@Override
 	public boolean equals(Object o) {
 		if (o == null) {
