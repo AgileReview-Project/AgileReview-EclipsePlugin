@@ -115,6 +115,10 @@ public class EditorParserController extends AbstractController<IEditorParser> im
             String[] fileendings = fileSupportMap.get(file.getFileExtension());
             if (fileendings != null) {
                 parser.addTagsToEditorSelection(editor, tagId, fileendings);
+                if (!perspectiveOpen) {
+                    //remove parser after adding tags in order to control the highlighting
+                    parser.removeAllInstances();
+                }
             } else {
                 // No annotations supported TODO: perhaps notify with "remember my answer"
             }

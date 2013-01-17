@@ -434,4 +434,27 @@
              name="org.agilereview.comment.annotation.Author10">
        </type>
     </extension>
+    <extension
+          point="org.eclipse.ui.contexts">
+       <context
+             description="Enabled when the AgileReview perspective is open"
+             id="org.agilereview.core.contexts.perspectiveopen"
+             name="AgileReview Perspective open">
+       </context>
+    </extension>
+    <extension
+         point="org.eclipse.ui.bindings">
+      <key
+            commandId="org.agilereview.core.newComment"
+            contextId="org.agilereview.core.contexts.perspectiveopen"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="M1+M2++">
+      </key>
+      <key
+            commandId="org.agilereview.core.deleteComment"
+            contextId="org.agilereview.core.contexts.perspectiveopen"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="M1+M2+-">
+      </key>
+   </extension>
 </plugin>

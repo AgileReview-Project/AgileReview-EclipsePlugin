@@ -7,6 +7,7 @@
  */
 package org.agilereview.core;
 
+import org.agilereview.core.controller.ContextController;
 import org.agilereview.core.controller.RegistryListener;
 import org.agilereview.core.controller.extension.EditorParserController;
 import org.agilereview.core.controller.extension.ExtensionControllerFactory;
@@ -45,7 +46,13 @@ public class Activator extends AbstractUIPlugin {
     public void start(BundleContext context) throws Exception {
         super.start(context);
         plugin = this;
-        registerListeners();
+        new Thread(new Runnable() {
+            
+            @Override
+            public void run() {
+                registerListeners();
+            }
+        }).start();
     }
     
     /*
@@ -75,5 +82,6 @@ public class Activator extends AbstractUIPlugin {
                 .getExtensionController(ExtensionPoint.ReviewDataReceiver));
         new RegistryListener(StorageController.ISTORAGECLIENT_ID, ExtensionControllerFactory.getExtensionController(ExtensionPoint.StorageClient));
         new RegistryListener(EditorParserController.IEDITORPARSER_ID, ExtensionControllerFactory.getExtensionController(ExtensionPoint.EditorParser));
+        new ContextController();
     }
 }

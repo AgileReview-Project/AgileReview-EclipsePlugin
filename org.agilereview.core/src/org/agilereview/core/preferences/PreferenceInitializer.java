@@ -20,6 +20,9 @@ import org.eclipse.swt.widgets.Display;
  */
 public class PreferenceInitializer extends AbstractPreferenceInitializer {
     
+    /**
+     * States whether all preferences have been initialized
+     */
     public static volatile boolean isInitialized = false;
     
     @Override
@@ -47,6 +50,7 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
             }
         });
         
+        @SuppressWarnings("unchecked")
         Enumeration<String> properties = (Enumeration<String>) pref.propertyNames();
         while (properties.hasMoreElements()) {
             String next = properties.nextElement();
