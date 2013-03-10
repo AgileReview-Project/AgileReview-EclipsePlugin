@@ -34,6 +34,10 @@ public class ContentProvider extends AbstractReviewDataReceiver implements IStru
      * The comments to be displayed (model of TableViewer viewer)
      */
     private final ArrayList<Comment> comments = new ArrayList<Comment>();
+    /**
+     * Currently provided {@link ReviewSet}
+     */
+    private ReviewSet reviewSet;
     
     /**
      * @return the instance
@@ -52,6 +56,15 @@ public class ContentProvider extends AbstractReviewDataReceiver implements IStru
     }
     
     /**
+     * Returns the currently provided {@link ReviewSet}
+     * @return the currently provided {@link ReviewSet}
+     * @author Malte Brunnlieb (10.03.2013)
+     */
+    public ReviewSet getReviewSet() {
+        return reviewSet;
+    }
+    
+    /**
      * {@inheritDoc}
      * @see org.eclipse.jface.viewers.IContentProvider#dispose()
      * @author Malte Brunnlieb (27.05.2012)
@@ -66,6 +79,7 @@ public class ContentProvider extends AbstractReviewDataReceiver implements IStru
      */
     @Override
     protected Object transformData(ReviewSet rawData) {
+        reviewSet = rawData;
         comments.clear();
         for (Review r : rawData) {
             comments.addAll(r.getComments());

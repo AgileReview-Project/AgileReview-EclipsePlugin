@@ -15,6 +15,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import org.agilereview.core.external.definition.IReviewDataReceiver;
 
@@ -218,5 +219,24 @@ public final class ReviewSet extends HashSet<Review> implements PropertyChangeLi
     @Override
     public int hashCode() {
         return (int) (super.hashCode() ^ serialVersionUID);
+    }
+    
+    /**
+     * Sets the given comments as the current filter for the given source. In order to provide different parallel filter mechanisms, a filter depends
+     * on its managing source object
+     * @param source object which manages the filter mechanism
+     * @param comments the filtered set of comments to be shown
+     * @author Malte Brunnlieb (10.03.2013)
+     */
+    public void publishFilter(Object source, Set<Comment> comments) {
+        for (Review r : this) {
+            for (Comment c : r.getComments()) {
+                if (comments.contains(c)) {
+                    c.filteredBy.remove(source);
+                } else {
+                    c.filteredBy.add(source);
+                }
+            }
+        }
     }
 }

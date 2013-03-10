@@ -16,7 +16,9 @@ import java.util.Map;
 import java.util.Set;
 
 import org.agilereview.common.exception.ExceptionHandler;
+import org.agilereview.core.external.storage.Comment;
 import org.agilereview.core.external.storage.Review;
+import org.agilereview.core.external.storage.ReviewSet;
 import org.agilereview.ui.basic.commentSummary.CSTableViewer;
 import org.agilereview.ui.basic.commentSummary.CSToolBar;
 import org.agilereview.ui.basic.commentSummary.filter.ExplorerSelectionFilter;
@@ -35,6 +37,7 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
+import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.ui.ISelectionListener;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.PlatformUI;
@@ -59,6 +62,10 @@ public class FilterController extends SelectionAdapter implements Listener, KeyL
      */
     private SearchFilter currentSearchFilter;
     /**
+     * Currently provided {@link ReviewSet}
+     */
+    private ReviewSet reviewSet;
+    /**
      * The current {@link ExplorerSelectionFilter} set on the {@link CSTableViewer}
      */
     private ExplorerSelectionFilter currentExplorerSelectionFilter;
@@ -68,12 +75,14 @@ public class FilterController extends SelectionAdapter implements Listener, KeyL
      * @param toolBar {@link CSToolBar} which sets the filter mechanisms
      * @param viewer {@link CSTableViewer} of the comment table
      * @param searchFilter initiating {@link SearchFilter}
+     * @param reviewSet currently provided {@link ReviewSet}
      * @author Malte Brunnlieb (03.05.2012)
      */
-    public FilterController(CSToolBar toolBar, CSTableViewer viewer, SearchFilter searchFilter) {
+    public FilterController(CSToolBar toolBar, CSTableViewer viewer, SearchFilter searchFilter, ReviewSet reviewSet) {
         this.toolBar = toolBar;
         this.tableViewer = viewer;
         this.currentSearchFilter = searchFilter;
+        this.reviewSet = reviewSet;
     }
     
     /* (non-Javadoc)
@@ -82,7 +91,6 @@ public class FilterController extends SelectionAdapter implements Listener, KeyL
      */
     @Override
     public void keyPressed(KeyEvent e) {
-        // not needed
     }
     
     /* (non-Javadoc)
@@ -93,7 +101,7 @@ public class FilterController extends SelectionAdapter implements Listener, KeyL
     public void keyReleased(KeyEvent e) {
         currentSearchFilter.setSearchText(toolBar.getSearchText());
         tableViewer.refresh();
-        //filterComments(); //TODO perhaps get filtered comments of viewer??
+        reviewSet.publishFilter(this, getFilteredComments());
     }
     
     /* (non-Javadoc)
@@ -127,7 +135,7 @@ public class FilterController extends SelectionAdapter implements Listener, KeyL
         } else {
             tableViewer.removeFilter(openFilter);
         }
-        //filterComments(); //TODO remove?! wird glaub ich nicht mehr gebraucht
+        reviewSet.publishFilter(this, getFilteredComments());
     }
     
     /**
@@ -209,5 +217,20 @@ public class FilterController extends SelectionAdapter implements Listener, KeyL
         }
         
         return paths;
+    }
+    
+    /**
+     * Returns all currently shown comments of the table
+     * @return comments of all currently displayed comments
+     * @author Malte Brunnlieb (10.03.2013)
+     */
+    private HashSet<Comment> getFilteredComments() {
+        HashSet<Comment> comments = new HashSet<Comment>();
+        for (TableItem i : tableViewer.getTable().getItems()) {
+            if (i.getData() instanceof Comment) {
+                comments.add((Comment) i.getData());
+            }
+        }
+        return comments;
     }
 }

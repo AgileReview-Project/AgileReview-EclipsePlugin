@@ -12,7 +12,9 @@ import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.agilereview.core.Activator;
 import org.agilereview.core.external.definition.IStorageClient;
@@ -71,6 +73,11 @@ public final class Comment implements PropertyChangeListener {
      * A list of replies that were made to the comment
      */
     private List<Reply> replies = new ArrayList<Reply>(0);
+    
+    /**
+     * A set of sources filtering this comment
+     */
+    Set<Object> filteredBy = new HashSet<Object>();
     /**
      * {@link PropertyChangeSupport} of this POJO, used for firing {@link PropertyChangeEvent}s on changes of fields.
      */
@@ -371,4 +378,12 @@ public final class Comment implements PropertyChangeListener {
         return "Comment '" + this.getId() + "' of author '" + this.getAuthor() + "' in " + this.getReview().toString();
     }
     
+    /**
+     * Checks whether the comment is filtered by any object
+     * @return <code>true</code> if the comment is not filtered by any object<br><code>false</code> otherwise
+     * @author Malte Brunnlieb (10.03.2013)
+     */
+    public boolean isFilteredToBeShown() {
+        return !filteredBy.isEmpty();
+    }
 }

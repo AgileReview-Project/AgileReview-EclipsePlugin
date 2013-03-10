@@ -105,7 +105,8 @@ public class CommentSummaryView extends AbstractReviewDataView {
         toolBar = new CSToolBar(parent);
         
         viewer = new CSTableViewer(parent);
-        viewer.setContentProvider(ContentProvider.getInstance());
+        ContentProvider cp = ContentProvider.getInstance();
+        viewer.setContentProvider(cp);
         ColumnComparator comparator = new ColumnComparator();
         viewer.setComparator(comparator);
         SearchFilter commentFilter = new SearchFilter(null);
@@ -114,7 +115,7 @@ public class CommentSummaryView extends AbstractReviewDataView {
         viewer.addDoubleClickListener(new ViewController(viewer));
         getSite().setSelectionProvider(viewer);
         
-        filterController = new FilterController(toolBar, viewer, commentFilter);
+        filterController = new FilterController(toolBar, viewer, commentFilter, cp.getReviewSet());
         toolBar.setListeners(filterController);
         getSite().getWorkbenchWindow().getSelectionService().addSelectionListener("org.agilereview.ui.basic.reviewExplorerView", filterController);
         parent.layout();
