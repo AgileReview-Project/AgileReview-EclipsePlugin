@@ -8,6 +8,7 @@
 package org.agilereview.test.mock.editorparser.external;
 
 import org.agilereview.core.external.definition.IEditorParser;
+import org.agilereview.core.external.storage.Comment;
 import org.eclipse.ui.IEditorPart;
 
 /**
@@ -40,29 +41,11 @@ public class EditorParserMock implements IEditorParser {
     }
     
     /* (non-Javadoc)
-     * @see org.agilereview.core.external.definition.IEditorParser#clearAllTags()
-     * @author Malte Brunnlieb (20.11.2012)
-     */
-    @Override
-    public void clearAllTags() {
-        // do nothing for the moment
-    }
-    
-    /* (non-Javadoc)
-     * @see org.agilereview.core.external.definition.IEditorParser#reparse()
-     * @author Malte Brunnlieb (20.11.2012)
-     */
-    @Override
-    public void reparse() {
-        // do nothing for the moment
-    }
-    
-    /* (non-Javadoc)
      * @see org.agilereview.core.external.definition.IEditorParser#addTagsToEditorSelection(org.eclipse.ui.IEditorPart, java.lang.String, java.lang.String[])
      * @author Malte Brunnlieb (05.12.2012)
      */
     @Override
-    public void addTagsToEditorSelection(IEditorPart editor, String tagId, String[] multiLineCommentTags) {
+    public void addTagsToEditorSelection(IEditorPart editor, Comment comment, String[] multiLineCommentTags) {
         // do nothing for the moment
     }
     
@@ -71,7 +54,7 @@ public class EditorParserMock implements IEditorParser {
      * @author Malte Brunnlieb (05.12.2012)
      */
     @Override
-    public void removeTagsInEditor(IEditorPart editor, String tagId, String[] multiLineCommentTags) {
+    public void removeTagsInEditor(IEditorPart editor, Comment comment, String[] multiLineCommentTags) {
         // do nothing for the moment
     }
     

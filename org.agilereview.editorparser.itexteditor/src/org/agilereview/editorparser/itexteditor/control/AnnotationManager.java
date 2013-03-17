@@ -25,7 +25,7 @@ public class AnnotationManager {
     /**
      * The color manager for author color management
      */
-    private ColorManager colorManager = new ColorManager();
+    private final ColorManager colorManager = new ColorManager();
     /**
      * The texteditor's annotation model
      */
@@ -33,7 +33,7 @@ public class AnnotationManager {
     /**
      * The annotations added by AgileReview to the editor's annotation model
      */
-    private final HashMap<String, Annotation> annotationMap = new HashMap<String, Annotation>();
+    private final HashMap<Comment, Annotation> annotationMap = new HashMap<Comment, Annotation>();
     
     /**
      * Creates a new AgileAnnotationModel
@@ -55,53 +55,54 @@ public class AnnotationManager {
     /**
      * Displays the given positions as annotations in the provided editor. Therefore annotations which should not be displayed any more will be
      * removed and not yet drawn annotations will be added to the annotation model.
-     * @param keyPositionMap a map of Positions which should be annotated and the comment keys correlated to the positions
+     * @param commentPositionMap a map of Positions which should be annotated and the comment keys correlated to the positions
      */
-    void displayAnnotations(Map<String, Position> keyPositionMap) {
-        if (keyPositionMap == null) keyPositionMap = new HashMap<String, Position>();
+    void displayAnnotations(Map<Comment, Position> commentPositionMap) {
+        if (commentPositionMap == null) commentPositionMap = new HashMap<Comment, Position>();
         
         //add annotations that are not already displayed
         Map<Annotation, Position> annotationsToAdd = new HashMap<Annotation, Position>();
-        for (String s : keyPositionMap.keySet()) {
-            if (!annotationMap.containsKey(s)) {
-                Annotation annotation = createNewAnnotation(s);
+        for (Comment comment : commentPositionMap.keySet()) {
+            if (!annotationMap.containsKey(comment) && comment.isFilteredToBeShown()) {
+                Annotation annotation = createNewAnnotation(comment);
                 if (annotation != null) {
-                    annotationsToAdd.put(annotation, keyPositionMap.get(s));
+                    annotationsToAdd.put(annotation, commentPositionMap.get(comment));
                 }
             }
         }
         //remove annotations that should not be displayed
         ArrayList<Annotation> annotationsToRemove = new ArrayList<Annotation>();
-        ArrayList<String> keysToDelete = new ArrayList<String>();
-        for (String key : annotationMap.keySet()) {
-            if (!keyPositionMap.containsKey(key)) {
-                annotationsToRemove.add(annotationMap.get(key));
-                keysToDelete.add(key);
+        ArrayList<Comment> commentsToDelete = new ArrayList<Comment>();
+        for (Comment comment : annotationMap.keySet()) {
+            if (!commentPositionMap.containsKey(comment) || !comment.isFilteredToBeShown()) {
+                annotationsToRemove.add(annotationMap.get(comment));
+                commentsToDelete.add(comment);
             }
         }
         annotationModel.replaceAnnotations(annotationsToRemove.toArray(new Annotation[0]), annotationsToAdd);
-        annotationMap.keySet().removeAll(keysToDelete);
+        annotationMap.keySet().removeAll(commentsToDelete);
     }
     
     /**
      * Updates the given comment annotations in the provided editor to the given positions
-     * @param keyPositionMap a map of updated positions and the comment keys correlated to the positions
+     * @param commentPositionMap a map of updated positions and the comment keys correlated to the positions
      */
-    void updateAnnotations(Map<String, Position> keyPositionMap) {
-        for (String key : keyPositionMap.keySet()) {
-            if (annotationMap.get(key) != null) {
-                annotationModel.modifyAnnotationPosition(annotationMap.get(key), keyPositionMap.get(key));
+    void updateAnnotations(Map<Comment, Position> commentPositionMap) {
+        for (Comment comment : commentPositionMap.keySet()) {
+            if (annotationMap.get(comment) != null) {
+                annotationModel.modifyAnnotationPosition(annotationMap.get(comment), commentPositionMap.get(comment));
             }
         }
     }
     
     /**
      * Adds a new annotation at a given position p.
-     * @param commentKey The tag key of the comment for which this annotation holds
+     * @param comment {@link Comment} for which this annotation holds
      * @param p The position to add the annotation on.
      */
-    void addAnnotation(String commentKey, Position p) {
-        Annotation annotation = createNewAnnotation(commentKey);
+    void addAnnotation(Comment comment, Position p) {
+        if (!comment.isFilteredToBeShown()) return;
+        Annotation annotation = createNewAnnotation(comment);
         if (annotation != null) {
             ((IAnnotationModel) this.annotationModel).addAnnotation(annotation, p);
         }
@@ -109,10 +110,10 @@ public class AnnotationManager {
     
     /**
      * Deletes all annotations correlating to the given comment keys
-     * @param tagId unique tag key of the comment annotation which should be deleted
+     * @param comment {@link Comment} which annotation should be deleted
      */
-    void deleteAnnotation(String tagId) {
-        Annotation a = annotationMap.remove(tagId);
+    void deleteAnnotation(Comment comment) {
+        Annotation a = annotationMap.remove(comment);
         if (a != null) {
             a.markDeleted(true);
         }
@@ -141,26 +142,25 @@ public class AnnotationManager {
      * @param p position
      * @return all comments which are overlapping with the given {@link Position}
      */
-    String[] getCommentsByPosition(Position p) {
-        HashSet<String> commentKeys = new HashSet<String>();
+    Comment[] getCommentsByPosition(Position p) {
+        HashSet<Comment> commentKeys = new HashSet<Comment>();
         Position tmp;
-        for (String key : annotationMap.keySet()) {
-            tmp = ((IAnnotationModel) this.annotationModel).getPosition(annotationMap.get(key));
+        for (Comment comment : annotationMap.keySet()) {
+            tmp = ((IAnnotationModel) this.annotationModel).getPosition(annotationMap.get(comment));
             if (tmp.overlapsWith(p.getOffset(), p.getLength())) {
-                commentKeys.add(key);
+                commentKeys.add(comment);
             }
         }
-        return commentKeys.toArray(new String[0]);
+        return commentKeys.toArray(new Comment[0]);
     }
     
     /**
      * Creates a new annotation for a given comment key
-     * @param commentKey for which an annotation will be created
+     * @param comment {@link Comment} for which an annotation will be created
      * @return created annotation or<br>null, if the comment is not known
      */
-    private Annotation createNewAnnotation(String commentKey) {
+    private Annotation createNewAnnotation(Comment comment) {
         String annotationType;
-        Comment comment = DataManager.getInstance().getComment(commentKey);
         if (comment == null) return null;
         if (colorManager.isMultiColorEnabled() && colorManager.hasCustomizedColor(comment.getAuthor())) {
             annotationType = AgileReviewPreferences.AUTHOR_COLOR_DEFAULT + "_" + new AuthorReservationPreferences().getAuthorTag(comment.getAuthor());
@@ -169,7 +169,16 @@ public class AnnotationManager {
         }
         Annotation annotation = new Annotation(annotationType, true, "Review: " + comment.getReview().getId() + ", Author: " + comment.getAuthor()
                 + ", Comment-ID: " + comment.getId());
-        this.annotationMap.put(commentKey, annotation);
+        this.annotationMap.put(comment, annotation);
         return annotation;
+    }
+    
+    /**
+     * Returns the {@link Set} of {@link Comment}s which are currently displayed (annotated)
+     * @return the {@link Set} of {@link Comment}s which are currently displayed (annotated)
+     * @author Malte Brunnlieb (17.03.2013)
+     */
+    public HashSet<Comment> getCurrentlyDisplayedComments() {
+        return new HashSet<Comment>(annotationMap.keySet());
     }
 }

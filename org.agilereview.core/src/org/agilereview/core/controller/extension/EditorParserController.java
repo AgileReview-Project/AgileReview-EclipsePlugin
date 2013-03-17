@@ -14,6 +14,7 @@ import org.agilereview.common.exception.ExceptionHandler;
 import org.agilereview.common.ui.PlatformUITools;
 import org.agilereview.core.Activator;
 import org.agilereview.core.external.definition.IEditorParser;
+import org.agilereview.core.external.storage.Comment;
 import org.agilereview.core.parser.NullParser;
 import org.agilereview.core.preferences.PreferenceInitializer;
 import org.agilereview.core.preferences.dataprocessing.FileSupportPreferencesFactory;
@@ -103,18 +104,18 @@ public class EditorParserController extends AbstractController<IEditorParser> im
     
     /**
      * Adds comment tags to the current selection of the currently opened editor. The tags will capture the tagId as information.
-     * @param tagId id for identifying the connected comment
+     * @param comment {@link Comment} to be added
      * @param editor {@link IEditorPart} in which the tags should be added
      * @author Malte Brunnlieb (04.12.2012)
      */
-    public void addTagsToEditorSelection(IEditorPart editor, String tagId) {
+    public void addTagsToEditorSelection(IEditorPart editor, Comment comment) {
         IEditorParser parser = getParser(editor.getClass());
         Map<String, String[]> fileSupportMap = FileSupportPreferencesFactory.createFileSupportMap();
         IFile file = (IFile) editor.getEditorInput().getAdapter(IFile.class);
         if (file != null) {
             String[] fileendings = fileSupportMap.get(file.getFileExtension());
             if (fileendings != null) {
-                parser.addTagsToEditorSelection(editor, tagId, fileendings);
+                parser.addTagsToEditorSelection(editor, comment, fileendings);
                 if (!perspectiveOpen) {
                     //remove parser after adding tags in order to control the highlighting
                     parser.removeAllInstances();
@@ -129,18 +130,18 @@ public class EditorParserController extends AbstractController<IEditorParser> im
     
     /**
      * Removes all tags according to the given tagId
-     * @param tagId id of the comment to be removed
+     * @param comment {@link Comment} to be removed
      * @param editor {@link IEditorPart} in which the tags with the given id should be removed
      * @author Malte Brunnlieb (04.12.2012)
      */
-    public void removeTags(IEditorPart editor, String tagId) {
+    public void removeTags(IEditorPart editor, Comment comment) {
         IEditorParser parser = getParser(editor.getClass());
         Map<String, String[]> fileSupportMap = FileSupportPreferencesFactory.createFileSupportMap();
         IFile file = (IFile) editor.getEditorInput().getAdapter(IFile.class);
         if (file != null) {
             String[] fileendings = fileSupportMap.get(file.getFileExtension());
             if (fileendings != null) {
-                parser.removeTagsInEditor(editor, tagId, fileendings);
+                parser.removeTagsInEditor(editor, comment, fileendings);
             } else {
                 // No annotations supported TODO: perhaps notify with "remember my answer"
             }

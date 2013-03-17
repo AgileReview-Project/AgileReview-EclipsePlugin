@@ -12,6 +12,7 @@ import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -31,7 +32,7 @@ public final class Comment implements PropertyChangeListener {
     /**
      * The id of the comment that is retrieved from an {@link IStorageClient}
      */
-    private String id;
+    private final String id;
     /**
      * The {@link IFile} underlying the editor in which the comment was added
      */
@@ -73,15 +74,14 @@ public final class Comment implements PropertyChangeListener {
      * A list of replies that were made to the comment
      */
     private List<Reply> replies = new ArrayList<Reply>(0);
-    
     /**
      * A set of sources filtering this comment
      */
-    Set<Object> filteredBy = new HashSet<Object>();
+    Set<Object> filteredBy = Collections.synchronizedSet(new HashSet<Object>());
     /**
      * {@link PropertyChangeSupport} of this POJO, used for firing {@link PropertyChangeEvent}s on changes of fields.
      */
-    private PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(this);
+    private final PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(this);
     
     /**
      * Constructor that should be used if a new comment is created.
@@ -361,11 +361,17 @@ public final class Comment implements PropertyChangeListener {
      */
     @Override
     public boolean equals(Object o) {
-        if (o == null) { return false; }
-        if (o.getClass() != getClass()) { return false; }
+        if (o == null) {
+            return false;
+        }
+        if (o.getClass() != getClass()) {
+            return false;
+        }
         Comment commentToCompare = (Comment) o;
         if (this.getReview().equals(commentToCompare.getReview()) && this.author.equals(commentToCompare.getAuthor())
-                && this.getId().equals(commentToCompare.getId())) { return true; }
+                && this.getId().equals(commentToCompare.getId())) {
+            return true;
+        }
         return false;
     }
     

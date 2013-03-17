@@ -81,7 +81,7 @@ public abstract class AbstractReviewDataView extends ViewPart {
     /**
      * Simple object for thread synchronization
      */
-    private Object syncObject = new Object();
+    private final Object syncObject = new Object();
     
     /* (non-Javadoc)
      * @see org.eclipse.ui.part.WorkbenchPart#createPartControl(org.eclipse.swt.widgets.Composite)
@@ -109,7 +109,7 @@ public abstract class AbstractReviewDataView extends ViewPart {
             viewInput = input;
             buildRightUI();
             if (input != null) {
-                Display.getDefault().syncExec(new Runnable() {
+                Display.getDefault().asyncExec(new Runnable() {
                     @Override
                     public void run() {
                         refreshInput(input);
@@ -119,17 +119,10 @@ public abstract class AbstractReviewDataView extends ViewPart {
         }
     }
     
-/**
-     * Method for the binding framework to find the data receiver corresponding to this view.
-     * Should look like (with regard to sample):
-     * <p><blockquote><pre>
-     * {@code 
-     *     @Override
-     *     public Class<? extends AbstractReviewDataReceiver> getReviewDataReceiverClass() {
-     *          return MyViewDataReceiver.class;
-     *     }
-     * }
-     * </pre></blockquote></p>
+    /**
+     * Method for the binding framework to find the data receiver corresponding to this view. Should look like (with regard to sample):
+     * <p><blockquote>@Override<br>public Class<? extends AbstractReviewDataReceiver> getReviewDataReceiverClass() {<br> <dd>return
+     * MyViewDataReceiver.class;<br>}</blockquote></p>
      * @return Class of the corresponding data receiver
      * @author Thilo Rauch (13.07.2012)
      */

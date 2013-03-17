@@ -7,6 +7,7 @@
  */
 package org.agilereview.ui.basic.commentSummary;
 
+import org.agilereview.core.external.storage.ReviewSet;
 import org.agilereview.ui.basic.commentSummary.control.FilterController;
 import org.agilereview.ui.basic.commentSummary.control.ViewController;
 import org.agilereview.ui.basic.commentSummary.filter.ColumnComparator;
@@ -42,6 +43,10 @@ public class CommentSummaryView extends AbstractReviewDataView {
      * The {@link FilterController} which manages all filter actions
      */
     private FilterController filterController;
+    /**
+     * Current search filter
+     */
+    private SearchFilter searchFilter;
     
     /**
      * Creates a new {@link CommentSummaryView}
@@ -109,15 +114,12 @@ public class CommentSummaryView extends AbstractReviewDataView {
         viewer.setContentProvider(cp);
         ColumnComparator comparator = new ColumnComparator();
         viewer.setComparator(comparator);
-        SearchFilter commentFilter = new SearchFilter(null);
-        viewer.addFilter(commentFilter);
+        searchFilter = new SearchFilter(null);
+        viewer.addFilter(searchFilter);
         
         viewer.addDoubleClickListener(new ViewController(viewer));
         getSite().setSelectionProvider(viewer);
         
-        filterController = new FilterController(toolBar, viewer, commentFilter, cp.getReviewSet());
-        toolBar.setListeners(filterController);
-        getSite().getWorkbenchWindow().getSelectionService().addSelectionListener("org.agilereview.ui.basic.reviewExplorerView", filterController);
         parent.layout();
     }
     
@@ -127,7 +129,13 @@ public class CommentSummaryView extends AbstractReviewDataView {
      */
     @Override
     protected void refreshInput(Object reviewData) {
-        viewer.setInput(reviewData);
+        if (reviewData instanceof ReviewSet) {
+            viewer.setInput(reviewData);
+            filterController = new FilterController(toolBar, viewer, searchFilter, (ReviewSet) reviewData);
+            getSite().getWorkbenchWindow().getSelectionService()
+                    .addSelectionListener("org.agilereview.ui.basic.reviewExplorerView", filterController);
+            toolBar.setListeners(filterController);
+        }
     }
     
 }

@@ -8,6 +8,7 @@
 package org.agilereview.core.parser;
 
 import org.agilereview.core.external.definition.IEditorParser;
+import org.agilereview.core.external.storage.Comment;
 import org.eclipse.ui.IEditorPart;
 
 /**
@@ -21,7 +22,7 @@ public class NullParser implements IEditorParser {
      * @author Malte Brunnlieb (04.12.2012)
      */
     @Override
-    public void addTagsToEditorSelection(IEditorPart editor, String tagId, String[] multiLineCommentTags) {
+    public void addTagsToEditorSelection(IEditorPart editor, Comment comment, String[] multiLineCommentTags) {
     }
     
     /* (non-Javadoc)
@@ -29,23 +30,7 @@ public class NullParser implements IEditorParser {
      * @author Malte Brunnlieb (04.12.2012)
      */
     @Override
-    public void removeTagsInEditor(IEditorPart editor, String tagId, String[] multiLineCommentTags) {
-    }
-    
-    /* (non-Javadoc)
-     * @see org.agilereview.core.external.definition.IEditorParser#clearAllTags()
-     * @author Malte Brunnlieb (04.12.2012)
-     */
-    @Override
-    public void clearAllTags() {
-    }
-    
-    /* (non-Javadoc)
-     * @see org.agilereview.core.external.definition.IEditorParser#reparse()
-     * @author Malte Brunnlieb (04.12.2012)
-     */
-    @Override
-    public void reparse() {
+    public void removeTagsInEditor(IEditorPart editor, Comment comment, String[] multiLineCommentTags) {
     }
     
     /* (non-Javadoc)

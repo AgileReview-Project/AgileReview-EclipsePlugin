@@ -64,7 +64,7 @@ public class FilterController extends SelectionAdapter implements Listener, KeyL
     /**
      * Currently provided {@link ReviewSet}
      */
-    private ReviewSet reviewSet;
+    private final ReviewSet reviewSet;
     /**
      * The current {@link ExplorerSelectionFilter} set on the {@link CSTableViewer}
      */
@@ -83,6 +83,7 @@ public class FilterController extends SelectionAdapter implements Listener, KeyL
         this.tableViewer = viewer;
         this.currentSearchFilter = searchFilter;
         this.reviewSet = reviewSet;
+        reviewSet.publishFilter(this, getFilteredComments());
     }
     
     /* (non-Javadoc)

@@ -41,7 +41,7 @@ public class DeleteCommentHandler extends AbstractHandler {
                 Object o = it.next();
                 if (o instanceof Comment) {
                     try {
-                        api.deleteComment(((Comment) o).getId());
+                        api.deleteComment((Comment) o);
                     } catch (NoOpenEditorException e) {
                         ExceptionHandler
                                 .warnUser("Wrong usage of Commenting API as currently there is no open editor the comment can be deleted from.");
@@ -53,5 +53,4 @@ public class DeleteCommentHandler extends AbstractHandler {
         
         return null;
     }
-    
 }

@@ -30,11 +30,11 @@ public class CommentingAPI {
     /**
      * {@link StorageController} instance
      */
-    private StorageController sController;
+    private final StorageController sController;
     /**
      * {@link EditorParserController} instance
      */
-    private EditorParserController eController;
+    private final EditorParserController eController;
     
     /**
      * Creates a new instance of the {@link CommentingAPI}
@@ -73,33 +73,36 @@ public class CommentingAPI {
         if (editor == null) throw new NoOpenEditorException();
         
         IEditorPart part = PlatformUITools.getActiveWorkbenchPage().getActiveEditor();
-        if (part == null) { throw new NoOpenEditorException(); }
+        if (part == null) {
+            throw new NoOpenEditorException();
+        }
         IFile file = (IFile) part.getEditorInput().getAdapter(IFile.class);
         
         Review review = getReview(reviewId);
-        if (review == null) { throw new NullArgumentException(
-                "Comment could not be created. Currently no review data are provided by the StorageClient."); }
+        if (review == null) {
+            throw new NullArgumentException("Comment could not be created. Currently no review data are provided by the StorageClient.");
+        }
         String commentId = sController.getNewCommentId(author, review);
         
         Comment newComment = new Comment(commentId, file, review);
         review.addComment(newComment);
-        
-        eController.addTagsToEditorSelection(editor, commentId);
+        eController.addTagsToEditorSelection(editor, newComment);
         return newComment;
     }
     
     /**
      * Deletes the {@link Comment} with the given comment id
-     * @param commentId identifying the {@link Comment} which should be deleted
+     * @param comment {@link Comment} which should be deleted
      * @throws NoOpenEditorException //TODO should be removed when tag parser for IFile has been implemented
      * @author Malte Brunnlieb (17.12.2012)
      */
-    public void deleteComment(String commentId) throws NoOpenEditorException {
+    public void deleteComment(Comment comment) throws NoOpenEditorException {
         IEditorPart part = PlatformUITools.getActiveWorkbenchPage().getActiveEditor();
-        if (part == null) { throw new NoOpenEditorException(); }
-        eController.removeTags(part, commentId);
-        Comment commentToDelete = getComment(commentId);
-        commentToDelete.getReview().deleteComment(commentToDelete);
+        if (part == null) {
+            throw new NoOpenEditorException();
+        }
+        eController.removeTags(part, comment);
+        comment.getReview().deleteComment(comment);
     }
     
     /**
@@ -111,22 +114,8 @@ public class CommentingAPI {
     private Review getReview(String reviewId) {
         Set<Review> reviews = new HashSet<Review>(sController.getAllReviews());
         for (Review r : reviews) {
-            if (r.getId().equals(reviewId)) { return r; }
-        }
-        return null;
-    }
-    
-    /**
-     * Searches for the {@link Comment} with the given id in the current {@link ReviewSet}.
-     * @param commentId {@link Comment} id of the {@link Comment} which should be returned
-     * @return the {@link Comment} searched for<br><code>null</code>, otherwise
-     * @author Malte Brunnlieb (17.12.2012)
-     */
-    private Comment getComment(String commentId) {
-        Set<Review> reviews = new HashSet<Review>(sController.getAllReviews());
-        for (Review r : reviews) {
-            for (Comment c : r.getComments()) {
-                if (c.getId().equals(commentId)) { return c; }
+            if (r.getId().equals(reviewId)) {
+                return r;
             }
         }
         return null;
