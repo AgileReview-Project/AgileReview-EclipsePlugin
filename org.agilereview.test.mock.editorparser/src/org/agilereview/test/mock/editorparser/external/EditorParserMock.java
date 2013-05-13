@@ -54,7 +54,7 @@ public class EditorParserMock implements IEditorParser {
      * @author Malte Brunnlieb (05.12.2012)
      */
     @Override
-    public void removeTagsInEditor(IEditorPart editor, Comment comment, String[] multiLineCommentTags) {
+    public void removeTagsInEditor(IEditorPart editor, String tagId, String[] multiLineCommentTags) {
         // do nothing for the moment
     }
     
@@ -83,6 +83,26 @@ public class EditorParserMock implements IEditorParser {
     @Override
     public void addInstance(IEditorPart editor, String[] multiLineCommentTags) {
         // do nothing for the moment
+    }
+    
+    /* (non-Javadoc)
+     * @see org.agilereview.core.external.definition.IEditorParser#clearAllTags()
+     * @author Malte Brunnlieb (13.05.2013)
+     */
+    @Override
+    public void clearAllTags() {
+        // TODO Auto-generated method stub
+        
+    }
+    
+    /* (non-Javadoc)
+     * @see org.agilereview.core.external.definition.IEditorParser#reparse()
+     * @author Malte Brunnlieb (13.05.2013)
+     */
+    @Override
+    public void reparse() {
+        // TODO Auto-generated method stub
+        
     }
     
 }

@@ -37,7 +37,7 @@ public final class ReviewSet extends HashSet<Review> implements PropertyChangeLi
     /**
      * Map for storing generic values
      */
-    private final Map<String, Object> genericMap = new HashMap<String, Object>();
+    private Map<String, Object> genericMap = new HashMap<String, Object>();
     
     /**
      * {@inheritDoc} <br> Added {@link PropertyChangeSupport} for tracking changes by {@link IReviewDataReceiver}
@@ -167,9 +167,7 @@ public final class ReviewSet extends HashSet<Review> implements PropertyChangeLi
      * @author Thilo Rauch (26.11.2012)
      */
     public Object getValue(String key) {
-        if (key == null) {
-            return null;
-        }
+        if (key == null) { return null; }
         return genericMap.get(key);
     }
     
@@ -233,15 +231,10 @@ public final class ReviewSet extends HashSet<Review> implements PropertyChangeLi
     public void publishFilter(Object source, Set<Comment> comments) {
         for (Review r : this) {
             for (Comment c : r.getComments()) {
-                boolean isFilteredToBeShown = c.isFilteredToBeShown();
                 if (comments.contains(c)) {
-                    c.filteredBy.add(source);
-                } else {
                     c.filteredBy.remove(source);
-                }
-                if (isFilteredToBeShown != c.isFilteredToBeShown()) {
-                    PropertyChangeEvent event = new PropertyChangeEvent(c, "filter", isFilteredToBeShown, c.isFilteredToBeShown());
-                    propertyChangeSupport.firePropertyChange(event);
+                } else {
+                    c.filteredBy.add(source);
                 }
             }
         }

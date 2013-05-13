@@ -104,7 +104,7 @@ public class EditorParserController extends AbstractController<IEditorParser> im
     
     /**
      * Adds comment tags to the current selection of the currently opened editor. The tags will capture the tagId as information.
-     * @param comment {@link Comment} to be added
+     * @param comment for which the tags should be added
      * @param editor {@link IEditorPart} in which the tags should be added
      * @author Malte Brunnlieb (04.12.2012)
      */
@@ -130,18 +130,18 @@ public class EditorParserController extends AbstractController<IEditorParser> im
     
     /**
      * Removes all tags according to the given tagId
-     * @param comment {@link Comment} to be removed
+     * @param tagId id of the comment to be removed
      * @param editor {@link IEditorPart} in which the tags with the given id should be removed
      * @author Malte Brunnlieb (04.12.2012)
      */
-    public void removeTags(IEditorPart editor, Comment comment) {
+    public void removeTags(IEditorPart editor, String tagId) {
         IEditorParser parser = getParser(editor.getClass());
         Map<String, String[]> fileSupportMap = FileSupportPreferencesFactory.createFileSupportMap();
         IFile file = (IFile) editor.getEditorInput().getAdapter(IFile.class);
         if (file != null) {
             String[] fileendings = fileSupportMap.get(file.getFileExtension());
             if (fileendings != null) {
-                parser.removeTagsInEditor(editor, comment, fileendings);
+                parser.removeTagsInEditor(editor, tagId, fileendings);
             } else {
                 // No annotations supported TODO: perhaps notify with "remember my answer"
             }

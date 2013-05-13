@@ -7,11 +7,9 @@
  */
 package org.agilereview.editorparser.itexteditor.control;
 
+import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.util.Collections;
 import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Set;
 
 import org.agilereview.core.external.definition.IReviewDataReceiver;
@@ -23,7 +21,7 @@ import org.agilereview.core.external.storage.ReviewSet;
  * This class manages all data received via the {@link IReviewDataReceiver} interface and triggers painting a filtered set of comments as annotations
  * @author Malte Brunnlieb (22.11.2012)
  */
-public class DataManager implements IReviewDataReceiver {
+public class DataManager implements IReviewDataReceiver, PropertyChangeListener {
     
     /**
      * Current set of reviews provided by the core plug-in
@@ -33,10 +31,6 @@ public class DataManager implements IReviewDataReceiver {
      * Instance created by the AgileReview core plug-in
      */
     private static volatile DataManager instance;
-    /**
-     * {@link PropertyChangeListener}s of this plugin
-     */
-    private final List<PropertyChangeListener> listeners = Collections.synchronizedList(new LinkedList<PropertyChangeListener>());
     
     /**
      * Constructor which saves the current created instance for further usage
@@ -65,11 +59,16 @@ public class DataManager implements IReviewDataReceiver {
     @Override
     public void setReviewData(ReviewSet reviews) {
         this.reviews = reviews;
-        synchronized (listeners) {
-            for (PropertyChangeListener listener : listeners) {
-                reviews.addPropertyChangeListener(listener);
-            }
-        }
+        reviews.addPropertyChangeListener(this);
+    }
+    
+    /* (non-Javadoc)
+     * @see java.beans.PropertyChangeListener#propertyChange(java.beans.PropertyChangeEvent)
+     * @author Malte Brunnlieb (22.11.2012)
+     */
+    @Override
+    public void propertyChange(PropertyChangeEvent arg0) {
+        // TODO Implement Filtermechanism
     }
     
     /**
@@ -82,22 +81,9 @@ public class DataManager implements IReviewDataReceiver {
         Set<Review> reviews = new HashSet<Review>(this.reviews);
         for (Review r : reviews) {
             for (Comment c : r.getComments()) {
-                if (c.getId().equals(id)) {
-                    return c;
-                }
+                if (c.getId().equals(id)) { return c; }
             }
         }
         return null;
     }
-    
-    /**
-     * Adds a {@link PropertyChangeListener} to the current {@link ReviewSet}
-     * @param listener {@link PropertyChangeListener} to be added
-     * @author Malte Brunnlieb (17.03.2013)
-     */
-    public void addPropertyChangeListener(PropertyChangeListener listener) {
-        listeners.add(listener);
-        reviews.addPropertyChangeListener(listener);
-    }
-    
 }

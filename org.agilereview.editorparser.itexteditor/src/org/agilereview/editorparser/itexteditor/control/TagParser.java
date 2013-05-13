@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -43,7 +44,7 @@ public class TagParser {
     /**
      * Commenting tags for this instance
      */
-    private final String[] tags;
+    private String[] tags;
     /**
      * Regular Expression used by this instance
      */
@@ -55,11 +56,15 @@ public class TagParser {
     /**
      * This map lists every comment tag found in the document with its {@link Position}
      */
-    private final HashMap<Comment, Position> commentPositionMap = new HashMap<Comment, Position>();
+    private final TreeMap<String, Position> idPositionMap = new TreeMap<String, Position>();
     /**
      * Position map of all tags
      */
-    private final HashMap<Comment, Position[]> commentTagPositions = new HashMap<Comment, Position[]>();
+    private final TreeMap<String, Position[]> idTagPositions = new TreeMap<String, Position[]>();
+    /**
+     * The currently displayed comments
+     */
+    private final TreeSet<String> displayedComments = new TreeSet<String>();
     /**
      * Document which provides the contents for this instance
      */
@@ -71,7 +76,7 @@ public class TagParser {
     /**
      * Annotation model for this parser
      */
-    private final AnnotationManager annotationManager;
+    private final AnnotationManager annotationModel;
     
     /**
      * Creates a new instance of AnnotationParser with the given input
@@ -90,14 +95,12 @@ public class TagParser {
         
         if (editor.getDocumentProvider() != null) {
             this.document = editor.getDocumentProvider().getDocument(editor.getEditorInput());
-            if (this.document == null) {
-                throw new NoDocumentFoundException();
-            }
+            if (this.document == null) { throw new NoDocumentFoundException(); }
         } else {
             throw new NoDocumentFoundException();
         }
         
-        this.annotationManager = new AnnotationManager(editor);
+        this.annotationModel = new AnnotationManager(editor);
         parseInput();
     }
     
@@ -110,8 +113,8 @@ public class TagParser {
         
         editor.getDocumentProvider().saveDocument(null, editor.getEditorInput(), document, true);
         
-        commentPositionMap.clear();
-        commentTagPositions.clear();
+        idPositionMap.clear();
+        idTagPositions.clear();
         HashSet<String> corruptedCommentKeys = new HashSet<String>();
         IRegion r;
         int startOffset = 0;
@@ -141,11 +144,11 @@ public class TagParser {
             // check for begin tags without end tags
             boolean curruptedBeginTagExists = false;
             TreeSet<Position> positionsToDelete = new TreeSet<Position>();
-            for (Comment comment : commentTagPositions.keySet()) {
-                Position[] ps = commentTagPositions.get(comment);
+            for (String key : idTagPositions.keySet()) {
+                Position[] ps = idTagPositions.get(key);
                 if (ps[1] == null) {
                     // corrupt: begin tag without end tag --> deleting
-                    corruptedCommentKeys.add(comment.getId());
+                    corruptedCommentKeys.add(key);
                     positionsToDelete.add(new ComparablePosition(ps[0]));
                     curruptedBeginTagExists = true;
                 }
@@ -159,7 +162,7 @@ public class TagParser {
                     document.replace(tmp.getOffset(), tmp.getLength(), "");
                 }
                 // delete corrupted annotations
-                this.annotationManager.deleteAnnotations(corruptedCommentKeys);
+                this.annotationModel.deleteAnnotations(corruptedCommentKeys);
                 // parse the file another time to get the correct positions for the tags
                 parseInput();
             }
@@ -176,13 +179,14 @@ public class TagParser {
         editor.getDocumentProvider().saveDocument(null, editor.getEditorInput(), document, true);
         
         // update annotations in order to recognize moved tags
-        HashMap<Comment, Position> annotationsToUpdate = new HashMap<Comment, Position>();
-        for (Comment comment : annotationManager.getCurrentlyDisplayedComments()) {
-            if (commentPositionMap.get(comment) != null) {
-                annotationsToUpdate.put(comment, commentPositionMap.get(comment));
+        TreeMap<String, Position> annotationsToUpdate = new TreeMap<String, Position>();
+        for (String key : displayedComments) {
+            
+            if (idPositionMap.get(key) != null) {
+                annotationsToUpdate.put(key, idPositionMap.get(key));
             }
         }
-        annotationManager.updateAnnotations(annotationsToUpdate);
+        annotationModel.updateAnnotations(annotationsToUpdate);
     }
     
     /**
@@ -200,20 +204,17 @@ public class TagParser {
         Position[] tagPositions;
         if (matcher.group(1) != null && matcher.group(1).equals("?")) {
             String key = matcher.group(2).trim();
-            Comment comment = DataManager.getInstance().getComment(key);
-            if (comment != null) {
-                tagPositions = commentTagPositions.get(comment);
-                // begin tag
-                if (tagPositions != null) {
-                    // same begin tag already exists --> deleting
-                    corruptedCommentKeys.add(key);
-                    document.replace(tagRegion.getOffset(), tagRegion.getLength(), "");
-                    tagDeleted = true;
-                } else {
-                    commentPositionMap.put(comment, new Position(document.getLineOffset(document.getLineOfOffset(tagRegion.getOffset()))));
-                }
-                rewriteTagLocationForLineAdaption(comment, matcher, tagRegion, true);
+            tagPositions = idTagPositions.get(key);
+            // begin tag
+            if (tagPositions != null) {
+                // same begin tag already exists --> deleting
+                corruptedCommentKeys.add(key);
+                document.replace(tagRegion.getOffset(), tagRegion.getLength(), "");
+                tagDeleted = true;
+            } else {
+                idPositionMap.put(key, new Position(document.getLineOffset(document.getLineOfOffset(tagRegion.getOffset()))));
             }
+            rewriteTagLocationForLineAdaption(matcher, tagRegion, true);
         }
         return tagDeleted;
     }
@@ -233,35 +234,32 @@ public class TagParser {
         Position[] tagPositions;
         if (matcher.group(3) != null && matcher.group(3).equals("?")) {
             String key = matcher.group(2).trim();
-            Comment comment = DataManager.getInstance().getComment(key);
-            if (comment != null) {
-                tagPositions = commentTagPositions.get(comment);
-                // end tag
-                if (tagPositions != null) {
-                    if (tagPositions[1] != null) {
-                        // same end tag already exists --> deleting
-                        corruptedCommentKeys.add(key);
-                        document.replace(tagRegion.getOffset(), tagRegion.getLength(), "");
-                        tagDeleted = true;
-                    } else {
-                        // end tag not set
-                        Position tmp = commentPositionMap.get(comment);
-                        int line = document.getLineOfOffset(tagRegion.getOffset());
-                        tmp.setLength(document.getLineOffset(line) - tmp.getOffset() + document.getLineLength(line));
-                        commentPositionMap.put(comment, tmp);
-                        
-                        Position[] tmp2 = commentTagPositions.get(comment);
-                        tmp2[1] = new Position(tagRegion.getOffset(), tagRegion.getLength());
-                        commentTagPositions.put(comment, tmp2);
-                    }
-                } else {
-                    // end tag without begin tag --> deleting
+            tagPositions = idTagPositions.get(key);
+            // end tag
+            if (tagPositions != null) {
+                if (tagPositions[1] != null) {
+                    // same end tag already exists --> deleting
                     corruptedCommentKeys.add(key);
                     document.replace(tagRegion.getOffset(), tagRegion.getLength(), "");
                     tagDeleted = true;
+                } else {
+                    // end tag not set
+                    Position tmp = idPositionMap.get(key);
+                    int line = document.getLineOfOffset(tagRegion.getOffset());
+                    tmp.setLength(document.getLineOffset(line) - tmp.getOffset() + document.getLineLength(line));
+                    idPositionMap.put(key, tmp);
+                    
+                    Position[] tmp2 = idTagPositions.get(key);
+                    tmp2[1] = new Position(tagRegion.getOffset(), tagRegion.getLength());
+                    idTagPositions.put(key, tmp2);
                 }
-                rewriteTagLocationForLineAdaption(comment, matcher, tagRegion, false);
+            } else {
+                // end tag without begin tag --> deleting
+                corruptedCommentKeys.add(key);
+                document.replace(tagRegion.getOffset(), tagRegion.getLength(), "");
+                tagDeleted = true;
             }
+            rewriteTagLocationForLineAdaption(matcher, tagRegion, false);
         }
         return tagDeleted;
     }
@@ -269,15 +267,14 @@ public class TagParser {
     /**
      * If the line was added by AgileReview, this function will rewrite the location of the current tag such that the line delimiter will also be
      * removed.
-     * @param comment {@link Comment} the tags should be adapted for
      * @param matcher Matcher matching the tagRegex against the tag in the current line
      * @param tagRegion Region the tag occurs in
      * @param startLine states whether the startLine or the endLine will be adapted
      * @throws BadLocationException
      * @author Malte Brunnlieb (08.09.2012)
      */
-    private void rewriteTagLocationForLineAdaption(Comment comment, Matcher matcher, IRegion tagRegion, boolean startLine)
-            throws BadLocationException {
+    private void rewriteTagLocationForLineAdaption(Matcher matcher, IRegion tagRegion, boolean startLine) throws BadLocationException {
+        String key = matcher.group(2).trim();
         if ("-".equals(matcher.group(4))) {
             // set the position such that the line break beforehand will be removed too when replacing this position with the empty string
             int currLine = document.getLineOfOffset(tagRegion.getOffset());
@@ -287,57 +284,57 @@ public class TagParser {
             // if there is at least one tag which is not alone in this line, do not delete the whole line!
             Matcher lineMatcher = Pattern.compile("(.*)" + tagRegex + "(.*)").matcher(lineToDelete);
             if (lineMatcher.matches() && lineMatcher.group(1).trim().isEmpty() && lineMatcher.group(6).trim().isEmpty()) {
-                setTagPosition(startLine, comment, new Position(document.getLineOffset(currLine), document.getLineLength(currLine)));
+                setTagPosition(startLine, key, new Position(document.getLineOffset(currLine), document.getLineLength(currLine)));
                 return;
             }
         }
-        setTagPosition(startLine, comment, new Position(tagRegion.getOffset(), tagRegion.getLength()));
+        setTagPosition(startLine, key, new Position(tagRegion.getOffset(), tagRegion.getLength()));
     }
     
     /**
      * Sets the tag position newPos either for the start tag or the end tag
      * @param startTag determines whether the start tag should be set or the end tag
-     * @param comment {@link Comment} the tags are for
+     * @param key of the comment the tags are for
      * @param newPos new {@link Position} to be set
      * @author Malte Brunnlieb (09.09.2012)
      */
-    private void setTagPosition(boolean startTag, Comment comment, Position newPos) {
-        Position[] oldPos = commentTagPositions.get(comment);
+    private void setTagPosition(boolean startTag, String key, Position newPos) {
+        Position[] oldPos = idTagPositions.get(key);
         if (oldPos == null) {
             oldPos = new Position[2];
         }
         oldPos[startTag ? 0 : 1] = newPos;
-        commentTagPositions.put(comment, oldPos);
+        idTagPositions.put(key, oldPos);
     }
     
     /**
      * Adds comment tags with the given id to the current editor document selection
-     * @param comment {@link Comment} which should be added
+     * @param tagId for the comment which should be added
      * @throws BadLocationException
      * @throws CoreException
      * @author Malte Brunnlieb (06.12.2012)
      */
-    public void addTagsInDocument(Comment comment) throws BadLocationException, CoreException {
+    public void addTagsInDocument(String tagId) throws BadLocationException, CoreException {
         ISelection selection = editor.getSelectionProvider().getSelection();
         if (selection instanceof ITextSelection) {
             int selStartLine = ((ITextSelection) selection).getStartLine();
             int selEndLine = ((ITextSelection) selection).getEndLine();
-            addTagsInDocument(comment, selStartLine, selEndLine);
+            addTagsInDocument(tagId, selStartLine, selEndLine);
         }
     }
     
     /**
      * Adds the Comment tags for the given comment in the currently opened file at the currently selected place
-     * @param comment {@link Comment} which should be inserted
+     * @param tagId Comment id for which the tags should be inserted
      * @param selStartLine of the position where the comment should be inserted
      * @param selEndLine of the position where the comment should be inserted
      * @throws BadLocationException Thrown if the selected location is not in the document (Should theoretically never happen)
      * @throws CoreException
      */
-    public void addTagsInDocument(Comment comment, int selStartLine, int selEndLine) throws BadLocationException, CoreException {
+    public void addTagsInDocument(String tagId, int selStartLine, int selEndLine) throws BadLocationException, CoreException {
         boolean startLineInserted = false, endLineInserted = false;;
         int origSelStartLine = selStartLine;
-        String commentTag = keySeparator + comment.getId() + keySeparator;
+        String commentTag = keySeparator + tagId + keySeparator;
         boolean[] significantlyChanged = new boolean[] { false, false };
         
         // check if selection needs to be adapted
@@ -455,7 +452,10 @@ public class TagParser {
         parseInput();
         
         if (isAgileReviewPerspectiveOpen()) {//TODO only reserve if this comment should also be displayed
-            new AuthorReservationPreferences().addReservation(comment.getAuthor());
+            Comment c = DataManager.getInstance().getComment(tagId);
+            if (c != null) {
+                new AuthorReservationPreferences().addReservation(c.getAuthor());
+            }
         }
     }
     
@@ -553,15 +553,15 @@ public class TagParser {
     
     /**
      * Removes all tags in the parsers document related to the given tagId
-     * @param comment {@link Comment} for which the tags should be removed
+     * @param tagId comment id for which the tags should be removed
      * @throws BadLocationException will be thrown if the cached tag locations are out of bounds from the current document
      * @throws CoreException will be thrown during reparsing the document after tag deletion
      * @author Malte Brunnlieb (26.11.2012)
      */
-    public void removeTagsInDocument(Comment comment) throws BadLocationException, CoreException {
+    public void removeTagsInDocument(String tagId) throws BadLocationException, CoreException {
         TreeSet<Position> tagPositions = new TreeSet<Position>();
         
-        Position[] ps = commentTagPositions.get(comment);
+        Position[] ps = idTagPositions.get(tagId);
         if (ps != null) {
             ArrayList<ComparablePosition> cp = new ArrayList<ComparablePosition>();
             for (int i = 0; i < ps.length; i++) {
@@ -570,8 +570,8 @@ public class TagParser {
             tagPositions.addAll(cp);
         }
         
-        this.commentTagPositions.keySet().remove(comment);
-        this.commentPositionMap.keySet().remove(comment);
+        this.idTagPositions.keySet().remove(tagId);
+        this.idPositionMap.keySet().remove(tagId);
         
         Iterator<Position> it = tagPositions.descendingIterator();
         while (it.hasNext()) {
@@ -599,8 +599,8 @@ public class TagParser {
      * @param p position
      * @return all comments which are overlapping with the given {@link Position}
      */
-    public Comment[] getCommentsByPosition(Position p) {
-        return this.annotationManager.getCommentsByPosition(p);
+    public String[] getCommentsByPosition(Position p) {
+        return this.annotationModel.getCommentsByPosition(p);
     }
     
     /**
@@ -608,8 +608,8 @@ public class TagParser {
      * @return a {@link Map} of comment IDs which are observed during parsing the document to the position of the comments
      * @author Malte Brunnlieb (06.12.2012)
      */
-    public Map<Comment, Position> getObservedComments() {
-        return new HashMap<Comment, Position>(commentPositionMap);
+    public Map<String, Position> getObservedComments() {
+        return new HashMap<String, Position>(idPositionMap);
     }
     
     /**
@@ -620,8 +620,8 @@ public class TagParser {
     public Position getNextCommentsPosition(Position current) {
         Position position;
         TreeSet<ComparablePosition> positions = new TreeSet<ComparablePosition>();
-        for (Comment comment : annotationManager.getCurrentlyDisplayedComments()) {
-            position = commentPositionMap.get(comment);
+        for (String key : displayedComments) {
+            position = idPositionMap.get(key);
             positions.add(new ComparablePosition(position));
         }
         return positions.higher(new ComparablePosition(current));
@@ -629,12 +629,12 @@ public class TagParser {
     
     /**
      * Returns the position of the annotation for the given tag
-     * @param comment {@link Comment} which position should be returned
+     * @param tagId tag id of the tag whose position should be returned
      * @return a {@link Position} on which any annotation for the tag can be performed
      * @author Malte Brunnlieb (27.11.2012)
      */
-    public Position getPosition(Comment comment) {
-        return commentPositionMap.get(comment);
+    public Position getPosition(String tagId) {
+        return idPositionMap.get(tagId);
     }
     
     //    public void relocateComment(Comment comment, boolean display) throws BadLocationException {

@@ -19,7 +19,7 @@ public interface IEditorParser {
     
     /**
      * Adds comment tags to the current selection of the currently opened editor. The tags will capture the tagId as information.
-     * @param comment {@link Comment} to be added
+     * @param comment the tagId should be retrieved from
      * @param editor {@link IEditorPart} in which the tags should be added
      * @param multiLineCommentTags a two-dimensional array containing the begin and end tag which should be used for inserting the comment anchor
      * @author Malte Brunnlieb (15.07.2012)
@@ -28,12 +28,24 @@ public interface IEditorParser {
     
     /**
      * Removes all tags according to the given tagId
-     * @param comment to be removed
+     * @param tagId id of the comment to be removed
      * @param editor {@link IEditorPart} in which the tags with the given id should be removed
      * @param multiLineCommentTags a two-dimensional array containing the begin and end tag which should be used for inserting the comment anchor
      * @author Malte Brunnlieb (13.07.2012)
      */
-    public void removeTagsInEditor(IEditorPart editor, Comment comment, String[] multiLineCommentTags);
+    public void removeTagsInEditor(IEditorPart editor, String tagId, String[] multiLineCommentTags);
+    
+    /**
+     * Deletes all Tags in the parsed editor
+     * @author Malte Brunnlieb (16.11.2012)
+     */
+    public void clearAllTags();
+    
+    /**
+     * Forces the editor parser to reparse its contents<br>This will be necessary after every kind of refactoring
+     * @author Malte Brunnlieb (16.11.2012)
+     */
+    public void reparse();
     
     /**
      * Disables the parser plug-in and all parsers created by this instance. In this method you should also remove all annotations and other
@@ -51,7 +63,7 @@ public interface IEditorParser {
     public void removeParser(IEditorPart editor);
     
     /**
-     * Adds a parser to the given editor. This function is called whenever an editor is brought to top
+     * Adds a parser to the given editor. All ui supported improvements like annotations should also be instantiated.
      * @param editor {@link IEditorPart} for which the parser should be added
      * @param multiLineCommentTags a two-dimensional array containing the begin and end tag which should be used for inserting the comment anchor
      * @author Malte Brunnlieb (03.12.2012)
