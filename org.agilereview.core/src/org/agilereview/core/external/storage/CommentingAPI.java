@@ -30,11 +30,11 @@ public class CommentingAPI {
     /**
      * {@link StorageController} instance
      */
-    private StorageController sController;
+    private final StorageController sController;
     /**
      * {@link EditorParserController} instance
      */
-    private EditorParserController eController;
+    private final EditorParserController eController;
     
     /**
      * Creates a new instance of the {@link CommentingAPI}
@@ -73,14 +73,17 @@ public class CommentingAPI {
         if (editor == null) throw new NoOpenEditorException();
         
         IEditorPart part = PlatformUITools.getActiveWorkbenchPage().getActiveEditor();
-        if (part == null) { throw new NoOpenEditorException(); }
+        if (part == null) {
+            throw new NoOpenEditorException();
+        }
         IFile file = (IFile) part.getEditorInput().getAdapter(IFile.class);
         
         Review review = getReview(reviewId);
-        if (review == null) { throw new NullArgumentException(
-                "Comment could not be created. Currently no review data are provided by the StorageClient."); }
-        String commentId = sController.getNewCommentId(author, review);
+        if (review == null) {
+            throw new NullArgumentException("Comment could not be created. Currently no review data are provided by the StorageClient.");
+        }
         
+        String commentId = sController.getNewCommentId(author, review);
         Comment newComment = new Comment(commentId, file, review);
         review.addComment(newComment);
         
@@ -96,7 +99,9 @@ public class CommentingAPI {
      */
     public void deleteComment(String commentId) throws NoOpenEditorException {
         IEditorPart part = PlatformUITools.getActiveWorkbenchPage().getActiveEditor();
-        if (part == null) { throw new NoOpenEditorException(); }
+        if (part == null) {
+            throw new NoOpenEditorException();
+        }
         eController.removeTags(part, commentId);
         Comment commentToDelete = getComment(commentId);
         commentToDelete.getReview().deleteComment(commentToDelete);
@@ -111,7 +116,9 @@ public class CommentingAPI {
     private Review getReview(String reviewId) {
         Set<Review> reviews = new HashSet<Review>(sController.getAllReviews());
         for (Review r : reviews) {
-            if (r.getId().equals(reviewId)) { return r; }
+            if (r.getId().equals(reviewId)) {
+                return r;
+            }
         }
         return null;
     }
@@ -126,7 +133,9 @@ public class CommentingAPI {
         Set<Review> reviews = new HashSet<Review>(sController.getAllReviews());
         for (Review r : reviews) {
             for (Comment c : r.getComments()) {
-                if (c.getId().equals(commentId)) { return c; }
+                if (c.getId().equals(commentId)) {
+                    return c;
+                }
             }
         }
         return null;

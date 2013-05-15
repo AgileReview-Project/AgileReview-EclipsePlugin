@@ -71,7 +71,7 @@ public class ExceptionHandler {
                 
                 @Override
                 public void run() {
-                    MessageDialog.openError(Display.getCurrent().getActiveShell(), "Warning!", msg);
+                    MessageDialog.openWarning(Display.getCurrent().getActiveShell(), "Warning!", msg);
                 }
             });
         }
