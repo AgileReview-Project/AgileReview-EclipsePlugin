@@ -29,15 +29,15 @@ public class FileSupportPreferencesFactory {
      * Representation of one entry for file support of multi line comments.
      * @author Malte Brunnlieb (20.11.2012)
      */
-    public class FileSupportEntry {
+    public static class FileSupportEntry {
         /**
          * A two dimensional array containing first the start comment tag and second the end comment tag
          */
-        public String[] commentTags;
+        public String[] commentTags = new String[0];
         /**
          * All file endings of files which support the comment tags in {@link FileSupportEntry#commentTags}
          */
-        public String[] fileendings;
+        public String[] fileendings = new String[0];
     }
     
     /**

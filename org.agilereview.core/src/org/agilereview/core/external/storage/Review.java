@@ -103,6 +103,7 @@ public class Review implements PropertyChangeListener, IPreferenceChangeListener
         preferences.addPreferenceChangeListener(this);
     }
     
+    @Override
     protected void finalize() throws Throwable {
         InstanceScope.INSTANCE.getNode(Activator.PLUGIN_ID).removePreferenceChangeListener(this);
         super.finalize();
@@ -341,6 +342,9 @@ public class Review implements PropertyChangeListener, IPreferenceChangeListener
         propertyChangeSupport.removePropertyChangeListener(listener);
     }
     
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
         propertyChangeSupport.firePropertyChange(evt);
@@ -354,11 +358,13 @@ public class Review implements PropertyChangeListener, IPreferenceChangeListener
         IEclipsePreferences preferences = InstanceScope.INSTANCE.getNode(Activator.PLUGIN_ID);
         String reviewIdsPref = preferences.get(AgileReviewPreferences.OPEN_REVIEWS, "");
         ArrayList<String> reviewIds;
+        
         if ("".equals(reviewIdsPref)) {
             reviewIds = new ArrayList<String>();
         } else {
             reviewIds = new ArrayList<String>(Arrays.asList(reviewIdsPref.split(",")));
         }
+        
         if (this.isOpen) {
             if (!reviewIds.contains(this.id)) {
                 reviewIds.add(this.id);
@@ -366,16 +372,18 @@ public class Review implements PropertyChangeListener, IPreferenceChangeListener
         } else {
             reviewIds.remove(this.id);
         }
-        reviewIdsPref = "";
+        
+        StringBuffer buf = new StringBuffer();
         if (reviewIds.size() > 0) {
             Iterator<String> i = reviewIds.iterator();
             for (;;) {
-                reviewIdsPref += i.next();
+                buf.append(i.next());
                 if (!i.hasNext()) break;
-                reviewIdsPref += (",");
+                buf.append(",");
             }
         }
-        preferences.put(AgileReviewPreferences.OPEN_REVIEWS, reviewIdsPref);
+        preferences.put(AgileReviewPreferences.OPEN_REVIEWS, buf.toString());
+        
         try {
             preferences.flush();
         } catch (BackingStoreException e) {
@@ -414,10 +422,16 @@ public class Review implements PropertyChangeListener, IPreferenceChangeListener
      */
     @Override
     public boolean equals(Object o) {
-        if (o == null) { return false; }
-        if (o.getClass() != getClass()) { return false; }
+        if (o == null) {
+            return false;
+        }
+        if (o.getClass() != getClass()) {
+            return false;
+        }
         Review reviewToCompare = (Review) o;
-        if (this.getId().equals(reviewToCompare.getId())) { return true; }
+        if (this.getId().equals(reviewToCompare.getId())) {
+            return true;
+        }
         return false;
     }
     

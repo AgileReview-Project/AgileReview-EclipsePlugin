@@ -36,7 +36,7 @@ public abstract class AbstractController<T> implements IExtensionController {
     /**
      * Checks whether the controller was fully initialized (first checkForClients included)
      */
-    private boolean initialized = false;
+    private volatile boolean initialized = false;
     
     /**
      * Creates a new instance of an {@link AbstractController}

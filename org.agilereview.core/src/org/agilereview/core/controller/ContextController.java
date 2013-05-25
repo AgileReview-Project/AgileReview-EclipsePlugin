@@ -32,11 +32,11 @@ public class ContextController implements IPerspectiveListener {
     /**
      * The AgileReview perspective ID
      */
-    private final String perspectiveId = "org.agilereview.perspective";
+    private static final String perspectiveId = "org.agilereview.perspective";
     /**
      * Context id handling the state of the AgileReview perspective
      */
-    private final String perspectiveContextId = "org.agilereview.core.contexts.perspectiveopen";
+    private static final String perspectiveContextId = "org.agilereview.core.contexts.perspectiveopen";
     
     /**
      * Creates a new instance of the {@link ContextController}. The {@link ContextController} registers itself for necessary topics in the workbench.
