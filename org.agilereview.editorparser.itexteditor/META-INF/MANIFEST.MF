@@ -15,4 +15,5 @@ Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Import-Package: org.agilereview.core.external.definition,
  org.agilereview.core.external.exception,
  org.agilereview.core.external.preferences,
- org.agilereview.core.external.storage
+ org.agilereview.core.external.storage,
+ org.agilereview.core.external.storage.listeners

@@ -1,0 +1,14 @@
+Manifest-Version: 1.0
+Export-Package: org.agilereview.test.mock.editorparser.external
+Require-Bundle: org.eclipse.ui,org.eclipse.core.runtime,org.agilerevie
+ w.core;bundle-version="0.9.0",org.eclipse.core.resources;bundle-versi
+ on="3.5.0",org.eclipse.ui.editors;bundle-version="3.7.0"
+Bundle-ActivationPolicy: lazy
+Bundle-Version: 1.0.0.201305152122
+Bundle-Name: EditorParserMock
+Bundle-Activator: org.agilereview.test.mock.editorparser.Activator
+Bundle-ManifestVersion: 2
+Bundle-SymbolicName: org.agilereview.test.mock.editorParser;singleton:
+ =true
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+

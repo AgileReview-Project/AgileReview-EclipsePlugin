@@ -6,14 +6,53 @@
   <artifactId>org.agilereview.core.test</artifactId>
   <description>AgileReview Core Test Fragment</description>
   <version>1.0.0-SNAPSHOT</version>
-  <packaging>eclipse-plugin</packaging>
+  <packaging>eclipse-test-plugin</packaging>
   
   	<properties>
 	  <tycho-version>0.17.0</tycho-version>
+	  <test.max.heap.size>1g</test.max.heap.size>
 	</properties>
 	
+	<dependencies>
+		<!--<dependency>
+	      <groupId>junit</groupId>
+	      <artifactId>junit</artifactId>
+	      <version>4.8.1</version>
+	      <scope>test</scope>
+	    </dependency>-->
+		<!-- <dependency>
+			<groupId>org.agilereview</groupId>
+			<artifactId>org.agilereview.test.mock.editorparser</artifactId>
+			<version>1.0.0-SNAPSHOT</version>
+			<type>eclipse-plugin</type>
+		</dependency>-->
+		
+		<!-- 
+		Require-Bundle: org.junit4;bundle-version="4.5.0",
+		 org.agilereview.test.common,
+		 org.eclipse.ui.editors;bundle-version="3.7.0",
+		 org.agilereview.test.mock.editorParser;bundle-version="1.0.0"
+		Fragment-Host: org.agilereview.core;bundle-version="1.0.0"
+		 -->
+	</dependencies>
+	
 	<build>
-	  <plugins>	      
+	  <plugins>
+	  	  <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>2.14.1</version>
+                <configuration>
+                    <!-- Mehr Speicher für die JVM, die die Tests ausführt -->
+                    <argLine>-Xms128m -Xmx${test.max.heap.size} -XX:MaxPermSize=256m -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=/tmp/heapdumps/</argLine>
+                    <forkMode>once</forkMode>
+                    <systemPropertyVariables>
+                        <user.language>en</user.language>
+                        <user.country>DE</user.country>
+                        <!--<file.encoding>${project.build.sourceEncoding}</file.encoding>-->
+                    </systemPropertyVariables>
+                </configuration>
+            </plugin>
 	      <plugin>
 	        <groupId>org.sonatype.tycho</groupId>
 	        <artifactId>tycho-maven-plugin</artifactId>
@@ -25,10 +64,79 @@
 	        <artifactId>target-platform-configuration</artifactId>
 	        <version>0.11.1</version>
 	        <configuration>
-	          <resolver>p2</resolver>
+				<resolver>p2</resolver>
+				<pomDependencies>consider</pomDependencies>
+				<!--<environments>
+					<environment>
+						<os>win32</os>
+						<ws>win32</ws>
+						<arch>x86</arch>
+					</environment>
+					<environment>
+						<os>win64</os>
+						<ws>win64</ws>
+						<arch>x64</arch>
+					</environment>
+				</environments>-->
 	        </configuration>
 	      </plugin>
 	  </plugins>
+	  <pluginManagement>
+	  	<plugins>
+	  		<!--This plugin's configuration is used to store Eclipse m2e settings only. It has no influence on the Maven build itself.-->
+	  		<plugin>
+	  			<groupId>org.eclipse.m2e</groupId>
+	  			<artifactId>lifecycle-mapping</artifactId>
+	  			<version>1.0.0</version>
+	  			<configuration>
+	  				<lifecycleMappingMetadata>
+	  					<pluginExecutions>
+	  						<pluginExecution>
+	  							<pluginExecutionFilter>
+	  								<groupId>
+	  									org.sonatype.tycho
+	  								</groupId>
+	  								<artifactId>
+	  									maven-osgi-compiler-plugin
+	  								</artifactId>
+	  								<versionRange>
+	  									[0.11.1,)
+	  								</versionRange>
+	  								<goals>
+	  									<goal>compile</goal>
+	  									<goal>testCompile</goal>
+	  								</goals>
+	  							</pluginExecutionFilter>
+	  							<action>
+	  								<ignore></ignore>
+	  							</action>
+	  						</pluginExecution>
+	  						<pluginExecution>
+	  							<pluginExecutionFilter>
+	  								<groupId>
+	  									org.sonatype.tycho
+	  								</groupId>
+	  								<artifactId>
+	  									maven-osgi-packaging-plugin
+	  								</artifactId>
+	  								<versionRange>
+	  									[0.11.1,)
+	  								</versionRange>
+	  								<goals>
+	  									<goal>build-qualifier</goal>
+	  									<goal>validate-version</goal>
+	  								</goals>
+	  							</pluginExecutionFilter>
+	  							<action>
+	  								<ignore></ignore>
+	  							</action>
+	  						</pluginExecution>
+	  					</pluginExecutions>
+	  				</lifecycleMappingMetadata>
+	  			</configuration>
+	  		</plugin>
+	  	</plugins>
+	  </pluginManagement>
 	</build>
 	
 	<repositories>

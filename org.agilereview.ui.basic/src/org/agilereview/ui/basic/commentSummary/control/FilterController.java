@@ -7,29 +7,20 @@
  */
 package org.agilereview.ui.basic.commentSummary.control;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import static ch.lambdaj.Lambda.having;
+import static ch.lambdaj.Lambda.on;
+import static org.hamcrest.Matchers.not;
 
-import org.agilereview.common.exception.ExceptionHandler;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Map.Entry;
+
 import org.agilereview.core.external.storage.Comment;
-import org.agilereview.core.external.storage.Review;
 import org.agilereview.core.external.storage.ReviewSet;
 import org.agilereview.ui.basic.commentSummary.CSTableViewer;
 import org.agilereview.ui.basic.commentSummary.CSToolBar;
-import org.agilereview.ui.basic.commentSummary.filter.ExplorerSelectionFilter;
-import org.agilereview.ui.basic.commentSummary.filter.OpenFilter;
 import org.agilereview.ui.basic.commentSummary.filter.SearchFilter;
 import org.agilereview.ui.basic.commentSummary.table.Column;
-import org.agilereview.ui.basic.reviewExplorer.ReviewExplorerView;
-import org.eclipse.core.resources.IResource;
-import org.eclipse.jface.viewers.ISelection;
-import org.eclipse.jface.viewers.ITreeSelection;
-import org.eclipse.jface.viewers.TreePath;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -37,26 +28,33 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
-import org.eclipse.swt.widgets.TableItem;
-import org.eclipse.ui.ISelectionListener;
-import org.eclipse.ui.IWorkbenchPart;
-import org.eclipse.ui.PlatformUI;
-import org.eclipse.ui.commands.ICommandService;
+import org.hamcrest.Matcher;
 
 /**
  * Controller for filter events
  * @author Malte Brunnlieb (03.05.2012)
  */
-public class FilterController extends SelectionAdapter implements Listener, KeyListener, ISelectionListener {
+public class FilterController extends SelectionAdapter implements Listener, KeyListener {
+    
+    /**
+     * Filter applied on the {@link ReviewSet}
+     * @author Malte Brunnlieb (01.06.2013)
+     */
+    private enum Filter {
+        /**
+         * Search Filter
+         */
+        SEARCH_FILTER,
+        /**
+         * Open Comment Filter
+         */
+        OPEN_FILTER
+    }
     
     /**
      * ToolBar which sets the filters
      */
     private final CSToolBar toolBar;
-    /**
-     * TableViewer of the comment table
-     */
-    private final CSTableViewer tableViewer;
     /**
      * The current {@link SearchFilter} set on the {@link CSTableViewer}
      */
@@ -64,26 +62,20 @@ public class FilterController extends SelectionAdapter implements Listener, KeyL
     /**
      * Currently provided {@link ReviewSet}
      */
-    private final ReviewSet reviewSet;
+    private ReviewSet reviewSet;
     /**
-     * The current {@link ExplorerSelectionFilter} set on the {@link CSTableViewer}
+     * Currently applied filters
      */
-    private ExplorerSelectionFilter currentExplorerSelectionFilter;
+    private Map<Object, Matcher<Object>> currentFilters = new HashMap<Object, Matcher<Object>>();
     
     /**
      * Creates a new instance of the {@link FilterController} controlling the given {@link CSToolBar}
      * @param toolBar {@link CSToolBar} which sets the filter mechanisms
-     * @param viewer {@link CSTableViewer} of the comment table
-     * @param searchFilter initiating {@link SearchFilter}
-     * @param reviewSet currently provided {@link ReviewSet}
      * @author Malte Brunnlieb (03.05.2012)
      */
-    public FilterController(CSToolBar toolBar, CSTableViewer viewer, SearchFilter searchFilter, ReviewSet reviewSet) {
+    public FilterController(CSToolBar toolBar) {
         this.toolBar = toolBar;
-        this.tableViewer = viewer;
-        this.currentSearchFilter = searchFilter;
-        this.reviewSet = reviewSet;
-        reviewSet.publishFilter(this, getFilteredComments());
+        this.currentSearchFilter = new SearchFilter(Column.NULL);
     }
     
     /* (non-Javadoc)
@@ -100,9 +92,21 @@ public class FilterController extends SelectionAdapter implements Listener, KeyL
      */
     @Override
     public void keyReleased(KeyEvent e) {
-        currentSearchFilter.setSearchText(toolBar.getSearchText());
-        tableViewer.refresh();
-        reviewSet.publishFilter(this, getFilteredComments());
+        processSearchFiltering();
+    }
+    
+    /**
+     * Adds or removes the current search filter dependent on the current specified search text in the {@link CSToolBar}
+     * @author Malte Brunnlieb (01.06.2013)
+     */
+    private void processSearchFiltering() {
+        String searchText = toolBar.getSearchText();
+        currentSearchFilter.setSearchText(searchText);
+        if (searchText.trim().isEmpty()) {
+            removeFilter(this);
+        } else {
+            applyFilter(Filter.SEARCH_FILTER, currentSearchFilter.getFilterExpression());
+        }
     }
     
     /* (non-Javadoc)
@@ -116,9 +120,8 @@ public class FilterController extends SelectionAdapter implements Listener, KeyL
         Object command = event.widget.getData("actionCommand");
         if (command.equals("setSearchFilter") && event.widget instanceof Combo) {
             Combo comboBox = (Combo) event.widget;
-            tableViewer.removeFilter(currentSearchFilter);
             currentSearchFilter = new SearchFilter(Column.get(comboBox.getText()));
-            tableViewer.addFilter(currentSearchFilter);
+            processSearchFiltering();
             toolBar.setFilterText("Search for " + comboBox.getText());
         }
     }
@@ -130,108 +133,44 @@ public class FilterController extends SelectionAdapter implements Listener, KeyL
      */
     @Override
     public void widgetSelected(SelectionEvent e) {
-        OpenFilter openFilter = new OpenFilter();
         if (toolBar.showOnlyOpenComments()) {
-            tableViewer.addFilter(openFilter);
+            applyFilter(Filter.OPEN_FILTER, having(on(Comment.class).getStatus(), not(equals(0))));
         } else {
-            tableViewer.removeFilter(openFilter);
-        }
-        reviewSet.publishFilter(this, getFilteredComments());
-    }
-    
-    /**
-     * Selection of ReviewExplorer changed, filter comments
-     * @see org.eclipse.ui.ISelectionListener#selectionChanged(org.eclipse.ui.IWorkbenchPart, org.eclipse.jface.viewers.ISelection)
-     * @author Malte Brunnlieb (10.05.2012)
-     */
-    public void selectionChanged(IWorkbenchPart part, ISelection selection) {
-        if (part.getClass().equals(ReviewExplorerView.class) && selection instanceof ITreeSelection && !selection.isEmpty()) {
-            
-            ICommandService cmdService = (ICommandService) PlatformUI.getWorkbench().getService(ICommandService.class);
-            if (cmdService == null) {
-                ExceptionHandler.warnUser("The Service ICommandService could not be determined.");
-                return;
-            }
-            
-            //Command linkExplorerCommand = cmdService.getCommand("org.eclipse.ui.navigate.linkWithEditor"); // TODO check command ID
-            //Object state = linkExplorerCommand.getState("org.eclipse.ui.commands.toggleState").getValue();
-            Object state = false;
-            if ((Boolean) state) {
-                ITreeSelection sel = (ITreeSelection) selection;
-                List<String> reviewIDs = getReviewIDs(sel);
-                Map<String, Set<String>> paths = getPaths(sel);
-                
-                currentExplorerSelectionFilter = new ExplorerSelectionFilter(reviewIDs, paths);
-                tableViewer.addFilter(currentExplorerSelectionFilter);
-                //filterComments(); //TODO check this (Parser filtering)
-            }
-        } else {
-            if (currentExplorerSelectionFilter != null) {
-                tableViewer.removeFilter(currentExplorerSelectionFilter);
-            }
+            removeFilter(Filter.OPEN_FILTER);
         }
     }
     
     /**
-     * Picks all {@link Review}s contained in the given {@link ITreeSelection} and returns all review IDs
-     * @param sel {@link ITreeSelection} in which will be searched for {@link Review}s
-     * @return A {@link List} of contained the found review IDs
-     * @author Malte Brunnlieb (08.05.2012)
+     * Applies the given filter
+     * @param owner Owner {@link Object} of the given filter
+     * @param filter {@link Matcher} which represents the filtermechanism
+     * @author Malte Brunnlieb (01.06.2013)
      */
-    private List<String> getReviewIDs(ITreeSelection sel) {
-        ArrayList<String> reviewIDs = new ArrayList<String>();
-        Iterator<?> it = sel.iterator();
-        
-        while (it.hasNext()) {
-            Object next = it.next();
-            if (next instanceof Review) {
-                String reviewID = ((Review) next).getId();
-                if (!reviewIDs.contains(reviewID)) {
-                    reviewIDs.add(reviewID);
-                }
-            }
-        }
-        
-        return reviewIDs;
+    private void applyFilter(Object owner, Matcher<Object> filter) {
+        currentFilters.put(owner, filter);
+        reviewSet.setCommentFilter(owner, filter);
     }
     
     /**
-     * Searches for {@link IResource}s in the given {@link ITreeSelection}. All {@link IResource}s will be mapped by their origin review ID.
-     * @param sel {@link ITreeSelection} which will be the bases of the search
-     * @return A {@link Map} of review IDs to a {@link Set} of paths of the underlying {@link IResource}s
-     * @author Malte Brunnlieb (08.05.2012)
+     * Removes the given filter
+     * @param owner Owner {@link Object} of the filter to be removed
+     * @author Malte Brunnlieb (01.06.2013)
      */
-    private Map<String, Set<String>> getPaths(ITreeSelection sel) {
-        HashMap<String, Set<String>> paths = new HashMap<String, Set<String>>();
-        
-        for (TreePath tp : sel.getPaths()) {
-            if (tp.getLastSegment() instanceof IResource) {
-                String path = ((IResource) tp.getLastSegment()).getLocation().toOSString();
-                String reviewID = ((Review) tp.getFirstSegment()).getId();
-                if (paths.containsKey(reviewID)) {
-                    paths.get(reviewID).add(path);
-                } else {
-                    paths.put(reviewID, new HashSet<String>());
-                    paths.get(reviewID).add(path);
-                }
-            }
-        }
-        
-        return paths;
+    private void removeFilter(Object owner) {
+        currentFilters.remove(owner);
+        reviewSet.removeCommentFilter(owner);
     }
     
     /**
-     * Returns all currently shown comments of the table
-     * @return comments of all currently displayed comments
-     * @author Malte Brunnlieb (10.03.2013)
+     * Sets the current {@link ReviewSet} reference
+     * @param reviewSet
+     * @author Malte Brunnlieb (01.06.2013)
      */
-    private HashSet<Comment> getFilteredComments() {
-        HashSet<Comment> comments = new HashSet<Comment>();
-        for (TableItem i : tableViewer.getTable().getItems()) {
-            if (i.getData() instanceof Comment) {
-                comments.add((Comment) i.getData());
-            }
+    public void setReviewSet(ReviewSet reviewSet) {
+        this.reviewSet = reviewSet;
+        for (Entry<Object, Matcher<Object>> entry : currentFilters.entrySet()) {
+            reviewSet.setCommentFilter(entry.getKey(), entry.getValue());
         }
-        return comments;
     }
+    
 }

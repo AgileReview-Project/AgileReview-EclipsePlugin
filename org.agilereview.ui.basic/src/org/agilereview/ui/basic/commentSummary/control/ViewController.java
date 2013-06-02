@@ -7,6 +7,10 @@
  */
 package org.agilereview.ui.basic.commentSummary.control;
 
+import java.util.Set;
+
+import org.agilereview.core.external.storage.Comment;
+import org.agilereview.core.external.storage.listeners.ICommentFilterListener;
 import org.agilereview.ui.basic.commentSummary.CSTableViewer;
 import org.agilereview.ui.basic.commentSummary.CommentSummaryView;
 import org.agilereview.ui.basic.commentSummary.filter.ColumnComparator;
@@ -22,7 +26,7 @@ import org.eclipse.swt.widgets.TableColumn;
  * This {@link ViewController} handles elementary events of the {@link CommentSummaryView}
  * @author Malte Brunnlieb (28.04.2012)
  */
-public class ViewController extends SelectionAdapter implements IDoubleClickListener {
+public class ViewController extends SelectionAdapter implements IDoubleClickListener, ICommentFilterListener {
     
     /**
      * TableViewer which events should be handled
@@ -67,5 +71,14 @@ public class ViewController extends SelectionAdapter implements IDoubleClickList
         tableViewer.getTable().setSortDirection(sortDirection);
         tableViewer.getTable().setSortColumn(tableColumn);
         tableViewer.refresh();
+    }
+    
+    /* (non-Javadoc)
+     * @see org.agilereview.core.external.storage.listeners.ICommentFilterListener#setFilteredComments(java.util.Set)
+     * @author Malte Brunnlieb (01.06.2013)
+     */
+    @Override
+    public void setFilteredComments(Set<Comment> filteredComments) {
+        tableViewer.setInput(filteredComments);
     }
 }

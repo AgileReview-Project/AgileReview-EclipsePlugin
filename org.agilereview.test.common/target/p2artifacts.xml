@@ -1,0 +1,14 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<?artifactRepository version='1.1.0'?>
+<artifacts size='1'>
+  <artifact classifier='osgi.bundle' id='org.agilereview.test.common' version='1.0.0.201305152106'>
+    <properties size='6'>
+      <property name='artifact.size' value='1797403'/>
+      <property name='download.size' value='1797403'/>
+      <property name='download.md5' value='f8b8c77ec7487396c6d96216fb073086'/>
+      <property name='maven-groupId' value='org.agilereview'/>
+      <property name='maven-artifactId' value='org.agilereview.test.common'/>
+      <property name='maven-version' value='1.0.0-SNAPSHOT'/>
+    </properties>
+  </artifact>
+</artifacts>

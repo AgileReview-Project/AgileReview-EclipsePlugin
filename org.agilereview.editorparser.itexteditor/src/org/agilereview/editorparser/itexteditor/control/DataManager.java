@@ -7,8 +7,6 @@
  */
 package org.agilereview.editorparser.itexteditor.control;
 
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -16,17 +14,22 @@ import org.agilereview.core.external.definition.IReviewDataReceiver;
 import org.agilereview.core.external.storage.Comment;
 import org.agilereview.core.external.storage.Review;
 import org.agilereview.core.external.storage.ReviewSet;
+import org.agilereview.core.external.storage.listeners.ICommentFilterListener;
 
 /**
  * This class manages all data received via the {@link IReviewDataReceiver} interface and triggers painting a filtered set of comments as annotations
  * @author Malte Brunnlieb (22.11.2012)
  */
-public class DataManager implements IReviewDataReceiver, PropertyChangeListener {
+public class DataManager implements IReviewDataReceiver, ICommentFilterListener {
     
     /**
      * Current set of reviews provided by the core plug-in
      */
     private ReviewSet reviews;
+    /**
+     * Currently visible comments
+     */
+    private Set<Comment> visibleComments;
     /**
      * Instance created by the AgileReview core plug-in
      */
@@ -59,16 +62,7 @@ public class DataManager implements IReviewDataReceiver, PropertyChangeListener 
     @Override
     public void setReviewData(ReviewSet reviews) {
         this.reviews = reviews;
-        reviews.addPropertyChangeListener(this);
-    }
-    
-    /* (non-Javadoc)
-     * @see java.beans.PropertyChangeListener#propertyChange(java.beans.PropertyChangeEvent)
-     * @author Malte Brunnlieb (22.11.2012)
-     */
-    @Override
-    public void propertyChange(PropertyChangeEvent arg0) {
-        // TODO Implement Filtermechanism
+        reviews.addCommentFilterListener(this);
     }
     
     /**
@@ -85,5 +79,24 @@ public class DataManager implements IReviewDataReceiver, PropertyChangeListener 
             }
         }
         return null;
+    }
+    
+    /* (non-Javadoc)
+     * @see org.agilereview.core.external.storage.listeners.ICommentFilterListener#setFilteredComments(java.util.Set)
+     * @author Malte Brunnlieb (01.06.2013)
+     */
+    @Override
+    public void setFilteredComments(Set<Comment> filteredComments) {
+        visibleComments = filteredComments;
+    }
+    
+    /**
+     * Determines whether the given comment should be highlighted
+     * @param comment {@link Comment}
+     * @return <code>true</code> if the comment should be highlighted, <br><code>false</code> otherwise
+     * @author Malte Brunnlieb (01.06.2013)
+     */
+    public boolean isVisible(Comment comment) {
+        return visibleComments.contains(comment);
     }
 }

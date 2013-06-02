@@ -50,7 +50,7 @@ public class EditorParserExtension implements IEditorParser {
             }
             try {
                 parserMap.get(editor).addTagsInDocument(comment.getId());
-                if (comment.isFilteredToBeShown()) {
+                if (DataManager.getInstance().isVisible(comment)) {
                     annotationManagerMap.get(editor).addAnnotation(comment.getId(), parserMap.get(editor).getPosition(comment.getId()));
                 }
             } catch (BadLocationException e) {

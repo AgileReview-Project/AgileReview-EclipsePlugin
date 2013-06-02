@@ -11,7 +11,6 @@ import org.agilereview.core.external.storage.ReviewSet;
 import org.agilereview.ui.basic.commentSummary.control.FilterController;
 import org.agilereview.ui.basic.commentSummary.control.ViewController;
 import org.agilereview.ui.basic.commentSummary.filter.ColumnComparator;
-import org.agilereview.ui.basic.commentSummary.filter.SearchFilter;
 import org.agilereview.ui.basic.commentSummary.table.ContentProvider;
 import org.agilereview.ui.basic.external.reviewDataReceiver.AbstractReviewDataReceiver;
 import org.agilereview.ui.basic.external.reviewDataReceiver.AbstractReviewDataView;
@@ -43,10 +42,6 @@ public class CommentSummaryView extends AbstractReviewDataView {
      * The {@link FilterController} which manages all filter actions
      */
     private FilterController filterController;
-    /**
-     * Current search filter
-     */
-    private SearchFilter searchFilter;
     
     /**
      * Creates a new {@link CommentSummaryView}
@@ -63,20 +58,6 @@ public class CommentSummaryView extends AbstractReviewDataView {
      */
     public static CommentSummaryView getInstance() {
         return instance;
-    }
-    
-    /**
-     * {@inheritDoc} Also removes selection listeners
-     * @see org.eclipse.ui.part.WorkbenchPart#dispose()
-     * @author Malte Brunnlieb (27.05.2012)
-     */
-    @Override
-    public void dispose() {
-        if (filterController != null) {
-            getSite().getWorkbenchWindow().getSelectionService().removeSelectionListener("org.agilereview.ui.basic.reviewExplorerView",
-                    filterController);
-        }
-        super.dispose();
     }
     
     /**
@@ -114,8 +95,6 @@ public class CommentSummaryView extends AbstractReviewDataView {
         viewer.setContentProvider(cp);
         ColumnComparator comparator = new ColumnComparator();
         viewer.setComparator(comparator);
-        searchFilter = new SearchFilter(null);
-        viewer.addFilter(searchFilter);
         
         viewer.addDoubleClickListener(new ViewController(viewer));
         getSite().setSelectionProvider(viewer);
@@ -131,10 +110,12 @@ public class CommentSummaryView extends AbstractReviewDataView {
     protected void refreshInput(Object reviewData) {
         if (reviewData instanceof ReviewSet) {
             viewer.setInput(reviewData);
-            filterController = new FilterController(toolBar, viewer, searchFilter, (ReviewSet) reviewData);
-            getSite().getWorkbenchWindow().getSelectionService()
-                    .addSelectionListener("org.agilereview.ui.basic.reviewExplorerView", filterController);
-            toolBar.setListeners(filterController);
+            if (filterController == null) {
+                filterController = new FilterController(toolBar);
+                toolBar.setListeners(filterController);
+            }
+            filterController.setReviewSet((ReviewSet) reviewData);
+            ((ReviewSet) reviewData).addCommentFilterListener(new ViewController(viewer));
         }
     }
     

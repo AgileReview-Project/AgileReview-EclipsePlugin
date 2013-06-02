@@ -14,10 +14,16 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import org.agilereview.core.external.definition.IReviewDataReceiver;
+import org.agilereview.core.external.storage.listeners.ICommentFilterListener;
+import org.hamcrest.Matcher;
+
+import ch.lambdaj.Lambda;
 
 /**
  * List of {@link Review}s provides property change support for the list itself and the reviews contained
@@ -33,7 +39,14 @@ public final class ReviewSet extends HashSet<Review> implements PropertyChangeLi
      * {@link PropertyChangeSupport} of this POJO, used for firing {@link PropertyChangeEvent}s on changes of fields.
      */
     private final PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(this);
-    
+    /**
+     * The {@link List} of currently registered {@link ICommentFilterListener}s
+     */
+    private final List<ICommentFilterListener> commentFilterListeners = new LinkedList<ICommentFilterListener>();
+    /**
+     * Current registered filter
+     */
+    private final Map<Object, Matcher<Object>> currentFilter = new HashMap<Object, Matcher<Object>>();
     /**
      * Map for storing generic values
      */
@@ -148,6 +161,76 @@ public final class ReviewSet extends HashSet<Review> implements PropertyChangeLi
     }
     
     /**
+     * Sets the given comments as the current filter for the given source. In order to provide different parallel filter mechanisms, a filter depends
+     * on its managing source object
+     * @param source object which manages the filter mechanism
+     * @param filter the filtered set of comments to be shown
+     * @author Malte Brunnlieb (10.03.2013)
+     */
+    public void setCommentFilter(Object source, Matcher<Object> filter) {
+        synchronized (currentFilter) {
+            currentFilter.put(source, filter);
+            filterComments();
+        }
+    }
+    
+    /**
+     * Removes the filter for the given source
+     * @param source object on which the filter is registered
+     * @author Malte Brunnlieb (28.05.2013)
+     */
+    public void removeCommentFilter(Object source) {
+        synchronized (currentFilter) {
+            currentFilter.remove(source);
+            filterComments();
+        }
+    }
+    
+    /**
+     * Filters the currently visible set of comments
+     * @author Malte Brunnlieb (01.06.2013)
+     */
+    private void filterComments() {
+        Set<Comment> filteredComments = new HashSet<Comment>();
+        for (Review r : this) {
+            filteredComments.addAll(r.getComments());
+        }
+        for (Matcher<Object> matcher : currentFilter.values()) {
+            filteredComments.retainAll(Lambda.filter(matcher, filteredComments));
+        }
+        notifyCommentFilterListeners(filteredComments);
+    }
+    
+    /**
+     * 
+     * @param filteredComments
+     * @author Malte Brunnlieb (01.06.2013)
+     */
+    private void notifyCommentFilterListeners(Set<Comment> filteredComments) {
+        for (ICommentFilterListener listener : commentFilterListeners) {
+            listener.setFilteredComments(new HashSet<Comment>(filteredComments));
+        }
+    }
+    
+    /**
+     * Adds the given {@link ICommentFilterListener}
+     * @param listener {@link ICommentFilterListener} to be added
+     * @author Malte Brunnlieb (01.06.2013)
+     */
+    public void addCommentFilterListener(ICommentFilterListener listener) {
+        commentFilterListeners.add(listener);
+    }
+    
+    /**
+     * Removes the given {@link ICommentFilterListener}
+     * @param listener {@link ICommentFilterListener} to be removed
+     * @author Malte Brunnlieb (01.06.2013)
+     */
+    public void removeCommentFilterListener(ICommentFilterListener listener) {
+        commentFilterListeners.remove(listener);
+    }
+    
+    /**
      * Possibility to store generic values in the review set (including {@link PropertyChangeSupport})
      * @param key key under which the value will be stored. The key is also the <i>propertyName</i> which will be used for propertyChange events
      * @param value value to store
@@ -221,24 +304,5 @@ public final class ReviewSet extends HashSet<Review> implements PropertyChangeLi
     @Override
     public int hashCode() {
         return (int) (super.hashCode() ^ serialVersionUID);
-    }
-    
-    /**
-     * Sets the given comments as the current filter for the given source. In order to provide different parallel filter mechanisms, a filter depends
-     * on its managing source object
-     * @param source object which manages the filter mechanism
-     * @param comments the filtered set of comments to be shown
-     * @author Malte Brunnlieb (10.03.2013)
-     */
-    public void publishFilter(Object source, Set<Comment> comments) {
-        for (Review r : this) {
-            for (Comment c : r.getComments()) {
-                if (comments.contains(c)) {
-                    c.filteredBy.remove(source);
-                } else {
-                    c.filteredBy.add(source);
-                }
-            }
-        }
     }
 }

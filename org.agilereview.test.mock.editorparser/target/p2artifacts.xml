@@ -1,0 +1,14 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<?artifactRepository version='1.1.0'?>
+<artifacts size='1'>
+  <artifact classifier='osgi.bundle' id='org.agilereview.test.mock.editorParser' version='1.0.0.201305152122'>
+    <properties size='6'>
+      <property name='artifact.size' value='4830'/>
+      <property name='download.size' value='4830'/>
+      <property name='download.md5' value='96cd772589092322eb3582c4dc09ecab'/>
+      <property name='maven-groupId' value='org.agilereview'/>
+      <property name='maven-artifactId' value='org.agilereview.test.mock.editorparser'/>
+      <property name='maven-version' value='1.0.0-SNAPSHOT'/>
+    </properties>
+  </artifact>
+</artifacts>

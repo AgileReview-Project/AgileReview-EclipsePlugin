@@ -1,0 +1,36 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<units size='1'>
+  <unit id='org.agilereview.test.mock.editorParser' version='1.0.0.201305152122'>
+    <update id='org.agilereview.test.mock.editorParser' range='[0.0.0,1.0.0.201305152122)' severity='0'/>
+    <properties size='4'>
+      <property name='org.eclipse.equinox.p2.name' value='EditorParserMock'/>
+      <property name='maven-groupId' value='org.agilereview'/>
+      <property name='maven-artifactId' value='org.agilereview.test.mock.editorparser'/>
+      <property name='maven-version' value='1.0.0-SNAPSHOT'/>
+    </properties>
+    <provides size='4'>
+      <provided namespace='org.eclipse.equinox.p2.iu' name='org.agilereview.test.mock.editorParser' version='1.0.0.201305152122'/>
+      <provided namespace='osgi.bundle' name='org.agilereview.test.mock.editorParser' version='1.0.0.201305152122'/>
+      <provided namespace='java.package' name='org.agilereview.test.mock.editorparser.external' version='0.0.0'/>
+      <provided namespace='org.eclipse.equinox.p2.eclipse.type' name='bundle' version='1.0.0'/>
+    </provides>
+    <requires size='5'>
+      <required namespace='osgi.bundle' name='org.eclipse.ui' range='0.0.0'/>
+      <required namespace='osgi.bundle' name='org.eclipse.core.runtime' range='0.0.0'/>
+      <required namespace='osgi.bundle' name='org.agilereview.core' range='0.9.0'/>
+      <required namespace='osgi.bundle' name='org.eclipse.core.resources' range='3.5.0'/>
+      <required namespace='osgi.bundle' name='org.eclipse.ui.editors' range='3.7.0'/>
+    </requires>
+    <artifacts size='1'>
+      <artifact classifier='osgi.bundle' id='org.agilereview.test.mock.editorParser' version='1.0.0.201305152122'/>
+    </artifacts>
+    <touchpoint id='org.eclipse.equinox.p2.osgi' version='1.0.0'/>
+    <touchpointData size='1'>
+      <instructions size='1'>
+        <instruction key='manifest'>
+          Bundle-Name: EditorParserMock&#xA;Bundle-Version: 1.0.0.201305152122&#xA;Bundle-Activator: org.agilereview.test.mock.editorparser.Activator&#xA;Created-By: Apache Maven&#xA;Archiver-Version: Plexus Archiver&#xA;Require-Bundle: org.eclipse.ui,org.eclipse.core.runtime,org.agilereview.core;bundle-version=&quot;0.9.0&quot;,org.eclipse.core.resources;bundle-version=&quot;3.5.0&quot;,org.eclipse.ui.editors;bundle-version=&quot;3.7.0&quot;&#xA;Export-Package: org.agilereview.test.mock.editorparser.external&#xA;Bundle-SymbolicName: org.agilereview.test.mock.editorParser;singleton:=true&#xA;Built-By: mbrunnli&#xA;Manifest-Version: 1.0&#xA;Build-Jdk: 1.6.0_38&#xA;Bundle-ActivationPolicy: lazy&#xA;Bundle-ManifestVersion: 2&#xA;Bundle-RequiredExecutionEnvironment: JavaSE-1.6&#xA;
+        </instruction>
+      </instructions>
+    </touchpointData>
+  </unit>
+</units>

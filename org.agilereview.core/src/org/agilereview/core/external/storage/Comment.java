@@ -12,9 +12,7 @@ import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import org.agilereview.core.Activator;
 import org.agilereview.core.external.definition.IStorageClient;
@@ -75,13 +73,13 @@ public final class Comment implements PropertyChangeListener {
     private List<Reply> replies = new ArrayList<Reply>(0);
     
     /**
-     * A set of sources filtering this comment
-     */
-    Set<Object> filteredBy = new HashSet<Object>();
-    /**
      * {@link PropertyChangeSupport} of this POJO, used for firing {@link PropertyChangeEvent}s on changes of fields.
      */
     private PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(this);
+    
+    public Comment() {
+        
+    }
     
     /**
      * Constructor that should be used if a new comment is created.
@@ -352,7 +350,7 @@ public final class Comment implements PropertyChangeListener {
      */
     @Override
     public int hashCode() {
-        return (this.getReview().getId() + this.getAuthor() + this.getId()).hashCode();
+        return ((review == null ? review : review.getId()) + author + id).hashCode();
     }
     
     /* (non-Javadoc)
@@ -375,15 +373,7 @@ public final class Comment implements PropertyChangeListener {
      */
     @Override
     public String toString() {
-        return "Comment '" + this.getId() + "' of author '" + this.getAuthor() + "' in " + this.getReview().toString();
+        return "Comment '" + id + "' of author '" + author + "' in " + (review == null ? review : review.toString());
     }
     
-    /**
-     * Checks whether the comment is filtered by any object
-     * @return <code>true</code> if the comment is not filtered by any object<br><code>false</code> otherwise
-     * @author Malte Brunnlieb (10.03.2013)
-     */
-    public boolean isFilteredToBeShown() {
-        return !filteredBy.isEmpty();
-    }
 }

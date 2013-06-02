@@ -7,21 +7,26 @@
  */
 package org.agilereview.ui.basic.commentSummary.filter;
 
+import static ch.lambdaj.Lambda.having;
+import static ch.lambdaj.Lambda.on;
+import static org.hamcrest.Matchers.containsString;
+
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.regex.Pattern;
+import java.util.LinkedList;
+import java.util.List;
 
 import org.agilereview.core.external.storage.Comment;
 import org.agilereview.ui.basic.commentSummary.table.Column;
 import org.agilereview.ui.basic.tools.CommentProperties;
-import org.eclipse.jface.viewers.Viewer;
-import org.eclipse.jface.viewers.ViewerFilter;
+import org.hamcrest.Matcher;
+import org.hamcrest.core.AllOf;
 
 /**
  * Filters comments by a given search keyword (and a given column)
  * @author Malte Brunnlieb (07.06.2012)
  */
-public class SearchFilter extends ViewerFilter {
+public class SearchFilter {
     
     /**
      * search word by which comments should be filtered
@@ -56,43 +61,56 @@ public class SearchFilter extends ViewerFilter {
      * @author Malte Brunnlieb (07.06.2012)
      */
     public void setSearchText(String s) {
-        this.searchString = ".*" + Pattern.quote(s) + ".*";
+        this.searchString = s;
     }
     
-    /* (non-Javadoc)
-     * @see org.eclipse.jface.viewers.ViewerFilter#select(org.eclipse.jface.viewers.Viewer, java.lang.Object, java.lang.Object)
+    /**
+     * Returns the Filter expression for the current filter
+     * @return {@link Matcher} for the current search filter
+     * @author Malte Brunnlieb (01.06.2013)
      */
-    @Override
-    public boolean select(Viewer viewer, Object parentElement, Object element) {
-        Comment c = (Comment) element;
-        if (searchString == null || searchString.length() == 0) { return true; }
+    @SuppressWarnings({ "unchecked", "rawtypes" })
+    public Matcher<Object> getFilterExpression() {
+        List<Matcher<Object>> matchers = new LinkedList<Matcher<Object>>();
+        boolean matchAll = false;
         
         switch (restriction) {
         default:
+            matchAll = true;
         case AUTHOR:
-            if (c.getAuthor().matches(searchString)) { return true; }
+            matchers.add(having(on(Comment.class).getAuthor(), containsString(searchString)));
+            if (!matchAll) break;
         case COMMENT_ID:
-            if (c.getId().matches(searchString)) { return true; }
+            matchers.add(having(on(Comment.class).getId(), containsString(searchString)));
+            if (!matchAll) break;
         case DATE_CREATED:
             DateFormat df = new SimpleDateFormat("dd.M.yyyy', 'HH:mm:ss");
-            if (df.format(c.getCreationDate().getTime()).matches(searchString)) { return true; }
+            matchers.add(having(df.format(on(Comment.class).getCreationDate().getTime()), containsString(searchString)));
+            if (!matchAll) break;
         case DATE_MODIFIED:
             df = new SimpleDateFormat("dd.M.yyyy', 'HH:mm:ss");
-            if (df.format(c.getModificationDate().getTime()).matches(searchString)) { return true; }
+            matchers.add(having(df.format(on(Comment.class).getModificationDate().getTime()), containsString(searchString)));
+            if (!matchAll) break;
         case LOCATION:
-            if (c.getCommentedFile().getFullPath().toOSString().matches(searchString)) { return true; }
+            matchers.add(having(on(Comment.class).getCommentedFile().getFullPath().toOSString(), containsString(searchString)));
+            if (!matchAll) break;
         case NO_REPLIES:
-            if (String.valueOf(c.getReplies().size()).matches(searchString)) { return true; }
+            matchers.add(having(String.valueOf(on(Comment.class).getReplies().size()), containsString(searchString)));
+            if (!matchAll) break;
         case PRIORITY:
-            if (commentProperties.getPriorityByID(c.getPriority()).matches(searchString)) { return true; }
+            matchers.add(having(commentProperties.getPriorityByID(on(Comment.class).getPriority()), containsString(searchString)));
+            if (!matchAll) break;
         case RECIPIENT:
-            if (c.getRecipient().matches(searchString)) { return true; }
+            matchers.add(having(on(Comment.class).getRecipient(), containsString(searchString)));
+            if (!matchAll) break;
         case REVIEW_ID:
-            if (c.getReview().getId().matches(searchString)) { return true; }
+            matchers.add(having(on(Comment.class).getReview().getId(), containsString(searchString)));
+            if (!matchAll) break;
         case STATUS:
-            if (commentProperties.getStatusByID(c.getStatus()).matches(searchString)) { return true; }
+            matchers.add(having(commentProperties.getStatusByID(on(Comment.class).getStatus()), containsString(searchString)));
+            if (!matchAll) break;
         }
         
-        return false;
+        return new AllOf(matchers);
     }
 }
