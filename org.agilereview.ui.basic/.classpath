@@ -3,12 +3,6 @@
 	<classpathentry including="**/*.java" kind="src" path="src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
-	<classpathentry kind="lib" path="hamcrest-all-1.1.jar"/>
-	<classpathentry kind="lib" path="cglib-nodep-2.2.jar" sourcepath="C:/Users/mbrunnli/.m2/repository/cglib/cglib-nodep/2.2/cglib-nodep-2.2-sources.jar">
-		<attributes>
-			<attribute name="javadoc_location" value="jar:file:/C:/Users/mbrunnli/.m2/repository/cglib/cglib-nodep/2.2/cglib-nodep-2.2-javadoc.jar!/"/>
-		</attributes>
-	</classpathentry>
 	<classpathentry kind="lib" path="C:/Users/mbrunnli/.m2/repository/p2/osgi/bundle/org.eclipse.ui/3.7.0.v20110928-1505/org.eclipse.ui-3.7.0.v20110928-1505.jar"/>
 	<classpathentry kind="lib" path="C:/Users/mbrunnli/.m2/repository/p2/osgi/bundle/org.eclipse.core.runtime/3.7.0.v20110110/org.eclipse.core.runtime-3.7.0.v20110110.jar"/>
 	<classpathentry kind="lib" path="C:/Users/mbrunnli/.m2/repository/p2/osgi/bundle/org.eclipse.osgi/3.7.2.v20120110-1415/org.eclipse.osgi-3.7.2.v20120110-1415.jar"/>
@@ -38,6 +32,5 @@
 	<classpathentry kind="lib" path="C:/Users/mbrunnli/.m2/repository/.cache/tycho/org.agilereview.common-1.0.0-SNAPSHOT.jar/lib/google-gson-2.2.2/gson-2.2.2.jar"/>
 	<classpathentry kind="lib" path="C:/Users/mbrunnli/.m2/repository/org/agilereview/org.agilereview.common/1.0.0-SNAPSHOT/org.agilereview.common-1.0.0-SNAPSHOT.jar"/>
 	<classpathentry kind="lib" path="C:/Users/mbrunnli/.m2/repository/p2/osgi/bundle/org.eclipse.ui.ide/3.7.0.v20110928-1505/org.eclipse.ui.ide-3.7.0.v20110928-1505.jar"/>
-	<classpathentry kind="lib" path="lambdaj-2.4.jar"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>

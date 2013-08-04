@@ -20,7 +20,4 @@ Export-Package: org.agilereview.ui.basic.external.reviewDataReceiver;
    org.eclipse.ui.part,
    org.agilereview.core.external.definition,
    org.eclipse.swt.widgets"
-Bundle-ClassPath: .,
- hamcrest-all-1.1.jar,
- cglib-nodep-2.2.jar,
- lambdaj-2.4.jar
+Bundle-ClassPath: .

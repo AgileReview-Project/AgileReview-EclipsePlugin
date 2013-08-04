@@ -114,8 +114,8 @@ public class CommentSummaryView extends AbstractReviewDataView {
                 filterController = new FilterController(toolBar);
                 toolBar.setListeners(filterController);
             }
-            filterController.setReviewSet((ReviewSet) reviewData);
             ((ReviewSet) reviewData).addCommentFilterListener(new ViewController(viewer));
+            filterController.setReviewSet((ReviewSet) reviewData);
         }
     }
     

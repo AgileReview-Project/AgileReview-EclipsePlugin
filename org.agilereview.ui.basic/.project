@@ -31,26 +31,4 @@
 		<nature>org.eclipse.pde.PluginNature</nature>
 		<nature>org.eclipse.jdt.core.javanature</nature>
 	</natures>
-	<linkedResources>
-		<link>
-			<name>cglib-nodep-2.2.jar</name>
-			<type>1</type>
-			<location>C:/Users/mbrunnli/.m2/repository/cglib/cglib-nodep/2.2/cglib-nodep-2.2.jar</location>
-		</link>
-		<link>
-			<name>hamcrest-all-1.1.jar</name>
-			<type>1</type>
-			<location>C:/Users/mbrunnli/.m2/repository/org/hamcrest/hamcrest-all/1.1/hamcrest-all-1.1.jar</location>
-		</link>
-		<link>
-			<name>lambdaj-2.3.3.jar</name>
-			<type>1</type>
-			<location>C:/Users/mbrunnli/.m2/repository/com/googlecode/lambdaj/lambdaj/2.3.3/lambdaj-2.3.3.jar</location>
-		</link>
-		<link>
-			<name>lambdaj-2.4.jar</name>
-			<type>1</type>
-			<location>C:/Users/mbrunnli/.m2/repository/com/googlecode/lambdaj/lambdaj/2.4/lambdaj-2.4.jar</location>
-		</link>
-	</linkedResources>
 </projectDescription>

@@ -250,9 +250,7 @@ public final class ReviewSet extends HashSet<Review> implements PropertyChangeLi
      * @author Thilo Rauch (26.11.2012)
      */
     public Object getValue(String key) {
-        if (key == null) {
-            return null;
-        }
+        if (key == null) { return null; }
         return genericMap.get(key);
     }
     

@@ -24,7 +24,7 @@ import org.eclipse.core.runtime.preferences.InstanceScope;
  * A class that stores data and a list of replies of a comment.
  * @author Peter Reuter (19.02.2012)
  */
-public final class Comment implements PropertyChangeListener {
+public class Comment implements PropertyChangeListener {
     
     /**
      * The id of the comment that is retrieved from an {@link IStorageClient}
@@ -76,10 +76,6 @@ public final class Comment implements PropertyChangeListener {
      * {@link PropertyChangeSupport} of this POJO, used for firing {@link PropertyChangeEvent}s on changes of fields.
      */
     private PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(this);
-    
-    public Comment() {
-        
-    }
     
     /**
      * Constructor that should be used if a new comment is created.

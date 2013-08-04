@@ -103,7 +103,7 @@ public class FilterController extends SelectionAdapter implements Listener, KeyL
         String searchText = toolBar.getSearchText();
         currentSearchFilter.setSearchText(searchText);
         if (searchText.trim().isEmpty()) {
-            removeFilter(this);
+            removeFilter(Filter.SEARCH_FILTER);
         } else {
             applyFilter(Filter.SEARCH_FILTER, currentSearchFilter.getFilterExpression());
         }

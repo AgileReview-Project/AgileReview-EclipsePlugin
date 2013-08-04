@@ -13,16 +13,18 @@
 		<tycho-version>0.17.0</tycho-version>
 	</properties>
 
-	<dependencies>
-		<dependency>
-			<groupId>com.googlecode.lambdaj</groupId>
-			<artifactId>lambdaj</artifactId>
-			<version>2.3.3</version>
-		</dependency>
-	</dependencies>
-
 	<build>
 		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+		        <artifactId>maven-eclipse-plugin</artifactId>
+		        <version>2.9</version>
+		        <configuration>
+		          <downloadSources>true</downloadSources>
+                <downloadJavadocs>true</downloadJavadocs>
+		          <pde>true</pde>
+		        </configuration>
+		      </plugin>
 			<plugin>
 				<groupId>org.sonatype.tycho</groupId>
 				<artifactId>tycho-maven-plugin</artifactId>
@@ -34,6 +36,7 @@
 				<artifactId>target-platform-configuration</artifactId>
 				<version>0.11.1</version>
 				<configuration>
+					<pomDependencies>consider</pomDependencies>
 					<resolver>p2</resolver>
 				</configuration>
 			</plugin>

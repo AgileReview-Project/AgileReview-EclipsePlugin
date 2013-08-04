@@ -11,8 +11,6 @@ import static ch.lambdaj.Lambda.having;
 import static ch.lambdaj.Lambda.on;
 import static org.hamcrest.Matchers.containsString;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -20,7 +18,7 @@ import org.agilereview.core.external.storage.Comment;
 import org.agilereview.ui.basic.commentSummary.table.Column;
 import org.agilereview.ui.basic.tools.CommentProperties;
 import org.hamcrest.Matcher;
-import org.hamcrest.core.AllOf;
+import org.hamcrest.core.AnyOf;
 
 /**
  * Filters comments by a given search keyword (and a given column)
@@ -84,21 +82,25 @@ public class SearchFilter {
             matchers.add(having(on(Comment.class).getId(), containsString(searchString)));
             if (!matchAll) break;
         case DATE_CREATED:
-            DateFormat df = new SimpleDateFormat("dd.M.yyyy', 'HH:mm:ss");
-            matchers.add(having(df.format(on(Comment.class).getCreationDate().getTime()), containsString(searchString)));
+            //TODO lambdaj problem
+            //                        DateFormat df = new SimpleDateFormat("dd.M.yyyy', 'HH:mm:ss");
+            //                        matchers.add(having(df.format(on(Comment.class).getCreationDate().getTime()), containsString(searchString)));
             if (!matchAll) break;
         case DATE_MODIFIED:
-            df = new SimpleDateFormat("dd.M.yyyy', 'HH:mm:ss");
-            matchers.add(having(df.format(on(Comment.class).getModificationDate().getTime()), containsString(searchString)));
+            //TODO lambdaj problem
+            //                        df = new SimpleDateFormat("dd.M.yyyy', 'HH:mm:ss");
+            //                        matchers.add(having(df.format(on(Comment.class).getModificationDate().getTime()), containsString(searchString)));
             if (!matchAll) break;
         case LOCATION:
             matchers.add(having(on(Comment.class).getCommentedFile().getFullPath().toOSString(), containsString(searchString)));
             if (!matchAll) break;
         case NO_REPLIES:
-            matchers.add(having(String.valueOf(on(Comment.class).getReplies().size()), containsString(searchString)));
+            //TODO lambdaj problem
+            //            matchers.add(having(String.valueOf(on(Comment.class).getReplies().size()), containsString(searchString)));
             if (!matchAll) break;
         case PRIORITY:
-            matchers.add(having(commentProperties.getPriorityByID(on(Comment.class).getPriority()), containsString(searchString)));
+            //TODO lambdaj problem
+            //            matchers.add(having(commentProperties.getPriorityByID(on(Comment.class).getPriority()), containsString(searchString)));
             if (!matchAll) break;
         case RECIPIENT:
             matchers.add(having(on(Comment.class).getRecipient(), containsString(searchString)));
@@ -107,10 +109,11 @@ public class SearchFilter {
             matchers.add(having(on(Comment.class).getReview().getId(), containsString(searchString)));
             if (!matchAll) break;
         case STATUS:
-            matchers.add(having(commentProperties.getStatusByID(on(Comment.class).getStatus()), containsString(searchString)));
+            //TODO lambdaj problem
+            //            matchers.add(having(commentProperties.getStatusByID(on(Comment.class).getStatus()), containsString(searchString)));
             if (!matchAll) break;
         }
         
-        return new AllOf(matchers);
+        return new AnyOf(matchers);
     }
 }

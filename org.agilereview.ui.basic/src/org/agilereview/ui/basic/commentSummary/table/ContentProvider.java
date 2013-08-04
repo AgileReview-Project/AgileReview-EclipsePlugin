@@ -9,6 +9,8 @@ package org.agilereview.ui.basic.commentSummary.table;
 
 import java.beans.PropertyChangeEvent;
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.agilereview.core.external.definition.IReviewDataReceiver;
 import org.agilereview.core.external.storage.Comment;
@@ -94,7 +96,24 @@ public class ContentProvider extends AbstractReviewDataReceiver implements IStru
      */
     @Override
     public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
-        viewer.refresh();
+        boolean validInput = true;
+        Set<Comment> newComments = new HashSet<Comment>();
+        if (newInput instanceof Set<?>) {
+            for (Object o : (Set<?>) newInput) {
+                if (!(o instanceof Comment)) {
+                    validInput = false;
+                    break;
+                } else {
+                    newComments.add((Comment) o);
+                }
+            }
+        }
+        
+        if (validInput) {
+            comments.clear();
+            comments.addAll(newComments);
+            viewer.refresh();
+        }
     }
     
     /**

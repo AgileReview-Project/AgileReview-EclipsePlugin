@@ -78,7 +78,7 @@ public class CommentProperties {
     public String getPriorityByID(int ID) {
         String prio = "Priority not found!";
         if (ID < 0 || ID >= this.commentPriorities.length) {
-            throw new RuntimeException(ID + " no valid PrioritiesID!");
+            throw new RuntimeException(ID + " is no valid Priorities-ID!");
         } else {
             prio = this.commentPriorities[ID];
         }
