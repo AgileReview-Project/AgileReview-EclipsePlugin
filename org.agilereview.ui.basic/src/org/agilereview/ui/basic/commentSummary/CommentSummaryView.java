@@ -29,7 +29,7 @@ public class CommentSummaryView extends AbstractReviewDataView {
     /**
      * Unique instance of the {@link CommentSummaryView}
      */
-    private static CommentSummaryView instance = null;
+    private static volatile CommentSummaryView instance = null;
     /**
      * The {@link ToolBar} for this ViewPart
      */
