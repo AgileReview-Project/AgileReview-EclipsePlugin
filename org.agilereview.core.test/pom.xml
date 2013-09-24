@@ -4,7 +4,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.agilereview</groupId>
   <artifactId>org.agilereview.core.test</artifactId>
-  <description>AgileReview Core Test Fragment</description>
+  <name>AgileReview Core Test Fragment</name>
   <version>1.0.0-SNAPSHOT</version>
   <packaging>eclipse-test-plugin</packaging>
   
@@ -52,7 +52,7 @@
                         <!--<file.encoding>${project.build.sourceEncoding}</file.encoding>-->
                     </systemPropertyVariables>
                 </configuration>
-            </plugin>
+          </plugin>
 	      <plugin>
 	        <groupId>org.sonatype.tycho</groupId>
 	        <artifactId>tycho-maven-plugin</artifactId>

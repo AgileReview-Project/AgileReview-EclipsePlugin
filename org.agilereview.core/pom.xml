@@ -4,89 +4,16 @@
 	xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.agilereview</groupId>
-	<artifactId>org.agilereview.core</artifactId>
-	<description>AgileReview Core</description>
-	<version>1.0.0-SNAPSHOT</version>
+	<artifactId>core</artifactId>
+	<name>AgileReview Core</name>
+	<version>${release.version}</version>
 	<packaging>eclipse-plugin</packaging>
-
-	<properties>
-		<tycho-version>0.17.0</tycho-version>
-	</properties>
-
-	<build>
-		<plugins>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-		        <artifactId>maven-eclipse-plugin</artifactId>
-		        <version>2.9</version>
-		        <configuration>
-		          <downloadSources>true</downloadSources>
-                <downloadJavadocs>true</downloadJavadocs>
-		          <pde>true</pde>
-		        </configuration>
-		      </plugin>
-			<plugin>
-				<groupId>org.sonatype.tycho</groupId>
-				<artifactId>tycho-maven-plugin</artifactId>
-				<version>0.11.1</version>
-				<extensions>true</extensions>
-			</plugin>
-			<plugin>
-				<groupId>org.sonatype.tycho</groupId>
-				<artifactId>target-platform-configuration</artifactId>
-				<version>0.11.1</version>
-				<configuration>
-					<pomDependencies>consider</pomDependencies>
-					<resolver>p2</resolver>
-				</configuration>
-			</plugin>
-		</plugins>
-
-		<pluginManagement>
-			<plugins>
-				<!--This plugin's configuration is used to store Eclipse m2e settings 
-					only. It has no influence on the Maven build itself. -->
-				<plugin>
-					<groupId>org.eclipse.m2e</groupId>
-					<artifactId>lifecycle-mapping</artifactId>
-					<version>1.0.0</version>
-					<configuration>
-						<lifecycleMappingMetadata>
-							<pluginExecutions>
-								<pluginExecution>
-									<pluginExecutionFilter>
-										<groupId>org.sonatype.tycho</groupId>
-										<artifactId>maven-osgi-compiler-plugin</artifactId>
-										<versionRange>[0.11.1,)</versionRange>
-										<goals>
-											<goal>compile</goal>
-										</goals>
-									</pluginExecutionFilter>
-									<action>
-										<ignore></ignore>
-									</action>
-								</pluginExecution>
-								<pluginExecution>
-									<pluginExecutionFilter>
-										<groupId>org.sonatype.tycho</groupId>
-										<artifactId>maven-osgi-packaging-plugin</artifactId>
-										<versionRange>[0.11.1,)</versionRange>
-										<goals>
-											<goal>validate-version</goal>
-											<goal>build-qualifier</goal>
-										</goals>
-									</pluginExecutionFilter>
-									<action>
-										<ignore></ignore>
-									</action>
-								</pluginExecution>
-							</pluginExecutions>
-						</lifecycleMappingMetadata>
-					</configuration>
-				</plugin>
-			</plugins>
-		</pluginManagement>
-	</build>
+	
+	<parent>
+		<groupId>org.agilereview</groupId>
+		<artifactId>parent</artifactId>
+		<version>${release.version}</version>
+	</parent>
 
 	<reporting>
 		<plugins>
@@ -106,12 +33,4 @@
 			</plugin>
 		</plugins>
 	</reporting>
-
-	<repositories>
-		<repository>
-			<id>indigo</id>
-			<layout>p2</layout>
-			<url>http://download.eclipse.org/releases/indigo/</url>
-		</repository>
-	</repositories>
 </project>
