@@ -422,16 +422,10 @@ public class Review implements PropertyChangeListener, IPreferenceChangeListener
      */
     @Override
     public boolean equals(Object o) {
-        if (o == null) {
-            return false;
-        }
-        if (o.getClass() != getClass()) {
-            return false;
-        }
+        if (o == null) { return false; }
+        if (o.getClass() != getClass()) { return false; }
         Review reviewToCompare = (Review) o;
-        if (this.getId().equals(reviewToCompare.getId())) {
-            return true;
-        }
+        if (this.getId().equals(reviewToCompare.getId())) { return true; }
         return false;
     }
     

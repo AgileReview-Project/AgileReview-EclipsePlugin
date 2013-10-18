@@ -1,23 +1,22 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: org.agilereview.ui.basic
+Bundle-Name: AgileReview Basic UI
 Bundle-SymbolicName: org.agilereview.ui.basic;singleton:=true
-Bundle-Version: 1.0.0.qualifier
+Bundle-Version: 1.0.0
 Bundle-Activator: org.agilereview.ui.basic.Activator
 Bundle-Vendor: AgileReview Project
-Require-Bundle: org.eclipse.ui,
- org.eclipse.core.runtime,
- org.eclipse.core.resources;bundle-version="3.5.2",
- org.agilereview.core,
- org.agilereview.common;bundle-version="1.0.0"
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ActivationPolicy: lazy
-Import-Package: org.agilereview.core.external.definition,
- org.agilereview.core.external.storage,
- org.eclipse.ui.ide
 Export-Package: org.agilereview.ui.basic.external.reviewDataReceiver;
   uses:="org.agilereview.core.external.storage,
    org.eclipse.ui.part,
    org.agilereview.core.external.definition,
    org.eclipse.swt.widgets"
 Bundle-ClassPath: .
+Require-Bundle: org.agilereview.common;bundle-version="1.0.0",
+ org.agilereview.core;bundle-version="1.0.0",
+ org.eclipse.core.resources;bundle-version="3.5.2",
+ org.eclipse.jface;bundle-version="3.5.2",
+ org.eclipse.ui;bundle-version="3.5.2",
+ org.eclipse.core.runtime;bundle-version="3.5.0",
+ org.eclipse.ui.ide;bundle-version="3.5.2"
