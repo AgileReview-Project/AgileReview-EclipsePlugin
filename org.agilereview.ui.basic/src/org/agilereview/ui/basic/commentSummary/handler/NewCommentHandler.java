@@ -39,7 +39,7 @@ public class NewCommentHandler extends AbstractHandler {
             ExceptionHandler.warnUser("You cannot create a new comment as currently there is no active review or author specified."); //TODO offer support (create/activate new review or specify author)
         } else {
             try {
-                new CommentingAPI().createComment(author, activeReview);
+                CommentingAPI.createComment(author, activeReview);
             } catch (NoOpenEditorException e) {
                 ExceptionHandler.warnUser("There is currently no editor open for commenting anything.");
             } catch (NullArgumentException e) {

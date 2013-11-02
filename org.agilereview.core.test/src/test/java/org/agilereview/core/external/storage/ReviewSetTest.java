@@ -5,7 +5,7 @@
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  * Contributors: Malte Brunnlieb, Philipp Diebold, Peter Reuter, Thilo Rauch
  */
-package org.agilereview.core.test.external.storage;
+package org.agilereview.core.external.storage;
 
 import static org.junit.Assert.*;
 

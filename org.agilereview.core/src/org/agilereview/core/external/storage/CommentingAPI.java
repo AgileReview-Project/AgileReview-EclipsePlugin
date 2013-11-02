@@ -30,17 +30,17 @@ public class CommentingAPI {
     /**
      * {@link StorageController} instance
      */
-    private final StorageController sController;
+    private static final StorageController sController;
     /**
      * {@link EditorParserController} instance
      */
-    private final EditorParserController eController;
+    private static final EditorParserController eController;
     
     /**
      * Creates a new instance of the {@link CommentingAPI}
      * @author Malte Brunnlieb (17.12.2012)
      */
-    public CommentingAPI() {
+    static {
         sController = (StorageController) ExtensionControllerFactory.getExtensionController(ExtensionPoint.StorageClient);
         eController = (EditorParserController) ExtensionControllerFactory.getExtensionController(ExtensionPoint.EditorParser);
     }
@@ -50,7 +50,7 @@ public class CommentingAPI {
      * @return the newly created {@link Review}
      * @author Malte Brunnlieb (17.12.2012)
      */
-    public Review createReview() {
+    public static Review createReview() {
         //TODO set name initially in order to be able to display the review in the review explorer nicely
         String reviewId = sController.getNewReviewId();
         Review review = new Review(reviewId);
@@ -67,7 +67,7 @@ public class CommentingAPI {
      * @throws NullArgumentException if one of the arguments are passed with value <code>null</code>
      * @author Malte Brunnlieb (17.12.2012)
      */
-    public Comment createComment(String author, String reviewId) throws NoOpenEditorException, NullArgumentException {
+    public static Comment createComment(String author, String reviewId) throws NoOpenEditorException, NullArgumentException {
         if (author == null || reviewId == null) throw new NullArgumentException("The given arguments cannot be set to null when creating a comment");
         IEditorPart editor = PlatformUITools.getActiveWorkbenchPage().getActiveEditor();
         if (editor == null) throw new NoOpenEditorException();
@@ -97,7 +97,7 @@ public class CommentingAPI {
      * @throws NoOpenEditorException //TODO should be removed when tag parser for IFile has been implemented
      * @author Malte Brunnlieb (17.12.2012)
      */
-    public void deleteComment(String commentId) throws NoOpenEditorException {
+    public static void deleteComment(String commentId) throws NoOpenEditorException {
         IEditorPart part = PlatformUITools.getActiveWorkbenchPage().getActiveEditor();
         if (part == null) {
             throw new NoOpenEditorException();
@@ -113,7 +113,7 @@ public class CommentingAPI {
      * @return the review with the given id<br><code>null</code>, otherwise
      * @author Malte Brunnlieb (26.11.2012)
      */
-    private Review getReview(String reviewId) {
+    private static Review getReview(String reviewId) {
         Set<Review> reviews = new HashSet<Review>(sController.getAllReviews());
         for (Review r : reviews) {
             if (r.getId().equals(reviewId)) {
@@ -129,7 +129,7 @@ public class CommentingAPI {
      * @return the {@link Comment} searched for<br><code>null</code>, otherwise
      * @author Malte Brunnlieb (17.12.2012)
      */
-    private Comment getComment(String commentId) {
+    private static Comment getComment(String commentId) {
         Set<Review> reviews = new HashSet<Review>(sController.getAllReviews());
         for (Review r : reviews) {
             for (Comment c : r.getComments()) {

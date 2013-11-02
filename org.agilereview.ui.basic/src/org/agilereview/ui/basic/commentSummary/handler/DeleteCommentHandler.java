@@ -35,13 +35,12 @@ public class DeleteCommentHandler extends AbstractHandler {
         
         ISelection selection = PlatformUITools.getActiveWorkbenchPage().getSelection();
         if (selection instanceof IStructuredSelection) {
-            CommentingAPI api = new CommentingAPI();
             Iterator<?> it = ((IStructuredSelection) selection).iterator();
             while (it.hasNext()) {
                 Object o = it.next();
                 if (o instanceof Comment) {
                     try {
-                        api.deleteComment(((Comment) o).getId());
+                        CommentingAPI.deleteComment(((Comment) o).getId());
                     } catch (NoOpenEditorException e) {
                         ExceptionHandler
                                 .warnUser("Wrong usage of Commenting API as currently there is no open editor the comment can be deleted from.");

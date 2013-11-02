@@ -7,15 +7,13 @@
  */
 package org.agilereview.ui.basic.test.detail;
 
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-
 import java.util.Calendar;
 
 import org.agilereview.core.external.storage.Comment;
 import org.agilereview.core.external.storage.Reply;
 import org.agilereview.core.external.storage.Review;
 import org.agilereview.core.external.storage.ReviewSet;
+import org.agilereview.core.external.storage.StorageAPI;
 import org.agilereview.test.common.storage.external.StorageClientMock;
 import org.agilereview.ui.basic.commentSummary.CommentSummaryView;
 import org.eclipse.core.resources.IFile;
@@ -27,6 +25,9 @@ import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 /**
  * Test class for class {@link CommentSummaryView}
@@ -66,7 +67,7 @@ public class DetailViewTest {
     @Before
     public void setupTest() {
         bot.resetWorkbench();
-        SWTBotPerspective perspective = bot.perspectiveById("org.agilereview.ui.basic.perspective");
+        SWTBotPerspective perspective = bot.perspectiveById("org.agilereview.perspective");
         if (!perspective.isActive()) {
             perspective.activate();
         }
@@ -79,19 +80,25 @@ public class DetailViewTest {
     @Test
     public void Test_Show() {
         //test preparation
-        Review review = new Review("1");
+        Review review = mock(Review.class);
+        when(review.getId()).thenReturn("1");
+        
         IFile fileMock = mock(IFile.class);
         when(fileMock.getFullPath()).thenReturn(new Path("some filepath"));
         
-        final Comment c1 = new Comment("", "Adam", fileMock, review, Calendar.getInstance(), Calendar.getInstance(), "rec 1", 1, 0, "some text 1");
-        final Comment c2 = new Comment("", "Klaus", fileMock, review, Calendar.getInstance(), Calendar.getInstance(), "rec 2", 0, 1, "some text 2");
+        final Comment c1 = StorageAPI.createComment("", "Adam", fileMock, review, Calendar.getInstance(), Calendar.getInstance(), "rec 1", 1, 0,
+                "some text 1");
+        final Comment c2 = StorageAPI.createComment("", "Klaus", fileMock, review, Calendar.getInstance(), Calendar.getInstance(), "rec 2", 0, 1,
+                "some text 2");
         c1.addReply(new Reply("reply1", "Eva", Calendar.getInstance(), Calendar.getInstance(), "This is my reply", c1));
         review.addComment(c1);
         review.addComment(c2);
         
         ReviewSet reviews = new ReviewSet();
         reviews.add(review);
-        reviews.add(new Review("2"));
+        Review r2 = mock(Review.class);
+        when(r2.getId()).thenReturn("2");
+        reviews.add(r2);
         
         StorageClientMock.getInstance().setStorageContent(reviews);
         

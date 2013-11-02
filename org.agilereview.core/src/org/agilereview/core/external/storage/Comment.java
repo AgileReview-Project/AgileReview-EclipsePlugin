@@ -102,7 +102,7 @@ public class Comment implements PropertyChangeListener {
      * @param priority the priority of the comment
      * @param text the text of the comment
      */
-    public Comment(String id, String author, IFile commentedFile, Review review, Calendar creationDate, Calendar modificationDate, String recipient,
+    Comment(String id, String author, IFile commentedFile, Review review, Calendar creationDate, Calendar modificationDate, String recipient,
             int status, int priority, String text) {
         this.id = id;
         this.author = author;
@@ -355,11 +355,17 @@ public class Comment implements PropertyChangeListener {
      */
     @Override
     public boolean equals(Object o) {
-        if (o == null) { return false; }
-        if (o.getClass() != getClass()) { return false; }
+        if (o == null) {
+            return false;
+        }
+        if (o.getClass() != getClass()) {
+            return false;
+        }
         Comment commentToCompare = (Comment) o;
         if (this.getReview().equals(commentToCompare.getReview()) && this.author.equals(commentToCompare.getAuthor())
-                && this.getId().equals(commentToCompare.getId())) { return true; }
+                && this.getId().equals(commentToCompare.getId())) {
+            return true;
+        }
         return false;
     }
     

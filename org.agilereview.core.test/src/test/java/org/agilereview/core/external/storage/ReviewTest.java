@@ -5,7 +5,7 @@
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  * Contributors: Malte Brunnlieb, Philipp Diebold, Peter Reuter, Thilo Rauch
  */
-package org.agilereview.core.test.external.storage;
+package org.agilereview.core.external.storage;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
@@ -23,7 +23,7 @@ import junit.framework.AssertionFailedError;
 import org.agilereview.core.external.preferences.AgileReviewPreferences;
 import org.agilereview.core.external.storage.Comment;
 import org.agilereview.core.external.storage.Review;
-import org.agilereview.core.test.utils.HelperClass;
+import org.agilereview.core.utils.HelperClass;
 import org.eclipse.core.runtime.AssertionFailedException;
 import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.junit.Test;

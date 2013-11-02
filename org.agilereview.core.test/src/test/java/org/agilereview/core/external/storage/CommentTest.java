@@ -1,7 +1,4 @@
-package org.agilereview.core.test.external.storage;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+package org.agilereview.core.external.storage;
 
 import java.beans.PropertyChangeEvent;
 import java.util.ArrayList;
@@ -13,9 +10,15 @@ import junit.framework.AssertionFailedError;
 import org.agilereview.core.external.storage.Comment;
 import org.agilereview.core.external.storage.Reply;
 import org.agilereview.core.external.storage.Review;
-import org.agilereview.core.test.utils.HelperClass;
+import org.agilereview.core.external.storage.StorageAPI;
+import org.agilereview.core.utils.HelperClass;
 import org.eclipse.core.resources.IFile;
 import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
+import static org.mockito.Mockito.mock;
 
 /**
  * TestClass for {@link org.agilereview.core.external.storage.Comment}
@@ -36,7 +39,7 @@ public class CommentTest {
     public final void testCommentStringIFileReview() {
         IFile file = HelperClass.getIFile("/org.agilereview.core.test/src/test/resources/Test.txt");
         String id = "c0";
-        Review r = new Review("r0");
+        Review r = mock(Review.class);
         
         // create comment
         Comment comment = new Comment(id, file, r);
@@ -44,8 +47,9 @@ public class CommentTest {
         assertNotNull(comment);
         
         // check integrity
-        if (!comment.getId().equals(id) || !comment.getCommentedFile().equals(file) || !comment.getReview().equals(r)) { throw new AssertionFailedError(
-                "Comment integrity not valid after creation!"); }
+        if (!comment.getId().equals(id) || !comment.getCommentedFile().equals(file) || !comment.getReview().equals(r)) {
+            throw new AssertionFailedError("Comment integrity not valid after creation!");
+        }
     }
     
     /**
@@ -60,10 +64,10 @@ public class CommentTest {
         String recipient = "anyone";
         String text = "description";
         Calendar d = Calendar.getInstance();
-        Review review = new Review("r2");
+        Review review = mock(Review.class);
         
         // create comment
-        Comment comment = new Comment(id, author, file, review, d, d, recipient, 1, 2, text);
+        Comment comment = StorageAPI.createComment(id, author, file, review, d, d, recipient, 1, 2, text);
         
         assertNotNull(comment);
         
@@ -71,7 +75,9 @@ public class CommentTest {
         if (!id.equals(comment.getId()) || !author.equals(comment.getAuthor()) || !file.equals(comment.getCommentedFile())
                 || !review.equals(comment.getReview()) || !d.equals(comment.getCreationDate()) || !d.equals(comment.getModificationDate())
                 || !recipient.equals(comment.getRecipient()) || comment.getStatus() != 1 || comment.getPriority() != 2
-                || !text.equals(comment.getText())) { throw new AssertionFailedError("Comment integrity not valid after creation!"); }
+                || !text.equals(comment.getText())) {
+            throw new AssertionFailedError("Comment integrity not valid after creation!");
+        }
     }
     
     /**
@@ -117,8 +123,9 @@ public class CommentTest {
         
         comment.setCommentedFile(file);
         
-        if (!file.equals(comment.getCommentedFile()) || comment.getModificationDate().equals(comment.getCreationDate()) || !pcl.getPropertyChanged()) { throw new AssertionFailedError(
-                "CommentedFile could not be set successfully!"); }
+        if (!file.equals(comment.getCommentedFile()) || comment.getModificationDate().equals(comment.getCreationDate()) || !pcl.getPropertyChanged()) {
+            throw new AssertionFailedError("CommentedFile could not be set successfully!");
+        }
     }
     
     /**
@@ -171,8 +178,9 @@ public class CommentTest {
         
         comment.setRecipient("Theo");
         
-        if (!"Theo".equals(comment.getRecipient()) || comment.getModificationDate().equals(comment.getCreationDate()) || !pcl.getPropertyChanged()) { throw new AssertionFailedError(
-                "Recipient could not be set successfully!"); }
+        if (!"Theo".equals(comment.getRecipient()) || comment.getModificationDate().equals(comment.getCreationDate()) || !pcl.getPropertyChanged()) {
+            throw new AssertionFailedError("Recipient could not be set successfully!");
+        }
     }
     
     /**
@@ -196,7 +204,9 @@ public class CommentTest {
         
         comment.setStatus(5);
         
-        if (!(comment.getStatus() == 5) || !pcl.getPropertyChanged()) { throw new AssertionFailedError("Status could not be set successfully!"); }
+        if (!(comment.getStatus() == 5) || !pcl.getPropertyChanged()) {
+            throw new AssertionFailedError("Status could not be set successfully!");
+        }
     }
     
     /**
@@ -222,8 +232,9 @@ public class CommentTest {
         
         comment.setPriority(10);
         
-        if (!(comment.getPriority() == 10) || comment.getModificationDate().equals(comment.getCreationDate()) || !pcl.getPropertyChanged()) { throw new AssertionFailedError(
-                "Priority could not be set successfully!"); }
+        if (!(comment.getPriority() == 10) || comment.getModificationDate().equals(comment.getCreationDate()) || !pcl.getPropertyChanged()) {
+            throw new AssertionFailedError("Priority could not be set successfully!");
+        }
     }
     
     /**
@@ -251,8 +262,9 @@ public class CommentTest {
         
         comment.setText(text);
         
-        if (!text.equals(comment.getText()) || comment.getModificationDate().equals(comment.getCreationDate()) || !pcl.getPropertyChanged()) { throw new AssertionFailedError(
-                "Comment text could not be set successfully!"); }
+        if (!text.equals(comment.getText()) || comment.getModificationDate().equals(comment.getCreationDate()) || !pcl.getPropertyChanged()) {
+            throw new AssertionFailedError("Comment text could not be set successfully!");
+        }
     }
     
     /**
@@ -287,8 +299,9 @@ public class CommentTest {
         comment.setReplies(replies);
         
         if (!(replies.size() == comment.getReplies().size())
-                || !(comment.getReplies().contains(r1) && comment.getReplies().contains(r2) && comment.getReplies().contains(r3))) { throw new AssertionFailedError(
-                "Replies could not be set successfully!"); }
+                || !(comment.getReplies().contains(r1) && comment.getReplies().contains(r2) && comment.getReplies().contains(r3))) {
+            throw new AssertionFailedError("Replies could not be set successfully!");
+        }
         
     }
     
@@ -311,11 +324,14 @@ public class CommentTest {
         
         if (!(comment.getReplies().contains(r)) || !(prevSize + 1 == comment.getReplies().size())
                 || !comment.getReplies().get(comment.getReplies().size() - 1).equals(r)
-                || comment.getModificationDate().equals(comment.getCreationDate()) || !pcl.getPropertyChanged()) { throw new AssertionFailedError(
-                "Reply could not be added successfully!"); }
+                || comment.getModificationDate().equals(comment.getCreationDate()) || !pcl.getPropertyChanged()) {
+            throw new AssertionFailedError("Reply could not be added successfully!");
+        }
         
         comment.addReply(r);
-        if (comment.getReplies().size() > prevSize + 1) { throw new AssertionFailedError("Reply added twice!"); }
+        if (comment.getReplies().size() > prevSize + 1) {
+            throw new AssertionFailedError("Reply added twice!");
+        }
     }
     
     /**
@@ -346,8 +362,9 @@ public class CommentTest {
         comment.deleteReply(replies[index]);
         
         if (!(prevSize - 1 == comment.getReplies().size()) || comment.getReplies().contains(replies[index])
-                || comment.getModificationDate().equals(comment.getCreationDate()) || !pcl.getPropertyChanged()) { throw new AssertionFailedError(
-                "Reply could not be removed by name successfully!"); }
+                || comment.getModificationDate().equals(comment.getCreationDate()) || !pcl.getPropertyChanged()) {
+            throw new AssertionFailedError("Reply could not be removed by name successfully!");
+        }
     }
     
     /**
@@ -378,8 +395,9 @@ public class CommentTest {
         comment.deleteReply(comment.getReplies().size() - (replies.length - 1 - index));
         
         if (!(prevSize - 1 == comment.getReplies().size()) || comment.getReplies().contains(replies[index])
-                || comment.getModificationDate().equals(comment.getCreationDate()) || !pcl.getPropertyChanged()) { throw new AssertionFailedError(
-                "Reply could not be removed by index successfully!"); }
+                || comment.getModificationDate().equals(comment.getCreationDate()) || !pcl.getPropertyChanged()) {
+            throw new AssertionFailedError("Reply could not be removed by index successfully!");
+        }
     }
     
     /**
@@ -396,7 +414,9 @@ public class CommentTest {
         
         comment.setStatus(2);
         
-        if (!pcl.getPropertyChanged()) { throw new AssertionFailedError("PropertyChangeListener was not added successfully to review!"); }
+        if (!pcl.getPropertyChanged()) {
+            throw new AssertionFailedError("PropertyChangeListener was not added successfully to review!");
+        }
     }
     
     /**
@@ -413,7 +433,9 @@ public class CommentTest {
         
         comment.setStatus(2);
         
-        if (pcl.getPropertyChanged()) { throw new AssertionFailedError("PropertyChangeListener was not removed successfully from review"); }
+        if (pcl.getPropertyChanged()) {
+            throw new AssertionFailedError("PropertyChangeListener was not removed successfully from review");
+        }
     }
     
     /**
@@ -428,7 +450,9 @@ public class CommentTest {
         
         comment.propertyChange(new PropertyChangeEvent(comment, "test", false, true));
         
-        if (!pcl.getPropertyChanged()) { throw new AssertionFailedError("PropertyChangeEvent not forwarded correctly!"); }
+        if (!pcl.getPropertyChanged()) {
+            throw new AssertionFailedError("PropertyChangeEvent not forwarded correctly!");
+        }
     }
     
     /**
@@ -438,7 +462,7 @@ public class CommentTest {
      */
     private Comment createDefaultComment() {
         IFile file = HelperClass.getIFile("/org.agilereview.core.test/resources/Test.txt");
-        Review r = new Review("r0");
+        Review r = mock(Review.class);
         
         Comment comment = new Comment("c0", file, r);
         

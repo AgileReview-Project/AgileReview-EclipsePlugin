@@ -7,9 +7,6 @@
  */
 package org.agilereview.ui.basic.test.commentSummary;
 
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-
 import java.util.Calendar;
 import java.util.LinkedList;
 import java.util.List;
@@ -19,6 +16,7 @@ import junit.framework.Assert;
 import org.agilereview.core.external.storage.Comment;
 import org.agilereview.core.external.storage.Review;
 import org.agilereview.core.external.storage.ReviewSet;
+import org.agilereview.core.external.storage.StorageAPI;
 import org.agilereview.test.common.storage.external.StorageClientMock;
 import org.agilereview.ui.basic.commentSummary.CommentSummaryView;
 import org.agilereview.ui.basic.commentSummary.table.Column;
@@ -36,6 +34,9 @@ import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 /**
  * Test class for class {@link CommentSummaryView}
@@ -93,9 +94,9 @@ public class CommentSummaryViewTest {
         when(fileMock.getFullPath()).thenReturn(new Path(""));
         
         List<Comment> comments = new LinkedList<Comment>();
-        final Comment c1 = new Comment("", "Adam", fileMock, reviewMock, Calendar.getInstance(), Calendar.getInstance(), "", 0, 0, "");
+        final Comment c1 = StorageAPI.createComment("", "Adam", fileMock, reviewMock, Calendar.getInstance(), Calendar.getInstance(), "", 0, 0, "");
         comments.add(c1);
-        Comment c2 = new Comment("", "Klaus", fileMock, reviewMock, Calendar.getInstance(), Calendar.getInstance(), "", 0, 0, "");
+        Comment c2 = StorageAPI.createComment("", "Klaus", fileMock, reviewMock, Calendar.getInstance(), Calendar.getInstance(), "", 0, 0, "");
         comments.add(c2);
         when(reviewMock.getComments()).thenReturn(comments);
         when(reviewMock.getId()).thenReturn("");
@@ -151,11 +152,11 @@ public class CommentSummaryViewTest {
         when(fileMock.getFullPath()).thenReturn(new Path(""));
         
         List<Comment> comments = new LinkedList<Comment>();
-        Comment c1 = new Comment("", "Adam", fileMock, reviewMock, Calendar.getInstance(), Calendar.getInstance(), "", 1, 0, "");
+        Comment c1 = StorageAPI.createComment("", "Adam", fileMock, reviewMock, Calendar.getInstance(), Calendar.getInstance(), "", 1, 0, "");
         comments.add(c1);
-        final Comment c2 = new Comment("", "Klaus", fileMock, reviewMock, Calendar.getInstance(), Calendar.getInstance(), "", 0, 0, "");
+        final Comment c2 = StorageAPI.createComment("", "Klaus", fileMock, reviewMock, Calendar.getInstance(), Calendar.getInstance(), "", 0, 0, "");
         comments.add(c2);
-        final Comment c3 = new Comment("", "ASDF", fileMock, reviewMock, Calendar.getInstance(), Calendar.getInstance(), "", 2, 0, "");
+        final Comment c3 = StorageAPI.createComment("", "ASDF", fileMock, reviewMock, Calendar.getInstance(), Calendar.getInstance(), "", 2, 0, "");
         comments.add(c3);
         when(reviewMock.getComments()).thenReturn(comments);
         when(reviewMock.getId()).thenReturn("");

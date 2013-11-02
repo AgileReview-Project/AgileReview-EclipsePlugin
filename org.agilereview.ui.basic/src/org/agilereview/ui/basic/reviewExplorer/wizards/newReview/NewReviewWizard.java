@@ -44,7 +44,7 @@ public class NewReviewWizard extends Wizard implements INewWizard {
     @Override
     public boolean performFinish() {
         boolean result = false;
-        Review newRev = new CommentingAPI().createReview();
+        Review newRev = CommentingAPI.createReview();
         if (newRev != null) {
             newRev.setName(this.page1.getReviewName());
             newRev.setReference(this.page1.getReviewReference());

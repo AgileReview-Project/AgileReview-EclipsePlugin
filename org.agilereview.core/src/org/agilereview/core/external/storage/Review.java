@@ -75,7 +75,7 @@ public class Review implements PropertyChangeListener, IPreferenceChangeListener
      * Constructor that should be used if a new {@link Review}w is created. The {@link Review} will be added to the list of open reviews.
      * @param id a unique identifier for the {@link Review} computed by the current IStorageClient.
      */
-    public Review(String id) {
+    Review(String id) {
         this.id = id;
         setOpenReviewsPreference();
         InstanceScope.INSTANCE.getNode(Activator.PLUGIN_ID).addPreferenceChangeListener(this);
@@ -422,10 +422,16 @@ public class Review implements PropertyChangeListener, IPreferenceChangeListener
      */
     @Override
     public boolean equals(Object o) {
-        if (o == null) { return false; }
-        if (o.getClass() != getClass()) { return false; }
+        if (o == null) {
+            return false;
+        }
+        if (o.getClass() != getClass()) {
+            return false;
+        }
         Review reviewToCompare = (Review) o;
-        if (this.getId().equals(reviewToCompare.getId())) { return true; }
+        if (this.getId().equals(reviewToCompare.getId())) {
+            return true;
+        }
         return false;
     }
     

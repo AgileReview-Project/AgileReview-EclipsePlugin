@@ -8,6 +8,8 @@
 package org.agilereview.ui.basic.test.reviewExplorer;
 
 import java.io.ByteArrayInputStream;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 
 import junit.framework.Assert;
@@ -15,6 +17,7 @@ import junit.framework.Assert;
 import org.agilereview.core.external.storage.Comment;
 import org.agilereview.core.external.storage.Review;
 import org.agilereview.core.external.storage.ReviewSet;
+import org.agilereview.core.external.storage.StorageAPI;
 import org.agilereview.test.common.storage.external.StorageClientMock;
 import org.agilereview.test.common.utils.TmpJavaProject;
 import org.agilereview.ui.basic.commentSummary.CommentSummaryView;
@@ -39,6 +42,9 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
+
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 /**
  * Test class for class {@link CommentSummaryView}
@@ -84,7 +90,7 @@ public class ReviewExplorerViewTest {
     @Before
     public void setupTest() throws CoreException {
         bot.resetWorkbench();
-        SWTBotPerspective perspective = bot.perspectiveById("org.agilereview.ui.basic.perspective");
+        SWTBotPerspective perspective = bot.perspectiveById("org.agilereview.perspective");
         if (!perspective.isActive()) {
             perspective.activate();
         }
@@ -166,9 +172,11 @@ public class ReviewExplorerViewTest {
         // setup test data
         IFile file = createFileStructure(tmpJavaProject1.getProject(), new String[] { "src" }, "test.java");
         
-        Review r1 = new Review("r1");
-        Comment c1 = new Comment("c1", "Alice", file, r1, Calendar.getInstance(), Calendar.getInstance(), "", 0, 0, "");
+        Review r1 = mock(Review.class);
+        when(r1.getId()).thenReturn("r1");
+        Comment c1 = StorageAPI.createComment("c1", "Alice", file, r1, Calendar.getInstance(), Calendar.getInstance(), "", 0, 0, "");
         r1.addComment(c1);
+        when(r1.getComments()).thenReturn(Arrays.asList(c1));
         
         ReviewSet reviews = new ReviewSet();
         reviews.add(r1);
@@ -205,8 +213,9 @@ public class ReviewExplorerViewTest {
         // setup test data
         IFile file = createFileStructure(tmpJavaProject1.getProject(), new String[] { "src" }, "test.java");
         
-        Review r1 = new Review("r1");
-        Comment c1 = new Comment("c1", "Alice", file, r1, Calendar.getInstance(), Calendar.getInstance(), "", 0, 0, "");
+        Review r1 = mock(Review.class);
+        when(r1.getId()).thenReturn("r1");
+        Comment c1 = StorageAPI.createComment("c1", "Alice", file, r1, Calendar.getInstance(), Calendar.getInstance(), "", 0, 0, "");
         r1.addComment(c1);
         
         ReviewSet reviews = new ReviewSet();
@@ -252,8 +261,9 @@ public class ReviewExplorerViewTest {
         // setup test data
         IFile file = createFileStructure(tmpJavaProject1.getProject(), new String[] { "src" }, "test.java");
         
-        final Review r1 = new Review("r1");
-        Comment c1 = new Comment("c1", "Alice", file, r1, Calendar.getInstance(), Calendar.getInstance(), "", 0, 0, "");
+        final Review r1 = mock(Review.class);
+        when(r1.getId()).thenReturn("r1");
+        Comment c1 = StorageAPI.createComment("c1", "Alice", file, r1, Calendar.getInstance(), Calendar.getInstance(), "", 0, 0, "");
         r1.addComment(c1);
         
         ReviewSet reviews = new ReviewSet();
@@ -274,8 +284,10 @@ public class ReviewExplorerViewTest {
             public void run() {
                 Image old = item.widget.getImage();
                 
-                r1.clearComments();
-                r1.setIsOpen(false);
+                when(r1.getComments()).thenReturn(new ArrayList<Comment>());
+                //r1.clearComments();
+                when(r1.getIsOpen()).thenReturn(false);
+                // r1.setIsOpen(false);
                 
                 item.expand();
                 Assert.assertEquals(0, item.getItems().length);
@@ -292,13 +304,15 @@ public class ReviewExplorerViewTest {
     @Test
     public void testOneReviewWithDifferentProjects() throws CoreException {
         // setup test data
-        Review r1 = new Review("r1");
+        Review r1 = mock(Review.class);
+        when(r1.getId()).thenReturn("r1");
+        
         IFile file1 = createFileStructure(tmpJavaProject1.getProject(), new String[] { "folder1" }, "file1.java");
-        Comment c1 = new Comment("c1", "Alice", file1, r1, Calendar.getInstance(), Calendar.getInstance(), "", 0, 0, "");
+        Comment c1 = StorageAPI.createComment("c1", "Alice", file1, r1, Calendar.getInstance(), Calendar.getInstance(), "", 0, 0, "");
         r1.addComment(c1);
         
         IFile file2 = createFileStructure(tmpJavaProject2.getProject(), new String[] { "folder1" }, "file1.java");
-        Comment c2 = new Comment("c2", "Alice", file2, r1, Calendar.getInstance(), Calendar.getInstance(), "", 0, 0, "");
+        Comment c2 = StorageAPI.createComment("c2", "Alice", file2, r1, Calendar.getInstance(), Calendar.getInstance(), "", 0, 0, "");
         r1.addComment(c2);
         
         ReviewSet reviews = new ReviewSet();
@@ -357,14 +371,18 @@ public class ReviewExplorerViewTest {
     @Test
     public void testOneReviewWithDifferentFolder() throws CoreException {
         // setup test data
-        Review r1 = new Review("r1");
+        Review r1 = mock(Review.class);
+        when(r1.getId()).thenReturn("r1");
+        
         IFile file1 = createFileStructure(tmpJavaProject1.getProject(), new String[] { "folder1" }, "file1.java");
-        Comment c1 = new Comment("c1", "Alice", file1, r1, Calendar.getInstance(), Calendar.getInstance(), "", 0, 0, "");
+        Comment c1 = StorageAPI.createComment("c1", "Alice", file1, r1, Calendar.getInstance(), Calendar.getInstance(), "", 0, 0, "");
         r1.addComment(c1);
         
         IFile file2 = createFileStructure(tmpJavaProject1.getProject(), new String[] { "folder2" }, "file2.java");
-        Comment c2 = new Comment("c2", "Alice", file2, r1, Calendar.getInstance(), Calendar.getInstance(), "", 0, 0, "");
+        Comment c2 = StorageAPI.createComment("c2", "Alice", file2, r1, Calendar.getInstance(), Calendar.getInstance(), "", 0, 0, "");
         r1.addComment(c2);
+        
+        when(r1.getComments()).thenReturn(Arrays.asList(c1, c2));
         
         ReviewSet reviews = new ReviewSet();
         reviews.add(r1);
@@ -413,17 +431,21 @@ public class ReviewExplorerViewTest {
     @Test
     public void testOneReviewWithDifferentFiles() throws CoreException {
         // setup test data
-        Review r1 = new Review("r1");
+        Review r1 = mock(Review.class);
+        when(r1.getId()).thenReturn("r1");
+        
         IFile file1 = createFileStructure(tmpJavaProject1.getProject(), new String[] { "folder1" }, "file1.java");
-        Comment c1 = new Comment("c1", "Alice", file1, r1, Calendar.getInstance(), Calendar.getInstance(), "", 0, 0, "");
+        Comment c1 = StorageAPI.createComment("c1", "Alice", file1, r1, Calendar.getInstance(), Calendar.getInstance(), "", 0, 0, "");
         r1.addComment(c1);
         
         IFile file2 = createFileStructure(tmpJavaProject1.getProject(), new String[] { "folder1" }, "file2.java");
-        Comment c2 = new Comment("c2", "Alice", file2, r1, Calendar.getInstance(), Calendar.getInstance(), "", 0, 0, "");
+        Comment c2 = StorageAPI.createComment("c2", "Alice", file2, r1, Calendar.getInstance(), Calendar.getInstance(), "", 0, 0, "");
         r1.addComment(c2);
         
         ReviewSet reviews = new ReviewSet();
         reviews.add(r1);
+        
+        when(r1.getComments()).thenReturn(Arrays.asList(c1, c2));
         
         StorageClientMock.getInstance().setStorageContent(reviews);
         
@@ -462,15 +484,21 @@ public class ReviewExplorerViewTest {
     @Test
     public void testMultipleReviewsWithDifferentFiles() throws CoreException {
         // setup test data
-        Review r1 = new Review("r1");
-        IFile file1 = createFileStructure(tmpJavaProject1.getProject(), new String[] { "folder1" }, "file1.java");
-        Comment c1 = new Comment("c1", "Alice", file1, r1, Calendar.getInstance(), Calendar.getInstance(), "", 0, 0, "");
-        r1.addComment(c1);
+        Review r1 = mock(Review.class);
+        when(r1.getId()).thenReturn("r1");
         
-        Review r2 = new Review("r2");
+        IFile file1 = createFileStructure(tmpJavaProject1.getProject(), new String[] { "folder1" }, "file1.java");
+        Comment c1 = StorageAPI.createComment("c1", "Alice", file1, r1, Calendar.getInstance(), Calendar.getInstance(), "", 0, 0, "");
+        r1.addComment(c1);
+        when(r1.getComments()).thenReturn(Arrays.asList(c1));
+        
+        Review r2 = mock(Review.class);
+        when(r2.getId()).thenReturn("r2");
+        
         IFile file2 = createFileStructure(tmpJavaProject1.getProject(), new String[] { "folder1" }, "file2.java");
-        Comment c2 = new Comment("c2", "Alice", file2, r2, Calendar.getInstance(), Calendar.getInstance(), "", 0, 0, "");
+        Comment c2 = StorageAPI.createComment("c2", "Alice", file2, r2, Calendar.getInstance(), Calendar.getInstance(), "", 0, 0, "");
         r2.addComment(c2);
+        when(r2.getComments()).thenReturn(Arrays.asList(c2));
         
         ReviewSet reviews = new ReviewSet();
         reviews.add(r1);
@@ -526,9 +554,12 @@ public class ReviewExplorerViewTest {
         // setup test data
         IFile file = createFileStructure(tmpJavaProject1.getProject(), new String[] { "src" }, "test.java");
         
-        Review r1 = new Review("r1");
-        Comment c1 = new Comment("c1", "Alice", file, r1, Calendar.getInstance(), Calendar.getInstance(), "", 0, 0, "");
+        Review r1 = mock(Review.class);
+        when(r1.getId()).thenReturn("r1");
+        
+        Comment c1 = StorageAPI.createComment("c1", "Alice", file, r1, Calendar.getInstance(), Calendar.getInstance(), "", 0, 0, "");
         r1.addComment(c1);
+        when(r1.getComments()).thenReturn(Arrays.asList(c1));
         
         ReviewSet reviews1 = new ReviewSet();
         reviews1.add(r1);
@@ -547,11 +578,15 @@ public class ReviewExplorerViewTest {
         Assert.assertEquals(1, tree.getAllItems().length);
         Assert.assertEquals("r1", tree.getAllItems()[0].getText());
         // Change input
-        Review r2 = new Review("r2");
-        Comment c2 = new Comment("c2", "Alice", file, r2, Calendar.getInstance(), Calendar.getInstance(), "", 0, 0, "");
+        Review r2 = mock(Review.class);
+        when(r2.getId()).thenReturn("r2");
+        
+        Comment c2 = StorageAPI.createComment("c2", "Alice", file, r2, Calendar.getInstance(), Calendar.getInstance(), "", 0, 0, "");
         r2.addComment(c2);
+        when(r2.getComments()).thenReturn(Arrays.asList(c2));
         ReviewSet reviews2 = new ReviewSet();
         reviews2.add(r2);
+        
         StorageClientMock.getInstance().setStorageContent(reviews2);
         try {
             Thread.sleep(2 * 1000);
@@ -574,9 +609,12 @@ public class ReviewExplorerViewTest {
         // setup test data
         IFile file = createFileStructure(tmpJavaProject1.getProject(), new String[] { "src" }, "test.java");
         
-        Review r1 = new Review("r1");
-        Comment c1 = new Comment("c1", "Alice", file, r1, Calendar.getInstance(), Calendar.getInstance(), "", 0, 0, "");
+        Review r1 = mock(Review.class);
+        when(r1.getId()).thenReturn("r1");
+        
+        Comment c1 = StorageAPI.createComment("c1", "Alice", file, r1, Calendar.getInstance(), Calendar.getInstance(), "", 0, 0, "");
         r1.addComment(c1);
+        when(r1.getComments()).thenReturn(Arrays.asList(c1));
         
         ReviewSet reviews = new ReviewSet();
         reviews.add(r1);
@@ -595,9 +633,12 @@ public class ReviewExplorerViewTest {
         Assert.assertEquals(1, tree.getAllItems().length);
         
         // Change review set
-        Review r2 = new Review("r2");
-        Comment c2 = new Comment("c2", "Alice", file, r2, Calendar.getInstance(), Calendar.getInstance(), "", 0, 0, "");
+        Review r2 = mock(Review.class);
+        when(r2.getId()).thenReturn("r2");
+        Comment c2 = StorageAPI.createComment("c2", "Alice", file, r2, Calendar.getInstance(), Calendar.getInstance(), "", 0, 0, "");
         r2.addComment(c2);
+        when(r2.getComments()).thenReturn(Arrays.asList(c2));
+        
         reviews.add(r2);
         StorageClientMock.getInstance().setStorageContent(reviews);
         // StorageClientMock.getInstance().addReview(r2);
@@ -620,9 +661,12 @@ public class ReviewExplorerViewTest {
         // setup test data
         IFile file = createFileStructure(tmpJavaProject1.getProject(), new String[] { "before" }, "test.java");
         
-        Review r1 = new Review("r1");
-        Comment c1 = new Comment("c1", "Alice", file, r1, Calendar.getInstance(), Calendar.getInstance(), "", 0, 0, "");
+        Review r1 = mock(Review.class);
+        when(r1.getId()).thenReturn("r1");
+        
+        Comment c1 = StorageAPI.createComment("c1", "Alice", file, r1, Calendar.getInstance(), Calendar.getInstance(), "", 0, 0, "");
         r1.addComment(c1);
+        when(r1.getComments()).thenReturn(Arrays.asList(c1));
         
         ReviewSet reviews = new ReviewSet();
         reviews.add(r1);
@@ -650,8 +694,9 @@ public class ReviewExplorerViewTest {
         
         // Add new comment
         file = createFileStructure(tmpJavaProject1.getProject(), new String[] { "after" }, "test.java");
-        Comment c2 = new Comment("c2", "Bob", file, r1, Calendar.getInstance(), Calendar.getInstance(), "", 0, 0, "");
+        Comment c2 = StorageAPI.createComment("c2", "Bob", file, r1, Calendar.getInstance(), Calendar.getInstance(), "", 0, 0, "");
         r1.addComment(c2);
+        when(r1.getComments()).thenReturn(Arrays.asList(c1, c2));
         
         // Check for change
         Assert.assertEquals(2, item.getItems().length);
