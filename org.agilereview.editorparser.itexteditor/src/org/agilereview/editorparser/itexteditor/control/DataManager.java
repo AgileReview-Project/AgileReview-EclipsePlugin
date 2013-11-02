@@ -7,6 +7,8 @@
  */
 package org.agilereview.editorparser.itexteditor.control;
 
+import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeSupport;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -34,6 +36,11 @@ public class DataManager implements IReviewDataReceiver, ICommentFilterListener 
      * Instance created by the AgileReview core plug-in
      */
     private static volatile DataManager instance;
+    
+    /**
+     * Property change support for the filter mechanism
+     */
+    private PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(this);
     
     /**
      * Constructor which saves the current created instance for further usage
@@ -75,19 +82,12 @@ public class DataManager implements IReviewDataReceiver, ICommentFilterListener 
         Set<Review> reviews = new HashSet<Review>(this.reviews);
         for (Review r : reviews) {
             for (Comment c : r.getComments()) {
-                if (c.getId().equals(id)) { return c; }
+                if (c.getId().equals(id)) {
+                    return c;
+                }
             }
         }
         return null;
-    }
-    
-    /* (non-Javadoc)
-     * @see org.agilereview.core.external.storage.listeners.ICommentFilterListener#setFilteredComments(java.util.Set)
-     * @author Malte Brunnlieb (01.06.2013)
-     */
-    @Override
-    public void setFilteredComments(Set<Comment> filteredComments) {
-        visibleComments = filteredComments;
     }
     
     /**
@@ -97,6 +97,26 @@ public class DataManager implements IReviewDataReceiver, ICommentFilterListener 
      * @author Malte Brunnlieb (01.06.2013)
      */
     public boolean isVisible(Comment comment) {
-        return visibleComments.contains(comment);
+        return visibleComments != null && visibleComments.contains(comment);
+    }
+    
+    /* (non-Javadoc)
+     * @see org.agilereview.core.external.storage.listeners.ICommentFilterListener#setFilteredComments(java.util.Set)
+     * @author Malte Brunnlieb (01.06.2013)
+     */
+    @Override
+    public void setFilteredComments(Set<Comment> filteredComments) {
+        visibleComments = filteredComments;
+        propertyChangeSupport.firePropertyChange("visibleComments", null, visibleComments);
+        System.out.println("new comment!");
+    }
+    
+    /**
+     * Added a {@link PropertyChangeListener} for the set of visible comments
+     * @param listener {@link PropertyChangeListener} for the set of visible comments
+     * @author Malte Brunnlieb (02.11.2013)
+     */
+    public void addVisibleCommentsListener(PropertyChangeListener listener) {
+        propertyChangeSupport.addPropertyChangeListener(listener);
     }
 }

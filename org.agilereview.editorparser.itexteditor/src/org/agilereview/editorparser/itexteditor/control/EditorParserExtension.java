@@ -7,8 +7,12 @@
  */
 package org.agilereview.editorparser.itexteditor.control;
 
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import org.agilereview.common.exception.ExceptionHandler;
 import org.agilereview.core.external.definition.IEditorParser;
@@ -26,7 +30,7 @@ import org.eclipse.ui.texteditor.ITextEditor;
  * Extension interface for the {@link IEditorParser} extension point and manager class for all created editor parsers of this plug-in
  * @author Malte Brunnlieb (11.11.2012)
  */
-public class EditorParserExtension implements IEditorParser {
+public class EditorParserExtension implements IEditorParser, PropertyChangeListener {
     
     /**
      * Map which holds a parser for each opened editor
@@ -36,6 +40,14 @@ public class EditorParserExtension implements IEditorParser {
      * Map which holds an {@link AnnotationManager} for each opened editor
      */
     private HashMap<IEditorPart, AnnotationManager> annotationManagerMap = new HashMap<IEditorPart, AnnotationManager>();
+    
+    /**
+     * Creates a new {@link IEditorParser} extension and register itself as a listener to manage the comment filter
+     * @author Malte Brunnlieb (02.11.2013)
+     */
+    public EditorParserExtension() {
+        DataManager.getInstance().addVisibleCommentsListener(this);
+    }
     
     /* (non-Javadoc)
      * @see org.agilereview.core.external.definition.IEditorParser#addTagsToEditorSelection(org.eclipse.ui.IEditorPart, Comment, java.lang.String[])
@@ -156,6 +168,30 @@ public class EditorParserExtension implements IEditorParser {
             }
         } else {
             ExceptionHandler.warnUser("The comment could not be added to the document as the underlying file could not be retreived.");
+        }
+    }
+    
+    /* (non-Javadoc)
+     * @see java.beans.PropertyChangeListener#propertyChange(java.beans.PropertyChangeEvent)
+     * @author Malte Brunnlieb (02.11.2013)
+     */
+    @Override
+    public void propertyChange(PropertyChangeEvent event) {
+        if (event.getPropertyName().equals("visibleComments") && event.getNewValue() instanceof Set<?>) {
+            @SuppressWarnings("unchecked")
+            Set<Comment> filteredComments = (Set<Comment>) event.getNewValue();
+            Set<String> commentTagIds = new HashSet<String>(filteredComments.size());
+            for (Comment c : filteredComments) {
+                commentTagIds.add(c.getId());
+            }
+            
+            System.out.println("redraw");
+            
+            for (IEditorPart editor : annotationManagerMap.keySet()) {
+                Map<String, Position> observedComments = parserMap.get(editor).getObservedComments();
+                observedComments.keySet().retainAll(commentTagIds);
+                annotationManagerMap.get(editor).displayAnnotations(observedComments);
+            }
         }
     }
 }

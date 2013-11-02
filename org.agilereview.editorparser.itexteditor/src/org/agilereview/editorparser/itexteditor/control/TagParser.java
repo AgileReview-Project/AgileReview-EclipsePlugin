@@ -62,10 +62,6 @@ public class TagParser {
      */
     private final TreeMap<String, Position[]> idTagPositions = new TreeMap<String, Position[]>();
     /**
-     * The currently displayed comments
-     */
-    private final TreeSet<String> displayedComments = new TreeSet<String>();
-    /**
      * Document which provides the contents for this instance
      */
     private IDocument document;
@@ -73,10 +69,6 @@ public class TagParser {
      * The document of this parser
      */
     private final ITextEditor editor;
-    /**
-     * Annotation model for this parser
-     */
-    private final AnnotationManager annotationModel;
     
     /**
      * Creates a new instance of AnnotationParser with the given input
@@ -95,12 +87,13 @@ public class TagParser {
         
         if (editor.getDocumentProvider() != null) {
             this.document = editor.getDocumentProvider().getDocument(editor.getEditorInput());
-            if (this.document == null) { throw new NoDocumentFoundException(); }
+            if (this.document == null) {
+                throw new NoDocumentFoundException();
+            }
         } else {
             throw new NoDocumentFoundException();
         }
         
-        this.annotationModel = new AnnotationManager(editor);
         parseInput();
     }
     
@@ -161,8 +154,6 @@ public class TagParser {
                     Position tmp = it.next();
                     document.replace(tmp.getOffset(), tmp.getLength(), "");
                 }
-                // delete corrupted annotations
-                this.annotationModel.deleteAnnotations(corruptedCommentKeys);
                 // parse the file another time to get the correct positions for the tags
                 parseInput();
             }
@@ -178,15 +169,6 @@ public class TagParser {
         // TODO only save document if there are changes made by the parser
         editor.getDocumentProvider().saveDocument(null, editor.getEditorInput(), document, true);
         
-        // update annotations in order to recognize moved tags
-        TreeMap<String, Position> annotationsToUpdate = new TreeMap<String, Position>();
-        for (String key : displayedComments) {
-            
-            if (idPositionMap.get(key) != null) {
-                annotationsToUpdate.put(key, idPositionMap.get(key));
-            }
-        }
-        annotationModel.updateAnnotations(annotationsToUpdate);
     }
     
     /**
@@ -595,15 +577,6 @@ public class TagParser {
     //    }
     
     /**
-     * Returns all comments which are overlapping with the given {@link Position}
-     * @param p position
-     * @return all comments which are overlapping with the given {@link Position}
-     */
-    public String[] getCommentsByPosition(Position p) {
-        return this.annotationModel.getCommentsByPosition(p);
-    }
-    
-    /**
      * Returns a map of all observed comments in the attached document to its positions
      * @return a {@link Map} of comment IDs which are observed during parsing the document to the position of the comments
      * @author Malte Brunnlieb (06.12.2012)
@@ -612,20 +585,20 @@ public class TagParser {
         return new HashMap<String, Position>(idPositionMap);
     }
     
-    /**
-     * Computes the next position from the given one on where a comment is located.
-     * @param current The current position
-     * @return The next position or<br> null if there is no such position.
-     */
-    public Position getNextCommentsPosition(Position current) {
-        Position position;
-        TreeSet<ComparablePosition> positions = new TreeSet<ComparablePosition>();
-        for (String key : displayedComments) {
-            position = idPositionMap.get(key);
-            positions.add(new ComparablePosition(position));
-        }
-        return positions.higher(new ComparablePosition(current));
-    }
+    //    /**
+    //     * Computes the next position from the given one on where a comment is located.
+    //     * @param current The current position
+    //     * @return The next position or<br> null if there is no such position.
+    //     */
+    //    public Position getNextCommentsPosition(Position current) {
+    //        Position position;
+    //        TreeSet<ComparablePosition> positions = new TreeSet<ComparablePosition>();
+    //        for (String key : displayedComments) {
+    //            position = idPositionMap.get(key);
+    //            positions.add(new ComparablePosition(position));
+    //        }
+    //        return positions.higher(new ComparablePosition(current));
+    //    }
     
     /**
      * Returns the position of the annotation for the given tag
@@ -646,4 +619,5 @@ public class TagParser {
     //            addTagsInDocument(comment, display, selStartLine, selEndLine);
     //        }
     //    }
+    
 }
