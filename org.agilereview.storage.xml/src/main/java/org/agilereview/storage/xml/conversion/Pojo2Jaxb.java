@@ -41,6 +41,7 @@ public class Pojo2Jaxb {
 		try {
 			JAXBContext jaxbContext = JAXBContext.newInstance(clazz);
 			Marshaller jaxbMarshaller = jaxbContext.createMarshaller();
+			jaxbMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
 			jaxbMarshaller.marshal(jaxbObject, file.getLocation().toFile());
 			file.refreshLocal(IFile.DEPTH_INFINITE, null);
 		} catch (JAXBException e) {
