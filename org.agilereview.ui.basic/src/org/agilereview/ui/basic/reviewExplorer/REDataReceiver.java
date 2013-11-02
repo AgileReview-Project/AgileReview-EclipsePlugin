@@ -62,7 +62,7 @@ public class REDataReceiver extends AbstractReviewDataReceiver {
      */
     @Override
     protected boolean triggerPropertyChange(PropertyChangeEvent evt, ReviewSet data) {
-        return false;
+        return true;
     }
     
 }

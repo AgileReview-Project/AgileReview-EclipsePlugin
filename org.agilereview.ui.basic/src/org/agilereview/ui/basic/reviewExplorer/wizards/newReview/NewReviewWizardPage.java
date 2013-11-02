@@ -53,7 +53,6 @@ public class NewReviewWizardPage extends WizardPage implements ModifyListener {
         Label lReviewId = new Label(container, SWT.NULL);
         lReviewId.setText("Review name*:");
         
-        // TODO: New concept: ID != name?
         name = new Text(container, SWT.BORDER | SWT.SINGLE);
         name.setText("");
         name.setToolTipText("Review name must be set.");
@@ -116,29 +115,29 @@ public class NewReviewWizardPage extends WizardPage implements ModifyListener {
     
     @Override
     public void modifyText(ModifyEvent e) {
-    	
-    	// TODO: Better checking?
-    	if (name.getText().isEmpty()) {
-    		setErrorMessage("* Value must not be empty");
-    		setPageComplete(false);
-    	} else {
+        
+        // TODO: Better checking?
+        if (name.getText().isEmpty()) {
+            setErrorMessage("* Value must not be empty");
+            setPageComplete(false);
+        } else {
             setErrorMessage(null);
             setPageComplete(true);
-    	}
-    	
-//        String validMessage = PropertiesManager.getInstance().isValid(id.getText());
-//        if (validMessage == null) {
-//            // Try if reviewId is already existent
-//            if (!ReviewAccess.getInstance().reviewExists(this.id.getText())) {
-//                setErrorMessage(null);
-//                setPageComplete(true);
-//            } else {
-//                setErrorMessage("ReviewId already in use");
-//                setPageComplete(false);
-//            }
-//        } else {
-//            setErrorMessage("* " + validMessage);
-//            setPageComplete(false);
-//        }
+        }
+        
+        //        String validMessage = PropertiesManager.getInstance().isValid(id.getText());
+        //        if (validMessage == null) {
+        //            // Try if reviewId is already existent
+        //            if (!ReviewAccess.getInstance().reviewExists(this.id.getText())) {
+        //                setErrorMessage(null);
+        //                setPageComplete(true);
+        //            } else {
+        //                setErrorMessage("ReviewId already in use");
+        //                setPageComplete(false);
+        //            }
+        //        } else {
+        //            setErrorMessage("* " + validMessage);
+        //            setPageComplete(false);
+        //        }
     }
 }
