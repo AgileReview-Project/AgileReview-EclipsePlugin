@@ -101,6 +101,20 @@ public class CommentingAPI {
     }
     
     /**
+     * Deletes the {@link Review} with the given review id
+     * @param reviewId identifying the {@link Review} which should be deleted
+     * @throws NoOpenEditorException //TODO should be removed when tag parser for IFile has been implemented
+     * @author Thilo Rauch (02.11.2013)
+     */
+    public static void deleteReview(String reviewId) throws NoOpenEditorException {
+        Review review = getReview(reviewId);
+        for (Comment c : review.getComments()) {
+            deleteComment(c.getId());
+        }
+        sController.getAllReviews().remove(review);
+    }
+    
+    /**
      * Deletes the {@link Comment} with the given comment id
      * @param commentId identifying the {@link Comment} which should be deleted
      * @throws NoOpenEditorException //TODO should be removed when tag parser for IFile has been implemented
