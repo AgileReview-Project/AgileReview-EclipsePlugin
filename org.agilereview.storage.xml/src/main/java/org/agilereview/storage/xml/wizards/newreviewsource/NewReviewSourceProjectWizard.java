@@ -1,8 +1,8 @@
 package org.agilereview.storage.xml.wizards.newreviewsource;
 
+import org.agilereview.common.exception.ExceptionHandler;
 import org.agilereview.storage.xml.Activator;
 import org.agilereview.storage.xml.SourceFolderManager;
-import org.agilereview.storage.xml.exception.ExceptionHandler;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jface.viewers.IStructuredSelection;
@@ -86,7 +86,7 @@ public class NewReviewSourceProjectWizard extends Wizard implements INewWizard {
 				preferences.flush();
 			} catch (BackingStoreException e) {
 				String message = "AgileReview could not persistently set Review Source Project.";
-				ExceptionHandler.notifyUser(message);
+				ExceptionHandler.logAndNotifyUser(new Exception(message), Activator.PLUGIN_ID);
 			}			
 		}
 		

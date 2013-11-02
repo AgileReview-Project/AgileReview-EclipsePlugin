@@ -1,8 +1,8 @@
 package org.agilereview.storage.xml.handler;
 
+import org.agilereview.common.exception.ExceptionHandler;
 import org.agilereview.storage.xml.Activator;
 import org.agilereview.storage.xml.SourceFolderManager;
-import org.agilereview.storage.xml.exception.ExceptionHandler;
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
@@ -74,7 +74,7 @@ public class ActivateReviewSourceProjectHandler extends AbstractHandler {
 							preferences.flush();
 						} catch (BackingStoreException e) {
 							String message = "AgileReview could not persistently set Review Source Project.";
-							ExceptionHandler.notifyUser(message);
+							ExceptionHandler.logAndNotifyUser(new Exception(message), Activator.PLUGIN_ID);
 						}
 						
 					} else {
@@ -90,7 +90,7 @@ public class ActivateReviewSourceProjectHandler extends AbstractHandler {
 			}
 
 			if (error)
-				ExceptionHandler.notifyUser("Current selection is not an Review Source Project!");
+				ExceptionHandler.logAndNotifyUser(new Exception("Current selection is not an Review Source Project!"), Activator.PLUGIN_ID);
 
 		} catch (CoreException e) { // CoreException presented to the user via the ExecutionException
 			throw new ExecutionException("Closed or non-existent project selected.", e);

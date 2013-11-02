@@ -2,10 +2,10 @@ package org.agilereview.storage.xml;
 
 import java.io.ByteArrayInputStream;
 
+import org.agilereview.common.exception.ExceptionHandler;
 import org.agilereview.core.external.storage.Comment;
 import org.agilereview.core.external.storage.Review;
 import org.agilereview.storage.xml.exception.DataLoadingException;
-import org.agilereview.storage.xml.exception.ExceptionHandler;
 import org.agilereview.storage.xml.wizards.noreviewsource.NoReviewSourceProjectWizard;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
@@ -84,7 +84,7 @@ public class SourceFolderManager {
 			if (!p.exists() || !p.isOpen()) {
 				String message = "Selected Review Source Project does not exist or is not open. Please open the selected Review Source Project or create a new one.";
 				Activator.getDefault().getLog().log(new Status(IStatus.ERROR, Activator.PLUGIN_ID, message));
-				ExceptionHandler.notifyUser(message);
+				ExceptionHandler.logAndNotifyUser(new Exception(message), Activator.PLUGIN_ID);
 				Display.getCurrent().syncExec(new Runnable() {
 					@Override
 					public void run() {
@@ -108,7 +108,7 @@ public class SourceFolderManager {
 						}
 					} catch (CoreException e) {
 						String message = "Error while refreshing Review Source Project '"+getCurrentReviewSourceProjectName()+"'!";
-						ExceptionHandler.notifyUser(new DataLoadingException(message));
+						ExceptionHandler.logAndNotifyUser(new DataLoadingException(message), Activator.PLUGIN_ID);
 					}	 
 				}				
 			}
@@ -145,7 +145,7 @@ public class SourceFolderManager {
 		} catch (final CoreException e) {
 			String message = "Could not create or open AgileReview Source Project " + projectName + "!";
 			Activator.getDefault().getLog().log(new Status(IStatus.ERROR, Activator.PLUGIN_ID, message));
-			ExceptionHandler.notifyUser(message);
+			ExceptionHandler.logAndNotifyUser(message, e, Activator.PLUGIN_ID);
 			result = false;
 		}
 		return result;
@@ -165,7 +165,7 @@ public class SourceFolderManager {
 			return true;
 		} catch (final CoreException e) {
 			String message = "Could not set project natures for project " + p.getName() + "!";
-			ExceptionHandler.notifyUser(message, e);
+			ExceptionHandler.logAndNotifyUser(message, e, Activator.PLUGIN_ID);
 			Activator.getDefault().getLog().log(new Status(IStatus.ERROR, Activator.PLUGIN_ID, message));
 			return false;
 		}
@@ -202,7 +202,7 @@ public class SourceFolderManager {
 					while (!file.exists()) {
 					}
 				} catch (final CoreException e) {
-					ExceptionHandler.notifyUser(e);
+					ExceptionHandler.logAndNotifyUser(e, Activator.PLUGIN_ID);
 				}
 			}
 			return file;
@@ -227,7 +227,7 @@ public class SourceFolderManager {
 					while (!folder.exists()) {
 					}
 				} catch (final CoreException e) {
-					ExceptionHandler.notifyUser(e);
+					ExceptionHandler.logAndNotifyUser(e, Activator.PLUGIN_ID);
 				}
 			}
 			return folder;
@@ -252,7 +252,7 @@ public class SourceFolderManager {
 					while (!file.exists()) {
 					}
 				} catch (final CoreException e) {
-					ExceptionHandler.notifyUser(e);
+					ExceptionHandler.logAndNotifyUser(e, Activator.PLUGIN_ID);
 				}
 			}
 			return file;
@@ -270,7 +270,7 @@ public class SourceFolderManager {
 			try {
 				reviewFolder.delete(true, null);
 			} catch (CoreException e) {
-				ExceptionHandler.notifyUser(e);
+				ExceptionHandler.logAndNotifyUser(e, Activator.PLUGIN_ID);
 			}	
 		}
 	}
@@ -287,7 +287,7 @@ public class SourceFolderManager {
 			try {
 				commentFile.delete(true, null);
 			} catch (CoreException e) {
-				ExceptionHandler.notifyUser(e);
+				ExceptionHandler.logAndNotifyUser(e, Activator.PLUGIN_ID);
 			}
 		}
 	}

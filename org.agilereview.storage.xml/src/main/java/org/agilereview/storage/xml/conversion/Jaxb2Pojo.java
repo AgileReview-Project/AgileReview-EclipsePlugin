@@ -5,10 +5,15 @@ import java.util.Calendar;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
+import javax.xml.datatype.DatatypeConfigurationException;
+import javax.xml.datatype.DatatypeFactory;
+import javax.xml.datatype.XMLGregorianCalendar;
 
+import org.agilereview.common.exception.ExceptionHandler;
 import org.agilereview.core.external.storage.Comment;
 import org.agilereview.core.external.storage.Review;
 import org.agilereview.core.external.storage.StorageAPI;
+import org.agilereview.storage.xml.Activator;
 import org.agilereview.storage.xml.exception.ConversionException;
 import org.agilereview.storage.xml.exception.DataLoadingException;
 import org.agilereview.xmlschema.author.Comments;
@@ -52,7 +57,25 @@ public class Jaxb2Pojo {
 	
 	public static Comment getComment(Review review, org.agilereview.xmlschema.author.Comment jaxbComment) {
 			IFile file = ResourcesPlugin.getWorkspace().getRoot().getFile(new Path(jaxbComment.getResourcePath()));
-			return StorageAPI.createComment(jaxbComment.getId(), jaxbComment.getAuthorName(), file, review, (Calendar) jaxbComment.getCreationDate().toGregorianCalendar(), (Calendar) jaxbComment.getLastModified().toGregorianCalendar(), jaxbComment.getRecipient(), jaxbComment.getStatus(), jaxbComment.getPriority(), jaxbComment.getText());
+			XMLGregorianCalendar creationDate = jaxbComment.getCreationDate();
+			if (creationDate == null) {
+				try {
+					creationDate = DatatypeFactory.newInstance().newXMLGregorianCalendar();
+				} catch (DatatypeConfigurationException e) {
+					e.printStackTrace();
+				}
+				ExceptionHandler.logAndNotifyUser(new Exception(String.format("Creation Date of comment %s in review %s contains an invalid value and was set to a default value.", jaxbComment.getId(), jaxbComment.getReviewID())), Activator.PLUGIN_ID);
+			}
+			XMLGregorianCalendar lastModified = jaxbComment.getLastModified();
+			if (lastModified == null) {
+				try {
+					lastModified = DatatypeFactory.newInstance().newXMLGregorianCalendar();
+				} catch (DatatypeConfigurationException e) {
+					e.printStackTrace();
+				}
+				ExceptionHandler.logAndNotifyUser(new Exception(String.format("Modification Date of comment %s in review %s contains an invalid value and was set to a default value.", jaxbComment.getId(), jaxbComment.getReviewID())), Activator.PLUGIN_ID);
+			}
+			return StorageAPI.createComment(jaxbComment.getId(), jaxbComment.getAuthorName(), file, review, (Calendar) creationDate.toGregorianCalendar(), (Calendar) lastModified.toGregorianCalendar(), jaxbComment.getRecipient(), jaxbComment.getStatus(), jaxbComment.getPriority(), jaxbComment.getText());
 	}
 	
 	public static Review getReview(org.agilereview.xmlschema.review.Review jaxbReview) {

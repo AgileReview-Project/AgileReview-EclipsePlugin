@@ -1,7 +1,7 @@
 package org.agilereview.storage.xml;
 
+import org.agilereview.common.exception.ExceptionHandler;
 import org.agilereview.core.external.preferences.AgileReviewPreferences;
-import org.agilereview.storage.xml.exception.ExceptionHandler;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceChangeEvent;
@@ -141,14 +141,14 @@ public class CloseProjectResourceListener implements IResourceChangeListener {
 											preferences.flush();
 										} catch (BackingStoreException e) {
 											String message = "AgileReview could not persistently set Review Source Project.";
-											ExceptionHandler.notifyUser(message);
+											ExceptionHandler.logAndNotifyUser(message, e, Activator.PLUGIN_ID);
 										}
 										
 									} catch (final CoreException e) {
 										String message = "An exception occured while reopening the closed Review Source Project "
 												+ oldSourceProject.getName() + "!" + e.getLocalizedMessage();
 										Activator.getDefault().getLog().log(new Status(IStatus.ERROR, Activator.PLUGIN_ID, message));
-										ExceptionHandler.notifyUser(message, e);
+										ExceptionHandler.logAndNotifyUser(msg, e, Activator.PLUGIN_ID);
 									}
 								} else {
 									//XXX check whether this fails --> in case, use a private function to open NoReviewSourceWizard

@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import org.agilereview.common.exception.ExceptionHandler;
 import org.agilereview.core.external.definition.IStorageClient;
 import org.agilereview.core.external.preferences.AgileReviewPreferences;
 import org.agilereview.core.external.storage.Comment;
@@ -21,7 +22,6 @@ import org.agilereview.storage.xml.conversion.Pojo2Jaxb;
 import org.agilereview.storage.xml.exception.ConversionException;
 import org.agilereview.storage.xml.exception.DataLoadingException;
 import org.agilereview.storage.xml.exception.DataStoringException;
-import org.agilereview.storage.xml.exception.ExceptionHandler;
 import org.agilereview.storage.xml.wizards.noreviewsource.NoReviewSourceProjectWizard;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
@@ -282,11 +282,11 @@ public class XmlStorageClient implements IStorageClient, IPreferenceChangeListen
 					message += error + "\n";
 				}
 				message += "\nThese files may be corrupted (e.g. empty). Please check them.\nComments of a review cannot be loaded without working review file.";
-				ExceptionHandler.notifyUser(new DataLoadingException(message));
+				ExceptionHandler.logAndNotifyUser(new DataLoadingException(message), Activator.PLUGIN_ID);
 			}
 		} catch (final CoreException e) {
 			String message = "Error while reading data from current Review Source Project. The Review Source Project '"+SourceFolderManager.getCurrentReviewSourceProjectName()+"' does not exists or is closed.";
-			ExceptionHandler.notifyUser(new DataLoadingException(message));
+			ExceptionHandler.logAndNotifyUser(new DataLoadingException(message), Activator.PLUGIN_ID);
 		}
 
 		return result;
@@ -327,12 +327,12 @@ public class XmlStorageClient implements IStorageClient, IPreferenceChangeListen
 						message += error + "\n";
 					}
 					message += "\nThese files may be corrupted (e.g. empty). Please check them.\nComments of a review cannot be loaded without working review file.";
-					ExceptionHandler.notifyUser(new DataLoadingException(message));
+					ExceptionHandler.logAndNotifyUser(new DataLoadingException(message), Activator.PLUGIN_ID);
 				}
 			}
 		} catch (final CoreException e) {
 			String message = "Error while reading data from current Review Source Project. The Review Source Project '"+SourceFolderManager.getCurrentReviewSourceProjectName()+"' does not exists or is closed.";
-			ExceptionHandler.notifyUser(new DataLoadingException(message));
+			ExceptionHandler.logAndNotifyUser(new DataLoadingException(message), Activator.PLUGIN_ID);
 		}
 
 		return result;
@@ -350,10 +350,10 @@ public class XmlStorageClient implements IStorageClient, IPreferenceChangeListen
 				Pojo2Jaxb.saveComments(jaxbComments, commentFile);
 			} catch (ConversionException e) {
 				String message = "Error while storing data in current Review Source Project. The data could not be converted to XML.";
-				ExceptionHandler.notifyUser(new DataStoringException(message));
+				ExceptionHandler.logAndNotifyUser(new DataStoringException(message), Activator.PLUGIN_ID);
 			} catch (DataStoringException e) {
 				String message = "Error while storing data in current Review Source Project.";
-				ExceptionHandler.notifyUser(new DataStoringException(message));
+				ExceptionHandler.logAndNotifyUser(new DataStoringException(message), Activator.PLUGIN_ID);
 			}
 		}
 	}
@@ -366,10 +366,10 @@ public class XmlStorageClient implements IStorageClient, IPreferenceChangeListen
 			Pojo2Jaxb.saveReview(jaxbReview, reviewFile);
 			} catch (ConversionException e) {
 				String message = "Error while storing data in current Review Source Project. The data could not be converted to XML.";
-				ExceptionHandler.notifyUser(new DataStoringException(message));
+				ExceptionHandler.logAndNotifyUser(new DataStoringException(message), Activator.PLUGIN_ID);
 			} catch (DataStoringException e) {
 				String message = "Error while storing data in current Review Source Project.";
-				ExceptionHandler.notifyUser(new DataStoringException(message));
+				ExceptionHandler.logAndNotifyUser(new DataStoringException(message), Activator.PLUGIN_ID);
 			}
 		}		
 	}
@@ -424,7 +424,7 @@ public class XmlStorageClient implements IStorageClient, IPreferenceChangeListen
 								commentFile.delete(true, null);
 							} catch (CoreException e) {
 								String message = "Error while deleting file '"+commentFile.getFullPath().toOSString()+"'.";
-								ExceptionHandler.notifyUser(new DataLoadingException(message));
+								ExceptionHandler.logAndNotifyUser(new DataLoadingException(message), Activator.PLUGIN_ID);
 							}	
 						}
 					}
@@ -492,7 +492,7 @@ public class XmlStorageClient implements IStorageClient, IPreferenceChangeListen
 			userNotified = true;
 			
 			String message = "No Review Source Project available. All changes will be discarded when Eclipse shuts down or a Review Source Project is created and/or activated. Please create and/or activate a Review Source Folder to persistently store Review data.";
-			ExceptionHandler.notifyUser(message);
+			ExceptionHandler.logAndNotifyUser(new Exception(message), Activator.PLUGIN_ID);
 			
 			// backup data that was inserted until now
 			ReviewSet backup = new ReviewSet();

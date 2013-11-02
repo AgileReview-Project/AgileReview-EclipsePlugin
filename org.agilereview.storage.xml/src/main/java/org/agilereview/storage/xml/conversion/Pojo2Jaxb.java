@@ -57,7 +57,7 @@ public class Pojo2Jaxb {
 			org.agilereview.xmlschema.author.Comment jaxbComment = new org.agilereview.xmlschema.author.Comment();
 			jaxbComment.setAuthorName(comment.getAuthor());
 			XMLGregorianCalendar dateCreated = getXmlGregorianCalendar(comment.getCreationDate().getTimeInMillis());
-			jaxbComment.setLastModified(dateCreated);
+			jaxbComment.setCreationDate(dateCreated);
 			jaxbComment.setId(comment.getId());
 			XMLGregorianCalendar dateModified = getXmlGregorianCalendar(comment.getModificationDate().getTimeInMillis());
 			jaxbComment.setLastModified(dateModified);
@@ -91,7 +91,7 @@ public class Pojo2Jaxb {
 	 * @return
 	 * @throws ConversionException
 	 * @author Peter Reuter (02.11.2013)
-	 * @param timeInMillis 
+	 * @param timeInMillis
 	 */
 	private static XMLGregorianCalendar getXmlGregorianCalendar(long timeInMillis) throws ConversionException {
 		GregorianCalendar gregCal = new GregorianCalendar();
