@@ -1,9 +1,5 @@
 package org.agilereview.storage.xml.test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -37,6 +33,10 @@ import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 @SuppressWarnings("javadoc")
 public class XmlStorageClientTest {
@@ -72,10 +72,10 @@ public class XmlStorageClientTest {
             Comment c = StorageAPI.createComment(commentIds[i], author, file, r, date, date, recipient, prio, status, ctext);
             comments.add(c);
             for (int j = 0; j < 2; j++) {
-                Reply rp = new Reply(replyIds[j], recipient, date, date, rtext, c);
+                Reply rp = StorageAPI.createReply(replyIds[j], recipient, date, date, rtext, c);
                 c.addReply(rp);
                 for (int k = 2 + 2 * j; k < 2 + 2 * j + 2; k++) {
-                    Reply subrp = new Reply(replyIds[k], recipient, date, date, rtext, rp);
+                    Reply subrp = StorageAPI.createReply(replyIds[k], recipient, date, date, rtext, rp);
                     rp.addReply(subrp);
                 }
             }
@@ -194,7 +194,9 @@ public class XmlStorageClientTest {
         rLoaded.getComments().get(0).setText(newCommentText);
         rLoaded.getComments().get(0).getReplies().get(0).setText(newReplyText);
         rLoaded.addComment(new Comment("c3", file, rLoaded));
-        rLoaded.getComments().get(2).addReply(new Reply("r7", rLoaded.getComments().get(2)));
+        
+        rLoaded.getComments().get(2).addReply(
+                StorageAPI.createReply("r7", "", Calendar.getInstance(), Calendar.getInstance(), "", rLoaded.getComments().get(2)));
         
         // force reload
         InstanceScope.INSTANCE.getNode(Activator.PLUGIN_ID).put("source_folder", "");

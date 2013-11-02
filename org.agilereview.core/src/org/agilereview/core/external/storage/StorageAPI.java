@@ -40,7 +40,7 @@ public class StorageAPI {
     }
     
     /**
-     * Creates a new review without connections and UI interactions to rebuild a comment structure
+     * Creates a new {@link Review} without connections and UI interactions to rebuild a comment structure
      * @param id the id of the {@link Review}
      * @param name the name of the {@link Review}
      * @param status the status of the {@link Review}
@@ -50,5 +50,18 @@ public class StorageAPI {
      */
     public static Review createReview(String id, String name, int status, String reference, String responsibility, String description) {
         return new Review(id, name, status, reference, responsibility, description);
+    }
+    
+    /**
+     * Creates a new {@link Reply} without connections and UI interactions to rebuild a comment structure
+     * @param id the ID of the reply
+     * @param author the author of the reply
+     * @param creationDate the date when the reply was create initially
+     * @param modificationDate date when the reply was create lastly
+     * @param text the text of the reply
+     * @param parent the parent {@link Object} of this {@link Reply}, either a {@link Comment} or another {@link Reply}
+     */
+    public static Reply createReply(String id, String author, Calendar creationDate, Calendar modificationDate, String text, Object parent) {
+        return new Reply(id, author, creationDate, modificationDate, text, parent);
     }
 }

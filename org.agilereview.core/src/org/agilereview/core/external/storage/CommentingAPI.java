@@ -92,6 +92,15 @@ public class CommentingAPI {
     }
     
     /**
+     * Creates a new {@link Reply} with the given id and the given parent
+     * @param id The ID of the reply
+     * @param parent The parent {@link Object} of this {@link Reply}, either a {@link Comment} or another {@link Reply}
+     */
+    public static Reply createReply(Object parent) {
+        return new Reply(sController.getNewReplyId(parent), parent);
+    }
+    
+    /**
      * Deletes the {@link Comment} with the given comment id
      * @param commentId identifying the {@link Comment} which should be deleted
      * @throws NoOpenEditorException //TODO should be removed when tag parser for IFile has been implemented

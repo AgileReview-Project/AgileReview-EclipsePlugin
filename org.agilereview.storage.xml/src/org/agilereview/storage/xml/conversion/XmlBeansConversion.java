@@ -91,7 +91,7 @@ public class XmlBeansConversion {
         Calendar modificationDate = xmlBeansReply.getLastModified();
         String text = xmlBeansReply.getText();
         
-        Reply reply = new Reply(id, author, creationDate, modificationDate, text, parent);
+        Reply reply = StorageAPI.createReply(id, author, creationDate, modificationDate, text, parent);
         
         if (xmlBeansReply.getReplies() != null && xmlBeansReply.getReplies().getReplyArray() != null) {
             reply.setReplies(getReplyList(reply, xmlBeansReply.getReplies().getReplyArray()));

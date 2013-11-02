@@ -10,7 +10,6 @@ package org.agilereview.ui.basic.test.detail;
 import java.util.Calendar;
 
 import org.agilereview.core.external.storage.Comment;
-import org.agilereview.core.external.storage.Reply;
 import org.agilereview.core.external.storage.Review;
 import org.agilereview.core.external.storage.ReviewSet;
 import org.agilereview.core.external.storage.StorageAPI;
@@ -90,7 +89,7 @@ public class DetailViewTest {
                 "some text 1");
         final Comment c2 = StorageAPI.createComment("", "Klaus", fileMock, review, Calendar.getInstance(), Calendar.getInstance(), "rec 2", 0, 1,
                 "some text 2");
-        c1.addReply(new Reply("reply1", "Eva", Calendar.getInstance(), Calendar.getInstance(), "This is my reply", c1));
+        c1.addReply(StorageAPI.createReply("reply1", "Eva", Calendar.getInstance(), Calendar.getInstance(), "This is my reply", c1));
         review.addComment(c1);
         review.addComment(c2);
         

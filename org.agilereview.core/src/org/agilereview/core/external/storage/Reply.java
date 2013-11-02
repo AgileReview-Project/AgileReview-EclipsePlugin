@@ -67,7 +67,7 @@ public final class Reply implements PropertyChangeListener {
      * @param text the text of the reply
      * @param parent the parent {@link Object} of this {@link Reply}, either a {@link Comment} or another {@link Reply}
      */
-    public Reply(String id, String author, Calendar creationDate, Calendar modificationDate, String text, Object parent) {
+    Reply(String id, String author, Calendar creationDate, Calendar modificationDate, String text, Object parent) {
         this.id = id;
         this.author = author;
         this.creationDate = creationDate;
@@ -81,7 +81,7 @@ public final class Reply implements PropertyChangeListener {
      * @param id The ID of the reply
      * @param parent The parent {@link Object} of this {@link Reply}, either a {@link Comment} or another {@link Reply}
      */
-    public Reply(String id, Object parent) {
+    Reply(String id, Object parent) {
         this.id = id;
         this.parent = parent;
     }
@@ -270,10 +270,16 @@ public final class Reply implements PropertyChangeListener {
      */
     @Override
     public boolean equals(Object o) {
-        if (o == null) { return false; }
-        if (o.getClass() != getClass()) { return false; }
+        if (o == null) {
+            return false;
+        }
+        if (o.getClass() != getClass()) {
+            return false;
+        }
         Reply replyToCompare = (Reply) o;
-        if (this.getId().equals(replyToCompare.getId()) && this.parent.equals(replyToCompare.parent)) { return true; }
+        if (this.getId().equals(replyToCompare.getId()) && this.parent.equals(replyToCompare.parent)) {
+            return true;
+        }
         return false;
     }
     

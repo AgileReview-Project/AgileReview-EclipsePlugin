@@ -44,10 +44,10 @@ public class PojoConversionTest {
             Comment c = StorageAPI.createComment(commentIds[i], author, file, r, date, date, recipient, prio, status, ctext);
             comments.add(c);
             for (int j = 0; j < replyIds.length; j++) {
-                Reply rp = new Reply(replyIds[j], recipient, date, date, rtext, c);
+                Reply rp = StorageAPI.createReply(replyIds[j], recipient, date, date, rtext, c);
                 c.addReply(rp);
                 for (int k = 0; k < replyIds.length; k++) {
-                    Reply subrp = new Reply(replyIds[k], recipient, date, date, rtext, rp);
+                    Reply subrp = StorageAPI.createReply(replyIds[k], recipient, date, date, rtext, rp);
                     rp.addReply(subrp);
                 }
             }
