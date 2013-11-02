@@ -23,6 +23,7 @@ import org.agilereview.storage.xml.exception.ConversionException;
 import org.agilereview.storage.xml.exception.DataLoadingException;
 import org.agilereview.storage.xml.exception.DataStoringException;
 import org.agilereview.storage.xml.wizards.noreviewsource.NoReviewSourceProjectWizard;
+import org.agilereview.xmlschema.author.Comments;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IResource;
@@ -300,7 +301,7 @@ public class XmlStorageClient implements IStorageClient, IPreferenceChangeListen
 	 * @author Peter Reuter (04.04.2012)
 	 */
 	private org.agilereview.xmlschema.author.Comments loadAllXmlBeansComment(String reviewId) {
-		org.agilereview.xmlschema.author.Comments result = null;
+		org.agilereview.xmlschema.author.Comments result = new Comments();
 		try {
 			IFolder reviewFolder = SourceFolderManager.getReviewFolder(reviewId);
 			if (reviewFolder != null) {
