@@ -62,9 +62,7 @@ public class EditorParserExtension implements IEditorParser, PropertyChangeListe
             }
             try {
                 parserMap.get(editor).addTagsInDocument(comment.getId());
-                if (DataManager.getInstance().isVisible(comment)) {
-                    annotationManagerMap.get(editor).addAnnotation(comment.getId(), parserMap.get(editor).getPosition(comment.getId()));
-                }
+                annotationManagerMap.get(editor).addAnnotation(comment.getId(), parserMap.get(editor).getPosition(comment.getId()));
             } catch (BadLocationException e) {
                 ExceptionHandler.logAndNotifyUser("Parsing error of the ITextEditor parser: Invalid comment position.", e, Activator.PLUGIN_ID);
             } catch (CoreException e) {
