@@ -33,11 +33,4 @@
 			</plugin>
 		</plugins>
 	</reporting>
-	<dependencies>
-		<dependency>
-			<groupId>org.agilereview</groupId>
-			<artifactId>org.agilereview.storage.xml</artifactId>
-			<name>AgileReview XML Storage</name>
-		</dependency>
-	</dependencies>
 </project>

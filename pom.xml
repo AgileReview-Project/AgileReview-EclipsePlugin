@@ -20,6 +20,7 @@
 		<module>org.agilereview.common</module>
 		<module>org.agilereview.core</module>
 		<module>org.agilereview.ui.basic</module>
+		<module>org.agilereview.storage.xml</module>
 	</modules>
 
 	<pluginRepositories>
