@@ -6,13 +6,13 @@
 	<groupId>org.agilereview</groupId>
 	<artifactId>org.agilereview.common</artifactId>
 	<name>AgileReview Common</name>
-	<version>${release.version}</version>
+	<version>1.0.0-SNAPSHOT</version>
 	<packaging>eclipse-plugin</packaging>
 	
 	<parent>
 		<groupId>org.agilereview</groupId>
-		<artifactId>parent</artifactId>
-		<version>${release.version}</version>
+		<artifactId>org.agilereview.parent</artifactId>
+		<version>1.0.0-SNAPSHOT</version>
 	</parent>
 
 	<dependencies>

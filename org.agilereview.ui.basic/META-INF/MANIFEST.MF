@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: AgileReview Basic UI
 Bundle-SymbolicName: org.agilereview.ui.basic;singleton:=true
-Bundle-Version: 1.0.0
+Bundle-Version: 1.0.0.qualifier
 Bundle-Activator: org.agilereview.ui.basic.Activator
 Bundle-Vendor: AgileReview Project
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6

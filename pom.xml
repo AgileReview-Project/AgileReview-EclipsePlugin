@@ -4,16 +4,15 @@
 	xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.agilereview</groupId>
-	<artifactId>parent</artifactId>
+	<artifactId>org.agilereview.parent</artifactId>
 	<name>AgileReview Parent</name>
-	<version>${release.version}</version>
+	<version>1.0.0-SNAPSHOT</version>
 	<packaging>pom</packaging>
 
 	<properties>
 		<tycho.version>0.18.1</tycho.version>
 		<tycho-extras.version>0.18.1</tycho-extras.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<release.version>1.0.0</release.version>
 		<tycho-repo.url>https://oss.sonatype.org/content/groups/public/</tycho-repo.url>
 	</properties>
 
