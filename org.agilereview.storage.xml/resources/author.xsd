@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns="http://www.agilereview.org/XMLSchema/author" targetNamespace="http://www.agilereview.org/XMLSchema/author" elementFormDefault="qualified">
+	<xs:element name="comments">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="comment" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="comment">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="text"/>
+				<xs:element ref="replies" minOccurs="0"/>
+				<xs:element ref="customFields" minOccurs="0"/>
+			</xs:sequence>
+			<xs:attribute name="id" type="xs:ID" use="required"/>
+			<xs:attribute name="reviewID" type="xs:string" use="required"/>
+			<xs:attribute name="authorName" type="xs:string" use="required"/>
+			<xs:attribute name="resource-path" type="xs:string"/>
+			<xs:attribute name="creation-date" type="xs:dateTime" use="required"/>
+			<xs:attribute name="last-modified" type="xs:dateTime" use="required"/>
+			<xs:attribute name="status" type="xs:int" use="required"/>
+			<xs:attribute name="priority" type="xs:int"/>
+			<xs:attribute name="recipient" type="xs:string"/>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="text" type="xs:string"/>
+	<xs:element name="replies">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="reply" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="reply">
+		<xs:complexType>
+			<xs:sequence>
+    			<xs:element ref="text"/>
+				<xs:element ref="replies" minOccurs="0"/>
+			</xs:sequence>
+			<xs:attribute name="id" type="xs:ID" use="required"/>
+			<xs:attribute name="author" type="xs:string" use="required"/>
+			<xs:attribute name="creation-date" type="xs:dateTime" use="required"/>
+			<xs:attribute name="last-modified" type="xs:dateTime" use="required"/>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="customFields">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="customField" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="customField">
+		<xs:complexType>
+			<xs:attribute name="id" type="xs:ID" use="required"/>
+			<xs:attribute name="value" type="xs:string" use="required"/>
+		</xs:complexType>
+	</xs:element>
+</xs:schema>

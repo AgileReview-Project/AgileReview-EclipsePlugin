@@ -21,5 +21,9 @@ public class DataLoadingException extends Exception {
 	public DataLoadingException(String message) {
 		super(message);
 	}
+	
+	public DataLoadingException(Exception e) {
+		super(e);
+	}
 
 }

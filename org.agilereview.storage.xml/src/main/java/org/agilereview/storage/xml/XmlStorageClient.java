@@ -1,7 +1,6 @@
 package org.agilereview.storage.xml;
 
 import java.beans.PropertyChangeListener;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -17,16 +16,13 @@ import org.agilereview.core.external.storage.Comment;
 import org.agilereview.core.external.storage.Reply;
 import org.agilereview.core.external.storage.Review;
 import org.agilereview.core.external.storage.ReviewSet;
-import org.agilereview.storage.xml.conversion.PojoConversion;
-import org.agilereview.storage.xml.conversion.XmlBeansConversion;
+import org.agilereview.storage.xml.conversion.Jaxb2Pojo;
+import org.agilereview.storage.xml.conversion.Pojo2Jaxb;
+import org.agilereview.storage.xml.exception.ConversionException;
 import org.agilereview.storage.xml.exception.DataLoadingException;
+import org.agilereview.storage.xml.exception.DataStoringException;
 import org.agilereview.storage.xml.exception.ExceptionHandler;
 import org.agilereview.storage.xml.wizards.noreviewsource.NoReviewSourceProjectWizard;
-import org.agilereview.xmlSchema.author.CommentsDocument;
-import org.agilereview.xmlSchema.review.ReviewDocument;
-import org.apache.xmlbeans.XmlException;
-import org.apache.xmlbeans.XmlOptions;
-import org.apache.xmlbeans.XmlTokenSource;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IResource;
@@ -162,9 +158,9 @@ public class XmlStorageClient implements IStorageClient, IPreferenceChangeListen
 	 * @author Peter Reuter (04.04.2012)
 	 */
 	private void loadReviews() {
-		List<org.agilereview.xmlSchema.review.ReviewDocument.Review> xmlBeansReviews = loadAllXmlBeansReview();
-		for (org.agilereview.xmlSchema.review.ReviewDocument.Review xmlBeansReview : xmlBeansReviews) {
-			Review review = XmlBeansConversion.getReview(xmlBeansReview);
+		List<org.agilereview.xmlschema.review.Review> jaxbReviews = loadAllJaxbReview();
+		for (org.agilereview.xmlschema.review.Review xmlBeansReview : jaxbReviews) {
+			Review review = Jaxb2Pojo.getReview(xmlBeansReview);
 			this.idReviewMap.put(review.getId(), review);
 		}
 		this.reviewSet.addAll(idReviewMap.values());
@@ -178,21 +174,25 @@ public class XmlStorageClient implements IStorageClient, IPreferenceChangeListen
 	private void loadComments(String reviewId) {
 		Review review = this.idReviewMap.get(reviewId);
 		if (review != null) {
-			List<org.agilereview.xmlSchema.author.CommentDocument.Comment> xmlBeansComments = loadAllXmlBeansComment(reviewId);
 			ArrayList<Comment> comments = new ArrayList<Comment>();
-			for (org.agilereview.xmlSchema.author.CommentDocument.Comment xmlBeansComment : xmlBeansComments) {
-				Comment comment = XmlBeansConversion.getComment(review, xmlBeansComment);
-				// check if comment in map (just for unit tests --> XmlStorage is create twice, so it loads twice...
+			org.agilereview.xmlschema.author.Comments xmlBeansComments = loadAllXmlBeansComment(reviewId);
+			for (org.agilereview.xmlschema.author.Comment xmlBeansComment : xmlBeansComments.getComment()) {
+				Comment comment = Jaxb2Pojo.getComment(review, xmlBeansComment);
 				comments.add(comment);
 				this.idCommentMap.put(comment.getId(), comment);
-				if (xmlBeansComment.getReplies() != null && xmlBeansComment.getReplies().getReplyArray() != null) {
-					List<Reply> replies = XmlBeansConversion.getReplyList(comment, xmlBeansComment.getReplies().getReplyArray());
-					addReplies(replies);
-					comment.setReplies(replies);
-				}
+				addToIdMap(comment.getReplies());
 			}
 			review.setComments(comments);	
 		}		
+	}
+
+	private void addToIdMap(List<Reply> replies) {
+		for (Reply reply: replies) {
+			idReplyMap.put(reply.getId(), reply);
+			if (!reply.getReplies().isEmpty()) {
+				addToIdMap(reply.getReplies());
+			}
+		}
 	}
 
 	/**
@@ -211,7 +211,7 @@ public class XmlStorageClient implements IStorageClient, IPreferenceChangeListen
 	/////////////////////////////////////
 
 	/**
-	 * TODO add javadoc
+	 * Unload all reviews
 	 * @param reviews
 	 * @author Peter Reuter (18.07.2012)
 	 */
@@ -224,7 +224,7 @@ public class XmlStorageClient implements IStorageClient, IPreferenceChangeListen
 	}
 
 	/**
-	 * TODO add javadoc
+	 * Unload all comments
 	 * @param comments
 	 * @author Peter Reuter (18.07.2012)
 	 */
@@ -237,7 +237,7 @@ public class XmlStorageClient implements IStorageClient, IPreferenceChangeListen
 	}
 
 	/**
-	 * TODO add javadoc
+	 * Unload all replies
 	 * @param replies
 	 * @author Peter Reuter (18.07.2012)
 	 */
@@ -248,17 +248,17 @@ public class XmlStorageClient implements IStorageClient, IPreferenceChangeListen
 		}
 	}
 
-	/////////////////////////////////////////////////
-	// methods for loading xmlbeans data from disc //
-	/////////////////////////////////////////////////
+	/////////////////////////////////////////////
+	// methods for loading jaxb data from disc //
+	/////////////////////////////////////////////
 
 	/**
 	 * Loads all {@link org.agilereview.xmlSchema.review.ReviewDocument.Review} objects from all files available in the current source folder.
 	 * @return A {@link List} of XmlBeans objects representing the review files.
 	 * @author Peter Reuter (04.04.2012)
 	 */
-	private List<org.agilereview.xmlSchema.review.ReviewDocument.Review> loadAllXmlBeansReview() {
-		List<org.agilereview.xmlSchema.review.ReviewDocument.Review> result = new ArrayList<org.agilereview.xmlSchema.review.ReviewDocument.Review>();
+	private List<org.agilereview.xmlschema.review.Review> loadAllJaxbReview() {
+		List<org.agilereview.xmlschema.review.Review> result = new ArrayList<org.agilereview.xmlschema.review.Review>();
 		try {
 			IResource[] allFolders = SourceFolderManager.getCurrentReviewSourceProject().members();
 			LinkedList<String> errors = new LinkedList<String>();
@@ -267,11 +267,11 @@ public class XmlStorageClient implements IStorageClient, IPreferenceChangeListen
 					String reviewId = ((IFolder) currFolder).getName().replace("review.","");
 					IFile reviewFile = SourceFolderManager.getReviewFile(reviewId);
 					try {
-						ReviewDocument doc = ReviewDocument.Factory.parse(reviewFile.getContents());
-						result.add(doc.getReview());
-					} catch (XmlException e) {
+						org.agilereview.xmlschema.review.Review jaxbReview = Jaxb2Pojo.loadReview(reviewFile);
+						result.add(jaxbReview);
+					} catch (ConversionException e) {
 						errors.add(reviewFile.getLocation().toOSString() + " ("+e.getLocalizedMessage()+")");
-					} catch (IOException e) {
+					} catch (DataLoadingException e) {
 						errors.add(reviewFile.getLocation().toOSString() + " ("+e.getLocalizedMessage()+")");
 					}
 				}
@@ -299,8 +299,8 @@ public class XmlStorageClient implements IStorageClient, IPreferenceChangeListen
 	 * @return A {@link List} of XmlBeans objects representing the comments belonging to the review given.
 	 * @author Peter Reuter (04.04.2012)
 	 */
-	private List<org.agilereview.xmlSchema.author.CommentDocument.Comment> loadAllXmlBeansComment(String reviewId) {
-		List<org.agilereview.xmlSchema.author.CommentDocument.Comment> result = new ArrayList<org.agilereview.xmlSchema.author.CommentDocument.Comment>();
+	private org.agilereview.xmlschema.author.Comments loadAllXmlBeansComment(String reviewId) {
+		org.agilereview.xmlschema.author.Comments result = null;
 		try {
 			IFolder reviewFolder = SourceFolderManager.getReviewFolder(reviewId);
 			if (reviewFolder != null) {
@@ -310,11 +310,12 @@ public class XmlStorageClient implements IStorageClient, IPreferenceChangeListen
 					if (commentFile instanceof IFile && !commentFile.getName().equals("review.xml")) {
 						try {
 							String authorName = ((IFile) commentFile).getName().replace("author_", "").replace(".xml", "");
-							CommentsDocument doc = CommentsDocument.Factory.parse(SourceFolderManager.getCommentFile(reviewId, authorName).getContents());
-							result.addAll(Arrays.asList(doc.getComments().getCommentArray()));
-						} catch (XmlException e) {
+							IFile commentFile2 = SourceFolderManager.getCommentFile(reviewId, authorName);
+							org.agilereview.xmlschema.author.Comments doc = Jaxb2Pojo.loadComments(commentFile2);
+							result = doc;
+						} catch (ConversionException e) {
 							errors.add(commentFile.getLocation().toOSString() + " ("+e.getLocalizedMessage()+")");
-						} catch (IOException e) {
+						} catch (DataLoadingException e) {
 							errors.add(commentFile.getLocation().toOSString() + " ("+e.getLocalizedMessage()+")");
 						}
 					}
@@ -336,53 +337,41 @@ public class XmlStorageClient implements IStorageClient, IPreferenceChangeListen
 
 		return result;
 	}
-
-	//////////////////////////////////////////////
-	// methods for storing xmldocuments on disc //
-	//////////////////////////////////////////////
-
-	/**
-	 * @param file the {@link IFile} which will representing the saved {@link XmlTokenSource}
-	 * @param doc the {@link XmlTokenSource} to save
-	 */
-	private void saveXmlDocument(IFile file, XmlTokenSource doc) {
-		try {
-			doc.save(file.getLocation().toFile(), new XmlOptions().setSavePrettyPrint());
-			try {
-				file.refreshLocal(IFile.DEPTH_INFINITE, null);
-			} catch (CoreException e) {
-				String message = "Error while refreshing file "+file.getFullPath().toOSString()+"!";
-				ExceptionHandler.notifyUser(new DataLoadingException(message));
-			}
-		} catch (IOException e) {
-			ExceptionHandler.notifyUser(e);
-		}
-	}
-
-	/**
-	 * Writes back new comments/replies or changes of a comment/reply to the filesystem.
-	 * @param comment The comment that was changed or is the parent comment of the reply that changed.
-	 * @author Peter Reuter (24.06.2012)
-	 */
+	
+	///////////////////////////////////////
+	// methods for storing pojos on dics //
+	///////////////////////////////////////
+	
 	private void store(Comment comment) {
 		IFile commentFile = SourceFolderManager.getCommentFile(comment.getReview().getId(), comment.getAuthor());
 		if (commentFile != null) {
-			CommentsDocument doc = PojoConversion.getXmlBeansCommentsDocument(getComments(comment.getReview(), comment.getAuthor()));
-			saveXmlDocument(commentFile, doc);	
-		}		
+			try {
+				org.agilereview.xmlschema.author.Comments jaxbComments = Pojo2Jaxb.getJaxbComments(getComments(comment.getReview(), comment.getAuthor()));
+				Pojo2Jaxb.saveComments(jaxbComments, commentFile);
+			} catch (ConversionException e) {
+				String message = "Error while storing data in current Review Source Project. The data could not be converted to XML.";
+				ExceptionHandler.notifyUser(new DataStoringException(message));
+			} catch (DataStoringException e) {
+				String message = "Error while storing data in current Review Source Project.";
+				ExceptionHandler.notifyUser(new DataStoringException(message));
+			}
+		}
 	}
-
-	/**
-	 * Writes back new reviews or changes of a review to the filesystem.
-	 * @param review The {@link Review} that was added or changed.
-	 * @author Peter Reuter (24.06.2012)
-	 */
+	
 	private void store(Review review) {
 		IFile reviewFile = SourceFolderManager.getReviewFile(review.getId());
 		if (reviewFile != null) {
-			ReviewDocument doc = PojoConversion.getXmlBeansReviewDocument(review);
-			saveXmlDocument(reviewFile, doc);
-		}
+			try {
+			org.agilereview.xmlschema.review.Review jaxbReview = Pojo2Jaxb.getJaxbReview(review);
+			Pojo2Jaxb.saveReview(jaxbReview, reviewFile);
+			} catch (ConversionException e) {
+				String message = "Error while storing data in current Review Source Project. The data could not be converted to XML.";
+				ExceptionHandler.notifyUser(new DataStoringException(message));
+			} catch (DataStoringException e) {
+				String message = "Error while storing data in current Review Source Project.";
+				ExceptionHandler.notifyUser(new DataStoringException(message));
+			}
+		}		
 	}
 
 	///////////////////////////////////////////////
@@ -390,7 +379,7 @@ public class XmlStorageClient implements IStorageClient, IPreferenceChangeListen
 	///////////////////////////////////////////////
 
 	/**
-	 * TODO add javadoc
+	 * A {@link Comment} or {@link Reply} was changed
 	 * @param evt
 	 * @author Peter Reuter (18.07.2012)
 	 */
@@ -403,7 +392,7 @@ public class XmlStorageClient implements IStorageClient, IPreferenceChangeListen
 	}
 
 	/**
-	 * TODO add javadoc
+	 * A {@link Review} changed
 	 * @param evt
 	 * @author Peter Reuter (18.07.2012)
 	 */
@@ -453,7 +442,7 @@ public class XmlStorageClient implements IStorageClient, IPreferenceChangeListen
 	}
 
 	/**
-	 * TODO add javadoc
+	 * A {@link ReviewSet} changed.
 	 * @param evt
 	 * @author Peter Reuter (18.07.2012)
 	 */
