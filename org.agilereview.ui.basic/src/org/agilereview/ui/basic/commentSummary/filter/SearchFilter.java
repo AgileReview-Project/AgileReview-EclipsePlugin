@@ -138,11 +138,11 @@ public class SearchFilter {
                 }
             });
             if (!matchAll) break;
-        case REVIEW_ID:
+        case REVIEW_NAME:
             filter.add(new ICommentFilter() {
                 @Override
                 public boolean accept(Comment comment) {
-                    return comment.getReview().getId().contains(searchString);
+                    return comment.getReview().getName().contains(searchString);
                 }
             });
             if (!matchAll) break;

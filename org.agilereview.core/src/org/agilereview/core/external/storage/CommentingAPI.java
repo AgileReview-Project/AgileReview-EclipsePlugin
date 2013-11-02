@@ -101,13 +101,22 @@ public class CommentingAPI {
     }
     
     /**
-     * Deletes the {@link Review} with the given review id
+     * Deletes the {@link Review} with the given review id. Use this, if you do not have a reference to the real review.
      * @param reviewId identifying the {@link Review} which should be deleted
      * @throws NoOpenEditorException //TODO should be removed when tag parser for IFile has been implemented
      * @author Thilo Rauch (02.11.2013)
      */
     public static void deleteReview(String reviewId) throws NoOpenEditorException {
-        Review review = getReview(reviewId);
+        deleteReview(getReview(reviewId));
+    }
+    
+    /**
+     * Deletes the given {@link Review}
+     * @param review {@link Review} which should be deleted
+     * @throws NoOpenEditorException //TODO should be removed when tag parser for IFile has been implemented
+     * @author Thilo Rauch (02.11.2013)
+     */
+    public static void deleteReview(Review review) throws NoOpenEditorException {
         for (Comment c : review.getComments()) {
             deleteComment(c.getId());
         }
@@ -115,19 +124,51 @@ public class CommentingAPI {
     }
     
     /**
-     * Deletes the {@link Comment} with the given comment id
+     * Deletes the {@link Comment} with the given comment id. Use this, if you do not have a reference to the real comment.
      * @param commentId identifying the {@link Comment} which should be deleted
      * @throws NoOpenEditorException //TODO should be removed when tag parser for IFile has been implemented
      * @author Malte Brunnlieb (17.12.2012)
      */
     public static void deleteComment(String commentId) throws NoOpenEditorException {
+        deleteComment(getComment(commentId));
+    }
+    
+    /**
+     * Deletes the given {@link Comment}
+     * @param commentId {@link Comment} which should be deleted
+     * @throws NoOpenEditorException //TODO should be removed when tag parser for IFile has been implemented
+     * @author Thilo Rauch (02.11.2014)
+     */
+    public static void deleteComment(Comment comment) throws NoOpenEditorException {
         IEditorPart part = PlatformUITools.getActiveWorkbenchPage().getActiveEditor();
         if (part == null) {
             throw new NoOpenEditorException();
         }
-        eController.removeTags(part, commentId);
-        Comment commentToDelete = getComment(commentId);
-        commentToDelete.getReview().deleteComment(commentToDelete);
+        eController.removeTags(part, comment.getId());
+        comment.getReview().deleteComment(comment);
+    }
+    
+    /**
+     * Deletes the {@link Reply} with the given reviewId. Use this, if you do not have a reference to the real reply.
+     * @param replyId identifying the {@link Reply} which should be deleted
+     * @author Thilo Rauch (02.11.2013)
+     */
+    public static void deleteReply(String replyId) {
+        deleteReply(getReply(replyId));
+    }
+    
+    /**
+     * Deletes the given {@link Reply}
+     * @param replyId {@link Reply} which should be deleted
+     * @author Thilo Rauch (02.11.2013)
+     */
+    public static void deleteReply(Reply reply) {
+        Object parent = reply.getParent();
+        if (parent instanceof Reply) {
+            ((Reply) parent).deleteReply(reply);
+        } else if (parent instanceof Comment) {
+            ((Comment) parent).deleteReply(reply);
+        }
     }
     
     /**
@@ -162,5 +203,37 @@ public class CommentingAPI {
             }
         }
         return null;
+    }
+    
+    /**
+     * Searches for the {@link Reply} with the given id in the current {@link ReviewSet}.
+     * @param replyId {@link Reply} id of the {@link Reply} which should be returned
+     * @return the {@link Reply} searched for<br><code>null</code>, otherwise
+     * @author Thilo Rauch (02.11.2013)
+     */
+    private static Reply getReply(String replyId) {
+        // TODO: Test me hard
+        Set<Review> reviews = new HashSet<Review>(sController.getAllReviews());
+        for (Review r : reviews) {
+            for (Comment c : r.getComments()) {
+                for (Reply reply : c.getReplies()) {
+                    return getReply(replyId, reply);
+                }
+            }
+        }
+        return null;
+    }
+    
+    private static Reply getReply(String replyId, Reply reply) {
+        // TODO: Test me hard
+        Reply result = null;
+        if (reply.getId().equals(replyId)) {
+            result = reply;
+        } else {
+            for (Reply r : reply.getReplies()) {
+                result = r.getId().equals(replyId) ? r : getReply(replyId, r);
+            }
+        }
+        return result;
     }
 }

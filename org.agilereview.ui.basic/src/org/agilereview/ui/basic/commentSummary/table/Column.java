@@ -16,7 +16,7 @@ public enum Column {
     /**
      * Review ID respectively Review name
      */
-    REVIEW_ID {
+    REVIEW_NAME {
         /**
          * {@inheritDoc}
          * @see java.lang.Enum#toString()
@@ -24,7 +24,7 @@ public enum Column {
          */
         @Override
         public String toString() {
-            return "ReviewName";
+            return "Review name";
         }
     },
     /**
@@ -180,7 +180,9 @@ public enum Column {
      */
     public static Column get(String name) {
         for (Column c : values()) {
-            if (c.toString().equals(name)) { return c; }
+            if (c.toString().equals(name)) {
+                return c;
+            }
         }
         return null;
     }

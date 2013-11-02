@@ -22,7 +22,7 @@ public class DeleteReviewHandler extends AbstractHandler {
                 for (Object o : ((IStructuredSelection) sel).toArray()) {
                     if (o instanceof Review) {
                         try {
-                            CommentingAPI.deleteReview(((Review) o).getId());
+                            CommentingAPI.deleteReview((Review) o);
                         } catch (NoOpenEditorException e) {
                             ExceptionHandler
                                     .logAndNotifyUser(

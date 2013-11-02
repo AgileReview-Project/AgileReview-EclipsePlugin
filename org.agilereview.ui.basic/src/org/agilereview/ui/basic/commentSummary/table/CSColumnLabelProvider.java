@@ -50,9 +50,9 @@ public class CSColumnLabelProvider extends ColumnLabelProvider {
     @Override
     public String getText(Object element) {
         switch (column) {
-        case REVIEW_ID:
+        case REVIEW_NAME:
             Comment c = (Comment) element;
-            return c.getReview().getId();
+            return c.getReview().getName();
         case COMMENT_ID:
             c = (Comment) element;
             return c.getId();
@@ -76,7 +76,9 @@ public class CSColumnLabelProvider extends ColumnLabelProvider {
             return df.format(c.getCreationDate().getTime());
         case DATE_MODIFIED:
             c = (Comment) element;
-            if (c.getModificationDate() == null) { return ""; }
+            if (c.getModificationDate() == null) {
+                return "";
+            }
             df = new SimpleDateFormat("dd.M.yyyy', 'HH:mm:ss");
             return df.format(c.getModificationDate().getTime());
         case NO_REPLIES:

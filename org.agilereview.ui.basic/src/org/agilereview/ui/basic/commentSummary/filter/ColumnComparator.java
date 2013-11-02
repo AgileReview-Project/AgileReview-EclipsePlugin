@@ -20,7 +20,7 @@ public class ColumnComparator extends ViewerComparator {
     /**
      * {@link Column} that should be ordered
      */
-    private Column sortColumn = Column.REVIEW_ID;
+    private Column sortColumn = Column.REVIEW_NAME;
     /**
      * descending is defined as "1"
      */
@@ -57,7 +57,7 @@ public class ColumnComparator extends ViewerComparator {
         // a value = 0 is returned if c1=c2
         // a value > 0 is returned if c1>c2
         switch (sortColumn) {
-        case REVIEW_ID:
+        case REVIEW_NAME:
             rc = c1.getReview().getId().compareTo(c2.getReview().getId());
             break;
         case COMMENT_ID:
