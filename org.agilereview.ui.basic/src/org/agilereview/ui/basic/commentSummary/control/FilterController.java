@@ -7,15 +7,14 @@
  */
 package org.agilereview.ui.basic.commentSummary.control;
 
-import static ch.lambdaj.Lambda.having;
-import static ch.lambdaj.Lambda.on;
-import static org.hamcrest.Matchers.not;
-
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
 import org.agilereview.core.external.storage.Comment;
+import org.agilereview.core.external.storage.ICommentFilter;
 import org.agilereview.core.external.storage.ReviewSet;
 import org.agilereview.ui.basic.commentSummary.CSTableViewer;
 import org.agilereview.ui.basic.commentSummary.CSToolBar;
@@ -28,7 +27,6 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
-import org.hamcrest.Matcher;
 
 /**
  * Controller for filter events
@@ -66,7 +64,7 @@ public class FilterController extends SelectionAdapter implements Listener, KeyL
     /**
      * Currently applied filters
      */
-    private Map<Object, Matcher<Object>> currentFilters = new HashMap<Object, Matcher<Object>>();
+    private Map<Object, List<ICommentFilter>> currentFilters = new HashMap<Object, List<ICommentFilter>>();
     
     /**
      * Creates a new instance of the {@link FilterController} controlling the given {@link CSToolBar}
@@ -134,7 +132,13 @@ public class FilterController extends SelectionAdapter implements Listener, KeyL
     @Override
     public void widgetSelected(SelectionEvent e) {
         if (toolBar.showOnlyOpenComments()) {
-            applyFilter(Filter.OPEN_FILTER, having(on(Comment.class).getStatus(), not(equals(0))));
+            ICommentFilter[] commentFilter = new ICommentFilter[] { new ICommentFilter() {
+                @Override
+                public boolean accept(Comment comment) {
+                    return comment.getStatus() != 0;
+                }
+            } };
+            applyFilter(Filter.OPEN_FILTER, Arrays.asList(commentFilter));
         } else {
             removeFilter(Filter.OPEN_FILTER);
         }
@@ -143,10 +147,10 @@ public class FilterController extends SelectionAdapter implements Listener, KeyL
     /**
      * Applies the given filter
      * @param owner Owner {@link Object} of the given filter
-     * @param filter {@link Matcher} which represents the filtermechanism
+     * @param filter List of {@link ICommentFilter}s which represents the filtermechanism
      * @author Malte Brunnlieb (01.06.2013)
      */
-    private void applyFilter(Object owner, Matcher<Object> filter) {
+    private void applyFilter(Object owner, List<ICommentFilter> filter) {
         currentFilters.put(owner, filter);
         reviewSet.setCommentFilter(owner, filter);
     }
@@ -168,7 +172,7 @@ public class FilterController extends SelectionAdapter implements Listener, KeyL
      */
     public void setReviewSet(ReviewSet reviewSet) {
         this.reviewSet = reviewSet;
-        for (Entry<Object, Matcher<Object>> entry : currentFilters.entrySet()) {
+        for (Entry<Object, List<ICommentFilter>> entry : currentFilters.entrySet()) {
             reviewSet.setCommentFilter(entry.getKey(), entry.getValue());
         }
     }

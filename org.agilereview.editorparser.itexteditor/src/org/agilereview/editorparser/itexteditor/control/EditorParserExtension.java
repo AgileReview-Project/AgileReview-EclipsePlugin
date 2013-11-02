@@ -185,8 +185,6 @@ public class EditorParserExtension implements IEditorParser, PropertyChangeListe
                 commentTagIds.add(c.getId());
             }
             
-            System.out.println("redraw");
-            
             for (IEditorPart editor : annotationManagerMap.keySet()) {
                 Map<String, Position> observedComments = parserMap.get(editor).getObservedComments();
                 observedComments.keySet().retainAll(commentTagIds);

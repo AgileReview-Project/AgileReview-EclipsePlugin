@@ -7,18 +7,15 @@
  */
 package org.agilereview.ui.basic.commentSummary.filter;
 
-import static ch.lambdaj.Lambda.having;
-import static ch.lambdaj.Lambda.on;
-import static org.hamcrest.Matchers.containsString;
-
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.LinkedList;
 import java.util.List;
 
 import org.agilereview.core.external.storage.Comment;
+import org.agilereview.core.external.storage.ICommentFilter;
 import org.agilereview.ui.basic.commentSummary.table.Column;
 import org.agilereview.ui.basic.tools.CommentProperties;
-import org.hamcrest.Matcher;
-import org.hamcrest.core.AnyOf;
 
 /**
  * Filters comments by a given search keyword (and a given column)
@@ -64,56 +61,100 @@ public class SearchFilter {
     
     /**
      * Returns the Filter expression for the current filter
-     * @return {@link Matcher} for the current search filter
+     * @return a list of {@link ICommentFilter}s for the current search filter
      * @author Malte Brunnlieb (01.06.2013)
      */
-    @SuppressWarnings({ "unchecked", "rawtypes" })
-    public Matcher<Object> getFilterExpression() {
-        List<Matcher<Object>> matchers = new LinkedList<Matcher<Object>>();
+    public List<ICommentFilter> getFilterExpression() {
+        List<ICommentFilter> filter = new LinkedList<ICommentFilter>();
+        
         boolean matchAll = false;
         
         switch (restriction) {
         default:
             matchAll = true;
         case AUTHOR:
-            matchers.add(having(on(Comment.class).getAuthor(), containsString(searchString)));
+            filter.add(new ICommentFilter() {
+                @Override
+                public boolean accept(Comment comment) {
+                    return comment.getAuthor().contains(searchString);
+                }
+            });
             if (!matchAll) break;
         case COMMENT_ID:
-            matchers.add(having(on(Comment.class).getId(), containsString(searchString)));
+            filter.add(new ICommentFilter() {
+                @Override
+                public boolean accept(Comment comment) {
+                    return comment.getId().contains(searchString);
+                }
+            });
             if (!matchAll) break;
         case DATE_CREATED:
-            //TODO lambdaj problem
-            //                        DateFormat df = new SimpleDateFormat("dd.M.yyyy', 'HH:mm:ss");
-            //                        matchers.add(having(df.format(on(Comment.class).getCreationDate().getTime()), containsString(searchString)));
+            final DateFormat df1 = new SimpleDateFormat("dd.M.yyyy', 'HH:mm:ss");
+            filter.add(new ICommentFilter() {
+                @Override
+                public boolean accept(Comment comment) {
+                    return df1.format(comment.getCreationDate().getTime()).contains(searchString);
+                }
+            });
             if (!matchAll) break;
         case DATE_MODIFIED:
-            //TODO lambdaj problem
-            //                        df = new SimpleDateFormat("dd.M.yyyy', 'HH:mm:ss");
-            //                        matchers.add(having(df.format(on(Comment.class).getModificationDate().getTime()), containsString(searchString)));
+            final DateFormat df2 = new SimpleDateFormat("dd.M.yyyy', 'HH:mm:ss");
+            filter.add(new ICommentFilter() {
+                @Override
+                public boolean accept(Comment comment) {
+                    return df2.format(comment.getModificationDate().getTime()).contains(searchString);
+                }
+            });
             if (!matchAll) break;
         case LOCATION:
-            matchers.add(having(on(Comment.class).getCommentedFile().getFullPath().toOSString(), containsString(searchString)));
+            filter.add(new ICommentFilter() {
+                @Override
+                public boolean accept(Comment comment) {
+                    return comment.getCommentedFile().getFullPath().toOSString().contains(searchString);
+                }
+            });
             if (!matchAll) break;
         case NO_REPLIES:
-            //TODO lambdaj problem
-            //            matchers.add(having(String.valueOf(on(Comment.class).getReplies().size()), containsString(searchString)));
+            filter.add(new ICommentFilter() {
+                @Override
+                public boolean accept(Comment comment) {
+                    return String.valueOf(comment.getReplies().size()).contains(searchString);
+                }
+            });
             if (!matchAll) break;
         case PRIORITY:
-            //TODO lambdaj problem
-            //            matchers.add(having(commentProperties.getPriorityByID(on(Comment.class).getPriority()), containsString(searchString)));
+            filter.add(new ICommentFilter() {
+                @Override
+                public boolean accept(Comment comment) {
+                    return commentProperties.getPriorityByID(comment.getPriority()).contains(searchString);
+                }
+            });
             if (!matchAll) break;
         case RECIPIENT:
-            matchers.add(having(on(Comment.class).getRecipient(), containsString(searchString)));
+            filter.add(new ICommentFilter() {
+                @Override
+                public boolean accept(Comment comment) {
+                    return comment.getRecipient().contains(searchString);
+                }
+            });
             if (!matchAll) break;
         case REVIEW_ID:
-            matchers.add(having(on(Comment.class).getReview().getId(), containsString(searchString)));
+            filter.add(new ICommentFilter() {
+                @Override
+                public boolean accept(Comment comment) {
+                    return comment.getReview().getId().contains(searchString);
+                }
+            });
             if (!matchAll) break;
         case STATUS:
-            //TODO lambdaj problem
-            //            matchers.add(having(commentProperties.getStatusByID(on(Comment.class).getStatus()), containsString(searchString)));
+            filter.add(new ICommentFilter() {
+                @Override
+                public boolean accept(Comment comment) {
+                    return commentProperties.getStatusByID(comment.getStatus()).contains(searchString);
+                }
+            });
             if (!matchAll) break;
         }
-        
-        return new AnyOf(matchers);
+        return filter;
     }
 }

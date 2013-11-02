@@ -8,7 +8,7 @@
 package org.agilereview.core.external.storage;
 
 /**
- * 
+ * This interface can be used to specify filter logic for filtering the displayed comments
  * @author Malte Brunnlieb (02.06.2013)
  */
 public interface ICommentFilter {
@@ -16,7 +16,7 @@ public interface ICommentFilter {
     /**
      * Determines whether the given comment should be accepted by the filter or not
      * @param comment current {@link Comment}
-     * @return
+     * @return <code>true</code> if the {@link Comment} should be displayed<br><code>false</code> , otherwise
      * @author Malte Brunnlieb (02.06.2013)
      */
     public boolean accept(Comment comment);

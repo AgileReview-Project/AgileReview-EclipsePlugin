@@ -108,7 +108,6 @@ public class DataManager implements IReviewDataReceiver, ICommentFilterListener 
     public void setFilteredComments(Set<Comment> filteredComments) {
         visibleComments = filteredComments;
         propertyChangeSupport.firePropertyChange("visibleComments", null, visibleComments);
-        System.out.println("new comment!");
     }
     
     /**

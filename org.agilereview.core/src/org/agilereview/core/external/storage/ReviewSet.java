@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -21,9 +22,6 @@ import java.util.Set;
 
 import org.agilereview.core.external.definition.IReviewDataReceiver;
 import org.agilereview.core.external.storage.listeners.ICommentFilterListener;
-import org.hamcrest.Matcher;
-
-import ch.lambdaj.Lambda;
 
 /**
  * List of {@link Review}s provides property change support for the list itself and the reviews contained
@@ -46,7 +44,7 @@ public final class ReviewSet extends HashSet<Review> implements PropertyChangeLi
     /**
      * Current registered filter
      */
-    private final Map<Object, Matcher<Object>> currentFilter = new HashMap<Object, Matcher<Object>>();
+    private final Map<Object, List<ICommentFilter>> currentFilter = new HashMap<Object, List<ICommentFilter>>();
     /**
      * Map for storing generic values
      */
@@ -167,7 +165,7 @@ public final class ReviewSet extends HashSet<Review> implements PropertyChangeLi
      * @param filter the filtered set of comments to be shown
      * @author Malte Brunnlieb (10.03.2013)
      */
-    public void setCommentFilter(Object source, Matcher<Object> filter) {
+    public void setCommentFilter(Object source, List<ICommentFilter> filter) {
         synchronized (currentFilter) {
             currentFilter.put(source, filter);
             filterComments();
@@ -191,14 +189,29 @@ public final class ReviewSet extends HashSet<Review> implements PropertyChangeLi
      * @author Malte Brunnlieb (01.06.2013)
      */
     private void filterComments() {
-        Set<Comment> filteredComments = new HashSet<Comment>();
+        List<Comment> allComments = new LinkedList<Comment>();
         for (Review r : this) {
-            filteredComments.addAll(r.getComments());
+            allComments.addAll(r.getComments());
         }
-        for (Matcher<Object> matcher : currentFilter.values()) {
-            filteredComments.retainAll(Lambda.filter(matcher, filteredComments));
+        
+        if (currentFilter.isEmpty()) {
+            notifyCommentFilterListeners(new HashSet<Comment>(allComments));
+        } else {
+            Set<Comment> filteredComments = new HashSet<Comment>();
+            for (List<ICommentFilter> matcher : currentFilter.values()) {
+                for (ICommentFilter cf : matcher) {
+                    Iterator<Comment> it = allComments.iterator();
+                    while (it.hasNext()) {
+                        Comment c = it.next();
+                        if (cf.accept(c)) {
+                            filteredComments.add(c);
+                            it.remove();
+                        }
+                    }
+                }
+            }
+            notifyCommentFilterListeners(filteredComments);
         }
-        notifyCommentFilterListeners(filteredComments);
     }
     
     /**
@@ -250,7 +263,9 @@ public final class ReviewSet extends HashSet<Review> implements PropertyChangeLi
      * @author Thilo Rauch (26.11.2012)
      */
     public Object getValue(String key) {
-        if (key == null) { return null; }
+        if (key == null) {
+            return null;
+        }
         return genericMap.get(key);
     }
     
