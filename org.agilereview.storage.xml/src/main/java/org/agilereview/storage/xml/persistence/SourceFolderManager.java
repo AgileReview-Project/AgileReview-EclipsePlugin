@@ -1,10 +1,11 @@
-package org.agilereview.storage.xml;
+package org.agilereview.storage.xml.persistence;
 
 import java.io.ByteArrayInputStream;
 
 import org.agilereview.common.exception.ExceptionHandler;
 import org.agilereview.core.external.storage.Comment;
 import org.agilereview.core.external.storage.Review;
+import org.agilereview.storage.xml.Activator;
 import org.agilereview.storage.xml.exception.DataLoadingException;
 import org.agilereview.storage.xml.wizards.noreviewsource.NoReviewSourceProjectWizard;
 import org.eclipse.core.resources.IFile;
@@ -290,6 +291,24 @@ public class SourceFolderManager {
 				ExceptionHandler.logAndNotifyUser(e, Activator.PLUGIN_ID);
 			}
 		}
+	}
+
+	/**
+	 * @param currFolder
+	 * @return
+	 * @author Peter Reuter (03.11.2013)
+	 */
+	static String getReviewId(IResource currFolder) {
+		return ((IFolder) currFolder).getName().replace("review.","");
+	}
+
+	/**
+	 * @param commentFile
+	 * @return
+	 * @author Peter Reuter (03.11.2013)
+	 */
+	static boolean isAuthorFile(IResource commentFile) {
+		return commentFile instanceof IFile && !commentFile.getName().equals("review.xml");
 	}
 
 }

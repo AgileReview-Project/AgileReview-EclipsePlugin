@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -17,16 +16,12 @@ import org.agilereview.core.external.storage.Comment;
 import org.agilereview.core.external.storage.Reply;
 import org.agilereview.core.external.storage.Review;
 import org.agilereview.core.external.storage.ReviewSet;
-import org.agilereview.storage.xml.conversion.Jaxb2Pojo;
-import org.agilereview.storage.xml.conversion.Pojo2Jaxb;
-import org.agilereview.storage.xml.exception.ConversionException;
 import org.agilereview.storage.xml.exception.DataLoadingException;
-import org.agilereview.storage.xml.exception.DataStoringException;
+import org.agilereview.storage.xml.persistence.SourceFolderManager;
+import org.agilereview.storage.xml.persistence.XmlLoader;
+import org.agilereview.storage.xml.persistence.XmlPersister;
 import org.agilereview.storage.xml.wizards.noreviewsource.NoReviewSourceProjectWizard;
-import org.agilereview.xmlschema.author.Comments;
 import org.eclipse.core.resources.IFile;
-import org.eclipse.core.resources.IFolder;
-import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener;
@@ -153,15 +148,14 @@ public class XmlStorageClient implements IStorageClient, IPreferenceChangeListen
 	//////////////////////////////////////////////////////
 	// methods for loading POJO data from xmlbeans data //
 	//////////////////////////////////////////////////////
-
+	
 	/**
 	 * Loads all {@link Review} objects and adds a {@link PropertyChangeListener} to each of them.
 	 * @author Peter Reuter (04.04.2012)
 	 */
 	private void loadReviews() {
-		List<org.agilereview.xmlschema.review.Review> jaxbReviews = loadAllJaxbReview();
-		for (org.agilereview.xmlschema.review.Review xmlBeansReview : jaxbReviews) {
-			Review review = Jaxb2Pojo.getReview(xmlBeansReview);
+		List<Review> reviews = XmlLoader.loadReviews();
+		for (Review review: reviews) {
 			this.idReviewMap.put(review.getId(), review);
 		}
 		this.reviewSet.addAll(idReviewMap.values());
@@ -175,25 +169,12 @@ public class XmlStorageClient implements IStorageClient, IPreferenceChangeListen
 	private void loadComments(String reviewId) {
 		Review review = this.idReviewMap.get(reviewId);
 		if (review != null) {
-			ArrayList<Comment> comments = new ArrayList<Comment>();
-			org.agilereview.xmlschema.author.Comments xmlBeansComments = loadAllXmlBeansComment(reviewId);
-			for (org.agilereview.xmlschema.author.Comment xmlBeansComment : xmlBeansComments.getComment()) {
-				Comment comment = Jaxb2Pojo.getComment(review, xmlBeansComment);
-				comments.add(comment);
+			XmlLoader.loadComments(review);
+			for (Comment comment : review.getComments()) {
 				this.idCommentMap.put(comment.getId(), comment);
-				addToIdMap(comment.getReplies());
+				addReplies(comment.getReplies());
 			}
-			review.setComments(comments);	
 		}		
-	}
-
-	private void addToIdMap(List<Reply> replies) {
-		for (Reply reply: replies) {
-			idReplyMap.put(reply.getId(), reply);
-			if (!reply.getReplies().isEmpty()) {
-				addToIdMap(reply.getReplies());
-			}
-		}
 	}
 
 	/**
@@ -249,132 +230,6 @@ public class XmlStorageClient implements IStorageClient, IPreferenceChangeListen
 		}
 	}
 
-	/////////////////////////////////////////////
-	// methods for loading jaxb data from disc //
-	/////////////////////////////////////////////
-
-	/**
-	 * Loads all {@link org.agilereview.xmlSchema.review.ReviewDocument.Review} objects from all files available in the current source folder.
-	 * @return A {@link List} of XmlBeans objects representing the review files.
-	 * @author Peter Reuter (04.04.2012)
-	 */
-	private List<org.agilereview.xmlschema.review.Review> loadAllJaxbReview() {
-		List<org.agilereview.xmlschema.review.Review> result = new ArrayList<org.agilereview.xmlschema.review.Review>();
-		try {
-			IResource[] allFolders = SourceFolderManager.getCurrentReviewSourceProject().members();
-			LinkedList<String> errors = new LinkedList<String>();
-			for (IResource currFolder : allFolders) {
-				if (currFolder instanceof IFolder) {
-					String reviewId = ((IFolder) currFolder).getName().replace("review.","");
-					IFile reviewFile = SourceFolderManager.getReviewFile(reviewId);
-					try {
-						org.agilereview.xmlschema.review.Review jaxbReview = Jaxb2Pojo.loadReview(reviewFile);
-						result.add(jaxbReview);
-					} catch (ConversionException e) {
-						errors.add(reviewFile.getLocation().toOSString() + " ("+e.getLocalizedMessage()+")");
-					} catch (DataLoadingException e) {
-						errors.add(reviewFile.getLocation().toOSString() + " ("+e.getLocalizedMessage()+")");
-					}
-				}
-			}
-			if (!errors.isEmpty()) {
-				String message = "AgileReview could not load the following review files:\n\n";
-				for (String error : errors) {
-					message += error + "\n";
-				}
-				message += "\nThese files may be corrupted (e.g. empty). Please check them.\nComments of a review cannot be loaded without working review file.";
-				ExceptionHandler.logAndNotifyUser(new DataLoadingException(message), Activator.PLUGIN_ID);
-			}
-		} catch (final CoreException e) {
-			String message = "Error while reading data from current Review Source Project. The Review Source Project '"+SourceFolderManager.getCurrentReviewSourceProjectName()+"' does not exists or is closed.";
-			ExceptionHandler.logAndNotifyUser(new DataLoadingException(message), Activator.PLUGIN_ID);
-		}
-
-		return result;
-	}
-
-	/**
-	 * Loads all {@link org.agilereview.xmlSchema.author.CommentDocument.Comment} objects from files available in the current source folder and
-	 * belonging to the given review.
-	 * @param reviewId The ID of the review.
-	 * @return A {@link List} of XmlBeans objects representing the comments belonging to the review given.
-	 * @author Peter Reuter (04.04.2012)
-	 */
-	private org.agilereview.xmlschema.author.Comments loadAllXmlBeansComment(String reviewId) {
-		org.agilereview.xmlschema.author.Comments result = new Comments();
-		try {
-			IFolder reviewFolder = SourceFolderManager.getReviewFolder(reviewId);
-			if (reviewFolder != null) {
-				LinkedList<String> errors = new LinkedList<String>();
-				IResource[] resources = reviewFolder.members();
-				for (IResource commentFile : resources) {
-					if (commentFile instanceof IFile && !commentFile.getName().equals("review.xml")) {
-						try {
-							String authorName = ((IFile) commentFile).getName().replace("author_", "").replace(".xml", "");
-							IFile commentFile2 = SourceFolderManager.getCommentFile(reviewId, authorName);
-							org.agilereview.xmlschema.author.Comments doc = Jaxb2Pojo.loadComments(commentFile2);
-							result = doc;
-						} catch (ConversionException e) {
-							errors.add(commentFile.getLocation().toOSString() + " ("+e.getLocalizedMessage()+")");
-						} catch (DataLoadingException e) {
-							errors.add(commentFile.getLocation().toOSString() + " ("+e.getLocalizedMessage()+")");
-						}
-					}
-
-				}
-				if (!errors.isEmpty()) {
-					String message = "AgileReview could not load the following review files:\n\n";
-					for (String error : errors) {
-						message += error + "\n";
-					}
-					message += "\nThese files may be corrupted (e.g. empty). Please check them.\nComments of a review cannot be loaded without working review file.";
-					ExceptionHandler.logAndNotifyUser(new DataLoadingException(message), Activator.PLUGIN_ID);
-				}
-			}
-		} catch (final CoreException e) {
-			String message = "Error while reading data from current Review Source Project. The Review Source Project '"+SourceFolderManager.getCurrentReviewSourceProjectName()+"' does not exists or is closed.";
-			ExceptionHandler.logAndNotifyUser(new DataLoadingException(message), Activator.PLUGIN_ID);
-		}
-
-		return result;
-	}
-	
-	///////////////////////////////////////
-	// methods for storing pojos on dics //
-	///////////////////////////////////////
-	
-	private void store(Comment comment) {
-		IFile commentFile = SourceFolderManager.getCommentFile(comment.getReview().getId(), comment.getAuthor());
-		if (commentFile != null) {
-			try {
-				org.agilereview.xmlschema.author.Comments jaxbComments = Pojo2Jaxb.getJaxbComments(getComments(comment.getReview(), comment.getAuthor()));
-				Pojo2Jaxb.saveComments(jaxbComments, commentFile);
-			} catch (ConversionException e) {
-				String message = "Error while storing data in current Review Source Project. The data could not be converted to XML.";
-				ExceptionHandler.logAndNotifyUser(new DataStoringException(message), Activator.PLUGIN_ID);
-			} catch (DataStoringException e) {
-				String message = "Error while storing data in current Review Source Project.";
-				ExceptionHandler.logAndNotifyUser(new DataStoringException(message), Activator.PLUGIN_ID);
-			}
-		}
-	}
-	
-	private void store(Review review) {
-		IFile reviewFile = SourceFolderManager.getReviewFile(review.getId());
-		if (reviewFile != null) {
-			try {
-			org.agilereview.xmlschema.review.Review jaxbReview = Pojo2Jaxb.getJaxbReview(review);
-			Pojo2Jaxb.saveReview(jaxbReview, reviewFile);
-			} catch (ConversionException e) {
-				String message = "Error while storing data in current Review Source Project. The data could not be converted to XML.";
-				ExceptionHandler.logAndNotifyUser(new DataStoringException(message), Activator.PLUGIN_ID);
-			} catch (DataStoringException e) {
-				String message = "Error while storing data in current Review Source Project.";
-				ExceptionHandler.logAndNotifyUser(new DataStoringException(message), Activator.PLUGIN_ID);
-			}
-		}		
-	}
-
 	///////////////////////////////////////////////
 	// helper methods for PropertyChangeListener //
 	///////////////////////////////////////////////
@@ -389,7 +244,7 @@ public class XmlStorageClient implements IStorageClient, IPreferenceChangeListen
 		while (!(source instanceof Comment)) {
 			source = ((Reply) source).getParent();
 		}
-		store((Comment) source);
+		XmlPersister.store((Comment) source);
 	}
 
 	/**
@@ -415,9 +270,9 @@ public class XmlStorageClient implements IStorageClient, IPreferenceChangeListen
 				oldValue.removeAll(newValue);
 				for (Comment c: oldValue) {
 					unloadReplies(c.getReplies());
-					ArrayList<Comment> authorCommentsForReview = getComments(c.getReview(), c.getAuthor());
+					ArrayList<Comment> authorCommentsForReview = Helper.getComments(c.getReview(), c.getAuthor());
 					if (authorCommentsForReview.size() > 0) {
-						store(c);
+						XmlPersister.store(c);
 					} else {
 						IFile commentFile = SourceFolderManager.getCommentFile(c.getReview().getId(), c.getAuthor());
 						if (commentFile != null) {
@@ -434,11 +289,11 @@ public class XmlStorageClient implements IStorageClient, IPreferenceChangeListen
 				// comments were added to review
 				newValue.removeAll(oldValue);
 				for (Comment c: newValue) {
-					store(c);
+					XmlPersister.store(c);
 				}
 			}
 		} else {
-			store((Review) evt.getSource());
+			XmlPersister.store((Review) evt.getSource());
 		}
 	}
 
@@ -464,7 +319,7 @@ public class XmlStorageClient implements IStorageClient, IPreferenceChangeListen
 						this.idCommentMap.put(comment.getId(), comment);
 						addReplies(comment.getReplies());
 					}
-					store(review);
+					XmlPersister.store(review);
 				}
 			} else {
 				// reviews removed
@@ -480,6 +335,20 @@ public class XmlStorageClient implements IStorageClient, IPreferenceChangeListen
 		} else {
 			// nothing to do here
 		}		
+	}
+
+	/**
+	 * @param evt
+	 * @author Peter Reuter (04.12.2012)
+	 */
+	private void processPropertyChange(java.beans.PropertyChangeEvent evt) {
+		if (evt.getSource() instanceof ReviewSet) {
+			propertyChangeOfReviewSet(evt);
+		} else if (evt.getSource() instanceof Review) {
+			propertyChangeOfReview(evt);
+		} else if ((evt.getSource() instanceof Comment || evt.getSource() instanceof Reply) && !"modificationDate".equals(evt.getPropertyName())) {
+			propertyChangeOfCommentOrReply(evt);
+		}
 	}
 
 	//////////////////////////////////////
@@ -520,20 +389,6 @@ public class XmlStorageClient implements IStorageClient, IPreferenceChangeListen
 		}				
 	}
 
-	/**
-	 * @param evt
-	 * @author Peter Reuter (04.12.2012)
-	 */
-	private void processPropertyChange(java.beans.PropertyChangeEvent evt) {
-		if (evt.getSource() instanceof ReviewSet) {
-			propertyChangeOfReviewSet(evt);
-		} else if (evt.getSource() instanceof Review) {
-			propertyChangeOfReview(evt);
-		} else if ((evt.getSource() instanceof Comment || evt.getSource() instanceof Reply) && !"modificationDate".equals(evt.getPropertyName())) {
-			propertyChangeOfCommentOrReply(evt);
-		}
-	}
-
 	///////////////////////////////////////
 	// method of IPropertyChangeListener //
 	///////////////////////////////////////
@@ -549,23 +404,6 @@ public class XmlStorageClient implements IStorageClient, IPreferenceChangeListen
 	//////////////////////////
 	// other helper methods //
 	//////////////////////////
-
-	/**
-	 * Returns all {@link Comment} objects belonging to the given {@link Review} and author.
-	 * @param review
-	 * @param author
-	 * @return An {@link ArrayList} of {@link Comment} objects.
-	 * @author Peter Reuter (04.04.2012)
-	 */
-	private ArrayList<Comment> getComments(Review review, String author) {
-		ArrayList<Comment> result = new ArrayList<Comment>();
-		for (Comment comment : review.getComments()) {
-			if (comment.getAuthor().equals(author)) {
-				result.add(comment);
-			}
-		}
-		return result;
-	}
 
 	/**
 	 * Adds the {@link List} of {@link Reply} objects recursively to the idReplyMap.

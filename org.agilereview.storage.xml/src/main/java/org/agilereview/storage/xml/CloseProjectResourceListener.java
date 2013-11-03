@@ -2,6 +2,7 @@ package org.agilereview.storage.xml;
 
 import org.agilereview.common.exception.ExceptionHandler;
 import org.agilereview.core.external.preferences.AgileReviewPreferences;
+import org.agilereview.storage.xml.persistence.SourceFolderManager;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceChangeEvent;
@@ -76,7 +77,6 @@ public class CloseProjectResourceListener implements IResourceChangeListener {
 	 * @param affectedChildren resource that are affected by the post delete event.
 	 * @author Peter Reuter (24.05.2012)
 	 */
-	@SuppressWarnings("deprecation")
 	private void handlePostDelete(final IResourceDelta[] affectedChildren) {
 		if (oldSourceProject != null) {
 			//check whether the project was one of the closed project
@@ -118,7 +118,6 @@ public class CloseProjectResourceListener implements IResourceChangeListener {
 	 * @param affectedChildren the children affected by the post close event
 	 * @author Peter Reuter (24.05.2012)
 	 */
-	@SuppressWarnings("deprecation")
 	private void handlePostClose(final IResourceDelta[] affectedChildren) {
 		preCloseOccured = false;
 		if (oldSourceProject != null) {

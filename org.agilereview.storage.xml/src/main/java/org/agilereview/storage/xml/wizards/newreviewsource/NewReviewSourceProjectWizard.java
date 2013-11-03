@@ -2,7 +2,7 @@ package org.agilereview.storage.xml.wizards.newreviewsource;
 
 import org.agilereview.common.exception.ExceptionHandler;
 import org.agilereview.storage.xml.Activator;
-import org.agilereview.storage.xml.SourceFolderManager;
+import org.agilereview.storage.xml.persistence.SourceFolderManager;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jface.viewers.IStructuredSelection;

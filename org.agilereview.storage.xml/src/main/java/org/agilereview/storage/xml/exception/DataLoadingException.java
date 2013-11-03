@@ -22,6 +22,10 @@ public class DataLoadingException extends Exception {
 		super(message);
 	}
 	
+	/**
+	 * @param e
+	 * @author Peter Reuter (03.11.2013)
+	 */
 	public DataLoadingException(Exception e) {
 		super(e);
 	}

@@ -2,7 +2,7 @@ package org.agilereview.storage.xml.handler;
 
 import org.agilereview.common.exception.ExceptionHandler;
 import org.agilereview.storage.xml.Activator;
-import org.agilereview.storage.xml.SourceFolderManager;
+import org.agilereview.storage.xml.persistence.SourceFolderManager;
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;

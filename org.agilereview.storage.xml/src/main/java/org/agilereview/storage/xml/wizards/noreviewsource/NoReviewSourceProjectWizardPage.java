@@ -3,7 +3,7 @@ package org.agilereview.storage.xml.wizards.noreviewsource;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.agilereview.storage.xml.SourceFolderManager;
+import org.agilereview.storage.xml.persistence.SourceFolderManager;
 import org.agilereview.storage.xml.wizards.newreviewsource.NewReviewSourceProjectWizard;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IWorkspaceRoot;

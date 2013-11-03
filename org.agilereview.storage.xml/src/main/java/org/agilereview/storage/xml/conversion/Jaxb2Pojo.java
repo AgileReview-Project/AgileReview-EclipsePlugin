@@ -1,85 +1,94 @@
 package org.agilereview.storage.xml.conversion;
 
-import java.util.Calendar;
+import java.util.ArrayList;
+import java.util.List;
 
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Unmarshaller;
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
 
-import org.agilereview.common.exception.ExceptionHandler;
 import org.agilereview.core.external.storage.Comment;
+import org.agilereview.core.external.storage.Reply;
 import org.agilereview.core.external.storage.Review;
 import org.agilereview.core.external.storage.StorageAPI;
-import org.agilereview.storage.xml.Activator;
-import org.agilereview.storage.xml.exception.ConversionException;
-import org.agilereview.storage.xml.exception.DataLoadingException;
-import org.agilereview.xmlschema.author.Comments;
+import org.agilereview.xmlschema.author.Replies;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.ResourcesPlugin;
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.Path;
 
 
+/**
+ * Methods for converting Jaxb objects to AgileReview Pojos 
+ * @author Peter Reuter (03.11.2013)
+ */
 public class Jaxb2Pojo {
 	
-	public static org.agilereview.xmlschema.review.Review loadReview(IFile reviewFile) throws ConversionException, DataLoadingException {
-		try {
-			JAXBContext jaxbContext = JAXBContext.newInstance(org.agilereview.xmlschema.review.Review.class);
-			Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
-			org.agilereview.xmlschema.review.Review jaxbReview = (org.agilereview.xmlschema.review.Review) jaxbUnmarshaller.unmarshal(reviewFile.getContents());
-			
-			return jaxbReview;
-			
-		} catch (JAXBException e) {
-			throw new ConversionException(e);
-		} catch (CoreException e) {
-			throw new DataLoadingException(e);
-		}
-	}
-	
-	public static Comments loadComments(IFile authorFile) throws ConversionException, DataLoadingException {
-		try {
-			JAXBContext jaxbContext = JAXBContext.newInstance(Comments.class);
-			Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
-			Comments jaxbComments = (Comments) jaxbUnmarshaller.unmarshal(authorFile.getContents());
-			
-			return jaxbComments;
-			
-		} catch (JAXBException e) {
-			throw new ConversionException(e);
-		} catch (CoreException e) {
-			throw new DataLoadingException(e);
-		}
-	}
-	
+	/**
+	 * Convert Jaxb {@link org.agilereview.xmlschema.author.Comment} to AgileReview {@link Comment}
+	 * @param review
+	 * @param jaxbComment
+	 * @return the converted {@link Comment}
+	 * @author Peter Reuter (03.11.2013)
+	 */
 	public static Comment getComment(Review review, org.agilereview.xmlschema.author.Comment jaxbComment) {
 			IFile file = ResourcesPlugin.getWorkspace().getRoot().getFile(new Path(jaxbComment.getResourcePath()));
-			XMLGregorianCalendar creationDate = jaxbComment.getCreationDate();
-			if (creationDate == null) {
-				try {
-					creationDate = DatatypeFactory.newInstance().newXMLGregorianCalendar();
-				} catch (DatatypeConfigurationException e) {
-					e.printStackTrace();
-				}
-				ExceptionHandler.logAndNotifyUser(new Exception(String.format("Creation Date of comment %s in review %s contains an invalid value and was set to a default value.", jaxbComment.getId(), jaxbComment.getReviewID())), Activator.PLUGIN_ID);
+			XMLGregorianCalendar creationDate = getSaveXmlGregorianCalendar(jaxbComment.getCreationDate());
+			XMLGregorianCalendar lastModified = getSaveXmlGregorianCalendar(jaxbComment.getLastModified());
+			Comment comment = StorageAPI.createComment(jaxbComment.getId(), jaxbComment.getAuthorName(), file, review, creationDate.toGregorianCalendar(), lastModified.toGregorianCalendar(), jaxbComment.getRecipient(), jaxbComment.getStatus(), jaxbComment.getPriority(), jaxbComment.getText());
+			comment.setReplies(getReplies(comment, jaxbComment.getReplies()));
+			return comment;
+	}
+
+	/**
+	 * @param date
+	 * @return
+	 * @author Peter Reuter (03.11.2013)
+	 */
+	private static XMLGregorianCalendar getSaveXmlGregorianCalendar(XMLGregorianCalendar date) {
+		if (date == null) {
+			try {
+				date = DatatypeFactory.newInstance().newXMLGregorianCalendar();
+			} catch (DatatypeConfigurationException e) {
+				e.printStackTrace();
 			}
-			XMLGregorianCalendar lastModified = jaxbComment.getLastModified();
-			if (lastModified == null) {
-				try {
-					lastModified = DatatypeFactory.newInstance().newXMLGregorianCalendar();
-				} catch (DatatypeConfigurationException e) {
-					e.printStackTrace();
-				}
-				ExceptionHandler.logAndNotifyUser(new Exception(String.format("Modification Date of comment %s in review %s contains an invalid value and was set to a default value.", jaxbComment.getId(), jaxbComment.getReviewID())), Activator.PLUGIN_ID);
-			}
-			return StorageAPI.createComment(jaxbComment.getId(), jaxbComment.getAuthorName(), file, review, (Calendar) creationDate.toGregorianCalendar(), (Calendar) lastModified.toGregorianCalendar(), jaxbComment.getRecipient(), jaxbComment.getStatus(), jaxbComment.getPriority(), jaxbComment.getText());
+		}
+		return date;
 	}
 	
+	/**
+	 * Convert Jaxb {@link org.agilereview.xmlschema.review.Review} to AgileReview {@link Review}
+	 * @param jaxbReview
+	 * @return the converted {@link Review}
+	 * @author Peter Reuter (03.11.2013)
+	 */
 	public static Review getReview(org.agilereview.xmlschema.review.Review jaxbReview) {
 		return new Review(jaxbReview.getId(), jaxbReview.getName(), jaxbReview.getStatus(), jaxbReview.getReferenceId(), jaxbReview.getResponsibility(), jaxbReview.getDescription());
+	}
+	
+	/**
+	 * @param parent
+	 * @param jaxbReplies
+	 * @return
+	 * @author Peter Reuter (03.11.2013)
+	 */
+	private static List<Reply> getReplies(Object parent, Replies jaxbReplies) {
+		List<Reply> replies = new ArrayList<Reply>();
+		for (org.agilereview.xmlschema.author.Reply jaxbReply: jaxbReplies.getReply()) {
+			replies.add(getReply(parent, jaxbReply));
+		}
+		return replies;
+	}
+	
+	/**
+	 * @param parent
+	 * @param jaxbReply
+	 * @return
+	 * @author Peter Reuter (03.11.2013)
+	 */
+	private static Reply getReply(Object parent, org.agilereview.xmlschema.author.Reply jaxbReply) {
+		XMLGregorianCalendar creationDate = getSaveXmlGregorianCalendar(jaxbReply.getCreationDate());
+		XMLGregorianCalendar modificationDate = getSaveXmlGregorianCalendar(jaxbReply.getLastModified());
+		return StorageAPI.createReply(jaxbReply.getId(), jaxbReply.getAuthor(), creationDate.toGregorianCalendar(), modificationDate.toGregorianCalendar(), jaxbReply.getText(), parent);
 	}
 
 }
