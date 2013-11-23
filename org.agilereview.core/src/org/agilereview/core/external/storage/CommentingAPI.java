@@ -96,10 +96,11 @@ public class CommentingAPI {
     
     /**
      * Creates a new {@link Reply} with the given id and the given parent
-     * @param id The ID of the reply
      * @param parent The parent {@link Object} of this {@link Reply}, either a {@link Comment} or another {@link Reply}
+     * @return the created {@link Reply}
      */
     public static Reply createReply(Object parent) {
+        if (parent == null) throw new IllegalArgumentException("Parent object could not be null.");
         return new Reply(sController.getNewReplyId(parent), parent);
     }
     
@@ -110,6 +111,7 @@ public class CommentingAPI {
      * @author Thilo Rauch (02.11.2013)
      */
     public static void deleteReview(String reviewId) throws NoOpenEditorException {
+        if (reviewId == null) throw new IllegalArgumentException("Review id could not be null.");
         deleteReview(getReview(reviewId));
     }
     
@@ -120,8 +122,13 @@ public class CommentingAPI {
      * @author Thilo Rauch (02.11.2013)
      */
     public static void deleteReview(Review review) throws NoOpenEditorException {
+        if (review == null) throw new IllegalArgumentException("Review could not be null.");
         for (Comment c : review.getComments()) {
-            deleteComment(c.getId());
+            deleteComment(c);
+        }
+        Object detail = sController.getAllReviews().getValue(ReviewSetMetaDataKeys.SHOW_IN_DETAIL_VIEW);
+        if (review.equals(detail)) {
+            sController.getAllReviews().storeValue(ReviewSetMetaDataKeys.SHOW_IN_DETAIL_VIEW, null);
         }
         sController.getAllReviews().remove(review);
     }
@@ -133,21 +140,27 @@ public class CommentingAPI {
      * @author Malte Brunnlieb (17.12.2012)
      */
     public static void deleteComment(String commentId) throws NoOpenEditorException {
+        if (commentId == null) throw new IllegalArgumentException("Comment id could not be null.");
         deleteComment(getComment(commentId));
     }
     
     /**
      * Deletes the given {@link Comment}
-     * @param commentId {@link Comment} which should be deleted
+     * @param comment {@link Comment} which should be deleted
      * @throws NoOpenEditorException //TODO should be removed when tag parser for IFile has been implemented
      * @author Thilo Rauch (02.11.2014)
      */
     public static void deleteComment(Comment comment) throws NoOpenEditorException {
+        if (comment == null) throw new IllegalArgumentException("Comment could not be null.");
         IEditorPart part = PlatformUITools.getActiveWorkbenchPage().getActiveEditor();
         if (part == null) {
             throw new NoOpenEditorException();
         }
         eController.removeTags(part, comment.getId());
+        Object detail = sController.getAllReviews().getValue(ReviewSetMetaDataKeys.SHOW_IN_DETAIL_VIEW);
+        if (comment.equals(detail)) {
+            sController.getAllReviews().storeValue(ReviewSetMetaDataKeys.SHOW_IN_DETAIL_VIEW, null);
+        }
         comment.getReview().deleteComment(comment);
     }
     
@@ -157,15 +170,17 @@ public class CommentingAPI {
      * @author Thilo Rauch (02.11.2013)
      */
     public static void deleteReply(String replyId) {
+        if (replyId == null) throw new IllegalArgumentException("Reply id could not be null.");
         deleteReply(getReply(replyId));
     }
     
     /**
      * Deletes the given {@link Reply}
-     * @param replyId {@link Reply} which should be deleted
+     * @param reply {@link Reply} which should be deleted
      * @author Thilo Rauch (02.11.2013)
      */
     public static void deleteReply(Reply reply) {
+        if (reply == null) throw new IllegalArgumentException("Reply could not be null.");
         Object parent = reply.getParent();
         if (parent instanceof Reply) {
             ((Reply) parent).deleteReply(reply);
@@ -181,6 +196,7 @@ public class CommentingAPI {
      * @author Malte Brunnlieb (26.11.2012)
      */
     private static Review getReview(String reviewId) {
+        if (reviewId == null) throw new IllegalArgumentException("Review id could not be null.");
         Set<Review> reviews = new HashSet<Review>(sController.getAllReviews());
         for (Review r : reviews) {
             if (r.getId().equals(reviewId)) {

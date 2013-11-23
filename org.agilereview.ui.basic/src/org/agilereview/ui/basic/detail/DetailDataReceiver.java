@@ -10,6 +10,8 @@ package org.agilereview.ui.basic.detail;
 import java.beans.PropertyChangeEvent;
 
 import org.agilereview.core.external.storage.ReviewSet;
+import org.agilereview.core.external.storage.constants.PropertyChangeEventKeys;
+import org.agilereview.core.external.storage.constants.ReviewSetMetaDataKeys;
 import org.agilereview.ui.basic.external.reviewDataReceiver.AbstractReviewDataReceiver;
 import org.agilereview.ui.basic.external.reviewDataReceiver.AbstractReviewDataView;
 
@@ -47,13 +49,10 @@ public class DetailDataReceiver extends AbstractReviewDataReceiver {
      */
     @Override
     protected Object transformData(ReviewSet rawData) {
-        // TODO get the right object
         if (rawData != null) {
-            currentlyShownObject = rawData.getValue("detail");
+            currentlyShownObject = rawData.getValue(ReviewSetMetaDataKeys.SHOW_IN_DETAIL_VIEW);
             if (currentlyShownObject != null) {
                 return currentlyShownObject;
-            } else {
-                return new Object();
             }
         }
         return null;
@@ -65,7 +64,6 @@ public class DetailDataReceiver extends AbstractReviewDataReceiver {
      */
     @Override
     protected boolean triggerPropertyChange(PropertyChangeEvent evt, ReviewSet data) {
-        // TODO: ReviewSetMap change
-        return currentlyShownObject == null || evt.getSource().equals(currentlyShownObject) || (evt.getPropertyName().equalsIgnoreCase("detail"));
+        return evt.getPropertyName().equals(PropertyChangeEventKeys.REVIEWSET_METADATA) && !evt.getSource().equals(currentlyShownObject);
     }
 }
