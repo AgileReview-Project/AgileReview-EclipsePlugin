@@ -42,6 +42,7 @@ public class CSTableViewer extends TableViewer {
     public CSTableViewer(Composite parent) {
         super(parent, SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL | SWT.FULL_SELECTION | SWT.BORDER);
         createUI(parent);
+        addSelectionChangedListener(new ViewController(this));
     }
     
     /**

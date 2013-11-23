@@ -10,6 +10,8 @@ package org.agilereview.ui.basic.commentSummary.control;
 import java.util.Set;
 
 import org.agilereview.core.external.storage.Comment;
+import org.agilereview.core.external.storage.ReviewSet;
+import org.agilereview.core.external.storage.constants.ReviewSetMetaDataKeys;
 import org.agilereview.core.external.storage.listeners.ICommentFilterListener;
 import org.agilereview.ui.basic.commentSummary.CSTableViewer;
 import org.agilereview.ui.basic.commentSummary.CommentSummaryView;
@@ -17,6 +19,10 @@ import org.agilereview.ui.basic.commentSummary.filter.ColumnComparator;
 import org.agilereview.ui.basic.commentSummary.table.Column;
 import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IDoubleClickListener;
+import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.jface.viewers.ISelectionChangedListener;
+import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -26,7 +32,7 @@ import org.eclipse.swt.widgets.TableColumn;
  * This {@link ViewController} handles elementary events of the {@link CommentSummaryView}
  * @author Malte Brunnlieb (28.04.2012)
  */
-public class ViewController extends SelectionAdapter implements IDoubleClickListener, ICommentFilterListener {
+public class ViewController extends SelectionAdapter implements IDoubleClickListener, ICommentFilterListener, ISelectionChangedListener {
     
     /**
      * TableViewer which events should be handled
@@ -80,5 +86,20 @@ public class ViewController extends SelectionAdapter implements IDoubleClickList
     @Override
     public void setFilteredComments(Set<Comment> filteredComments) {
         tableViewer.setInput(filteredComments);
+    }
+    
+    /* (non-Javadoc)
+     * @see org.eclipse.jface.viewers.ISelectionChangedListener#selectionChanged(org.eclipse.jface.viewers.SelectionChangedEvent)
+     * @author Malte Brunnlieb (23.11.2013)
+     */
+    @Override
+    public void selectionChanged(SelectionChangedEvent event) {
+        ISelection selection = event.getSelection();
+        if (!selection.isEmpty() && selection instanceof IStructuredSelection) {
+            Object firstElement = ((IStructuredSelection) selection).getFirstElement();
+            if (firstElement instanceof Comment) {
+                ((ReviewSet) tableViewer.getInput()).storeValue(ReviewSetMetaDataKeys.SHOW_IN_DETAIL_VIEW, firstElement);
+            }
+        }
     }
 }
