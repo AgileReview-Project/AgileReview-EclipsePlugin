@@ -16,6 +16,7 @@ import java.util.List;
 
 import org.agilereview.core.Activator;
 import org.agilereview.core.external.preferences.AgileReviewPreferences;
+import org.agilereview.core.external.storage.constants.PropertyChangeEventKeys;
 import org.eclipse.core.runtime.preferences.InstanceScope;
 
 /**
@@ -120,7 +121,7 @@ public final class Reply implements PropertyChangeListener {
     private void resetModificationDate() {
         Calendar oldValue = this.modificationDate;
         this.modificationDate = Calendar.getInstance();
-        propertyChangeSupport.firePropertyChange("modificationDate", oldValue, this.modificationDate);
+        propertyChangeSupport.firePropertyChange(PropertyChangeEventKeys.REPLY_MODIFICATION_DATE, oldValue, this.modificationDate);
     }
     
     /**
@@ -137,7 +138,7 @@ public final class Reply implements PropertyChangeListener {
         String oldValue = this.text;
         this.text = text;
         resetModificationDate();
-        propertyChangeSupport.firePropertyChange("text", oldValue, this.text);
+        propertyChangeSupport.firePropertyChange(PropertyChangeEventKeys.REPLY_TEXT, oldValue, this.text);
     }
     
     /**
@@ -170,7 +171,7 @@ public final class Reply implements PropertyChangeListener {
             this.replies.add(reply);
             reply.addPropertyChangeListener(this);
             resetModificationDate();
-            propertyChangeSupport.firePropertyChange("replies", oldValue, this.replies);
+            propertyChangeSupport.firePropertyChange(PropertyChangeEventKeys.REPLY_REPLIES, oldValue, this.replies);
         }
     }
     
@@ -183,7 +184,7 @@ public final class Reply implements PropertyChangeListener {
         this.replies.remove(reply);
         reply.removePropertyChangeListener(this);
         resetModificationDate();
-        propertyChangeSupport.firePropertyChange("replies", oldValue, this.replies);
+        propertyChangeSupport.firePropertyChange(PropertyChangeEventKeys.REPLY_REPLIES, oldValue, this.replies);
     }
     
     /**
@@ -204,7 +205,7 @@ public final class Reply implements PropertyChangeListener {
             r.clearReplies();
         }
         this.replies.clear();
-        propertyChangeSupport.firePropertyChange("replies", oldValue, this.replies);
+        propertyChangeSupport.firePropertyChange(PropertyChangeEventKeys.REPLY_REPLIES, oldValue, this.replies);
     }
     
     /**

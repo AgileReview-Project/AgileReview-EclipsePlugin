@@ -21,6 +21,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.agilereview.core.external.definition.IReviewDataReceiver;
+import org.agilereview.core.external.storage.constants.PropertyChangeEventKeys;
 import org.agilereview.core.external.storage.listeners.ICommentFilterListener;
 
 /**
@@ -61,7 +62,7 @@ public final class ReviewSet extends HashSet<Review> implements PropertyChangeLi
         boolean changed = super.add(e);
         if (changed) {
             e.addPropertyChangeListener(this);
-            propertyChangeSupport.firePropertyChange("reviews", oldValue, this);
+            propertyChangeSupport.firePropertyChange(PropertyChangeEventKeys.REVIEWSET_REVIEWS, oldValue, this);
         }
         return changed;
     }
@@ -79,7 +80,7 @@ public final class ReviewSet extends HashSet<Review> implements PropertyChangeLi
             for (Review r : c) {
                 r.addPropertyChangeListener(this);
             }
-            propertyChangeSupport.firePropertyChange("reviews", oldValue, this);
+            propertyChangeSupport.firePropertyChange(PropertyChangeEventKeys.REVIEWSET_REVIEWS, oldValue, this);
         }
         return changed;
     }
@@ -96,7 +97,7 @@ public final class ReviewSet extends HashSet<Review> implements PropertyChangeLi
         if (success) {
             ((Review) o).setOpenReviewsPreference();
             ((Review) o).removePropertyChangeListener(this);
-            propertyChangeSupport.firePropertyChange("reviews", oldValue, this);
+            propertyChangeSupport.firePropertyChange(PropertyChangeEventKeys.REVIEWSET_REVIEWS, oldValue, this);
         }
         return success;
     }
@@ -115,7 +116,7 @@ public final class ReviewSet extends HashSet<Review> implements PropertyChangeLi
                 ((Review) r).setOpenReviewsPreference();
                 ((Review) r).removePropertyChangeListener(this);
             }
-            propertyChangeSupport.firePropertyChange("reviews", oldValue, this);
+            propertyChangeSupport.firePropertyChange(PropertyChangeEventKeys.REVIEWSET_REVIEWS, oldValue, this);
         }
         return success;
     }
@@ -136,7 +137,7 @@ public final class ReviewSet extends HashSet<Review> implements PropertyChangeLi
                 r.setOpenReviewsPreference();
                 r.removePropertyChangeListener(this);
             }
-            propertyChangeSupport.firePropertyChange("reviews", oldValue, this);
+            propertyChangeSupport.firePropertyChange(PropertyChangeEventKeys.REVIEWSET_REVIEWS, oldValue, this);
         }
         return success;
     }
@@ -155,7 +156,7 @@ public final class ReviewSet extends HashSet<Review> implements PropertyChangeLi
             r.removePropertyChangeListener(this);
         }
         super.clear();
-        propertyChangeSupport.firePropertyChange("reviews", oldValue, this);
+        propertyChangeSupport.firePropertyChange(PropertyChangeEventKeys.REVIEWSET_REVIEWS, oldValue, this);
     }
     
     /**
@@ -252,7 +253,7 @@ public final class ReviewSet extends HashSet<Review> implements PropertyChangeLi
      */
     public Object storeValue(String key, Object value) {
         Object oldObject = genericMap.put(key, value);
-        propertyChangeSupport.firePropertyChange("reviews", oldObject, value);
+        propertyChangeSupport.firePropertyChange(PropertyChangeEventKeys.REVIEWSET_METADATA, oldObject, value);
         return oldObject;
     }
     

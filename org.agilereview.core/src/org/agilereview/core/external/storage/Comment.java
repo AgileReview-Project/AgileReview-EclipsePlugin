@@ -17,6 +17,7 @@ import java.util.List;
 import org.agilereview.core.Activator;
 import org.agilereview.core.external.definition.IStorageClient;
 import org.agilereview.core.external.preferences.AgileReviewPreferences;
+import org.agilereview.core.external.storage.constants.PropertyChangeEventKeys;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.preferences.InstanceScope;
 
@@ -145,7 +146,7 @@ public class Comment implements PropertyChangeListener {
         IFile oldValue = this.commentedFile;
         this.commentedFile = commentedFile;
         resetModificationDate();
-        propertyChangeSupport.firePropertyChange("commentedFile", oldValue, this.commentedFile);
+        propertyChangeSupport.firePropertyChange(PropertyChangeEventKeys.COMMENT_COMMENTED_FILE_REFERENCE, oldValue, this.commentedFile);
     }
     
     /**
@@ -175,7 +176,7 @@ public class Comment implements PropertyChangeListener {
     private void resetModificationDate() {
         Calendar oldValue = this.modificationDate;
         this.modificationDate = Calendar.getInstance();
-        propertyChangeSupport.firePropertyChange("modificationDate", oldValue, this.modificationDate);
+        propertyChangeSupport.firePropertyChange(PropertyChangeEventKeys.COMMENT_MODIFICATION_DATE, oldValue, this.modificationDate);
     }
     
     /**
@@ -192,7 +193,7 @@ public class Comment implements PropertyChangeListener {
         String oldValue = this.recipient;
         this.recipient = recipient;
         resetModificationDate();
-        propertyChangeSupport.firePropertyChange("recipient", oldValue, this.recipient);
+        propertyChangeSupport.firePropertyChange(PropertyChangeEventKeys.COMMENT_RECIPIENT, oldValue, this.recipient);
     }
     
     /**
@@ -209,7 +210,7 @@ public class Comment implements PropertyChangeListener {
         int oldValue = this.status;
         this.status = status;
         resetModificationDate();
-        propertyChangeSupport.firePropertyChange("status", oldValue, this.status);
+        propertyChangeSupport.firePropertyChange(PropertyChangeEventKeys.COMMENT_STATUS, oldValue, this.status);
     }
     
     /**
@@ -226,7 +227,7 @@ public class Comment implements PropertyChangeListener {
         int oldValue = this.priority;
         this.priority = priority;
         resetModificationDate();
-        propertyChangeSupport.firePropertyChange("priority", oldValue, this.priority);
+        propertyChangeSupport.firePropertyChange(PropertyChangeEventKeys.COMMENT_PRIORITY, oldValue, this.priority);
     }
     
     /**
@@ -243,7 +244,7 @@ public class Comment implements PropertyChangeListener {
         String oldValue = this.text;
         this.text = text;
         resetModificationDate();
-        propertyChangeSupport.firePropertyChange("text", oldValue, this.text);
+        propertyChangeSupport.firePropertyChange(PropertyChangeEventKeys.COMMENT_TEXT, oldValue, this.text);
     }
     
     /**
@@ -276,7 +277,7 @@ public class Comment implements PropertyChangeListener {
             this.replies.add(reply);
             reply.addPropertyChangeListener(this);
             resetModificationDate();
-            propertyChangeSupport.firePropertyChange("replies", oldValue, this.replies);
+            propertyChangeSupport.firePropertyChange(PropertyChangeEventKeys.COMMENT_REPLIES, oldValue, this.replies);
         }
     }
     
@@ -289,7 +290,7 @@ public class Comment implements PropertyChangeListener {
         this.replies.remove(reply);
         reply.removePropertyChangeListener(this);
         resetModificationDate();
-        propertyChangeSupport.firePropertyChange("replies", oldValue, this.replies);
+        propertyChangeSupport.firePropertyChange(PropertyChangeEventKeys.COMMENT_REPLIES, oldValue, this.replies);
     }
     
     /**
@@ -310,7 +311,7 @@ public class Comment implements PropertyChangeListener {
             r.clearReplies();
         }
         this.replies.clear();
-        propertyChangeSupport.firePropertyChange("replies", oldValue, this.replies);
+        propertyChangeSupport.firePropertyChange(PropertyChangeEventKeys.COMMENT_REPLIES, oldValue, this.replies);
     }
     
     /**

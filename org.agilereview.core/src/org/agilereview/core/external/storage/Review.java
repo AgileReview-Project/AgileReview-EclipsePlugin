@@ -18,6 +18,7 @@ import java.util.List;
 import org.agilereview.common.exception.ExceptionHandler;
 import org.agilereview.core.Activator;
 import org.agilereview.core.external.preferences.AgileReviewPreferences;
+import org.agilereview.core.external.storage.constants.PropertyChangeEventKeys;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent;
@@ -129,7 +130,7 @@ public class Review implements PropertyChangeListener, IPreferenceChangeListener
     public void setName(String name) {
         String oldValue = this.name;
         this.name = name;
-        propertyChangeSupport.firePropertyChange("name", oldValue, this.name);
+        propertyChangeSupport.firePropertyChange(PropertyChangeEventKeys.REVIEW_NAME, oldValue, this.name);
     }
     
     /**
@@ -145,7 +146,7 @@ public class Review implements PropertyChangeListener, IPreferenceChangeListener
     public void setStatus(int status) {
         int oldValue = this.status;
         this.status = status;
-        propertyChangeSupport.firePropertyChange("status", oldValue, this.status);
+        propertyChangeSupport.firePropertyChange(PropertyChangeEventKeys.REVIEW_STATUS, oldValue, this.status);
     }
     
     /**
@@ -161,7 +162,7 @@ public class Review implements PropertyChangeListener, IPreferenceChangeListener
     public void setReference(String reference) {
         String oldValue = this.reference;
         this.reference = reference;
-        propertyChangeSupport.firePropertyChange("reference", oldValue, this.reference);
+        propertyChangeSupport.firePropertyChange(PropertyChangeEventKeys.REVIEW_REFERENCE, oldValue, this.reference);
     }
     
     /**
@@ -177,7 +178,7 @@ public class Review implements PropertyChangeListener, IPreferenceChangeListener
     public void setResponsibility(String responsibility) {
         String oldValue = this.responsibility;
         this.responsibility = responsibility;
-        propertyChangeSupport.firePropertyChange("responsibility", oldValue, this.responsibility);
+        propertyChangeSupport.firePropertyChange(PropertyChangeEventKeys.REVIEW_RESPONSIBILITY, oldValue, this.responsibility);
     }
     
     /**
@@ -209,7 +210,7 @@ public class Review implements PropertyChangeListener, IPreferenceChangeListener
             ArrayList<Comment> oldValue = new ArrayList<Comment>(this.comments);
             this.comments.add(comment);
             comment.addPropertyChangeListener(this);
-            propertyChangeSupport.firePropertyChange("comments", oldValue, this.comments);
+            propertyChangeSupport.firePropertyChange(PropertyChangeEventKeys.REVIEW_COMMENTS, oldValue, this.comments);
         }
     }
     
@@ -221,7 +222,7 @@ public class Review implements PropertyChangeListener, IPreferenceChangeListener
         ArrayList<Comment> oldValue = new ArrayList<Comment>(this.comments);
         this.comments.remove(comment);
         comment.removePropertyChangeListener(this);
-        propertyChangeSupport.firePropertyChange("comments", oldValue, this.comments);
+        propertyChangeSupport.firePropertyChange(PropertyChangeEventKeys.REVIEW_COMMENTS, oldValue, this.comments);
     }
     
     /**
@@ -242,7 +243,7 @@ public class Review implements PropertyChangeListener, IPreferenceChangeListener
             c.clearReplies();
         }
         this.comments.clear();
-        propertyChangeSupport.firePropertyChange("comments", oldValue, this.comments);
+        propertyChangeSupport.firePropertyChange(PropertyChangeEventKeys.REVIEW_COMMENTS, oldValue, this.comments);
     }
     
     /**
@@ -260,7 +261,7 @@ public class Review implements PropertyChangeListener, IPreferenceChangeListener
         this.isOpen = isOpen;
         setOpenReviewsPreference();
         setIsActive(false);
-        propertyChangeSupport.firePropertyChange("isOpen", oldValue, this.isOpen);
+        propertyChangeSupport.firePropertyChange(PropertyChangeEventKeys.REVIEW_ISOPEN_STATUS, oldValue, this.isOpen);
     }
     
     /**
@@ -321,7 +322,7 @@ public class Review implements PropertyChangeListener, IPreferenceChangeListener
     public void setDescription(String description) {
         String oldValue = this.description;
         this.description = description;
-        propertyChangeSupport.firePropertyChange("description", oldValue, this.description);
+        propertyChangeSupport.firePropertyChange(PropertyChangeEventKeys.REVIEW_DESCRIPTION, oldValue, this.description);
     }
     
     /**
@@ -402,7 +403,7 @@ public class Review implements PropertyChangeListener, IPreferenceChangeListener
             boolean oldValue = this.isActive;
             this.isActive = this.id.equals(event.getNewValue());
             if (this.isActive != oldValue) {
-                propertyChangeSupport.firePropertyChange("isActive", oldValue, this.isActive);
+                propertyChangeSupport.firePropertyChange(PropertyChangeEventKeys.REVIEW_ISACTIVE_STATUS, oldValue, this.isActive);
             }
         }
     }

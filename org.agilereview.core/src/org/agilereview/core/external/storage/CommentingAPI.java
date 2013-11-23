@@ -17,6 +17,7 @@ import org.agilereview.core.controller.extension.ExtensionControllerFactory.Exte
 import org.agilereview.core.controller.extension.StorageController;
 import org.agilereview.core.external.exception.NoOpenEditorException;
 import org.agilereview.core.external.exception.NullArgumentException;
+import org.agilereview.core.external.storage.constants.ReviewSetMetaDataKeys;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.ui.IEditorPart;
 
@@ -55,6 +56,7 @@ public class CommentingAPI {
         String reviewId = sController.getNewReviewId();
         Review review = new Review(reviewId);
         sController.getAllReviews().add(review);
+        sController.getAllReviews().storeValue(ReviewSetMetaDataKeys.SHOW_IN_DETAIL_VIEW, review);
         return review;
     }
     
@@ -88,6 +90,7 @@ public class CommentingAPI {
         review.addComment(newComment);
         
         eController.addTagsToEditorSelection(editor, newComment);
+        sController.getAllReviews().storeValue(ReviewSetMetaDataKeys.SHOW_IN_DETAIL_VIEW, newComment);
         return newComment;
     }
     
