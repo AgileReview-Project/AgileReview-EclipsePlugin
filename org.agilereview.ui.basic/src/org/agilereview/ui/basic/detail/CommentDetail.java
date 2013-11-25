@@ -38,15 +38,6 @@ import org.eclipse.swt.widgets.Text;
 public class CommentDetail extends Composite {
     
     /**
-     * Converts all line breaks either \n or \r to \r\n line breaks
-     * @param in the string which line breaks should be converted
-     * @return the converted string
-     */
-    private static String convertLineBreaks(String in) {
-        return in.replaceAll("\r\n|\r|\n", System.getProperty("line.separator"));
-    }
-    
-    /**
      * Text to show the comment tag of the shown Comment
      */
     private Text tagInstance;
@@ -465,5 +456,14 @@ public class CommentDetail extends Composite {
     //        return null;
     //        // return ColorManager.getColor(this.backupObject.getAuthor());
     //    }
+    
+    /**
+     * Converts all line breaks either \n or \r to \r\n line breaks
+     * @param in the string which line breaks should be converted
+     * @return the converted string
+     */
+    private static String convertLineBreaks(String in) {
+        return in.replaceAll("\r\n|\r|\n", System.getProperty("line.separator"));
+    }
     
 }

@@ -8,6 +8,8 @@
 package org.agilereview.ui.basic.external.reviewDataReceiver;
 
 import org.agilereview.core.external.definition.IStorageClient;
+import org.agilereview.core.external.storage.Comment;
+import org.agilereview.core.external.storage.Review;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -155,10 +157,17 @@ public abstract class AbstractReviewDataView extends ViewPart {
                 @Override
                 public void run() {
                     if (viewInput != null) {
-                        if (viewContent == ViewContent.WORKING) return;
-                        viewContent = ViewContent.WORKING;
-                        clearParent();
-                        buildUI(parent, viewInput);
+                        if (viewInput instanceof Comment || viewInput instanceof Review) {
+                            if (viewContent == ViewContent.WORKING) return;
+                            viewContent = ViewContent.WORKING;
+                            clearParent();
+                            buildUI(parent, viewInput);
+                        } else {
+                            if (viewContent == ViewContent.NONE) return;
+                            viewContent = ViewContent.NONE;
+                            clearParent();
+                            buildUI(parent, viewInput);
+                        }
                     } else {
                         if (viewContent == ViewContent.DUMMY) return;
                         viewContent = ViewContent.DUMMY;

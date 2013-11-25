@@ -53,6 +53,8 @@ public class DetailDataReceiver extends AbstractReviewDataReceiver {
             currentlyShownObject = rawData.getValue(ReviewSetMetaDataKeys.SHOW_IN_DETAIL_VIEW);
             if (currentlyShownObject != null) {
                 return currentlyShownObject;
+            } else {
+                return new Object();
             }
         }
         return null;
