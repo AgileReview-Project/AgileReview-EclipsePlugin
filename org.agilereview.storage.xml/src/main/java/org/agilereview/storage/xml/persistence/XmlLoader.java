@@ -186,6 +186,7 @@ public class XmlLoader {
 				Comment comment = Jaxb2Pojo.getComment(review, jaxbComment);
 				comments.add(comment);
 			}
+			review.setComments(comments);
 		}		
 	}
 
