@@ -8,7 +8,7 @@ import static org.junit.Assert.assertTrue;
 import java.util.Calendar;
 
 import org.agilereview.storage.xml.Activator;
-import org.agilereview.storage.xml.SourceFolderManager;
+import org.agilereview.storage.xml.persistence.SourceFolderManager;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
@@ -20,6 +20,11 @@ import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.junit.AfterClass;
 import org.junit.Test;
 
+/**
+ * Test for the {@link SourceFolderManager}
+ * @author Peter Reuter (01.12.2013)
+ */
+@SuppressWarnings("javadoc")
 public class SourceFolderManagerTest {
 
 	private static IProject sourcefolder = null;
