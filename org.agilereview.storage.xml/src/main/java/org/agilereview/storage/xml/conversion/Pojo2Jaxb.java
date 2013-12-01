@@ -106,6 +106,7 @@ public class Pojo2Jaxb {
 				jaxbReply.setReplies(getJaxbReplies(reply.getReplies()));
 			}
 			jaxbReply.setText(reply.getText());
+			jaxbReplies.getReply().add(jaxbReply);
 		}
 		
 		return jaxbReplies;
