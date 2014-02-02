@@ -47,6 +47,16 @@ public class CommentingAPI {
     }
     
     /**
+     * Stores a meta data value into the current {@link ReviewSet}
+     * @param key String identifier for the given value
+     * @param value {@link Object} value to be stored
+     * @author Malte Brunnlieb (02.02.2014)
+     */
+    public static void storeMetaValue(String key, Object value) {
+        sController.getAllReviews().storeValue(key, value);
+    }
+    
+    /**
      * Creates a new {@link Review} and adds it to the currently provided {@link ReviewSet}
      * @return the newly created {@link Review}
      * @author Malte Brunnlieb (17.12.2012)

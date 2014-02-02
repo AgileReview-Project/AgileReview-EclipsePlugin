@@ -10,7 +10,7 @@ package org.agilereview.ui.basic.commentSummary.control;
 import java.util.Set;
 
 import org.agilereview.core.external.storage.Comment;
-import org.agilereview.core.external.storage.ReviewSet;
+import org.agilereview.core.external.storage.CommentingAPI;
 import org.agilereview.core.external.storage.constants.ReviewSetMetaDataKeys;
 import org.agilereview.core.external.storage.listeners.ICommentFilterListener;
 import org.agilereview.ui.basic.commentSummary.CSTableViewer;
@@ -98,7 +98,7 @@ public class ViewController extends SelectionAdapter implements IDoubleClickList
         if (!selection.isEmpty() && selection instanceof IStructuredSelection) {
             Object firstElement = ((IStructuredSelection) selection).getFirstElement();
             if (firstElement instanceof Comment) {
-                ((ReviewSet) tableViewer.getInput()).storeValue(ReviewSetMetaDataKeys.SHOW_IN_DETAIL_VIEW, firstElement);
+                CommentingAPI.storeMetaValue(ReviewSetMetaDataKeys.SHOW_IN_DETAIL_VIEW, firstElement);
             }
         }
     }
