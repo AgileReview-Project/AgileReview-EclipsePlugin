@@ -1,6 +1,3 @@
-/org.agilereview.common/target
-/org.agilereview.common/lib
-/org.agilereview.core/target
-/org.agilereview.core.test/target
-/org.agilereview.storage.xml/target
-/org.agilereview.ui.basic/target
+target
+bin
+lib
