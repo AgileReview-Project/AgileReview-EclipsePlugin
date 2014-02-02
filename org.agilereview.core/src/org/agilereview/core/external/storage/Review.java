@@ -91,7 +91,7 @@ public class Review implements PropertyChangeListener, IPreferenceChangeListener
      * @param responsibility the person that is in charge for this {@link Review}
      * @param description a text describing the e.g. the content or scope of this {@link Review}
      */
-    public Review(String id, String name, int status, String reference, String responsibility, String description) {
+    Review(String id, String name, int status, String reference, String responsibility, String description) {
         this.id = id;
         this.name = name;
         this.status = status;

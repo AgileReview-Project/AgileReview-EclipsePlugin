@@ -84,7 +84,7 @@ public class Comment implements PropertyChangeListener {
      * @param commentedFile the {@link IFile} underlying the editor in which the comment was added
      * @param review The {@link Review} to which the comment belongs to.
      */
-    public Comment(String id, IFile commentedFile, Review review) {
+    Comment(String id, IFile commentedFile, Review review) {
         this.id = id;
         this.commentedFile = commentedFile;
         this.review = review;
