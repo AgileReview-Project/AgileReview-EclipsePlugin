@@ -135,7 +135,7 @@ public class FilterController extends SelectionAdapter implements Listener, KeyL
             ICommentFilter[] commentFilter = new ICommentFilter[] { new ICommentFilter() {
                 @Override
                 public boolean accept(Comment comment) {
-                    return comment.getStatus() != 0;
+                    return comment.getStatus() == 0;
                 }
             } };
             applyFilter(Filter.OPEN_FILTER, Arrays.asList(commentFilter));
