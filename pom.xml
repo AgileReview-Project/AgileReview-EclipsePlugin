@@ -14,6 +14,7 @@
 		<tycho-extras.version>0.18.1</tycho-extras.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<tycho-repo.url>https://oss.sonatype.org/content/groups/public/</tycho-repo.url>
+                <maven.release_plugin.version>2.4.2</maven.release_plugin.version>
 	</properties>
 
 	<modules>
@@ -22,6 +23,12 @@
 		<module>org.agilereview.ui.basic</module>
 		<module>org.agilereview.storage.xml</module>
 	</modules>
+
+        <scm>
+            <connection>scm:git:git@github.com:AgileReview-Project/AgileReview-Plugin.git</connection>
+            <url>scm:git:git@github.com:AgileReview-Project/AgileReview-Plugin.git</url>
+            <developerConnection>scm:git:git@github.com:AgileReview-Project/AgileReview-Plugin.git</developerConnection>
+        </scm>
 
 	<pluginRepositories>
 		<pluginRepository>
@@ -155,6 +162,13 @@
 					</execution>
 				</executions>
 			</plugin>-->
+
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-release-plugin</artifactId>
+                        <version>${maven.release_plugin.version}</version>
+                    </plugin>
+
 		</plugins>
 
 		<pluginManagement>
