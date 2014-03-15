@@ -269,54 +269,54 @@ IDE.
          id="org.agilereview.core"
          download-size="0"
          install-size="0"
-         version="1.0.0.qualifier"
+         version="0.0.0"
          unpack="false"/>
 
    <plugin
          id="org.agilereview.editorparser.itexteditor"
          download-size="0"
          install-size="0"
-         version="1.0.0.qualifier"
+         version="0.0.0"
          unpack="false"/>
 
    <plugin
          id="org.agilereview.export.xls"
          download-size="0"
          install-size="0"
-         version="1.0.0.qualifier"
+         version="0.0.0"
          unpack="false"/>
 
    <plugin
          id="org.agilereview.help"
          download-size="0"
          install-size="0"
-         version="1.0.0.qualifier"/>
+         version="0.0.0"/>
 
    <plugin
          id="org.agilereview.languagepack.jdt"
          download-size="0"
          install-size="0"
-         version="1.0.0.qualifier"
+         version="0.0.0"
          unpack="false"/>
 
    <plugin
          id="org.agilereview.storage.xml"
          download-size="0"
          install-size="0"
-         version="1.0.0.qualifier"/>
+         version="0.0.0"/>
 
    <plugin
          id="org.agilereview.ui.basic"
          download-size="0"
          install-size="0"
-         version="1.0.0.qualifier"
+         version="0.0.0"
          unpack="false"/>
 
    <plugin
          id="org.agilereview.common"
          download-size="0"
          install-size="0"
-         version="1.0.0.qualifier"
+         version="0.0.0"
          unpack="false"/>
 
 </feature>
