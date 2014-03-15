@@ -22,6 +22,12 @@
 		<module>org.agilereview.core</module>
 		<module>org.agilereview.ui.basic</module>
 		<module>org.agilereview.storage.xml</module>
+                <module>org.agilereview.export.xls</module>
+                <module>org.agilereview.editorparser.itexteditor</module>
+                <module>org.agilereview.languagepack.jdt</module>
+                <module>org.agilereview.help</module>
+                <module>org.agilereview.feature.basic</module>
+                <module>org.agilereview.updatesite.basic</module>
 	</modules>
 
         <scm>

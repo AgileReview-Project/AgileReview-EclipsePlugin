@@ -269,7 +269,7 @@ IDE.
          id="org.agilereview.core"
          download-size="0"
          install-size="0"
-         version="0.9.0.qualifier"
+         version="1.0.0.qualifier"
          unpack="false"/>
 
    <plugin
@@ -283,7 +283,7 @@ IDE.
          id="org.agilereview.export.xls"
          download-size="0"
          install-size="0"
-         version="0.9.0.qualifier"
+         version="1.0.0.qualifier"
          unpack="false"/>
 
    <plugin
@@ -296,20 +296,20 @@ IDE.
          id="org.agilereview.languagepack.jdt"
          download-size="0"
          install-size="0"
-         version="0.9.0.qualifier"
+         version="1.0.0.qualifier"
          unpack="false"/>
 
    <plugin
          id="org.agilereview.storage.xml"
          download-size="0"
          install-size="0"
-         version="0.9.0.qualifier"/>
+         version="1.0.0.qualifier"/>
 
    <plugin
          id="org.agilereview.ui.basic"
          download-size="0"
          install-size="0"
-         version="0.9.0.qualifier"
+         version="1.0.0.qualifier"
          unpack="false"/>
 
    <plugin

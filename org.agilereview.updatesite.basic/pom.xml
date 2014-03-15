@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <artifactId>org.agilereview.parent</artifactId>
+    <groupId>org.agilereview</groupId>
+    <version>1.0.0-SNAPSHOT</version>
+  </parent>
+  <groupId>org.agilereview</groupId>
+  <artifactId>org.agilereview.updatesite.basic</artifactId>
+  <name>AgileReview Basic UpdateSite</name>
+  <version>1.0.0-SNAPSHOT</version>
+  <packaging>eclipse-update-site</packaging>
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.eclipse.tycho</groupId>
+	<artifactId>tycho-packaging-plugin</artifactId>
+        <configuration>
+          <archiveSite>true</archiveSite>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+  <distributionManagement>
+<!--    <repository>
+        <id>update-site</id>
+        <url>sftp://your/url</url>
+     </repository>-->
+  </distributionManagement>
+</project>

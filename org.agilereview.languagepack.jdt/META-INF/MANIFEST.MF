@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: JavaLanguagePack Plug-In
 Bundle-SymbolicName: org.agilereview.languagepack.jdt
-Bundle-Version: 0.9.0.qualifier
+Bundle-Version: 1.0.0.qualifier
 Bundle-Activator: org.agilereview.languagepack.jdt.Activator
 Bundle-Vendor: AgileReview Plug-In
 Require-Bundle: org.eclipse.ui,

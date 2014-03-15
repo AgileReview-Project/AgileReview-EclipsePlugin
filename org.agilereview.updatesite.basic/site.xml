@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <site>
-   <feature url="features/org.agilereview.feature.basic_1.0.0.201212101253.jar" id="org.agilereview.feature.basic" version="1.0.0.201212101253">
+   <feature url="features/org.agilereview.feature.basic_1.0.0.qualifier.jar" id="org.agilereview.feature.basic" version="1.0.0.qualifier">
       <category name="org.agilereview.updatesite.basic"/>
    </feature>
    <category-def name="org.agilereview.updatesite.basic" label="AgileReview Basic UpdateSite"/>

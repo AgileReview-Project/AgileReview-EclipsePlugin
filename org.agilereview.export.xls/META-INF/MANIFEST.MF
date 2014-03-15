@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: AgileReview XlsExport Plug-In
 Bundle-SymbolicName: org.agilereview.export.xls
-Bundle-Version: 0.9.0.qualifier
+Bundle-Version: 1.0.0.qualifier
 Bundle-Activator: org.agilereview.export.xls.Activator
 Bundle-Vendor: AgileReview Project
 Require-Bundle: org.eclipse.ui,
