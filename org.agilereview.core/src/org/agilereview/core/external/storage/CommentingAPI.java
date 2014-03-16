@@ -83,12 +83,7 @@ public class CommentingAPI {
         if (author == null || reviewId == null) throw new NullArgumentException("The given arguments cannot be set to null when creating a comment");
         IEditorPart editor = PlatformUITools.getActiveWorkbenchPage().getActiveEditor();
         if (editor == null) throw new NoOpenEditorException();
-        
-        IEditorPart part = PlatformUITools.getActiveWorkbenchPage().getActiveEditor();
-        if (part == null) {
-            throw new NoOpenEditorException();
-        }
-        IFile file = (IFile) part.getEditorInput().getAdapter(IFile.class);
+        IFile file = (IFile) editor.getEditorInput().getAdapter(IFile.class);
         
         Review review = getReview(reviewId);
         if (review == null) {
