@@ -22,6 +22,7 @@ import org.agilereview.storage.xml.persistence.SourceFolderManager;
 import org.agilereview.storage.xml.persistence.XmlLoader;
 import org.agilereview.storage.xml.persistence.XmlPersister;
 import org.agilereview.storage.xml.wizards.noreviewsource.NoReviewSourceProjectWizard;
+import org.eclipse.core.internal.preferences.EclipsePreferences;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
@@ -30,6 +31,7 @@ import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChange
 import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.swt.widgets.Display;
+import org.osgi.service.prefs.BackingStoreException;
 
 /**
  * {@link IStorageClient} that stores review data in XML files.
@@ -400,6 +402,15 @@ public class XmlStorageClient implements IStorageClient, IPreferenceChangeListen
     public void preferenceChange(PreferenceChangeEvent event) {
         if (event.getKey().equals(SourceFolderManager.SOURCEFOLDER_PROPERTYNAME)) {
             SourceFolderManager.setCurrentSourceFolderProject();
+            // remove the preference for the currently active review as this might cause inconsistences
+            IEclipsePreferences preferences = InstanceScope.INSTANCE.getNode("org.agilereview.core");
+            preferences.remove(AgileReviewPreferences.ACTIVE_REVIEW_ID);
+            try {
+                preferences.flush();
+            } catch (BackingStoreException e) {
+                String message = "AgileReview could not discard the ID of the active review.";
+                ExceptionHandler.logAndNotifyUser(e, message);
+            }
             initialize();
         }
     }
