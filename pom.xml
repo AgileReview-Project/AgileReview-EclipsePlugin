@@ -14,7 +14,6 @@
 		<tycho-extras.version>0.18.1</tycho-extras.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<tycho-repo.url>https://oss.sonatype.org/content/groups/public/</tycho-repo.url>
-                <maven.release_plugin.version>2.4.2</maven.release_plugin.version>
 	</properties>
 
 	<modules>
@@ -168,12 +167,6 @@
 					</execution>
 				</executions>
 			</plugin>-->
-
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-release-plugin</artifactId>
-                        <version>${maven.release_plugin.version}</version>
-                    </plugin>
 
 		</plugins>
 
