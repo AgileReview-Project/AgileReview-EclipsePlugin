@@ -90,8 +90,13 @@ public class Jaxb2Pojo {
     private static Reply getReply(Object parent, org.agilereview.xmlschema.author.Reply jaxbReply) {
         XMLGregorianCalendar creationDate = getSaveXmlGregorianCalendar(jaxbReply.getCreationDate());
         XMLGregorianCalendar modificationDate = getSaveXmlGregorianCalendar(jaxbReply.getLastModified());
-        return StorageAPI.createReply(jaxbReply.getId(), jaxbReply.getAuthor(), creationDate.toGregorianCalendar(), modificationDate
+        Reply reply = StorageAPI.createReply(jaxbReply.getId(), jaxbReply.getAuthor(), creationDate.toGregorianCalendar(), modificationDate
                 .toGregorianCalendar(), jaxbReply.getText(), parent);
+        Replies jaxbReplies = jaxbReply.getReplies();
+        if (jaxbReplies != null) {
+            reply.setReplies(getReplies(reply, jaxbReplies));
+        }
+        return reply;
     }
     
 }

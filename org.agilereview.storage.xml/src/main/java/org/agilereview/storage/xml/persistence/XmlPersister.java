@@ -22,7 +22,8 @@ import org.eclipse.core.runtime.CoreException;
 public class XmlPersister {
 	
 	/**
-	 * @param comment
+	 * Persist a single {@link Comment}.
+	 * @param comment the {@link Comment}
 	 * @author Peter Reuter (03.11.2013)
 	 */
 	public static void store(Comment comment) {
@@ -42,7 +43,8 @@ public class XmlPersister {
 	}
 	
 	/**
-	 * @param review
+	 * Persist a single {@link Review}.
+	 * @param review the {@link Review}
 	 * @author Peter Reuter (03.11.2013)
 	 */
 	public static void store(Review review) {

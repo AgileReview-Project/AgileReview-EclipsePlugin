@@ -1,10 +1,18 @@
 package org.agilereview.storage.xml.test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
+
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
 
 import org.agilereview.core.external.preferences.AgileReviewPreferences;
 import org.agilereview.core.external.storage.Comment;
@@ -13,12 +21,11 @@ import org.agilereview.core.external.storage.Review;
 import org.agilereview.core.external.storage.ReviewSet;
 import org.agilereview.core.external.storage.StorageAPI;
 import org.agilereview.storage.xml.Activator;
-import org.agilereview.storage.xml.SourceFolderManager;
 import org.agilereview.storage.xml.XmlStorageClient;
-import org.agilereview.storage.xml.conversion.PojoConversion;
-import org.agilereview.xmlSchema.author.CommentsDocument;
-import org.agilereview.xmlSchema.review.ReviewDocument;
-import org.apache.xmlbeans.XmlOptions;
+import org.agilereview.storage.xml.conversion.Pojo2Jaxb;
+import org.agilereview.storage.xml.exception.ConversionException;
+import org.agilereview.storage.xml.persistence.SourceFolderManager;
+import org.agilereview.xmlschema.author.Comments;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
@@ -33,10 +40,6 @@ import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
 
 @SuppressWarnings("javadoc")
 public class XmlStorageClientTest {
@@ -63,27 +66,23 @@ public class XmlStorageClientTest {
     private static Review r;
     
     @BeforeClass
-    public static void setUpWorkspace() throws CoreException, IOException {
+    public static void setUpWorkspace() throws CoreException, IOException, JAXBException, ConversionException {
         // set up test data
         r = StorageAPI.createReview(reviewId, reviewName, status, reviewReference, recipient, reviewText);
         r.setIsOpen(true);
         ArrayList<Comment> comments = new ArrayList<Comment>();
-        for (int i = 0; i < commentIds.length; i++) {
-            Comment c = StorageAPI.createComment(commentIds[i], author, file, r, date, date, recipient, prio, status, ctext);
+        for (String commentId : commentIds) {
+            Comment c = StorageAPI.createComment(commentId, author, file, r, date, date, recipient, prio, status, ctext);
             comments.add(c);
             for (int j = 0; j < 2; j++) {
-                Reply rp = StorageAPI.createReply(replyIds[j], recipient, date, date, rtext, c);
+                Reply rp = StorageAPI.createReply(commentId + replyIds[j], recipient, date, date, rtext, c);
                 c.addReply(rp);
                 for (int k = 2 + 2 * j; k < 2 + 2 * j + 2; k++) {
-                    Reply subrp = StorageAPI.createReply(replyIds[k], recipient, date, date, rtext, rp);
+                    Reply subrp = StorageAPI.createReply(commentId + replyIds[j] + replyIds[k], recipient, date, date, rtext, rp);
                     rp.addReply(subrp);
                 }
             }
         }
-        
-        // convert test data to XmlBeans objects
-        CommentsDocument cDoc = PojoConversion.getXmlBeansCommentsDocument(comments);
-        ReviewDocument rDoc = PojoConversion.getXmlBeansReviewDocument(r);
         
         // create SourceFolder
         IWorkspaceRoot workspaceRoot = ResourcesPlugin.getWorkspace().getRoot();
@@ -119,10 +118,11 @@ public class XmlStorageClientTest {
         while (!af.exists()) {
         }
         
-        // save test data XmlBeans objects to the newly created source folder
-        cDoc.save(af.getLocation().toFile(), new XmlOptions().setSavePrettyPrint());
-        rDoc.save(rf.getLocation().toFile(), new XmlOptions().setSavePrettyPrint());
-        
+        // save test data Jaxb objects to the newly created source folder
+        Comments cs = Pojo2Jaxb.getJaxbComments(comments);
+        saveToFile(af, cs, Comments.class);
+        org.agilereview.xmlschema.review.Review review = Pojo2Jaxb.getJaxbReview(r);
+        saveToFile(rf, review, org.agilereview.xmlschema.review.Review.class);
     }
     
     @Test
@@ -163,9 +163,11 @@ public class XmlStorageClientTest {
         List<Comment> comments = ((Review) reviews.toArray()[0]).getComments();
         assertEquals(2, comments.size());
         for (int i = 0; i < 2; i++) {
-            assertEquals(2, comments.get(i).getReplies().size());
+            Comment currentComment = comments.get(i);
+            assertEquals(2, currentComment.getReplies().size());
             for (int j = 0; j < 2; j++) {
-                assertEquals(2, comments.get(i).getReplies().get(j).getReplies().size());
+                Reply currentReply = currentComment.getReplies().get(j);
+                assertEquals(2, currentReply.getReplies().size());
             }
         }
         
@@ -193,10 +195,13 @@ public class XmlStorageClientTest {
         rLoaded.setDescription(newReviewDescription);
         rLoaded.getComments().get(0).setText(newCommentText);
         rLoaded.getComments().get(0).getReplies().get(0).setText(newReplyText);
-        rLoaded.addComment(new Comment("c3", file, rLoaded));
+        Comment comment2 = StorageAPI.createComment("c2", "Piet", file, rLoaded, Calendar.getInstance(), Calendar.getInstance(), "Malte", 1, 0,
+                "Comment text");
+        rLoaded.addComment(comment2);
         
-        rLoaded.getComments().get(2).addReply(
-                StorageAPI.createReply("r7", "", Calendar.getInstance(), Calendar.getInstance(), "", rLoaded.getComments().get(2)));
+        Reply newReply = StorageAPI.createReply("c2r0", "Piet", Calendar.getInstance(), Calendar.getInstance(), "Reply text", rLoaded.getComments()
+                .get(2));
+        rLoaded.getComments().get(2).addReply(newReply);
         
         // force reload
         InstanceScope.INSTANCE.getNode(Activator.PLUGIN_ID).put("source_folder", "");
@@ -217,15 +222,16 @@ public class XmlStorageClientTest {
         // add new comments for new author
         String newAuthor = "DeletingGuy";
         InstanceScope.INSTANCE.getNode(AgileReviewPreferences.CORE_PLUGIN_ID).put(AgileReviewPreferences.AUTHOR, newAuthor);
-        Comment newComment = new Comment("c0", file, rLoaded);
-        rLoaded.addComment(newComment);
+        Comment commentToDelete = StorageAPI.createComment("c1", newAuthor, file, rLoaded, Calendar.getInstance(), Calendar.getInstance(), "Peter",
+                1, 0, "Comment text");
+        rLoaded.addComment(commentToDelete);
         // check if new file was created
         assertTrue(SourceFolder.getFolder("review." + reviewId).getFile("author_" + newAuthor + ".xml").exists());
         // remove comments from new author
-        rLoaded.deleteComment(newComment);
+        rLoaded.deleteComment(commentToDelete);
         // check if author file was deleted and comment was removed
         assertFalse(SourceFolder.getFolder("review." + reviewId).getFile("author_" + newAuthor + ".xml").exists());
-        assertFalse(rLoaded.getComments().contains(newComment));
+        assertFalse(rLoaded.getComments().contains(commentToDelete));
         
         rLoaded.setIsOpen(false);
         assertEquals(0, rLoaded.getComments().size());
@@ -235,6 +241,7 @@ public class XmlStorageClientTest {
         assertEquals(3, rLoaded.getComments().size());
         
         // clean up
+        rLoaded.deleteComment(comment2);
         InstanceScope.INSTANCE.getNode(Activator.PLUGIN_ID).put("source_folder", "");
     }
     
@@ -243,6 +250,14 @@ public class XmlStorageClientTest {
         if (!(SourceFolder == null) && SourceFolder.exists()) {
             SourceFolder.delete(true, null);
         }
+    }
+    
+    private static void saveToFile(IFile file, Object jaxbObject, Class clazz) throws JAXBException, CoreException {
+        JAXBContext jaxbContext = JAXBContext.newInstance(clazz);
+        Marshaller jaxbMarshaller = jaxbContext.createMarshaller();
+        jaxbMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
+        jaxbMarshaller.marshal(jaxbObject, file.getLocation().toFile());
+        file.refreshLocal(IFile.DEPTH_INFINITE, null);
     }
     
 }
