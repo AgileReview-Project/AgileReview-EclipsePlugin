@@ -61,7 +61,7 @@ public class DetailView extends AbstractReviewDataView {
      */
     @Override
     protected void refreshInput(Object reviewData) {
-        if (commentDetail != null) {
+        if (reviewData != null && reviewData instanceof Comment && commentDetail != null) {
             commentDetail.fillContents((Comment) reviewData);
         }
     }
