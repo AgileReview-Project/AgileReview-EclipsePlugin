@@ -90,7 +90,9 @@ public class FilterController extends SelectionAdapter implements Listener, KeyL
      */
     @Override
     public void keyReleased(KeyEvent e) {
-        processSearchFiltering();
+        if (!toolBar.getSearchText().equals(currentSearchFilter.getSearchString())) {
+            processSearchFiltering();
+        }
     }
     
     /**
