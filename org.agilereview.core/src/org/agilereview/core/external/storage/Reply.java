@@ -58,6 +58,10 @@ public final class Reply implements PropertyChangeListener {
      * {@link PropertyChangeSupport} of this POJO, used for firing {@link PropertyChangeEvent}s on changes of fields.
      */
     private PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(this);
+    /**
+     * Lock for add/remove/... operations on the review set which enables synchronized access and enables more specific property change events
+     */
+    private Boolean massOperationLock = false;
     
     /**
      * Constructor that should be used if a reply is reconstructed from storage
@@ -166,12 +170,14 @@ public final class Reply implements PropertyChangeListener {
      * @param reply the reply which is to add
      */
     public void addReply(Reply reply) {
-        if (!this.replies.contains(reply)) {
-            List<Reply> oldValue = new ArrayList<Reply>(this.replies);
-            this.replies.add(reply);
-            reply.addPropertyChangeListener(this);
-            resetModificationDate();
-            propertyChangeSupport.firePropertyChange(PropertyChangeEventKeys.REPLY_REPLIES, oldValue, this.replies);
+        synchronized (massOperationLock) {
+            if (!this.replies.contains(reply)) {
+                List<Reply> oldValue = new ArrayList<Reply>(this.replies);
+                this.replies.add(reply);
+                reply.addPropertyChangeListener(this);
+                resetModificationDate();
+                if (!massOperationLock) propertyChangeSupport.firePropertyChange(PropertyChangeEventKeys.REPLY_REPLIES, oldValue, this.replies);
+            }
         }
     }
     
@@ -180,11 +186,13 @@ public final class Reply implements PropertyChangeListener {
      * @param reply the reply which is to delete
      */
     public void deleteReply(Reply reply) {
-        List<Reply> oldValue = new ArrayList<Reply>(this.replies);
-        this.replies.remove(reply);
-        reply.removePropertyChangeListener(this);
-        resetModificationDate();
-        propertyChangeSupport.firePropertyChange(PropertyChangeEventKeys.REPLY_REPLIES, oldValue, this.replies);
+        synchronized (massOperationLock) {
+            List<Reply> oldValue = new ArrayList<Reply>(this.replies);
+            this.replies.remove(reply);
+            reply.removePropertyChangeListener(this);
+            resetModificationDate();
+            if (!massOperationLock) propertyChangeSupport.firePropertyChange(PropertyChangeEventKeys.REPLY_REPLIES, oldValue, this.replies);
+        }
     }
     
     /**

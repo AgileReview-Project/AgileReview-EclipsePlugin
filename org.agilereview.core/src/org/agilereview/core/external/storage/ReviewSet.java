@@ -52,19 +52,28 @@ public final class ReviewSet extends HashSet<Review> implements PropertyChangeLi
     private final Map<String, Object> genericMap = new HashMap<String, Object>();
     
     /**
+     * Lock for add/remove/... operations on the review set which enables synchronized access and enables more specific property change events
+     */
+    private Boolean massOperationLock = false;
+    
+    /**
      * {@inheritDoc} <br> Added {@link PropertyChangeSupport} for tracking changes by {@link IReviewDataReceiver}
      * @see java.util.ArrayList#add(java.lang.Object)
      * @author Malte Brunnlieb (03.06.2012)
      */
     @Override
     public boolean add(Review e) {
-        HashSet<Review> oldValue = new HashSet<Review>(this);
-        boolean changed = super.add(e);
-        if (changed) {
-            e.addPropertyChangeListener(this);
-            propertyChangeSupport.firePropertyChange(PropertyChangeEventKeys.REVIEWSET_REVIEWS, oldValue, this);
+        synchronized (massOperationLock) {
+            HashSet<Review> oldValue = new HashSet<Review>(this);
+            boolean changed = super.add(e);
+            if (changed) {
+                e.addPropertyChangeListener(this);
+                if (!massOperationLock) {
+                    propertyChangeSupport.firePropertyChange(PropertyChangeEventKeys.REVIEWSET_REVIEWS, oldValue, this);
+                }
+            }
+            return changed;
         }
-        return changed;
     }
     
     /**
@@ -74,15 +83,16 @@ public final class ReviewSet extends HashSet<Review> implements PropertyChangeLi
      */
     @Override
     public boolean addAll(Collection<? extends Review> c) {
-        HashSet<Review> oldValue = new HashSet<Review>(this);
-        boolean changed = super.addAll(c);
-        if (changed) {
-            for (Review r : c) {
-                r.addPropertyChangeListener(this);
+        synchronized (massOperationLock) {
+            massOperationLock = true;
+            HashSet<Review> oldValue = new HashSet<Review>(this);
+            boolean changed = super.addAll(c);
+            if (changed) {
+                propertyChangeSupport.firePropertyChange(PropertyChangeEventKeys.REVIEWSET_REVIEWS, oldValue, this);
             }
-            propertyChangeSupport.firePropertyChange(PropertyChangeEventKeys.REVIEWSET_REVIEWS, oldValue, this);
+            massOperationLock = false;
+            return changed;
         }
-        return changed;
     }
     
     /**
@@ -92,14 +102,18 @@ public final class ReviewSet extends HashSet<Review> implements PropertyChangeLi
      */
     @Override
     public boolean remove(Object o) {
-        HashSet<Review> oldValue = new HashSet<Review>(this);
-        boolean success = super.remove(o);
-        if (success) {
-            ((Review) o).setOpenReviewsPreference();
-            ((Review) o).removePropertyChangeListener(this);
-            propertyChangeSupport.firePropertyChange(PropertyChangeEventKeys.REVIEWSET_REVIEWS, oldValue, this);
+        synchronized (massOperationLock) {
+            HashSet<Review> oldValue = new HashSet<Review>(this);
+            boolean success = super.remove(o);
+            if (success) {
+                ((Review) o).setOpenReviewsPreference();
+                ((Review) o).removePropertyChangeListener(this);
+                if (!massOperationLock) {
+                    propertyChangeSupport.firePropertyChange(PropertyChangeEventKeys.REVIEWSET_REVIEWS, oldValue, this);
+                }
+            }
+            return success;
         }
-        return success;
     }
     
     /**
@@ -109,16 +123,16 @@ public final class ReviewSet extends HashSet<Review> implements PropertyChangeLi
      */
     @Override
     public boolean removeAll(Collection<?> c) {
-        HashSet<Review> oldValue = new HashSet<Review>(this);
-        boolean success = super.removeAll(c);
-        if (success) {
-            for (Object r : c) {
-                ((Review) r).setOpenReviewsPreference();
-                ((Review) r).removePropertyChangeListener(this);
+        synchronized (massOperationLock) {
+            massOperationLock = true;
+            HashSet<Review> oldValue = new HashSet<Review>(this);
+            boolean success = super.removeAll(c);
+            if (success) {
+                propertyChangeSupport.firePropertyChange(PropertyChangeEventKeys.REVIEWSET_REVIEWS, oldValue, this);
             }
-            propertyChangeSupport.firePropertyChange(PropertyChangeEventKeys.REVIEWSET_REVIEWS, oldValue, this);
+            massOperationLock = false;
+            return success;
         }
-        return success;
     }
     
     /**
@@ -128,18 +142,22 @@ public final class ReviewSet extends HashSet<Review> implements PropertyChangeLi
      */
     @Override
     public boolean retainAll(Collection<?> c) {
-        HashSet<Review> oldValue = new HashSet<Review>(this);
-        boolean success = super.retainAll(c);
-        if (success) {
-            ArrayList<Review> removedOnes = new ArrayList<Review>(oldValue);
-            removedOnes.removeAll(c);
-            for (Review r : removedOnes) {
-                r.setOpenReviewsPreference();
-                r.removePropertyChangeListener(this);
+        synchronized (massOperationLock) {
+            massOperationLock = true;
+            HashSet<Review> oldValue = new HashSet<Review>(this);
+            boolean success = super.retainAll(c);
+            if (success) {
+                ArrayList<Review> removedOnes = new ArrayList<Review>(oldValue);
+                removedOnes.removeAll(c);
+                for (Review r : removedOnes) {
+                    r.setOpenReviewsPreference();
+                    r.removePropertyChangeListener(this);
+                }
+                propertyChangeSupport.firePropertyChange(PropertyChangeEventKeys.REVIEWSET_REVIEWS, oldValue, this);
             }
-            propertyChangeSupport.firePropertyChange(PropertyChangeEventKeys.REVIEWSET_REVIEWS, oldValue, this);
+            massOperationLock = false;
+            return success;
         }
-        return success;
     }
     
     /**
