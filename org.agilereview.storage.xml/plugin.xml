@@ -31,8 +31,23 @@
       </run>
    </runtime>
 </extension>
+
 <extension
       point="org.eclipse.ui.menus">
+  <menuContribution
+         allPopups="false"
+         locationURI="popup:org.eclipse.jdt.ui.PackageExplorer">
+      <menu
+            id="org.agilereview.packageexplorer.menu"
+            label="AgileReview">
+            <command
+                commandId="org.agilereview.storage.xml.ActivateReviewSourceProject"
+                label="Activate Review Source Project"
+                style="push"
+                tooltip="Activate Review Source Project">
+          </command>
+      </menu>
+   </menuContribution>
    <menuContribution
          allPopups="false"
          locationURI="toolbar:org.agilereview.ui.basic.reviewExplorerView?after=org.agilereview.ui.basic.reviewexplorer.toolbar.separator5">
@@ -45,22 +60,6 @@
       <separator
             name="org.agilereview.storage.xml.separator1"
             visible="true">
-      </separator>
-   </menuContribution>
-   <menuContribution
-         allPopups="false"
-         locationURI="popup:org.eclipse.jdt.ui.PackageExplorer">
-      <separator
-            name="org.agilereview.storage.xml.separator1">
-      </separator>
-      <command
-            commandId="org.agilereview.storage.xml.ActivateReviewSourceProject"
-            label="Activate Review Source Project"
-            style="push"
-            tooltip="Activate Review Source Project">
-      </command>
-      <separator
-            name="org.agilereview.storage.xml.separator2">
       </separator>
    </menuContribution>
 </extension>
