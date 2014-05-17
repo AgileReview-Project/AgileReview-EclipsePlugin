@@ -71,6 +71,10 @@ public class Review implements PropertyChangeListener, IPreferenceChangeListener
      * {@link PropertyChangeSupport} of this POJO, used for firing {@link PropertyChangeEvent}s on changes of fields.
      */
     private final PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(this);
+    /**
+     * Lock for add/remove/... operations on the review set which enables synchronized access and enables more specific property change events
+     */
+    private Boolean massOperationLock = false;
     
     /**
      * Constructor that should be used if a new {@link Review}w is created. The {@link Review} will be added to the list of open reviews.
@@ -206,11 +210,15 @@ public class Review implements PropertyChangeListener, IPreferenceChangeListener
      * @param comment the {@link Comment} that is to be added to the {@link List} of {@link Comment}s
      */
     public void addComment(Comment comment) {
-        if (!this.comments.contains(comment)) {
-            ArrayList<Comment> oldValue = new ArrayList<Comment>(this.comments);
-            this.comments.add(comment);
-            comment.addPropertyChangeListener(this);
-            propertyChangeSupport.firePropertyChange(PropertyChangeEventKeys.REVIEW_COMMENTS, oldValue, this.comments);
+        synchronized (massOperationLock) {
+            if (!this.comments.contains(comment)) {
+                ArrayList<Comment> oldValue = new ArrayList<Comment>(this.comments);
+                this.comments.add(comment);
+                comment.addPropertyChangeListener(this);
+                if (!massOperationLock) {
+                    propertyChangeSupport.firePropertyChange(PropertyChangeEventKeys.REVIEW_COMMENTS, oldValue, this.comments);
+                }
+            }
         }
     }
     
@@ -219,10 +227,14 @@ public class Review implements PropertyChangeListener, IPreferenceChangeListener
      * @param comment the {@link Comment} that is to be removed from the {@link List} of {@link Comment}s
      */
     public void deleteComment(Comment comment) {
-        ArrayList<Comment> oldValue = new ArrayList<Comment>(this.comments);
-        this.comments.remove(comment);
-        comment.removePropertyChangeListener(this);
-        propertyChangeSupport.firePropertyChange(PropertyChangeEventKeys.REVIEW_COMMENTS, oldValue, this.comments);
+        synchronized (massOperationLock) {
+            ArrayList<Comment> oldValue = new ArrayList<Comment>(this.comments);
+            this.comments.remove(comment);
+            comment.removePropertyChangeListener(this);
+            if (!massOperationLock) {
+                propertyChangeSupport.firePropertyChange(PropertyChangeEventKeys.REVIEW_COMMENTS, oldValue, this.comments);
+            }
+        }
     }
     
     /**

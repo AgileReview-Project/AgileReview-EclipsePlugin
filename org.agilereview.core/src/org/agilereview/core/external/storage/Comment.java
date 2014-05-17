@@ -72,6 +72,10 @@ public class Comment implements PropertyChangeListener {
      * A list of replies that were made to the comment
      */
     private List<Reply> replies = new ArrayList<Reply>(0);
+    /**
+     * Lock for add/remove/... operations on the review set which enables synchronized access and enables more specific property change events
+     */
+    private Boolean massOperationLock = false;
     
     /**
      * {@link PropertyChangeSupport} of this POJO, used for firing {@link PropertyChangeEvent}s on changes of fields.
@@ -272,12 +276,15 @@ public class Comment implements PropertyChangeListener {
      * @param reply the reply which is to add
      */
     public void addReply(Reply reply) {
-        if (!this.replies.contains(reply)) {
-            List<Reply> oldValue = new ArrayList<Reply>(this.replies);
-            this.replies.add(reply);
-            reply.addPropertyChangeListener(this);
-            resetModificationDate();
-            propertyChangeSupport.firePropertyChange(PropertyChangeEventKeys.COMMENT_REPLIES, oldValue, this.replies);
+        synchronized (massOperationLock) {
+            if (!this.replies.contains(reply)) {
+                List<Reply> oldValue = new ArrayList<Reply>(this.replies);
+                this.replies.add(reply);
+                resetModificationDate();
+                reply.addPropertyChangeListener(this);
+                if (!massOperationLock) propertyChangeSupport.firePropertyChange(PropertyChangeEventKeys.COMMENT_REPLIES, oldValue, this.replies);
+                
+            }
         }
     }
     
@@ -286,11 +293,13 @@ public class Comment implements PropertyChangeListener {
      * @param reply the reply which is to delete
      */
     public void deleteReply(Reply reply) {
-        List<Reply> oldValue = new ArrayList<Reply>(this.replies);
-        this.replies.remove(reply);
-        reply.removePropertyChangeListener(this);
-        resetModificationDate();
-        propertyChangeSupport.firePropertyChange(PropertyChangeEventKeys.COMMENT_REPLIES, oldValue, this.replies);
+        synchronized (massOperationLock) {
+            List<Reply> oldValue = new ArrayList<Reply>(this.replies);
+            this.replies.remove(reply);
+            reply.removePropertyChangeListener(this);
+            resetModificationDate();
+            if (!massOperationLock) propertyChangeSupport.firePropertyChange(PropertyChangeEventKeys.COMMENT_REPLIES, oldValue, this.replies);
+        }
     }
     
     /**

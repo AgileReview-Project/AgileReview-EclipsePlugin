@@ -60,6 +60,14 @@ public class SearchFilter {
     }
     
     /**
+     * @return the searchString
+     * @author Malte Brunnlieb (16.03.2014)
+     */
+    public String getSearchString() {
+        return searchString;
+    }
+    
+    /**
      * Returns the Filter expression for the current filter
      * @return a list of {@link ICommentFilter}s for the current search filter
      * @author Malte Brunnlieb (01.06.2013)
