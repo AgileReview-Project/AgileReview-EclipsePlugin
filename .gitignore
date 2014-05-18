@@ -1,3 +1,9 @@
 target
 bin
 lib
+/org.agilereview.common.properties/.classpath
+/org.agilereview.common.properties/.project
+/org.agilereview.common.properties/.settings
+/org.agilereview.fileparser.impl/.project
+/org.agilereview.fileparser.impl/.classpath
+/org.agilereview.fileparser.impl/.settings
