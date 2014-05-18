@@ -13,19 +13,22 @@ import org.osgi.framework.BundleContext;
  */
 public class Activator extends AbstractUIPlugin {
     
-	public static class ISharedImages {
-		// TODO: Maybe AR icon is not needed?
-		/**
-		 * AgileReview icon
-		 */
-		public static final String AGILEREVIEW_ICON = "agilereview_icon";
-		/**
-		 * Active review icon
-		 */
-		public static final String ACTIVE_REVIEW_ICON = "active_review_icon";
-		
-	}
-	
+    public static class ISharedImages {
+        // TODO: Maybe AR icon is not needed?
+        /**
+         * AgileReview icon
+         */
+        public static final String AGILEREVIEW_ICON = "agilereview_icon";
+        /**
+         * Active review icon
+         */
+        public static final String ACTIVE_REVIEW_ICON = "active_review_icon";
+        /**
+         * World Icon (Browse)
+         */
+        public static final String BROWSE_WORLD = "browse_world";
+    }
+    
     /**
      * The plug-in ID
      */
@@ -49,13 +52,13 @@ public class Activator extends AbstractUIPlugin {
      * The constructor
      */
     public Activator() {
-    	try {
-    		InputStream inStream = Activator.class.getClassLoader().getResourceAsStream(internalPropFile);
-			internalProps.load(inStream);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+        try {
+            InputStream inStream = Activator.class.getClassLoader().getResourceAsStream(internalPropFile);
+            internalProps.load(inStream);
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
     }
     
     /*
@@ -88,15 +91,16 @@ public class Activator extends AbstractUIPlugin {
     }
     
     public String getInternalProperty(String key) {
-    	return internalProps.getProperty(key);
+        return internalProps.getProperty(key);
     }
     
     @Override
     protected void initializeImageRegistry(ImageRegistry registry) {
-    	super.initializeImageRegistry(registry);
-    	String coreId = "org.agilereview.core";
-    	registry.put(ISharedImages.AGILEREVIEW_ICON, AbstractUIPlugin.imageDescriptorFromPlugin(coreId, "icons/agilereview_icon.png"));
+        super.initializeImageRegistry(registry);
+        String coreId = "org.agilereview.core";
+        registry.put(ISharedImages.AGILEREVIEW_ICON, AbstractUIPlugin.imageDescriptorFromPlugin(coreId, "icons/agilereview_icon.png"));
         registry.put(ISharedImages.ACTIVE_REVIEW_ICON, AbstractUIPlugin.imageDescriptorFromPlugin(coreId, "icons/review_activate.png"));
-     }
+        registry.put(ISharedImages.BROWSE_WORLD, AbstractUIPlugin.imageDescriptorFromPlugin(PLUGIN_ID, "icons/discovery.gif"));
+    }
     
 }

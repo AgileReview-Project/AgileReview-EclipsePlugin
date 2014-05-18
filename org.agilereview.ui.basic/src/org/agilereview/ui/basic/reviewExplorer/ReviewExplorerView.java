@@ -77,7 +77,8 @@ public class ReviewExplorerView extends AbstractReviewDataView {
         // Prepare for SWTBot test
         treeViewer.getTree().setData("org.eclipse.swtbot.widget.key", "reTree");
         
-        treeViewer.addDoubleClickListener(new REDoubleClickListener());
+        treeViewer.addSelectionChangedListener(new ViewController());
+        treeViewer.addDoubleClickListener(new ViewController());
         // TODO: Still supported? 
         PlatformUI.getWorkbench().getHelpSystem().setHelp(parent, Activator.PLUGIN_ID + ".ReviewExplorer");
         

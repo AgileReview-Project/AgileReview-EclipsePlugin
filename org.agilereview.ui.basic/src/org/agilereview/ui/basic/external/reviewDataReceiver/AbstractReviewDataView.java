@@ -63,7 +63,7 @@ public abstract class AbstractReviewDataView extends ViewPart {
     /**
      * Parent of this {@link ViewPart}
      */
-    private Composite parent;
+    protected Composite parent;
     
     /**
      * Layout initially set on the parent. Saved for restoring after a dummy UI was shown
@@ -102,7 +102,7 @@ public abstract class AbstractReviewDataView extends ViewPart {
      * Method for the {@link AbstractReviewDataReceiver} to push the review data into the view. Input is either null (indicating no StorageClient) or
      * review data. The input may have been transformed by the user (using the
      * {@link AbstractReviewDataReceiver#transformData(org.agilereview.core.external.storage.ReviewSet) transformData} method of the
-     * AbstractReviewDataReceiver.
+     * AbstractReviewDataReceiver. Is called asynchronously in the UI-Thread.
      * @param input
      * @author Thilo Rauch (13.07.2012)
      */

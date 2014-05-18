@@ -8,6 +8,7 @@
 package org.agilereview.ui.basic.detail;
 
 import org.agilereview.core.external.storage.Comment;
+import org.agilereview.core.external.storage.Review;
 import org.agilereview.ui.basic.external.reviewDataReceiver.AbstractReviewDataReceiver;
 import org.agilereview.ui.basic.external.reviewDataReceiver.AbstractReviewDataView;
 import org.eclipse.swt.widgets.Composite;
@@ -21,6 +22,8 @@ public class DetailView extends AbstractReviewDataView {
     private static DetailView instance;
     
     private CommentDetail commentDetail;
+    
+    private ReviewDetail reviewDetail;
     
     public DetailView() {
         super();
@@ -49,6 +52,9 @@ public class DetailView extends AbstractReviewDataView {
         if (initalInput instanceof Comment) {
             commentDetail = new CommentDetail(parent, parent.getStyle());
             commentDetail.fillContents((Comment) initalInput);
+        } else if (initalInput instanceof Review) {
+            reviewDetail = new ReviewDetail(parent, parent.getStyle());
+            reviewDetail.fillContents((Review) initalInput);
         } else {
             clearParent();
         }
@@ -61,8 +67,28 @@ public class DetailView extends AbstractReviewDataView {
      */
     @Override
     protected void refreshInput(Object reviewData) {
-        if (reviewData != null && reviewData instanceof Comment && commentDetail != null) {
-            commentDetail.fillContents((Comment) reviewData);
+        if (reviewData != null) {
+            if (reviewData instanceof Comment && commentDetail != null) {
+                if (reviewDetail != null) {
+                    reviewDetail.dispose();
+                    reviewDetail = null;
+                }
+                if (commentDetail == null) {
+                    commentDetail = new CommentDetail(this.parent, this.parent.getStyle());
+                    parent.layout(true);
+                }
+                commentDetail.fillContents((Comment) reviewData);
+            } else if (reviewData instanceof Review && reviewDetail != null) {
+                if (commentDetail != null) {
+                    commentDetail.dispose();
+                    commentDetail = null;
+                }
+                if (reviewDetail == null) {
+                    reviewDetail = new ReviewDetail(this.parent, this.parent.getStyle());
+                    parent.layout();
+                }
+                reviewDetail.fillContents((Review) reviewData);
+            }
         }
     }
     
