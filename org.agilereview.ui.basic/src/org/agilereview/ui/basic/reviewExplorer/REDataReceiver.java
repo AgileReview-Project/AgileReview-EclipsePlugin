@@ -10,6 +10,7 @@ package org.agilereview.ui.basic.reviewExplorer;
 import java.beans.PropertyChangeEvent;
 
 import org.agilereview.core.external.storage.ReviewSet;
+import org.agilereview.core.external.storage.constants.PropertyChangeEventKeys;
 import org.agilereview.ui.basic.external.reviewDataReceiver.AbstractReviewDataReceiver;
 import org.agilereview.ui.basic.external.reviewDataReceiver.AbstractReviewDataView;
 
@@ -62,7 +63,11 @@ public class REDataReceiver extends AbstractReviewDataReceiver {
      */
     @Override
     protected boolean triggerPropertyChange(PropertyChangeEvent evt, ReviewSet data) {
-        return true;
+        // TODO: Thats really ugly, but don't know a better way at the moment
+        return (evt.getPropertyName().equals(PropertyChangeEventKeys.REVIEW_COMMENTS)
+                || evt.getPropertyName().equals(PropertyChangeEventKeys.REVIEW_ISACTIVE_STATUS)
+                || evt.getPropertyName().equals(PropertyChangeEventKeys.REVIEW_ISOPEN_STATUS)
+                || evt.getPropertyName().equals(PropertyChangeEventKeys.REVIEW_NAME) || evt.getPropertyName().equals(
+                PropertyChangeEventKeys.REVIEWSET_REVIEWS));
     }
-    
 }

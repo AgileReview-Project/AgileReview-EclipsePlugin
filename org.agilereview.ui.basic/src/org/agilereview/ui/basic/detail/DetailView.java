@@ -68,7 +68,8 @@ public class DetailView extends AbstractReviewDataView {
     @Override
     protected void refreshInput(Object reviewData) {
         if (reviewData != null) {
-            if (reviewData instanceof Comment && commentDetail != null) {
+            // TODO: Find a better way to do this
+            if (reviewData instanceof Comment) {
                 if (reviewDetail != null) {
                     reviewDetail.dispose();
                     reviewDetail = null;
@@ -78,14 +79,14 @@ public class DetailView extends AbstractReviewDataView {
                     parent.layout(true);
                 }
                 commentDetail.fillContents((Comment) reviewData);
-            } else if (reviewData instanceof Review && reviewDetail != null) {
+            } else if (reviewData instanceof Review) {
                 if (commentDetail != null) {
                     commentDetail.dispose();
                     commentDetail = null;
                 }
                 if (reviewDetail == null) {
                     reviewDetail = new ReviewDetail(this.parent, this.parent.getStyle());
-                    parent.layout();
+                    parent.layout(true);
                 }
                 reviewDetail.fillContents((Review) reviewData);
             }

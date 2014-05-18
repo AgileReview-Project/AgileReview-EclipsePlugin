@@ -240,8 +240,8 @@ public class ReviewDetail extends Composite implements SelectionListener {
             this.reference.setText(review.getReference());
             this.authorInstance.setText(review.getResponsibility());
             this.authorInstance.setToolTipText(review.getResponsibility());
-            this.reviewInstance.setText(review.getId());
-            this.reviewInstance.setToolTipText(review.getId());
+            this.reviewInstance.setText(review.getName());
+            this.reviewInstance.setToolTipText(review.getName());
             
             if (review.getDescription() != null) {
                 this.txt.setText(review.getDescription());
