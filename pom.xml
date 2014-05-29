@@ -10,8 +10,8 @@
 	<packaging>pom</packaging>
 
 	<properties>
-		<tycho.version>0.18.1</tycho.version>
-		<tycho-extras.version>0.18.1</tycho-extras.version>
+		<tycho.version>0.20.0</tycho.version>
+		<tycho-extras.version>0.20.0</tycho-extras.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<tycho-repo.url>https://oss.sonatype.org/content/groups/public/</tycho-repo.url>
 	</properties>
@@ -21,19 +21,28 @@
 		<module>org.agilereview.core</module>
 		<module>org.agilereview.ui.basic</module>
 		<module>org.agilereview.storage.xml</module>
-                <module>org.agilereview.export.xls</module>
-                <module>org.agilereview.editorparser.itexteditor</module>
-                <module>org.agilereview.languagepack.jdt</module>
-                <module>org.agilereview.help</module>
-                <module>org.agilereview.feature.basic</module>
-                <module>org.agilereview.updatesite.basic</module>
+		<module>org.agilereview.export.xls</module>
+		<module>org.agilereview.editorparser.itexteditor</module>
+		<module>org.agilereview.languagepack.jdt</module>
+		<module>org.agilereview.help</module>
+		<module>org.agilereview.feature.basic</module>
+		<module>org.agilereview.updatesite.basic</module>
 	</modules>
 
-        <scm>
-            <connection>scm:git:git@github.com:AgileReview-Project/AgileReview-Plugin.git</connection>
-            <url>scm:git:git@github.com:AgileReview-Project/AgileReview-Plugin.git</url>
-            <developerConnection>scm:git:git@github.com:AgileReview-Project/AgileReview-Plugin.git</developerConnection>
-        </scm>
+	<scm>
+		<connection>scm:git:git@github.com:AgileReview-Project/AgileReview-Plugin.git</connection>
+		<url>scm:git:git@github.com:AgileReview-Project/AgileReview-Plugin.git</url>
+		<developerConnection>scm:git:git@github.com:AgileReview-Project/AgileReview-Plugin.git</developerConnection>
+	</scm>
+
+	<dependencies>
+		<!-- Logger -->
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-api</artifactId>
+			<version>1.7.7</version>
+		</dependency>
+	</dependencies>
 
 	<pluginRepositories>
 		<pluginRepository>
@@ -51,6 +60,25 @@
 	<build>
 		<plugins>
 			<!-- Maven Build -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>3.1</version>
+				<configuration>
+					<source>1.7</source>
+					<target>1.7</target>
+				</configuration>
+			</plugin>
+			<!-- Skip all eclipse:eclipse builds due to MANIFEST-first approach -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-eclipse-plugin</artifactId>
+				<version>2.9</version>
+				<configuration>
+					<skip>true</skip>
+				</configuration>
+			</plugin>
+			<!-- Copy jar dependencies to lib folder -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-dependency-plugin</artifactId>
@@ -73,6 +101,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-clean-plugin</artifactId>
+				<version>2.5</version>
 				<executions>
 					<execution>
 						<id>clean-dependencies</id>
@@ -93,7 +122,7 @@
 					</execution>
 				</executions>
 			</plugin>
-			
+
 			<!-- Tycho Build -->
 			<plugin>
 				<groupId>org.eclipse.tycho</groupId>

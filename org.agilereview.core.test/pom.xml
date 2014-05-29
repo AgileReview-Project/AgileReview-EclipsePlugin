@@ -9,7 +9,7 @@
   <packaging>eclipse-test-plugin</packaging>
   
   	<properties>
-	  <tycho-version>0.17.0</tycho-version>
+	  <tycho-version>0.17.0</tycho-version>	
 	  <test.max.heap.size>1g</test.max.heap.size>
 	</properties>
 	
