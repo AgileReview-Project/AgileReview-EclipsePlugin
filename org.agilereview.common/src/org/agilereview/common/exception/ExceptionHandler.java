@@ -7,6 +7,9 @@
  */
 package org.agilereview.common.exception;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
+
 import org.agilereview.common.Activator;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.dialogs.MessageDialog;
@@ -75,5 +78,16 @@ public class ExceptionHandler {
                 }
             });
         }
+    }
+    
+    /**
+     * @return the string representation of the stacktrace of an exception.
+     * @author Peter Reuter (09.06.2014)
+     */
+    public static String getStackTrace(Exception e) {
+        StringWriter sw = new StringWriter();
+        PrintWriter pw = new PrintWriter(sw);
+        e.printStackTrace(pw);
+        return sw.toString();
     }
 }
