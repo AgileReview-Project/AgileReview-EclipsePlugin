@@ -109,15 +109,19 @@ public class StorageController extends AbstractController<IStorageClient> implem
      * @author Malte Brunnlieb (27.05.2012)
      */
     public void setStorageClient(String name) throws ExtensionCreationException {
-        if (activeClient != null && activeClientId.equals(name)) return;
+        if (this.activeClient != null && this.activeClientId.equals(name)) {
+            return;
+        }
         
         Set<String> extensions = getAvailableExtensions();
-        if (!extensions.contains(name)) { throw new ExtensionCreationException("The StorageClient with id " + name + " could not be found!"); }
+        if (!extensions.contains(name)) {
+            throw new ExtensionCreationException("The StorageClient with id " + name + " could not be found!");
+        }
         
         try {
-            activeClient = getUniqueExtension(name);
-            activeClientId = name;
-            storageClientChanged = true;
+            this.activeClient = getUniqueExtension(name);
+            this.activeClientId = name;
+            this.storageClientChanged = true;
         } catch (CoreException e) {
             e.printStackTrace();
             throw new ExtensionCreationException("The StorageClient with id " + name + " could not be intantiated!");
@@ -135,16 +139,16 @@ public class StorageController extends AbstractController<IStorageClient> implem
     @Override
     public ReviewSet getAllReviews() {
         try {
-            if (storageClientChanged) {
-                cachedReviewSet = activeClient.getAllReviews();
-                storageClientChanged = false;
+            if (this.storageClientChanged) {
+                this.cachedReviewSet = this.activeClient.getAllReviews();
+                this.storageClientChanged = false;
             }
-            ReviewSet result = cachedReviewSet;
+            ReviewSet result = this.cachedReviewSet;
             Assert.isNotNull(result);
             return result;
         } catch (Throwable ex) {
-            ExceptionHandler.logAndNotifyUser("An unknown exception occured in StorageClient '" + activeClient + "' while retrieving all comments",
-                    ex, Activator.PLUGIN_ID);
+            ExceptionHandler.logAndNotifyUser("An unknown exception occured in StorageClient '" + this.activeClient
+                    + "' while retrieving all comments", ex, Activator.PLUGIN_ID);
         }
         return null;
     }
@@ -157,11 +161,12 @@ public class StorageController extends AbstractController<IStorageClient> implem
     @Override
     public String getNewReviewId() {
         try {
-            String result = activeClient.getNewReviewId();
+            // XXX peter: add null check, I encountered a nullpointer while adding a review without SourceFolder
+            String result = this.activeClient.getNewReviewId();
             Assert.isNotNull(result);
             return result;
         } catch (Throwable ex) {
-            ExceptionHandler.logAndNotifyUser("An unknown exception occured in StorageClient '" + activeClient
+            ExceptionHandler.logAndNotifyUser("An unknown exception occured in StorageClient '" + this.activeClient
                     + "' while retrieving an ID for new review", ex, Activator.PLUGIN_ID);
         }
         return null;
@@ -175,11 +180,11 @@ public class StorageController extends AbstractController<IStorageClient> implem
     @Override
     public String getNewCommentId(String author, Review review) {
         try {
-            String result = activeClient.getNewCommentId(author, review);
+            String result = this.activeClient.getNewCommentId(author, review);
             Assert.isNotNull(result);
             return result;
         } catch (Throwable ex) {
-            ExceptionHandler.logAndNotifyUser("An unknown exception occured in StorageClient '" + activeClient
+            ExceptionHandler.logAndNotifyUser("An unknown exception occured in StorageClient '" + this.activeClient
                     + "' while retrieving an ID for new comment", ex, Activator.PLUGIN_ID);
         }
         return null;
@@ -193,11 +198,11 @@ public class StorageController extends AbstractController<IStorageClient> implem
     @Override
     public String getNewReplyId(Object parent) {
         try {
-            String result = activeClient.getNewReplyId(parent);
+            String result = this.activeClient.getNewReplyId(parent);
             Assert.isNotNull(result);
             return result;
         } catch (Throwable ex) {
-            ExceptionHandler.logAndNotifyUser("An unknown exception occured in StorageClient '" + activeClient
+            ExceptionHandler.logAndNotifyUser("An unknown exception occured in StorageClient '" + this.activeClient
                     + "' while retrieving an ID for new reply", ex, Activator.PLUGIN_ID);
         }
         return null;

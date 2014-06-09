@@ -7,7 +7,6 @@
  */
 package org.agilereview.core.external.storage;
 
-import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.HashSet;
@@ -19,7 +18,6 @@ import org.agilereview.core.controller.extension.EditorParserController;
 import org.agilereview.core.controller.extension.ExtensionControllerFactory;
 import org.agilereview.core.controller.extension.ExtensionControllerFactory.ExtensionPoint;
 import org.agilereview.core.controller.extension.StorageController;
-import org.agilereview.core.external.exception.FileNotInWorkspaceException;
 import org.agilereview.core.external.exception.NoOpenEditorException;
 import org.agilereview.core.external.exception.NullArgumentException;
 import org.agilereview.core.external.storage.constants.ReviewSetMetaDataKeys;
@@ -27,11 +25,8 @@ import org.agilereview.core.preferences.dataprocessing.FileSupportPreferencesFac
 import org.agilereview.fileparser.FileParser;
 import org.apache.commons.io.FilenameUtils;
 import org.eclipse.core.resources.IFile;
-import org.eclipse.core.resources.IWorkspaceRoot;
-import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.NullProgressMonitor;
-import org.eclipse.core.runtime.Path;
 import org.eclipse.ui.IEditorPart;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -99,9 +94,13 @@ public class CommentingAPI {
      * @author Malte Brunnlieb (17.12.2012)
      */
     public static Comment createCommentInEditorSelection(String author, String reviewId) throws NoOpenEditorException, NullArgumentException {
-        if (author == null || reviewId == null) throw new NullArgumentException("The given arguments cannot be set to null when creating a comment");
+        if (author == null || reviewId == null) {
+            throw new NullArgumentException("The given arguments cannot be set to null when creating a comment");
+        }
         IEditorPart editor = PlatformUITools.getActiveWorkbenchPage().getActiveEditor();
-        if (editor == null) throw new NoOpenEditorException();
+        if (editor == null) {
+            throw new NoOpenEditorException();
+        }
         IFile file = (IFile) editor.getEditorInput().getAdapter(IFile.class);
         
         Review review = getReview(reviewId);
@@ -118,44 +117,46 @@ public class CommentingAPI {
         return newComment;
     }
     
-    public static Comment createComment(File file, int startLine, int endLine, String author, String reviewId) throws IOException,
-            NullArgumentException, FileNotInWorkspaceException {
-        IWorkspaceRoot workspaceRoot = ResourcesPlugin.getWorkspace().getRoot();
-        String filePath = file.getAbsolutePath();
-        String workspacePath = workspaceRoot.getFullPath().toOSString();
-        if (filePath.startsWith(workspacePath)) {
-            // File within workspace --> try to get IFile for better eclipse internal synchronization
-            String relativePath = filePath.substring(workspacePath.length(), filePath.length());
-            IFile iFile = workspaceRoot.getFile(new Path(relativePath));
-            if (iFile.exists()) {
-                //get review
-                Review review = getReview(reviewId);
-                if (review == null) {
-                    throw new NullArgumentException("Comment could not be created. Currently no review data are provided by the StorageClient.");
-                }
-                
-                //create comment
-                String commentId = sController.getNewCommentId(author, review);
-                Comment newComment = new Comment(commentId, iFile, review);
-                review.addComment(newComment);
-                
-                Map<String, String[]> fileSupportMap = FileSupportPreferencesFactory.createFileSupportMap();
-                String fileExtension = FilenameUtils.getExtension(file.getName());
-                String[] multiLineCommentTags = fileSupportMap.get(fileExtension);
-                if (multiLineCommentTags != null) {
-                    FileParser fileParser = new FileParser(file, multiLineCommentTags);
-                    fileParser.addTags(commentId, startLine, endLine);
-                    refreshIFile(iFile);
-                } else {
-                    LOG.info("File extension '{}' is currently not supported. Adding global file comment", fileExtension);
-                }
-                return newComment;
-            } else {
-                throw new FileNotFoundException("The file " + file.getAbsolutePath() + " could not be found in the current workspace");
+    /**
+     * Creates a new {@link Comment} with the given author in the {@link Review} with the given review id in for the given file.
+     * @param file The file to which the comment will be added
+     * @param startLine line number of the for comment start tag
+     * @param endLine line number of the for comment end tag
+     * @param author the author's name
+     * @param reviewId the ID of the review to which the comment belongs
+     * @return the new {@link Comment}
+     * @throws IOException if the start/end tag cannot be added or the file does not exist.
+     * @throws NullArgumentException if the review with the given ID cannot be found.
+     * @author Malte Brunnlieb (09.06.2014)
+     * @author Peter Reuter (09.06.2014)
+     */
+    public static Comment createComment(IFile iFile, int startLine, int endLine, String author, String reviewId) throws IOException,
+            NullArgumentException {
+        if (iFile.exists()) {
+            //get review
+            Review review = getReview(reviewId);
+            if (review == null) {
+                throw new NullArgumentException("Comment could not be created. Currently no review data is provided by the StorageClient.");
             }
+            
+            //create comment
+            String commentId = sController.getNewCommentId(author, review);
+            Comment newComment = new Comment(commentId, iFile, review);
+            review.addComment(newComment);
+            
+            Map<String, String[]> fileSupportMap = FileSupportPreferencesFactory.createFileSupportMap();
+            String fileExtension = FilenameUtils.getExtension(iFile.getName());
+            String[] multiLineCommentTags = fileSupportMap.get(fileExtension);
+            if (multiLineCommentTags != null) {
+                FileParser fileParser = new FileParser(iFile.getLocation().toFile(), multiLineCommentTags);
+                fileParser.addTags(commentId, startLine, endLine);
+                refreshIFile(iFile);
+            } else {
+                LOG.info("File extension '{}' is currently not supported. Adding global file comment", fileExtension);
+            }
+            return newComment;
         } else {
-            throw new FileNotInWorkspaceException("The file " + file.getAbsolutePath() + " is not a children of the current workspace ("
-                    + workspaceRoot.getFullPath().toOSString() + ")");
+            throw new FileNotFoundException("The file " + iFile.getFullPath() + " could not be found in the current workspace");
         }
     }
     
@@ -179,7 +180,9 @@ public class CommentingAPI {
      */
     //TODO (MB) introduce IReplyable interface to restrict the parameter
     public static Reply createReply(Object parent) {
-        if (parent == null) throw new IllegalArgumentException("Parent object could not be null.");
+        if (parent == null) {
+            throw new IllegalArgumentException("Parent object could not be null.");
+        }
         return new Reply(sController.getNewReplyId(parent), parent);
     }
     
@@ -190,7 +193,9 @@ public class CommentingAPI {
      * @author Thilo Rauch (02.11.2013)
      */
     public static void deleteReview(String reviewId) throws IOException {
-        if (reviewId == null) throw new IllegalArgumentException("Review id could not be null.");
+        if (reviewId == null) {
+            throw new IllegalArgumentException("Review id could not be null.");
+        }
         deleteReview(getReview(reviewId));
     }
     
@@ -201,7 +206,9 @@ public class CommentingAPI {
      * @author Thilo Rauch (02.11.2013)
      */
     public static void deleteReview(Review review) throws IOException {
-        if (review == null) throw new IllegalArgumentException("Review could not be null.");
+        if (review == null) {
+            throw new IllegalArgumentException("Review could not be null.");
+        }
         for (Comment c : review.getComments()) {
             deleteComment(c);
         }
@@ -219,7 +226,9 @@ public class CommentingAPI {
      * @author Malte Brunnlieb (17.12.2012)
      */
     public static void deleteComment(String commentId) throws IOException {
-        if (commentId == null) throw new IllegalArgumentException("Comment id could not be null.");
+        if (commentId == null) {
+            throw new IllegalArgumentException("Comment id could not be null.");
+        }
         deleteComment(getComment(commentId));
     }
     
@@ -230,7 +239,9 @@ public class CommentingAPI {
      * @author Thilo Rauch (02.11.2014)
      */
     public static void deleteComment(Comment comment) throws IOException {
-        if (comment == null) throw new IllegalArgumentException("Comment could not be null.");
+        if (comment == null) {
+            throw new IllegalArgumentException("Comment could not be null.");
+        }
         IEditorPart part = PlatformUITools.getActiveWorkbenchPage().getActiveEditor();
         if (part != null) {
             eController.removeTags(part, comment.getId());
@@ -261,7 +272,9 @@ public class CommentingAPI {
      * @author Thilo Rauch (02.11.2013)
      */
     public static void deleteReply(String replyId) {
-        if (replyId == null) throw new IllegalArgumentException("Reply id could not be null.");
+        if (replyId == null) {
+            throw new IllegalArgumentException("Reply id could not be null.");
+        }
         deleteReply(getReply(replyId));
     }
     
@@ -271,7 +284,9 @@ public class CommentingAPI {
      * @author Thilo Rauch (02.11.2013)
      */
     public static void deleteReply(Reply reply) {
-        if (reply == null) throw new IllegalArgumentException("Reply could not be null.");
+        if (reply == null) {
+            throw new IllegalArgumentException("Reply could not be null.");
+        }
         Object parent = reply.getParent();
         if (parent instanceof Reply) {
             ((Reply) parent).deleteReply(reply);
@@ -287,7 +302,9 @@ public class CommentingAPI {
      * @author Malte Brunnlieb (26.11.2012)
      */
     private static Review getReview(String reviewId) {
-        if (reviewId == null) throw new IllegalArgumentException("Review id could not be null.");
+        if (reviewId == null) {
+            throw new IllegalArgumentException("Review id could not be null.");
+        }
         Set<Review> reviews = new HashSet<Review>(sController.getAllReviews());
         for (Review r : reviews) {
             if (r.getId().equals(reviewId)) {
