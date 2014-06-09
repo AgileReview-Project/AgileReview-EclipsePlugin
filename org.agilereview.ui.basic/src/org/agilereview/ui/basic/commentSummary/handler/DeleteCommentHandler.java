@@ -7,11 +7,11 @@
  */
 package org.agilereview.ui.basic.commentSummary.handler;
 
+import java.io.IOException;
 import java.util.Iterator;
 
 import org.agilereview.common.exception.ExceptionHandler;
 import org.agilereview.common.ui.PlatformUITools;
-import org.agilereview.core.external.exception.NoOpenEditorException;
 import org.agilereview.core.external.storage.Comment;
 import org.agilereview.core.external.storage.CommentingAPI;
 import org.eclipse.core.commands.AbstractHandler;
@@ -19,12 +19,19 @@ import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Handler for the delete command of comments in the comments summary view
  * @author Malte Brunnlieb (17.12.2012)
  */
 public class DeleteCommentHandler extends AbstractHandler {
+    
+    /**
+     * Logger instance
+     */
+    private static final Logger LOG = LoggerFactory.getLogger(DeleteCommentHandler.class);
     
     /* (non-Javadoc)
      * @see org.eclipse.core.commands.IHandler#execute(org.eclipse.core.commands.ExecutionEvent)
@@ -41,9 +48,10 @@ public class DeleteCommentHandler extends AbstractHandler {
                 if (o instanceof Comment) {
                     try {
                         CommentingAPI.deleteComment((Comment) o);
-                    } catch (NoOpenEditorException e) {
-                        ExceptionHandler
-                                .warnUser("Wrong usage of Commenting API as currently there is no open editor the comment can be deleted from.");
+                    } catch (IOException e) {
+                        LOG.error("Comment could not be deleted! File {} could not be read or written", ((Comment) o).getCommentedFile()
+                                .getFullPath().toOSString(), e);
+                        ExceptionHandler.warnUser("The file could not be read or written: " + e.getMessage());
                     }
                 }
             }

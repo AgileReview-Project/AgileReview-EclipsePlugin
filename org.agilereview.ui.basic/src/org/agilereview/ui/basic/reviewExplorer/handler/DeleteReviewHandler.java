@@ -1,18 +1,25 @@
 package org.agilereview.ui.basic.reviewExplorer.handler;
 
+import java.io.IOException;
+
 import org.agilereview.common.exception.ExceptionHandler;
-import org.agilereview.core.external.exception.NoOpenEditorException;
 import org.agilereview.core.external.storage.CommentingAPI;
 import org.agilereview.core.external.storage.Review;
-import org.agilereview.ui.basic.Activator;
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.ui.handlers.HandlerUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class DeleteReviewHandler extends AbstractHandler {
+    
+    /**
+     * Logger instance
+     */
+    public static final Logger LOG = LoggerFactory.getLogger(DeleteReviewHandler.class);
     
     @Override
     public Object execute(ExecutionEvent event) throws ExecutionException {
@@ -23,11 +30,9 @@ public class DeleteReviewHandler extends AbstractHandler {
                     if (o instanceof Review) {
                         try {
                             CommentingAPI.deleteReview((Review) o);
-                        } catch (NoOpenEditorException e) {
-                            ExceptionHandler
-                                    .logAndNotifyUser(
-                                            "At the moment all files containing comments from this review have to be open in the editor. This was not the case. It will be fixed in the future",
-                                            e, Activator.PLUGIN_ID);
+                        } catch (IOException e) {
+                            LOG.error("Review could not be deleted! One of the reviewed files could not be read or written", e);
+                            ExceptionHandler.warnUser("One of the reviewed files could not be read or written: " + e.getMessage());
                         }
                     }
                 }

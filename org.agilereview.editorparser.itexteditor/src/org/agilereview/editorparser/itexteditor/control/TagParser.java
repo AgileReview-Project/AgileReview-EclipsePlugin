@@ -17,6 +17,7 @@ import org.agilereview.editorparser.itexteditor.data.ComparablePosition;
 import org.agilereview.editorparser.itexteditor.exception.NoDocumentFoundException;
 import org.agilereview.editorparser.itexteditor.prefs.AuthorReservationPreferences;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.FindReplaceDocumentAdapter;
 import org.eclipse.jface.text.IDocument;
@@ -430,7 +431,7 @@ public class TagParser {
         }
         
         // Save, so Eclipse save actions can take place before parsing  
-        editor.getDocumentProvider().saveDocument(null, editor.getEditorInput(), document, true);
+        editor.getDocumentProvider().saveDocument(new NullProgressMonitor(), editor.getEditorInput(), document, true);
         parseInput();
         
         if (isAgileReviewPerspectiveOpen()) {//TODO only reserve if this comment should also be displayed

@@ -145,13 +145,7 @@ public class CommentingAPI {
                 if (multiLineCommentTags != null) {
                     FileParser fileParser = new FileParser(file, multiLineCommentTags);
                     fileParser.addTags(commentId, startLine, endLine);
-                    
-                    // Refresh iFile for synchronization issues
-                    try {
-                        iFile.refreshLocal(IFile.DEPTH_ZERO, new NullProgressMonitor());
-                    } catch (CoreException e) {
-                        LOG.warn("Refreshing of IFile {} failed!", iFile.getFullPath().toOSString(), e);
-                    }
+                    refreshIFile(iFile);
                 } else {
                     LOG.info("File extension '{}' is currently not supported. Adding global file comment", fileExtension);
                 }
@@ -162,6 +156,19 @@ public class CommentingAPI {
         } else {
             throw new FileNotInWorkspaceException("The file " + file.getAbsolutePath() + " is not a children of the current workspace ("
                     + workspaceRoot.getFullPath().toOSString() + ")");
+        }
+    }
+    
+    /**
+     * Resynchronizes the given {@link IFile} with the file system
+     * @param iFile to be refreshed
+     * @author Malte Brunnlieb (09.06.2014)
+     */
+    private static void refreshIFile(IFile iFile) {
+        try {
+            iFile.refreshLocal(IFile.DEPTH_ZERO, new NullProgressMonitor());
+        } catch (CoreException e) {
+            LOG.warn("Refreshing of IFile {} failed!", iFile.getFullPath().toOSString(), e);
         }
     }
     
@@ -179,10 +186,10 @@ public class CommentingAPI {
     /**
      * Deletes the {@link Review} with the given review id. Use this, if you do not have a reference to the real review.
      * @param reviewId identifying the {@link Review} which should be deleted
-     * @throws NoOpenEditorException //TODO should be removed when tag parser for IFile has been implemented
+     * @throws IOException if any commented file could not be read or written
      * @author Thilo Rauch (02.11.2013)
      */
-    public static void deleteReview(String reviewId) throws NoOpenEditorException {
+    public static void deleteReview(String reviewId) throws IOException {
         if (reviewId == null) throw new IllegalArgumentException("Review id could not be null.");
         deleteReview(getReview(reviewId));
     }
@@ -190,10 +197,10 @@ public class CommentingAPI {
     /**
      * Deletes the given {@link Review}
      * @param review {@link Review} which should be deleted
-     * @throws NoOpenEditorException //TODO should be removed when tag parser for IFile has been implemented
+     * @throws IOException if any commented file could not be read or written
      * @author Thilo Rauch (02.11.2013)
      */
-    public static void deleteReview(Review review) throws NoOpenEditorException {
+    public static void deleteReview(Review review) throws IOException {
         if (review == null) throw new IllegalArgumentException("Review could not be null.");
         for (Comment c : review.getComments()) {
             deleteComment(c);
@@ -208,10 +215,10 @@ public class CommentingAPI {
     /**
      * Deletes the {@link Comment} with the given comment id. Use this, if you do not have a reference to the real comment.
      * @param commentId identifying the {@link Comment} which should be deleted
-     * @throws NoOpenEditorException //TODO should be removed when tag parser for IFile has been implemented
+     * @throws IOException if the commented file could not be read or written
      * @author Malte Brunnlieb (17.12.2012)
      */
-    public static void deleteComment(String commentId) throws NoOpenEditorException {
+    public static void deleteComment(String commentId) throws IOException {
         if (commentId == null) throw new IllegalArgumentException("Comment id could not be null.");
         deleteComment(getComment(commentId));
     }
@@ -219,16 +226,28 @@ public class CommentingAPI {
     /**
      * Deletes the given {@link Comment}
      * @param comment {@link Comment} which should be deleted
-     * @throws NoOpenEditorException //TODO should be removed when tag parser for IFile has been implemented
+     * @throws IOException if the commented file could not be read or written
      * @author Thilo Rauch (02.11.2014)
      */
-    public static void deleteComment(Comment comment) throws NoOpenEditorException {
+    public static void deleteComment(Comment comment) throws IOException {
         if (comment == null) throw new IllegalArgumentException("Comment could not be null.");
         IEditorPart part = PlatformUITools.getActiveWorkbenchPage().getActiveEditor();
-        if (part == null) {
-            throw new NoOpenEditorException();
+        if (part != null) {
+            eController.removeTags(part, comment.getId());
+        } else {
+            Map<String, String[]> fileSupportMap = FileSupportPreferencesFactory.createFileSupportMap();
+            String[] multiLineCommentTags = fileSupportMap.get(comment.getCommentedFile().getFileExtension());
+            if (multiLineCommentTags != null) {
+                FileParser fileParser = new FileParser(comment.getCommentedFile().getRawLocation().toFile(), multiLineCommentTags);
+                fileParser.removeTags(comment.getId());
+                LOG.info("Comment with id '{}' and its tags removed.", comment.getId());
+                refreshIFile(comment.getCommentedFile());
+            } else {
+                LOG.info(
+                        "Comment with id '{}' removed. No tags were removed due to there are no multi line comment tags registered for file extension '.{}'",
+                        comment.getId(), comment.getCommentedFile().getFileExtension());
+            }
         }
-        eController.removeTags(part, comment.getId());
         Object detail = sController.getAllReviews().getValue(ReviewSetMetaDataKeys.SHOW_IN_DETAIL_VIEW);
         if (comment.equals(detail)) {
             sController.getAllReviews().storeValue(ReviewSetMetaDataKeys.SHOW_IN_DETAIL_VIEW, null);
