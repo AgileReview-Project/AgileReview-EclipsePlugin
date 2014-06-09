@@ -5,7 +5,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.agilereview</groupId>
 	<artifactId>org.agilereview.export.xls</artifactId>
-	<name>AgileReview Common</name>
+	<name>AgileReview Export xls/xlsx</name>
 	<version>1.0.0-SNAPSHOT</version>
 	<packaging>eclipse-plugin</packaging>
 	
@@ -15,4 +15,16 @@
 		<version>1.0.0-SNAPSHOT</version>
 	</parent>
 
+	<dependencies>
+		<dependency>
+		  <groupId>net.sf.jxls</groupId>
+		  <artifactId>jxls-reader</artifactId>
+		  <version>1.0.5</version>
+		</dependency>
+		<dependency>
+		  <groupId>net.sf.jxls</groupId>
+		  <artifactId>jxls-core</artifactId>
+		  <version>1.0.5</version>
+		</dependency>
+	</dependencies>
 </project>
