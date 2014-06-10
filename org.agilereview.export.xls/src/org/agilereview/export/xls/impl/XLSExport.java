@@ -22,8 +22,6 @@ import net.sf.jxls.transformer.XLSTransformer;
 import org.agilereview.core.external.storage.Comment;
 import org.agilereview.core.external.storage.Review;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
-import org.eclipse.core.resources.IWorkspaceRoot;
-import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
@@ -103,10 +101,7 @@ public class XLSExport implements IRunnableWithProgress {
         monitor.subTask("Collecting review data...");
         Map<String, Object> beans = new HashMap<String, Object>();
         
-        //collect all comments
-        
-        IWorkspaceRoot workspaceRoot = ResourcesPlugin.getWorkspace().getRoot();
-        
+        //collect comments
         //collect all files which have been reviewed
         Set<FileExportWrapper> reviewFiles = new HashSet<>();
         ArrayList<CommentWrapper> comments = new ArrayList<>();

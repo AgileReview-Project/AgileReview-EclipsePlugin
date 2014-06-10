@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         point="org.agilereview.core.ReviewDataReceiver">
+      <ReviewDataReceiver
+            class="org.agilereview.export.xls.extension.ReviewDataReceiver"
+            id="ReviewDataReceiver">
+      </ReviewDataReceiver>
+   </extension>
+   <extension
+         point="org.eclipse.ui.menus">
+      <menuContribution
+            allPopups="true"
+            locationURI="popup:org.agilereview.ui.basic.reviewExplorerView">
+         <command
+               commandId="org.agilereview.eclipse.export.reviews"
+               label="Export selected review"
+               style="push">
+         </command>
+      </menuContribution>
+   </extension>
+   <extension
+         point="org.eclipse.ui.commands">
+      <command
+            categoryId="org.agilereview.commands"
+            description="Export selected reviews in Review Explorer"
+            id="org.agilereview.eclipse.export.reviews"
+            name="Export reviews">
+      </command>
+   </extension>
+   <extension
+         point="org.eclipse.ui.handlers">
+      <handler
+            class="de.tukl.cs.softech.agilereview.views.reviewexplorer.handler.ExportHandler"
+            commandId="de.tukl.cs.softech.agilereview.views.reviewexplorer.export">
+         <activeWhen>
+            <with
+                  variable="activePart">
+               <instanceof
+                     value="org.agilereview.ui.basic.reviewExplorer.ReviewExplorerView">
+               </instanceof>
+            </with>
+         </activeWhen>
+         <enabledWhen>
+            <and>
+               <with
+                     variable="selection">
+                  <iterate
+                        ifEmpty="false"
+                        operator="and">
+                     <instanceof
+                           value="org.agilereview.core.external.storage.Review">
+                     </instanceof>
+                  </iterate>
+               </with>
+               <with
+                     variable="org.agilereview.export.selection.containsClosedReview">
+                  <equals
+                        value="false">
+                  </equals>
+               </with>
+            </and>
+         </enabledWhen>
+      </handler>
+   </extension>
+
+</plugin>
