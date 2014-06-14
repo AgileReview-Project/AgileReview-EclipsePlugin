@@ -67,8 +67,8 @@ public class CommentSummaryView extends AbstractReviewDataView {
      */
     @Override
     public void setFocus() {
-        if (toolBar != null) {
-            toolBar.setFocus();
+        if (this.toolBar != null) {
+            this.toolBar.setFocus();
         }
     }
     
@@ -88,16 +88,16 @@ public class CommentSummaryView extends AbstractReviewDataView {
     @Override
     protected void buildUI(Composite parent, Object initalInput) {
         parent.setLayout(new GridLayout());
-        toolBar = new CSToolBar(parent);
+        this.toolBar = new CSToolBar(parent);
         
-        viewer = new CSTableViewer(parent);
+        this.viewer = new CSTableViewer(parent);
         ContentProvider cp = ContentProvider.getInstance();
-        viewer.setContentProvider(cp);
+        this.viewer.setContentProvider(cp);
         ColumnComparator comparator = new ColumnComparator();
-        viewer.setComparator(comparator);
+        this.viewer.setComparator(comparator);
         
-        viewer.addDoubleClickListener(new ViewController(viewer));
-        getSite().setSelectionProvider(viewer);
+        this.viewer.addDoubleClickListener(new ViewController(this.viewer));
+        getSite().setSelectionProvider(this.viewer);
         
         parent.layout();
     }
@@ -108,14 +108,14 @@ public class CommentSummaryView extends AbstractReviewDataView {
      */
     @Override
     protected void refreshInput(Object reviewData) {
-        if (reviewData != null && reviewData instanceof ReviewSet) {
-            viewer.setInput(reviewData);
-            if (filterController == null) {
-                filterController = new FilterController(toolBar);
-                toolBar.setListeners(filterController);
+        if (reviewData != null && reviewData instanceof ReviewSet && this.viewer != null) {
+            this.viewer.setInput(reviewData);
+            if (this.filterController == null) {
+                this.filterController = new FilterController(this.toolBar);
+                this.toolBar.setListeners(this.filterController);
             }
-            ((ReviewSet) reviewData).addCommentFilterListener(new ViewController(viewer));
-            filterController.setReviewSet((ReviewSet) reviewData);
+            ((ReviewSet) reviewData).addCommentFilterListener(new ViewController(this.viewer));
+            this.filterController.setReviewSet((ReviewSet) reviewData);
         }
     }
     

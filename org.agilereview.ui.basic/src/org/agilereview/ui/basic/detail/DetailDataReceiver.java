@@ -50,9 +50,9 @@ public class DetailDataReceiver extends AbstractReviewDataReceiver {
     @Override
     protected Object transformData(ReviewSet rawData) {
         if (rawData != null) {
-            currentlyShownObject = rawData.getValue(ReviewSetMetaDataKeys.SHOW_IN_DETAIL_VIEW);
-            if (currentlyShownObject != null) {
-                return currentlyShownObject;
+            this.currentlyShownObject = rawData.getValue(ReviewSetMetaDataKeys.SHOW_IN_DETAIL_VIEW);
+            if (this.currentlyShownObject != null) {
+                return this.currentlyShownObject;
             } else {
                 return new Object();
             }
@@ -66,6 +66,6 @@ public class DetailDataReceiver extends AbstractReviewDataReceiver {
      */
     @Override
     protected boolean triggerPropertyChange(PropertyChangeEvent evt, ReviewSet data) {
-        return evt.getPropertyName().equals(PropertyChangeEventKeys.REVIEWSET_METADATA) && !evt.getSource().equals(currentlyShownObject);
+        return evt.getPropertyName().equals(PropertyChangeEventKeys.REVIEWSET_METADATA) && !evt.getSource().equals(this.currentlyShownObject);
     }
 }

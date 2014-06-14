@@ -8,6 +8,8 @@
 package org.agilereview.ui.basic.detail;
 
 import java.awt.Desktop;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.net.URI;
 import java.util.HashSet;
 
@@ -25,6 +27,7 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Sash;
 import org.eclipse.swt.widgets.Text;
@@ -34,7 +37,7 @@ import org.eclipse.ui.PlatformUI;
  * 
  * @author Thilo Rauch (18.05.2014)
  */
-public class ReviewDetail extends Composite implements SelectionListener {
+public class ReviewDetail extends Composite implements SelectionListener, PropertyChangeListener {
     /**
      * TextArea to edit the person in charge of the given Review
      */
@@ -59,11 +62,15 @@ public class ReviewDetail extends Composite implements SelectionListener {
      * Button for opening the external reference in a browser
      */
     private Button referenceButton;
+    /**
+     * The review that is shown. Keep it removing this instance as {@link PropertyChangeListener} when input is changed.
+     */
+    private Review review;
     
     /**
      * This set represents all components which should adapt the composite background color TODO: do this a better way?
      */
-    private HashSet<Control> bgComponents = new HashSet<Control>();
+    private final HashSet<Control> bgComponents = new HashSet<Control>();
     
     /**
      * Creates a new ReviewDetail Composite onto the given parent with the specified SWT styles
@@ -87,64 +94,64 @@ public class ReviewDetail extends Composite implements SelectionListener {
         
         Label review = new Label(this, SWT.PUSH);
         review.setText("Review: ");
-        bgComponents.add(review);
+        this.bgComponents.add(review);
         
-        reviewInstance = new Text(this, SWT.WRAP);
+        this.reviewInstance = new Text(this, SWT.WRAP);
         GridData gridData = new GridData();
         gridData.horizontalAlignment = GridData.FILL;
         gridData.horizontalSpan = numColumns - 1;
-        reviewInstance.setLayoutData(gridData);
-        reviewInstance.setEditable(false);
-        bgComponents.add(reviewInstance);
+        this.reviewInstance.setLayoutData(gridData);
+        this.reviewInstance.setEditable(false);
+        this.bgComponents.add(this.reviewInstance);
         
         Label refId = new Label(this, SWT.PUSH);
         refId.setText("External reference: ");
-        bgComponents.add(refId);
+        this.bgComponents.add(refId);
         
-        reference = new Text(this, SWT.BORDER | SWT.SINGLE);
+        this.reference = new Text(this, SWT.BORDER | SWT.SINGLE);
         gridData = new GridData();
         gridData.horizontalAlignment = GridData.FILL;
         gridData.grabExcessHorizontalSpace = true;
         gridData.horizontalSpan = numColumns - 2;
-        reference.setLayoutData(gridData);
+        this.reference.setLayoutData(gridData);
         // TODO: Source Provider
         //        reference.addFocusListener(this);
         
-        referenceButton = new Button(this, SWT.PUSH);
-        referenceButton.setImage(Activator.getDefault().getImageRegistry().get(ISharedImages.BROWSE_WORLD));
+        this.referenceButton = new Button(this, SWT.PUSH);
+        this.referenceButton.setImage(Activator.getDefault().getImageRegistry().get(ISharedImages.BROWSE_WORLD));
         gridData = new GridData();
         gridData.horizontalAlignment = GridData.END;
-        referenceButton.setLayoutData(gridData);
-        referenceButton.addSelectionListener(this);
-        referenceButton.setToolTipText("Interpret \"External reference\" as URI and open it");
-        bgComponents.add(referenceButton);
+        this.referenceButton.setLayoutData(gridData);
+        this.referenceButton.addSelectionListener(this);
+        this.referenceButton.setToolTipText("Interpret \"External reference\" as URI and open it");
+        this.bgComponents.add(this.referenceButton);
         
         Label author = new Label(this, SWT.PUSH);
         author.setText("Responsibility: ");
-        bgComponents.add(author);
+        this.bgComponents.add(author);
         
-        authorInstance = new Text(this, SWT.BORDER | SWT.SINGLE | SWT.WRAP);
+        this.authorInstance = new Text(this, SWT.BORDER | SWT.SINGLE | SWT.WRAP);
         gridData = new GridData();
         gridData.horizontalAlignment = GridData.FILL;
         gridData.horizontalSpan = numColumns - 1;
-        authorInstance.setLayoutData(gridData);
+        this.authorInstance.setLayoutData(gridData);
         // TODO: Source Provider
         //        authorInstance.addFocusListener(this);
         //        authorInstance.addModifyListener(this);
         
         Label status = new Label(this, SWT.PUSH);
         status.setText("Status: ");
-        bgComponents.add(status);
+        this.bgComponents.add(status);
         
-        statusDropDown = new Combo(this, SWT.DROP_DOWN | SWT.BORDER | SWT.PUSH);
+        this.statusDropDown = new Combo(this, SWT.DROP_DOWN | SWT.BORDER | SWT.PUSH);
         gridData = new GridData();
         gridData.horizontalAlignment = GridData.FILL;
         gridData.horizontalSpan = numColumns - 1;
-        statusDropDown.setLayoutData(gridData);
+        this.statusDropDown.setLayoutData(gridData);
         // TODO: Source Provider
         //        statusDropDown.addFocusListener(this);
         //        statusDropDown.addModifyListener(this);
-        bgComponents.add(statusDropDown);
+        this.bgComponents.add(this.statusDropDown);
         
         Sash sash = new Sash(this, SWT.PUSH);
         sash.setVisible(false);
@@ -155,13 +162,13 @@ public class ReviewDetail extends Composite implements SelectionListener {
         gridData.horizontalSpan = numColumns;
         caption.setLayoutData(gridData);
         caption.setText("Description:");
-        bgComponents.add(caption);
+        this.bgComponents.add(caption);
         
-        txt = new StyledText(this, SWT.PUSH | SWT.V_SCROLL | SWT.BORDER);
-        txt.setVisible(true);
-        txt.setWordWrap(true);
-        txt.setEditable(true);
-        txt.setEnabled(true);
+        this.txt = new StyledText(this, SWT.PUSH | SWT.V_SCROLL | SWT.BORDER);
+        this.txt.setVisible(true);
+        this.txt.setWordWrap(true);
+        this.txt.setEditable(true);
+        this.txt.setEnabled(true);
         // TODO: Source Provider
         //        txt.addFocusListener(this);
         //        txt.addModifyListener(this);
@@ -172,7 +179,7 @@ public class ReviewDetail extends Composite implements SelectionListener {
         gridData.horizontalSpan = numColumns;
         gridData.grabExcessVerticalSpace = true;
         gridData.grabExcessHorizontalSpace = true;
-        txt.setLayoutData(gridData);
+        this.txt.setLayoutData(gridData);
         
         // TODO: What was that for?
         //        setPropertyConfigurations();
@@ -237,18 +244,14 @@ public class ReviewDetail extends Composite implements SelectionListener {
             //            this.backupObject = (Review) review.copy();
             //            this.editedObject = review;
             
-            this.reference.setText(review.getReference());
-            this.authorInstance.setText(review.getResponsibility());
-            this.authorInstance.setToolTipText(review.getResponsibility());
-            this.reviewInstance.setText(review.getName());
-            this.reviewInstance.setToolTipText(review.getName());
-            
-            if (review.getDescription() != null) {
-                this.txt.setText(review.getDescription());
-            } else {
-                this.txt.setText("");
+            if (this.review != null) {
+                this.review.removePropertyChangeListener(this);
             }
-            statusDropDown.select(review.getStatus());
+            this.review = review;
+            
+            updateUiData(review);
+            
+            review.addPropertyChangeListener(this);
         }
         // TODO: What was that for?
         //        //set revertable to false because it was set from the ModificationListener while inserting inital content
@@ -256,6 +259,21 @@ public class ReviewDetail extends Composite implements SelectionListener {
         //                ISourceProviderService.class);
         //        SourceProvider sp = (SourceProvider) isps.getSourceProvider(SourceProvider.REVERTABLE);
         //        sp.setVariable(SourceProvider.REVERTABLE, false);
+    }
+    
+    private void updateUiData(Review review) {
+        this.reference.setText(review.getReference());
+        this.authorInstance.setText(review.getResponsibility());
+        this.authorInstance.setToolTipText(review.getResponsibility());
+        this.reviewInstance.setText(review.getName());
+        this.reviewInstance.setToolTipText(review.getName());
+        
+        if (review.getDescription() != null) {
+            this.txt.setText(review.getDescription());
+        } else {
+            this.txt.setText("");
+        }
+        this.statusDropDown.select(review.getStatus());
     }
     
     @Override
@@ -284,6 +302,22 @@ public class ReviewDetail extends Composite implements SelectionListener {
     @Override
     public void widgetDefaultSelected(SelectionEvent e) {
         widgetSelected(e);
+    }
+    
+    /* (non-Javadoc)
+     * @see java.beans.PropertyChangeListener#propertyChange(java.beans.PropertyChangeEvent)
+     * @author Peter Reuter (14.06.2014)
+     */
+    @Override
+    public void propertyChange(PropertyChangeEvent arg0) {
+        Display.getDefault().asyncExec(new Runnable() {
+            
+            @Override
+            public void run() {
+                updateUiData(ReviewDetail.this.review);
+            }
+            
+        });
     }
     
     // TODO: Implement different colors
