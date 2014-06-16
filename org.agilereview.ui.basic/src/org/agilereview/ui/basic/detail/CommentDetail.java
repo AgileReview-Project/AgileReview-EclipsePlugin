@@ -374,7 +374,10 @@ public class CommentDetail extends Composite {
      */
     @Override
     public boolean setFocus() {
-        return this.txt.setFocus();
+        if (!txt.isDisposed())
+            return this.txt.setFocus();
+        else
+            return false;
     }
     
     //    /**

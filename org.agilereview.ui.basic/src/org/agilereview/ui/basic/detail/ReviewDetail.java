@@ -218,7 +218,10 @@ public class ReviewDetail extends Composite implements SelectionListener, Proper
      */
     @Override
     public boolean setFocus() {
-        return this.txt.setFocus();
+        if (!txt.isDisposed())
+            return this.txt.setFocus();
+        else
+            return false;
     }
     
     //    /**
