@@ -4,7 +4,9 @@ Bundle-Name: AgileReview File Parser
 Bundle-SymbolicName: org.agilereview.fileparser;singleton:=true
 Bundle-Version: 1.0.0.qualifier
 Bundle-Activator: org.agilereview.fileparser.Activator
-Require-Bundle: org.agilereview.common;bundle-version="1.0.0"
+Require-Bundle: org.agilereview.common;bundle-version="1.0.0",
+ org.eclipse.ui;bundle-version="3.7.0",
+ org.eclipse.core.runtime;bundle-version="3.7.0"
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Import-Package: org.agilereview.core.external.definition
