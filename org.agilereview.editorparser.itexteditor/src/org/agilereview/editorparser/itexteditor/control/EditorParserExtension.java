@@ -25,12 +25,19 @@ import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.Position;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.texteditor.ITextEditor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Extension interface for the {@link IEditorParser} extension point and manager class for all created editor parsers of this plug-in
  * @author Malte Brunnlieb (11.11.2012)
  */
 public class EditorParserExtension implements IEditorParser, PropertyChangeListener {
+    
+    /**
+     * Logger instance
+     */
+    private static final Logger LOG = LoggerFactory.getLogger(EditorParserExtension.class);
     
     /**
      * Map which holds a parser for each opened editor
@@ -109,12 +116,31 @@ public class EditorParserExtension implements IEditorParser, PropertyChangeListe
     
     /* (non-Javadoc)
      * @see org.agilereview.core.external.definition.IEditorParser#reparse()
-     * @author Malte Brunnlieb (19.11.2012)
+     * @author Malte Brunnlieb (19.06.2014)
      */
     @Override
     public void reparse() {
         // TODO Auto-generated method stub
         
+    }
+    
+    /**
+     * Parses the document anew and rewrites all annotations
+     * @param editorPart {@link IEditorParser} to be reparsed
+     * @author Malte Brunnlieb (19.06.2014)
+     */
+    void reparse(IEditorPart editorPart) {
+        TagParser parser = parserMap.get(editorPart);
+        if (parser != null) {
+            AnnotationManager annotationManager = annotationManagerMap.get(editorPart);
+            try {
+                parser.parseInput();
+                LOG.debug("Editor input reparsed due to be changed in the background");
+            } catch (CoreException e) {
+                LOG.error("Error while parsing the editor input", e);
+            }
+            annotationManager.displayAnnotations(parser.getObservedComments());
+        }
     }
     
     /* (non-Javadoc)
@@ -153,10 +179,12 @@ public class EditorParserExtension implements IEditorParser, PropertyChangeListe
         if (file != null) {
             if (!parserMap.containsKey(editor)) {
                 try {
-                    parserMap.put(editor, new TagParser((ITextEditor) editor, multiLineCommentTags));
+                    TagParser tagParser = new TagParser((ITextEditor) editor, multiLineCommentTags);
+                    parserMap.put(editor, tagParser);
                     Map<String, Position> observedComments = parserMap.get(editor).getObservedComments();
                     annotationManagerMap.put(editor, new AnnotationManager(editor));
                     annotationManagerMap.get(editor).displayAnnotations(observedComments);
+                    editor.addPropertyListener(new EditorInputListener(editor, this));
                 } catch (NoDocumentFoundException e) {
                     ExceptionHandler.logAndNotifyUser("Parsing error of the ITextEditor parser: No document found for the current editor.", e,
                             Activator.PLUGIN_ID);

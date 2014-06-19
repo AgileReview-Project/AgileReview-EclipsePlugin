@@ -88,9 +88,7 @@ public class TagParser {
         
         if (editor.getDocumentProvider() != null) {
             this.document = editor.getDocumentProvider().getDocument(editor.getEditorInput());
-            if (this.document == null) {
-                throw new NoDocumentFoundException();
-            }
+            if (this.document == null) { throw new NoDocumentFoundException(); }
         } else {
             throw new NoDocumentFoundException();
         }
@@ -102,7 +100,7 @@ public class TagParser {
      * Parses all comment tags and saves them with their {@link Position}
      * @throws CoreException
      */
-    private void parseInput() throws CoreException {
+    public void parseInput() throws CoreException {
         this.document = editor.getDocumentProvider().getDocument(editor.getEditorInput());
         
         editor.getDocumentProvider().saveDocument(null, editor.getEditorInput(), document, true);
