@@ -10,6 +10,7 @@ package org.agilereview.core.external.storage;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.Map;
 import java.util.Set;
 
@@ -198,9 +199,11 @@ public class CommentingAPI {
      */
     public static void deleteReview(Review review) throws IOException {
         if (review == null) { throw new IllegalArgumentException("Review could not be null."); }
-        for (Comment c : review.getComments()) {
+        
+        for (Comment c : new LinkedList<Comment>(review.getComments())) {
             deleteComment(c);
         }
+        
         Object detail = sController.getAllReviews().getValue(ReviewSetMetaDataKeys.SHOW_IN_DETAIL_VIEW);
         if (review.equals(detail)) {
             sController.getAllReviews().storeValue(ReviewSetMetaDataKeys.SHOW_IN_DETAIL_VIEW, null);
