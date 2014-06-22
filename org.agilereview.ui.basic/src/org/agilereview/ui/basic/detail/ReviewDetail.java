@@ -265,6 +265,8 @@ public class ReviewDetail extends Composite implements SelectionListener, Proper
     }
     
     private void updateUiData(Review review) {
+        if (isDisposed()) return;
+        
         this.reference.setText(review.getReference());
         this.authorInstance.setText(review.getResponsibility());
         this.authorInstance.setToolTipText(review.getResponsibility());
