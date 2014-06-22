@@ -21,6 +21,8 @@ import org.agilereview.core.external.storage.ReviewSet;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.ui.PlatformUI;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * The {@link StorageController} manages the {@link IStorageClient}s for the org.agilereview.core.StorageClient ExtensionPoint and provides
@@ -28,6 +30,11 @@ import org.eclipse.ui.PlatformUI;
  * @author Malte Brunnlieb (22.03.2012)
  */
 public class StorageController extends AbstractController<IStorageClient> implements IStorageClient {
+    
+    /**
+     * Logger instance
+     */
+    private static final Logger LOG = LoggerFactory.getLogger(StorageController.class);
     
     /**
      * ExtensionPoint id for extensions implementing {@link IStorageClient}
@@ -77,12 +84,14 @@ public class StorageController extends AbstractController<IStorageClient> implem
         try {
             if (PlatformUI.getPreferenceStore().getBoolean("org.agilereview.testrunner.mock.storage")) { //TODO if client can be set via preferences -> use this
                 setStorageClient("StorageMock");
+                LOG.debug("Set storage client 'StorageMock'");
             } else if (getFirstExtension() != null) {
                 setStorageClient(getFirstExtension()); //TODO do not use first, but manage to set this client via preferences
+                LOG.debug("Set storage client '{}'", getFirstExtension());
             }
         } catch (ExtensionCreationException e) {
+            LOG.error("Fail to create an instance of the StorageClient", e);
             ExceptionHandler.logAndNotifyUser(e.getLocalizedMessage(), e, Activator.PLUGIN_ID);
-            e.printStackTrace();
         }
     }
     
@@ -109,21 +118,17 @@ public class StorageController extends AbstractController<IStorageClient> implem
      * @author Malte Brunnlieb (27.05.2012)
      */
     public void setStorageClient(String name) throws ExtensionCreationException {
-        if (this.activeClient != null && this.activeClientId.equals(name)) {
-            return;
-        }
+        if (this.activeClient != null && this.activeClientId.equals(name)) { return; }
         
         Set<String> extensions = getAvailableExtensions();
-        if (!extensions.contains(name)) {
-            throw new ExtensionCreationException("The StorageClient with id " + name + " could not be found!");
-        }
+        if (!extensions.contains(name)) { throw new ExtensionCreationException("The StorageClient with id " + name + " could not be found!"); }
         
         try {
             this.activeClient = getUniqueExtension(name);
             this.activeClientId = name;
             this.storageClientChanged = true;
         } catch (CoreException e) {
-            e.printStackTrace();
+            LOG.error("The StorageClient with id '{}' could not be intantiated!", name, e);
             throw new ExtensionCreationException("The StorageClient with id " + name + " could not be intantiated!");
         }
         
@@ -147,6 +152,7 @@ public class StorageController extends AbstractController<IStorageClient> implem
             Assert.isNotNull(result);
             return result;
         } catch (Throwable ex) {
+            LOG.error("An unknown exception occured in StorageClient '{}' while retrieving all comments", activeClient, ex);
             ExceptionHandler.logAndNotifyUser("An unknown exception occured in StorageClient '" + this.activeClient
                     + "' while retrieving all comments", ex, Activator.PLUGIN_ID);
         }
@@ -166,6 +172,7 @@ public class StorageController extends AbstractController<IStorageClient> implem
             Assert.isNotNull(result);
             return result;
         } catch (Throwable ex) {
+            LOG.error("An unknown exception occured in StorageClient '{}' while retrieving an ID for new review", activeClient, ex);
             ExceptionHandler.logAndNotifyUser("An unknown exception occured in StorageClient '" + this.activeClient
                     + "' while retrieving an ID for new review", ex, Activator.PLUGIN_ID);
         }
@@ -184,6 +191,7 @@ public class StorageController extends AbstractController<IStorageClient> implem
             Assert.isNotNull(result);
             return result;
         } catch (Throwable ex) {
+            LOG.error("An unknown exception occured in StorageClient '{}' while retrieving an ID for new comment", activeClient, ex);
             ExceptionHandler.logAndNotifyUser("An unknown exception occured in StorageClient '" + this.activeClient
                     + "' while retrieving an ID for new comment", ex, Activator.PLUGIN_ID);
         }
@@ -202,6 +210,7 @@ public class StorageController extends AbstractController<IStorageClient> implem
             Assert.isNotNull(result);
             return result;
         } catch (Throwable ex) {
+            LOG.error("An unknown exception occured in StorageClient '{}' while retrieving an ID for new reply", activeClient, ex);
             ExceptionHandler.logAndNotifyUser("An unknown exception occured in StorageClient '" + this.activeClient
                     + "' while retrieving an ID for new reply", ex, Activator.PLUGIN_ID);
         }
