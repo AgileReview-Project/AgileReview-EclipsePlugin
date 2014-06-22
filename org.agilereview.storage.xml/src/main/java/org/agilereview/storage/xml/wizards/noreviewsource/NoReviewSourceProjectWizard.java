@@ -1,7 +1,6 @@
 package org.agilereview.storage.xml.wizards.noreviewsource;
 
 import org.agilereview.common.exception.ExceptionHandler;
-import org.agilereview.core.external.preferences.AgileReviewPreferences;
 import org.agilereview.storage.xml.Activator;
 import org.agilereview.storage.xml.persistence.SourceFolderManager;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
@@ -55,17 +54,17 @@ public class NoReviewSourceProjectWizard extends Wizard implements IWizard {
     @Override
     public void addPages() {
         super.addPages();
-        page = new NoReviewSourceProjectWizardPage();
-        addPage(page);
+        this.page = new NoReviewSourceProjectWizardPage();
+        addPage(this.page);
     }
     
     @Override
     public boolean performFinish() {
-        chosenProjectName = page.getReviewSourceName();
-        boolean result = chosenProjectName != null;
-        if (result && setDirectly) {
+        this.chosenProjectName = this.page.getReviewSourceName();
+        boolean result = this.chosenProjectName != null;
+        if (result && this.setDirectly) {
             IEclipsePreferences preferences = InstanceScope.INSTANCE.getNode(Activator.PLUGIN_ID);
-            preferences.put(SourceFolderManager.SOURCEFOLDER_PROPERTYNAME, chosenProjectName);
+            preferences.put(SourceFolderManager.SOURCEFOLDER_PROPERTYNAME, this.chosenProjectName);
             try {
                 preferences.flush();
             } catch (BackingStoreException e) {
@@ -78,8 +77,17 @@ public class NoReviewSourceProjectWizard extends Wizard implements IWizard {
     
     @Override
     public boolean performCancel() {
-        return MessageDialog.openQuestion(getShell(), "Cancel Review Source Project selection", "Are you sure you want to cancel? "
-                + "Agilereview will not work until you create and choose an AgileReview Source Project.");
+        boolean cancel = true;
+        
+        IEclipsePreferences preferences = InstanceScope.INSTANCE.getNode(Activator.PLUGIN_ID);
+        String currentReviewSourceName = preferences.get(SourceFolderManager.SOURCEFOLDER_PROPERTYNAME, null);
+        
+        if (currentReviewSourceName == null) {
+            cancel = MessageDialog.openQuestion(getShell(), "Cancel Review Source Project selection", "Are you sure you want to cancel? "
+                    + "Agilereview will not work until you create and choose an AgileReview Source Project.");
+        }
+        
+        return cancel;
     }
     
     /**
@@ -87,7 +95,7 @@ public class NoReviewSourceProjectWizard extends Wizard implements IWizard {
      * @return name of the project chosen
      */
     public String getChosenProjectName() {
-        return chosenProjectName;
+        return this.chosenProjectName;
     }
     
 }
