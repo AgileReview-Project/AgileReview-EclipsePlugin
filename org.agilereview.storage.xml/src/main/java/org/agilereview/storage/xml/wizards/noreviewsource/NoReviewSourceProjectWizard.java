@@ -30,7 +30,7 @@ public class NoReviewSourceProjectWizard extends Wizard implements IWizard {
     private boolean setDirectly = true;
     
     /**
-     * Standard constructor. Equal to NoReviewSourceWizard(true)
+     * Standard constructor. Equal to <code>new NoReviewSourceWizard(true)</code>
      */
     public NoReviewSourceProjectWizard() {
         this(true);
