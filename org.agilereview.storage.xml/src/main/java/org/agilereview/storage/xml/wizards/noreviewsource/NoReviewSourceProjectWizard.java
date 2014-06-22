@@ -1,6 +1,7 @@
 package org.agilereview.storage.xml.wizards.noreviewsource;
 
 import org.agilereview.common.exception.ExceptionHandler;
+import org.agilereview.core.external.preferences.AgileReviewPreferences;
 import org.agilereview.storage.xml.Activator;
 import org.agilereview.storage.xml.persistence.SourceFolderManager;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
@@ -64,12 +65,22 @@ public class NoReviewSourceProjectWizard extends Wizard implements IWizard {
         boolean result = this.chosenProjectName != null;
         if (result && this.setDirectly) {
             IEclipsePreferences preferences = InstanceScope.INSTANCE.getNode(Activator.PLUGIN_ID);
-            preferences.put(SourceFolderManager.SOURCEFOLDER_PROPERTYNAME, this.chosenProjectName);
-            try {
-                preferences.flush();
-            } catch (BackingStoreException e) {
-                String message = "AgileReview could not persistently set Review Source Project.";
-                ExceptionHandler.logAndNotifyUser(new Exception(message), Activator.PLUGIN_ID);
+            String oldSourceFolder = preferences.get(SourceFolderManager.SOURCEFOLDER_PROPERTYNAME, null);
+            
+            //if folder changed, set new source folder, reset active review, and open review list
+            if (oldSourceFolder != null && !oldSourceFolder.equals(chosenProjectName)) {
+                IEclipsePreferences corePreferences = InstanceScope.INSTANCE.getNode(AgileReviewPreferences.CORE_PLUGIN_ID);
+                corePreferences.remove(AgileReviewPreferences.ACTIVE_REVIEW_ID);
+                corePreferences.remove(AgileReviewPreferences.OPEN_REVIEWS);
+                preferences.put(SourceFolderManager.SOURCEFOLDER_PROPERTYNAME, this.chosenProjectName);
+                
+                try {
+                    preferences.flush();
+                    corePreferences.flush();
+                } catch (BackingStoreException e) {
+                    String message = "AgileReview could not persistently set Review Source Project.";
+                    ExceptionHandler.logAndNotifyUser(new Exception(message), Activator.PLUGIN_ID);
+                }
             }
         }
         return result;
