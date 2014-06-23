@@ -16,11 +16,18 @@ import org.eclipse.jface.text.source.IAnnotationModelExtension;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.texteditor.ITextEditor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This class is used to draw and manage annotations for a given text editor
  */
 public class AnnotationManager {
+    
+    /**
+     * Logger instance
+     */
+    private static final Logger LOG = LoggerFactory.getLogger(AnnotationManager.class);
     
     /**
      * The color manager for author color management
@@ -103,6 +110,7 @@ public class AnnotationManager {
     void addAnnotation(String commentKey, Position p) {
         Annotation annotation = createNewAnnotation(commentKey);
         if (annotation != null) {
+            LOG.debug("Add Annotation {} to position {}", annotation, p);
             ((IAnnotationModel) this.annotationModel).addAnnotation(annotation, p);
         }
     }

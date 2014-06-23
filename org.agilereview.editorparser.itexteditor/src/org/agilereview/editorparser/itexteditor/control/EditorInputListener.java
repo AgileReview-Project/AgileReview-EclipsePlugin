@@ -7,6 +7,10 @@
  */
 package org.agilereview.editorparser.itexteditor.control;
 
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IPropertyListener;
 import org.eclipse.ui.IWorkbenchPartConstants;
@@ -30,6 +34,8 @@ public class EditorInputListener implements IPropertyListener {
      */
     private EditorParserExtension tagParser;
     
+    private List<Thread> propertyChangeThreads = new LinkedList<>();
+    
     /**
      * Creates a new input listener with the given target parser
      * @param tagParser {@link TagParser} for the target editor
@@ -47,7 +53,30 @@ public class EditorInputListener implements IPropertyListener {
     @Override
     public void propertyChanged(Object source, int propId) {
         if (propId == IWorkbenchPartConstants.PROP_INPUT || propId == IWorkbenchPartConstants.PROP_DIRTY) {
-            tagParser.reparse(editorPart);
+            
+            synchronized (propertyChangeThreads) {
+                //check if there is already a waiting property change thread -> do not create an additional one
+                Iterator<Thread> it = propertyChangeThreads.iterator();
+                while (it.hasNext()) {
+                    Thread t = it.next();
+                    if (t.isAlive()) {
+                        return; // there is one thread currently running -> avoid overhead
+                    } else {
+                        it.remove();
+                    }
+                }
+                
+                // create new Thread as otherwise the property change event will be run in the single ui thread
+                // Thus thread locking will not work.
+                Thread newThread = new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        tagParser.reparse(editorPart);
+                    }
+                });
+                propertyChangeThreads.add(newThread);
+                newThread.start();
+            }
         }
     }
 }

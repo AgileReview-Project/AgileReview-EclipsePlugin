@@ -28,11 +28,18 @@ import org.eclipse.jface.text.TextSelection;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.texteditor.ITextEditor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * The AnnotationParser analyzes the document of the given editor and provides a mapping of comment tags and their {@link Position}s
  */
 public class TagParser {
+    
+    /**
+     * Logger instance
+     */
+    private static final Logger LOG = LoggerFactory.getLogger(TagParser.class);
     
     /**
      * Sign which separates the comment id from all meta information
@@ -100,7 +107,7 @@ public class TagParser {
      * Parses all comment tags and saves them with their {@link Position}
      * @throws CoreException
      */
-    public void parseInput() throws CoreException {
+    public synchronized void parseInput() throws CoreException {
         this.document = editor.getDocumentProvider().getDocument(editor.getEditorInput());
         
         editor.getDocumentProvider().saveDocument(null, editor.getEditorInput(), document, true);
@@ -295,7 +302,7 @@ public class TagParser {
      * @throws CoreException
      * @author Malte Brunnlieb (06.12.2012)
      */
-    public void addTagsInDocument(String tagId) throws BadLocationException, CoreException {
+    public synchronized void addTagsInDocument(String tagId) throws BadLocationException, CoreException {
         ISelection selection = editor.getSelectionProvider().getSelection();
         if (selection instanceof ITextSelection) {
             int selStartLine = ((ITextSelection) selection).getStartLine();
@@ -312,7 +319,7 @@ public class TagParser {
      * @throws BadLocationException Thrown if the selected location is not in the document (Should theoretically never happen)
      * @throws CoreException
      */
-    public void addTagsInDocument(String tagId, int selStartLine, int selEndLine) throws BadLocationException, CoreException {
+    public synchronized void addTagsInDocument(String tagId, int selStartLine, int selEndLine) throws BadLocationException, CoreException {
         boolean startLineInserted = false, endLineInserted = false;;
         int origSelStartLine = selStartLine;
         String commentTag = keySeparator + tagId + keySeparator;
@@ -539,7 +546,7 @@ public class TagParser {
      * @throws CoreException will be thrown during reparsing the document after tag deletion
      * @author Malte Brunnlieb (26.11.2012)
      */
-    public void removeTagsInDocument(String tagId) throws BadLocationException, CoreException {
+    public synchronized void removeTagsInDocument(String tagId) throws BadLocationException, CoreException {
         TreeSet<Position> tagPositions = new TreeSet<Position>();
         
         Position[] ps = idTagPositions.get(tagId);
@@ -580,7 +587,7 @@ public class TagParser {
      * @return a {@link Map} of comment IDs which are observed during parsing the document to the position of the comments
      * @author Malte Brunnlieb (06.12.2012)
      */
-    public Map<String, Position> getObservedComments() {
+    public synchronized Map<String, Position> getObservedComments() {
         return new HashMap<String, Position>(idPositionMap);
     }
     
@@ -605,7 +612,7 @@ public class TagParser {
      * @return a {@link Position} on which any annotation for the tag can be performed
      * @author Malte Brunnlieb (27.11.2012)
      */
-    public Position getPosition(String tagId) {
+    public synchronized Position getPosition(String tagId) {
         return idPositionMap.get(tagId);
     }
     

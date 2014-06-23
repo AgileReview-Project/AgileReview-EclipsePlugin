@@ -67,13 +67,15 @@ public class EditorParserExtension implements IEditorParser, PropertyChangeListe
             if (!parserMap.containsKey(editor)) {
                 addInstance(editor, multiLineCommentTags);
             }
-            try {
-                parserMap.get(editor).addTagsInDocument(comment.getId());
-                annotationManagerMap.get(editor).addAnnotation(comment.getId(), parserMap.get(editor).getPosition(comment.getId()));
-            } catch (BadLocationException e) {
-                ExceptionHandler.logAndNotifyUser("Parsing error of the ITextEditor parser: Invalid comment position.", e, Activator.PLUGIN_ID);
-            } catch (CoreException e) {
-                ExceptionHandler.logAndNotifyUser("Parsing error of the ITextEditor parser: Internal eclipse exception.", e, Activator.PLUGIN_ID);
+            synchronized (parserMap.get(editor)) {
+                try {
+                    parserMap.get(editor).addTagsInDocument(comment.getId());
+                    annotationManagerMap.get(editor).addAnnotation(comment.getId(), parserMap.get(editor).getPosition(comment.getId()));
+                } catch (BadLocationException e) {
+                    ExceptionHandler.logAndNotifyUser("Parsing error of the ITextEditor parser: Invalid comment position.", e, Activator.PLUGIN_ID);
+                } catch (CoreException e) {
+                    ExceptionHandler.logAndNotifyUser("Parsing error of the ITextEditor parser: Internal eclipse exception.", e, Activator.PLUGIN_ID);
+                }
             }
         } else {
             ExceptionHandler.warnUser("The comment could not be added to the document as the underlying file could not be retreived.");
@@ -91,15 +93,20 @@ public class EditorParserExtension implements IEditorParser, PropertyChangeListe
             if (!parserMap.containsKey(editor)) {
                 addInstance(editor, multiLineCommentTags);
             }
-            try {
-                parserMap.get(editor).removeTagsInDocument(tagId);
-                annotationManagerMap.get(editor).deleteAnnotation(tagId);
-            } catch (BadLocationException e) {
-                ExceptionHandler.logAndNotifyUser("Parsing error of the ITextEditor parser: Invalid comment position.", e, Activator.PLUGIN_ID);
-            } catch (CoreException e) {
-                ExceptionHandler.logAndNotifyUser("Parsing error of the ITextEditor parser: Internal eclipse exception.", e, Activator.PLUGIN_ID);
+            synchronized (parserMap.get(editor)) {
+                try {
+                    parserMap.get(editor).removeTagsInDocument(tagId);
+                    annotationManagerMap.get(editor).deleteAnnotation(tagId);
+                } catch (BadLocationException e) {
+                    LOG.error("Parsing error of the ITextEditor parser while removing tags for comment '{}': Invalid comment position.", tagId, e);
+                    ExceptionHandler.logAndNotifyUser("Parsing error of the ITextEditor parser: Invalid comment position.", e, Activator.PLUGIN_ID);
+                } catch (CoreException e) {
+                    LOG.error("Parsing error of the ITextEditor parser while removing tags for comment '{}': Internal eclipse exception.", tagId, e);
+                    ExceptionHandler.logAndNotifyUser("Parsing error of the ITextEditor parser: Internal eclipse exception.", e, Activator.PLUGIN_ID);
+                }
             }
         } else {
+            LOG.warn("The comment with id '{}' could not be removed from document as the underlying file could not be retreived.", tagId);
             ExceptionHandler.warnUser("The comment could not be removed from document as the underlying file could not be retreived.");
         }
     }
@@ -132,14 +139,20 @@ public class EditorParserExtension implements IEditorParser, PropertyChangeListe
     void reparse(IEditorPart editorPart) {
         TagParser parser = parserMap.get(editorPart);
         if (parser != null) {
-            AnnotationManager annotationManager = annotationManagerMap.get(editorPart);
-            try {
-                parser.parseInput();
-                LOG.debug("Editor input reparsed due to be changed in the background");
-            } catch (CoreException e) {
-                LOG.error("Error while parsing the editor input", e);
+            LOG.debug("Thread {}: waiting for (parser) lock for reparsing", Thread.currentThread().getId());
+            synchronized (parser) {
+                LOG.debug("Thread {}: has (parser) lock for reparsing", Thread.currentThread().getId());
+                AnnotationManager annotationManager = annotationManagerMap.get(editorPart);
+                try {
+                    parser.parseInput();
+                    annotationManager.displayAnnotations(parser.getObservedComments());
+                    LOG.debug("Editor input reparsed due to be changed in the background");
+                    LOG.debug("Observed comments: {}", parser.getObservedComments());
+                } catch (CoreException e) {
+                    LOG.error("Error while parsing the editor input", e);
+                }
+                LOG.debug("Thread {}: release (parser) lock for reparsing", Thread.currentThread().getId());
             }
-            annotationManager.displayAnnotations(parser.getObservedComments());
         }
     }
     
