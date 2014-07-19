@@ -1,7 +1,7 @@
 language: java
 before_install:
-	- git clone --depth=50 --branch=master https://github.com/AgileReview-Project/AgileReview-CoreLib.git AgileReview-Project/AgileReview-CoreLib
-	- cd AgileReview-Project/AgileReview-CoreLib
-	- mvn install -DskipTests=true
-	- cd ..
-	- cd ..
+  - git clone --depth=50 --branch=master https://github.com/AgileReview-Project/AgileReview-CoreLib.git AgileReview-Project/AgileReview-CoreLib
+  - cd AgileReview-Project/AgileReview-CoreLib
+  - mvn install -DskipTests=true
+  - cd ..
+  - cd ..
