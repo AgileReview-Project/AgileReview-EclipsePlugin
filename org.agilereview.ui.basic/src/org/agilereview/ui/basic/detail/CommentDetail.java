@@ -13,7 +13,7 @@ import java.util.List;
 
 import org.agilereview.core.external.storage.Comment;
 import org.agilereview.core.external.storage.Reply;
-import org.agilereview.ui.basic.tools.CommentProperties;
+import org.agilereview.ui.basic.tools.CommentReviewProperties;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.SashForm;
 import org.eclipse.swt.custom.ScrolledComposite;
@@ -267,14 +267,14 @@ public class CommentDetail extends AbstractDetail<Comment> {
      * Sets the levels for the status and priority configuration of a comment.
      */
     private void setPropertyConfigurations() {
-        CommentProperties commentProps = new CommentProperties();
-        String[] levels = commentProps.getStatuses();
+        CommentReviewProperties commentProps = new CommentReviewProperties();
+        String[] levels = commentProps.getCommentStatuses();
         statusDropDown.removeAll();
         for (int i = 0; i < levels.length; i++) {
             statusDropDown.add(levels[i]);
         }
         
-        levels = commentProps.getPriorities();
+        levels = commentProps.getCommentPriorities();
         priorityDropDown.removeAll();
         for (int i = 0; i < levels.length; i++) {
             priorityDropDown.add(levels[i]);
@@ -309,7 +309,7 @@ public class CommentDetail extends AbstractDetail<Comment> {
     protected void fillContents() {
         Comment comment = this.getDetailObject();
         if (comment != null) {
-            
+            tagInstance.setText(comment.getId());
             tagInstance.setToolTipText(comment.getId());
             authorInstance.setText(comment.getAuthor());
             authorInstance.setToolTipText(comment.getAuthor());
@@ -358,6 +358,7 @@ public class CommentDetail extends AbstractDetail<Comment> {
      */
     @Override
     protected void saveChanges() {
+        if (isDisposed()) return;
         // Save status
         this.getDetailObject().setStatus(this.statusDropDown.getSelectionIndex());
         // Save priority

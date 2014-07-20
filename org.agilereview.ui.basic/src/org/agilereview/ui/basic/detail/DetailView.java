@@ -54,7 +54,7 @@ public class DetailView extends AbstractReviewDataView {
             commentDetail.setDetailObject((Comment) initalInput);
         } else if (initalInput instanceof Review) {
             reviewDetail = new ReviewDetail(parent, parent.getStyle());
-            reviewDetail.fillContents((Review) initalInput);
+            reviewDetail.setDetailObject((Review) initalInput);
         } else {
             clearParent();
         }
@@ -88,7 +88,7 @@ public class DetailView extends AbstractReviewDataView {
                     reviewDetail = new ReviewDetail(this.parent, this.parent.getStyle());
                     parent.layout(true);
                 }
-                reviewDetail.fillContents((Review) reviewData);
+                reviewDetail.setDetailObject((Review) reviewData);
             }
         }
     }

@@ -14,7 +14,7 @@ import org.agilereview.core.external.preferences.AgileReviewPreferences;
  * Advanced property access point for comments which provides further functionality
  * @author Malte Brunnlieb (28.04.2012)
  */
-public class CommentProperties {
+public class CommentReviewProperties {
     
     /**
      * Properties value: comment status
@@ -24,13 +24,17 @@ public class CommentProperties {
      * Properties value: comment properties
      */
     private String[] commentPriorities;
+    /**
+     * Properties value: review status
+     */
+    private String[] reviewStates;
     
     /**
-     * Creates a new {@link CommentProperties} instance
+     * Creates a new {@link CommentReviewProperties} instance
      * 
      * @author Malte Brunnlieb (28.04.2012)
      */
-    public CommentProperties() {
+    public CommentReviewProperties() {
         loadProperties();
     }
     
@@ -44,6 +48,8 @@ public class CommentProperties {
         commentStates = value.split(",");
         value = pref.get(AgileReviewPreferences.COMMENT_PRIORITIES);
         commentPriorities = value.split(",");
+        value = pref.get(AgileReviewPreferences.REVIEW_STATUS);
+        reviewStates = value.split(",");
     }
     
     /**
@@ -51,10 +57,10 @@ public class CommentProperties {
      * @param ID for the requested Comment status
      * @return the String according to the given ID
      */
-    public String getStatusByID(int ID) {
+    public String getCommentStatusByID(int ID) {
         String status = "Status not found!";
         if (ID < 0 || ID >= this.commentStates.length) {
-            throw new RuntimeException(ID + " no valid StatusID!");
+            throw new RuntimeException(ID + " no valid comment StatusID!");
         } else {
             status = this.commentStates[ID];
         }
@@ -66,7 +72,7 @@ public class CommentProperties {
      * @return array containing all possibilities for statuses
      * @author Thilo Rauch (26.11.2012)
      */
-    public String[] getStatuses() {
+    public String[] getCommentStatuses() {
         return this.commentStates;
     }
     
@@ -75,10 +81,10 @@ public class CommentProperties {
      * @param ID for the requested Comment priority
      * @return the String according to the given ID
      */
-    public String getPriorityByID(int ID) {
+    public String getCommentPriorityByID(int ID) {
         String prio = "Priority not found!";
         if (ID < 0 || ID >= this.commentPriorities.length) {
-            throw new RuntimeException(ID + " is no valid Priorities-ID!");
+            throw new RuntimeException(ID + " is no valid comment Priorities-ID!");
         } else {
             prio = this.commentPriorities[ID];
         }
@@ -90,7 +96,31 @@ public class CommentProperties {
      * @return array containing all possibilities for priorities
      * @author Thilo Rauch (26.11.2012)
      */
-    public String[] getPriorities() {
+    public String[] getCommentPriorities() {
         return this.commentPriorities;
+    }
+    
+    /**
+     * Returns a Comment status value defined in the properties according to its id
+     * @param ID for the requested Comment status
+     * @return the String according to the given ID
+     */
+    public String getReviewStatusByID(int ID) {
+        String status = "Status not found!";
+        if (ID < 0 || ID >= this.reviewStates.length) {
+            throw new RuntimeException(ID + " no valid review StatusID!");
+        } else {
+            status = this.reviewStates[ID];
+        }
+        return status;
+    }
+    
+    /**
+     * Returns all possibilities for review statuses
+     * @return array containing all possibilities for statuses
+     * @author Thilo Rauch (26.11.2012)
+     */
+    public String[] getReviewStatuses() {
+        return this.reviewStates;
     }
 }

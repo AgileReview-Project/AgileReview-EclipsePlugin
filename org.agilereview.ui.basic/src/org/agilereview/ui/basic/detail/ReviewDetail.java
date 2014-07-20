@@ -8,14 +8,12 @@
 package org.agilereview.ui.basic.detail;
 
 import java.awt.Desktop;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.net.URI;
-import java.util.HashSet;
 
 import org.agilereview.core.external.storage.Review;
 import org.agilereview.ui.basic.Activator;
 import org.agilereview.ui.basic.Activator.ISharedImages;
+import org.agilereview.ui.basic.tools.CommentReviewProperties;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.StyledText;
@@ -26,26 +24,26 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Sash;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.PlatformUI;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * 
  * @author Thilo Rauch (18.05.2014)
  */
-public class ReviewDetail extends Composite implements SelectionListener, PropertyChangeListener {
+public class ReviewDetail extends AbstractDetail<Review> implements SelectionListener {
     /**
      * TextArea to edit the person in charge of the given Review
      */
-    private Text authorInstance;
+    private Text responsibilityText;
     /**
      * Label to show the Review Name
      */
-    private Text reviewInstance;
+    private Text reviewNameText;
     /**
      * ComboBox to provide a choice for the Review status
      */
@@ -62,15 +60,18 @@ public class ReviewDetail extends Composite implements SelectionListener, Proper
      * Button for opening the external reference in a browser
      */
     private Button referenceButton;
-    /**
-     * The review that is shown. Keep it removing this instance as {@link PropertyChangeListener} when input is changed.
-     */
-    private Review review;
     
-    /**
-     * This set represents all components which should adapt the composite background color TODO: do this a better way?
-     */
-    private final HashSet<Control> bgComponents = new HashSet<Control>();
+    private static final Logger LOG = LoggerFactory.getLogger(ReviewDetail.class);
+    
+    //    /**
+    //     * The review that is shown. Keep it removing this instance as {@link PropertyChangeListener} when input is changed.
+    //     */
+    //    private Review review;
+    //    
+    //    /**
+    //     * This set represents all components which should adapt the composite background color TODO: do this a better way?
+    //     */
+    //    private final HashSet<Control> bgComponents = new HashSet<Control>();
     
     /**
      * Creates a new ReviewDetail Composite onto the given parent with the specified SWT styles
@@ -79,7 +80,6 @@ public class ReviewDetail extends Composite implements SelectionListener, Proper
      */
     protected ReviewDetail(Composite parent, int style) {
         super(parent, style);
-        initUI();
     }
     
     /**
@@ -94,19 +94,19 @@ public class ReviewDetail extends Composite implements SelectionListener, Proper
         
         Label review = new Label(this, SWT.PUSH);
         review.setText("Review: ");
-        this.bgComponents.add(review);
+        //        this.bgComponents.add(review);
         
-        this.reviewInstance = new Text(this, SWT.WRAP);
+        this.reviewNameText = new Text(this, SWT.WRAP);
         GridData gridData = new GridData();
         gridData.horizontalAlignment = GridData.FILL;
         gridData.horizontalSpan = numColumns - 1;
-        this.reviewInstance.setLayoutData(gridData);
-        this.reviewInstance.setEditable(false);
-        this.bgComponents.add(this.reviewInstance);
+        this.reviewNameText.setLayoutData(gridData);
+        this.reviewNameText.setEditable(false);
+        //        this.bgComponents.add(this.reviewInstance);
         
         Label refId = new Label(this, SWT.PUSH);
         refId.setText("External reference: ");
-        this.bgComponents.add(refId);
+        //        this.bgComponents.add(refId);
         
         this.reference = new Text(this, SWT.BORDER | SWT.SINGLE);
         gridData = new GridData();
@@ -114,8 +114,7 @@ public class ReviewDetail extends Composite implements SelectionListener, Proper
         gridData.grabExcessHorizontalSpace = true;
         gridData.horizontalSpan = numColumns - 2;
         this.reference.setLayoutData(gridData);
-        // TODO: Source Provider
-        //        reference.addFocusListener(this);
+        this.reference.addFocusListener(this);
         
         this.referenceButton = new Button(this, SWT.PUSH);
         this.referenceButton.setImage(Activator.getDefault().getImageRegistry().get(ISharedImages.BROWSE_WORLD));
@@ -124,34 +123,30 @@ public class ReviewDetail extends Composite implements SelectionListener, Proper
         this.referenceButton.setLayoutData(gridData);
         this.referenceButton.addSelectionListener(this);
         this.referenceButton.setToolTipText("Interpret \"External reference\" as URI and open it");
-        this.bgComponents.add(this.referenceButton);
+        //        this.bgComponents.add(this.referenceButton);
         
         Label author = new Label(this, SWT.PUSH);
         author.setText("Responsibility: ");
-        this.bgComponents.add(author);
+        //        this.bgComponents.add(author);
         
-        this.authorInstance = new Text(this, SWT.BORDER | SWT.SINGLE | SWT.WRAP);
+        this.responsibilityText = new Text(this, SWT.BORDER | SWT.SINGLE | SWT.WRAP);
         gridData = new GridData();
         gridData.horizontalAlignment = GridData.FILL;
         gridData.horizontalSpan = numColumns - 1;
-        this.authorInstance.setLayoutData(gridData);
-        // TODO: Source Provider
-        //        authorInstance.addFocusListener(this);
-        //        authorInstance.addModifyListener(this);
+        this.responsibilityText.setLayoutData(gridData);
+        this.responsibilityText.addFocusListener(this);
         
         Label status = new Label(this, SWT.PUSH);
         status.setText("Status: ");
-        this.bgComponents.add(status);
+        //        this.bgComponents.add(status);
         
         this.statusDropDown = new Combo(this, SWT.DROP_DOWN | SWT.BORDER | SWT.PUSH);
         gridData = new GridData();
         gridData.horizontalAlignment = GridData.FILL;
         gridData.horizontalSpan = numColumns - 1;
         this.statusDropDown.setLayoutData(gridData);
-        // TODO: Source Provider
-        //        statusDropDown.addFocusListener(this);
-        //        statusDropDown.addModifyListener(this);
-        this.bgComponents.add(this.statusDropDown);
+        this.statusDropDown.addFocusListener(this);
+        //        this.bgComponents.add(this.statusDropDown);
         
         Sash sash = new Sash(this, SWT.PUSH);
         sash.setVisible(false);
@@ -162,16 +157,15 @@ public class ReviewDetail extends Composite implements SelectionListener, Proper
         gridData.horizontalSpan = numColumns;
         caption.setLayoutData(gridData);
         caption.setText("Description:");
-        this.bgComponents.add(caption);
+        //        this.bgComponents.add(caption);
         
         this.txt = new StyledText(this, SWT.PUSH | SWT.V_SCROLL | SWT.BORDER);
         this.txt.setVisible(true);
         this.txt.setWordWrap(true);
         this.txt.setEditable(true);
         this.txt.setEnabled(true);
-        // TODO: Source Provider
-        //        txt.addFocusListener(this);
-        //        txt.addModifyListener(this);
+        this.txt.addFocusListener(this);
+        
         gridData = new GridData();
         gridData.horizontalAlignment = GridData.FILL;
         gridData.verticalAlignment = GridData.FILL;
@@ -181,36 +175,66 @@ public class ReviewDetail extends Composite implements SelectionListener, Proper
         gridData.grabExcessHorizontalSpace = true;
         this.txt.setLayoutData(gridData);
         
-        // TODO: What was that for?
-        //        setPropertyConfigurations();
+        setPropertyConfigurations();
     }
     
-    //    /*
-    //     * (non-Javadoc)
-    //     * @see de.tukl.cs.softech.agilereview.view.detail.AbstractDetail#saveChanges()
-    //     */
-    //    @Override
-    //    protected boolean saveChanges() {
-    //        boolean result = false;
-    //        String newStr;
-    //        if (!(newStr = this.authorInstance.getText().trim()).equals(this.editedObject.getPersonInCharge().getName())) {
-    //            this.editedObject.getPersonInCharge().setName(newStr);
-    //            result = true;
-    //        }
-    //        if (!(newStr = this.reference.getText().trim()).equals(this.editedObject.getReferenceId())) {
-    //            this.editedObject.setReferenceId(newStr);
-    //            result = true;
-    //        }
-    //        if (this.statusDropDown.getSelectionIndex() != this.editedObject.getStatus()) {
-    //            this.editedObject.setStatus(this.statusDropDown.getSelectionIndex());
-    //            result = true;
-    //        }
-    //        if (!(newStr = this.txt.getText().trim()).equals(this.editedObject.getDescription())) {
-    //            this.editedObject.setDescription(super.convertLineBreaks(newStr));
-    //            result = true;
-    //        }
-    //        return result;
-    //    }
+    /**
+     * Sets the levels for the status and priority configuration of a comment.
+     */
+    private void setPropertyConfigurations() {
+        CommentReviewProperties commentReviewProps = new CommentReviewProperties();
+        String[] levels = commentReviewProps.getReviewStatuses();
+        statusDropDown.removeAll();
+        for (int i = 0; i < levels.length; i++) {
+            statusDropDown.add(levels[i]);
+        }
+    }
+    
+    /* (non-Javadoc)
+     * @see org.agilereview.ui.basic.detail.AbstractDetail#fillContents()
+     * @author Thilo Rauch (20.07.2014)
+     */
+    @Override
+    protected void fillContents() {
+        Review review = this.getDetailObject();
+        if (review != null) {
+            updateUiData(review);
+        }
+    }
+    
+    // TODO: Only extra method for background changes (later)
+    private void updateUiData(Review review) {
+        if (isDisposed()) return;
+        this.reference.setText(review.getReference());
+        this.responsibilityText.setText(review.getResponsibility());
+        this.responsibilityText.setToolTipText(review.getResponsibility());
+        this.reviewNameText.setText(review.getName());
+        this.reviewNameText.setToolTipText(review.getName());
+        
+        if (review.getDescription() != null) {
+            this.txt.setText(review.getDescription());
+        } else {
+            this.txt.setText("");
+        }
+        this.statusDropDown.select(review.getStatus());
+    }
+    
+    /* (non-Javadoc)
+     * @see org.agilereview.ui.basic.detail.AbstractDetail#saveChanges()
+     * @author Thilo Rauch (20.07.2014)
+     */
+    @Override
+    protected void saveChanges() {
+        // Save author
+        if (isDisposed()) return;
+        this.getDetailObject().setResponsibility(this.responsibilityText.getText());
+        // Save Reference
+        this.getDetailObject().setReference(this.reference.getText());
+        // Save status
+        this.getDetailObject().setStatus(this.statusDropDown.getSelectionIndex());
+        // Save text
+        this.getDetailObject().setDescription(this.txt.getText());
+    }
     
     /*
      * (non-Javadoc)
@@ -224,62 +248,27 @@ public class ReviewDetail extends Composite implements SelectionListener, Proper
             return false;
     }
     
-    //    /**
-    //     * Sets the levels for the status and priority configuration of a comment.
+    //    /*
+    //     * (non-Javadoc)
+    //     * @see de.tukl.cs.softech.agilereview.view.detail.AbstractDetail#fillContents(java.lang.Object)
     //     */
-    //    private void setPropertyConfigurations() {
-    //        PropertiesManager pm = PropertiesManager.getInstance();
-    //        String value = pm.getInternalProperty(PropertiesManager.INTERNAL_KEYS.REVIEW_STATUS);
-    //        String[] levels = value.split(",");
-    //        statusDropDown.removeAll();
-    //        for (int i = 0; i < levels.length; i++) {
-    //            statusDropDown.add(levels[i]);
+    //    protected void fillContents(Review review) {
+    //        if (review != null) {
+    //            // TODO: What was that for?
+    //            //            this.backupObject = (Review) review.copy();
+    //            //            this.editedObject = review;
+    //            
+    //            if (this.review != null) {
+    //                this.review.removePropertyChangeListener(this);
+    //            }
+    //            this.review = review;
+    //            
+    //            updateUiData(review);
+    //            
+    //            review.addPropertyChangeListener(this);
     //        }
+    //        
     //    }
-    
-    /*
-     * (non-Javadoc)
-     * @see de.tukl.cs.softech.agilereview.view.detail.AbstractDetail#fillContents(java.lang.Object)
-     */
-    protected void fillContents(Review review) {
-        if (review != null) {
-            // TODO: What was that for?
-            //            this.backupObject = (Review) review.copy();
-            //            this.editedObject = review;
-            
-            if (this.review != null) {
-                this.review.removePropertyChangeListener(this);
-            }
-            this.review = review;
-            
-            updateUiData(review);
-            
-            review.addPropertyChangeListener(this);
-        }
-        // TODO: What was that for?
-        //        //set revertable to false because it was set from the ModificationListener while inserting inital content
-        //        ISourceProviderService isps = (ISourceProviderService) PlatformUI.getWorkbench().getActiveWorkbenchWindow().getService(
-        //                ISourceProviderService.class);
-        //        SourceProvider sp = (SourceProvider) isps.getSourceProvider(SourceProvider.REVERTABLE);
-        //        sp.setVariable(SourceProvider.REVERTABLE, false);
-    }
-    
-    private void updateUiData(Review review) {
-        if (isDisposed()) return;
-        
-        this.reference.setText(review.getReference());
-        this.authorInstance.setText(review.getResponsibility());
-        this.authorInstance.setToolTipText(review.getResponsibility());
-        this.reviewInstance.setText(review.getName());
-        this.reviewInstance.setToolTipText(review.getName());
-        
-        if (review.getDescription() != null) {
-            this.txt.setText(review.getDescription());
-        } else {
-            this.txt.setText("");
-        }
-        this.statusDropDown.select(review.getStatus());
-    }
     
     @Override
     public void widgetSelected(SelectionEvent e) {
@@ -290,15 +279,12 @@ public class ReviewDetail extends Composite implements SelectionListener, Proper
                     Desktop.getDesktop().browse(uri);
                 }
             } else {
-                // TODO Do some Logging
-                // PluginLogger.logWarning(this.getClass().toString(), "widgetSelected", "\"java.awt.Desktop\" not supported by OS");
+                LOG.warn("Show Reference in browser requested, but \"java.awt.Desktop\" not supported by OS.");
                 MessageDialog.openWarning(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(), "Not supported",
                         "Your operating system does not support this functionality.");
             }
         } catch (Exception ex) {
-            // TODO: DO some logging?
-            //            PluginLogger.logError(this.getClass().toString(), "widgetSelected", "Can not open \"" + this.reference.getText()
-            //                    + "\": It may not be a valid URI", ex);
+            LOG.warn("Can not open reference {}: It may not be a valid URI", this.reference.getText(), ex);
             MessageDialog.openError(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(), "Invalid URI",
                     "External Reference is an unvalid URI:\n" + ex.getLocalizedMessage());
         }
@@ -309,21 +295,22 @@ public class ReviewDetail extends Composite implements SelectionListener, Proper
         widgetSelected(e);
     }
     
-    /* (non-Javadoc)
-     * @see java.beans.PropertyChangeListener#propertyChange(java.beans.PropertyChangeEvent)
-     * @author Peter Reuter (14.06.2014)
-     */
-    @Override
-    public void propertyChange(PropertyChangeEvent arg0) {
-        Display.getDefault().asyncExec(new Runnable() {
-            
-            @Override
-            public void run() {
-                updateUiData(ReviewDetail.this.review);
-            }
-            
-        });
-    }
+    // TODO: Refresh background changes for Findbugs-Integration
+    //    /* (non-Javadoc)
+    //     * @see java.beans.PropertyChangeListener#propertyChange(java.beans.PropertyChangeEvent)
+    //     * @author Peter Reuter (14.06.2014)
+    //     */
+    //    @Override
+    //    public void propertyChange(PropertyChangeEvent arg0) {
+    //        Display.getDefault().asyncExec(new Runnable() {
+    //            
+    //            @Override
+    //            public void run() {
+    //                updateUiData(ReviewDetail.this.review);
+    //            }
+    //            
+    //        });
+    //    }
     
     // TODO: Implement different colors
     //    @Override

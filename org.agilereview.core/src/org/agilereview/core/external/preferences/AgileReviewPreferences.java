@@ -29,6 +29,10 @@ public interface AgileReviewPreferences {
      */
     public static final String COMMENT_PRIORITIES = "org.agilereview.preferences.comment_priorities";
     /**
+     * Comma separated list of review status
+     */
+    public static final String REVIEW_STATUS = "org.agilereview.preferences.review_status";
+    /**
      * id of the currently active review
      */
     public static final String ACTIVE_REVIEW_ID = "org.agilereview.preferences.active_review_id";

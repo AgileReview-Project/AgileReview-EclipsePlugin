@@ -15,7 +15,7 @@ import java.util.List;
 import org.agilereview.core.external.storage.Comment;
 import org.agilereview.core.external.storage.ICommentFilter;
 import org.agilereview.ui.basic.commentSummary.table.Column;
-import org.agilereview.ui.basic.tools.CommentProperties;
+import org.agilereview.ui.basic.tools.CommentReviewProperties;
 
 /**
  * Filters comments by a given search keyword (and a given column)
@@ -34,7 +34,7 @@ public class SearchFilter {
     /**
      * Property access point for comments
      */
-    private final CommentProperties commentProperties;
+    private final CommentReviewProperties commentProperties;
     
     /**
      * Constructor of the filter, used to set initial restrictions on category
@@ -47,7 +47,7 @@ public class SearchFilter {
         } else {
             this.restriction = restriction;
         }
-        commentProperties = new CommentProperties();
+        commentProperties = new CommentReviewProperties();
     }
     
     /**
@@ -134,7 +134,7 @@ public class SearchFilter {
             filter.add(new ICommentFilter() {
                 @Override
                 public boolean accept(Comment comment) {
-                    return commentProperties.getPriorityByID(comment.getPriority()).contains(searchString);
+                    return commentProperties.getCommentPriorityByID(comment.getPriority()).contains(searchString);
                 }
             });
             if (!matchAll) break;
@@ -158,7 +158,7 @@ public class SearchFilter {
             filter.add(new ICommentFilter() {
                 @Override
                 public boolean accept(Comment comment) {
-                    return commentProperties.getStatusByID(comment.getStatus()).contains(searchString);
+                    return commentProperties.getCommentStatusByID(comment.getStatus()).contains(searchString);
                 }
             });
             if (!matchAll) break;

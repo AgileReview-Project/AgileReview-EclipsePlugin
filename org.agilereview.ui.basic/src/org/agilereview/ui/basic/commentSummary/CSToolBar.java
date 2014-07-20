@@ -13,7 +13,7 @@ import java.util.List;
 
 import org.agilereview.ui.basic.commentSummary.control.FilterController;
 import org.agilereview.ui.basic.commentSummary.table.Column;
-import org.agilereview.ui.basic.tools.CommentProperties;
+import org.agilereview.ui.basic.tools.CommentReviewProperties;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -89,7 +89,7 @@ public class CSToolBar extends Composite {
         sash.setLayoutData(gd);
         
         onlyOpenCommentsCheckbox = new Button(this, SWT.CHECK);
-        String statusStr = new CommentProperties().getStatusByID(0);
+        String statusStr = new CommentReviewProperties().getCommentStatusByID(0);
         onlyOpenCommentsCheckbox.setText("Only show " + statusStr + " comments");
         onlyOpenCommentsCheckbox.setToolTipText("Show only " + statusStr + " comments");
         onlyOpenCommentsCheckbox.setData("org.eclipse.swtbot.widget.key", "csOnlyOpenCommentsCheckbox");

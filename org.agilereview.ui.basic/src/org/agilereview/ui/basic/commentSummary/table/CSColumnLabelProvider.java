@@ -11,7 +11,7 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 
 import org.agilereview.core.external.storage.Comment;
-import org.agilereview.ui.basic.tools.CommentProperties;
+import org.agilereview.ui.basic.tools.CommentReviewProperties;
 import org.eclipse.jface.viewers.ColumnLabelProvider;
 
 /**
@@ -26,9 +26,9 @@ public class CSColumnLabelProvider extends ColumnLabelProvider {
      */
     private final Column column;
     /**
-     * {@link CommentProperties} which will be instantiated if needed in the constructor
+     * {@link CommentReviewProperties} which will be instantiated if needed in the constructor
      */
-    private CommentProperties commentProperties;
+    private CommentReviewProperties commentProperties;
     
     /**
      * Creates a new {@link ColumnLabelProvider} for the specified {@link Column}
@@ -38,7 +38,7 @@ public class CSColumnLabelProvider extends ColumnLabelProvider {
     public CSColumnLabelProvider(Column column) {
         this.column = column;
         if (column == Column.STATUS || column == Column.PRIORITY) {
-            commentProperties = new CommentProperties();
+            commentProperties = new CommentReviewProperties();
         }
     }
     
@@ -64,11 +64,11 @@ public class CSColumnLabelProvider extends ColumnLabelProvider {
             return c.getRecipient();
         case STATUS:
             c = (Comment) element;
-            String status = commentProperties.getStatusByID(c.getStatus());
+            String status = commentProperties.getCommentStatusByID(c.getStatus());
             return status;
         case PRIORITY:
             c = (Comment) element;
-            String prio = commentProperties.getPriorityByID(c.getPriority());
+            String prio = commentProperties.getCommentPriorityByID(c.getPriority());
             return prio;
         case DATE_CREATED:
             c = (Comment) element;

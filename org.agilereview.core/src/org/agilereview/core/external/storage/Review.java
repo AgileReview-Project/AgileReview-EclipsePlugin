@@ -133,6 +133,7 @@ public class Review implements PropertyChangeListener, IPreferenceChangeListener
      */
     public void setName(String name) {
         String oldValue = this.name;
+        if (oldValue.equals(name)) return;
         this.name = name;
         propertyChangeSupport.firePropertyChange(PropertyChangeEventKeys.REVIEW_NAME, oldValue, this.name);
     }
@@ -149,6 +150,7 @@ public class Review implements PropertyChangeListener, IPreferenceChangeListener
      */
     public void setStatus(int status) {
         int oldValue = this.status;
+        if (oldValue == status) return;
         this.status = status;
         propertyChangeSupport.firePropertyChange(PropertyChangeEventKeys.REVIEW_STATUS, oldValue, this.status);
     }
@@ -165,6 +167,7 @@ public class Review implements PropertyChangeListener, IPreferenceChangeListener
      */
     public void setReference(String reference) {
         String oldValue = this.reference;
+        if (oldValue.equals(reference)) return;
         this.reference = reference;
         propertyChangeSupport.firePropertyChange(PropertyChangeEventKeys.REVIEW_REFERENCE, oldValue, this.reference);
     }
@@ -181,6 +184,7 @@ public class Review implements PropertyChangeListener, IPreferenceChangeListener
      */
     public void setResponsibility(String responsibility) {
         String oldValue = this.responsibility;
+        if (oldValue.equals(responsibility)) return;
         this.responsibility = responsibility;
         propertyChangeSupport.firePropertyChange(PropertyChangeEventKeys.REVIEW_RESPONSIBILITY, oldValue, this.responsibility);
     }
@@ -333,6 +337,7 @@ public class Review implements PropertyChangeListener, IPreferenceChangeListener
      */
     public void setDescription(String description) {
         String oldValue = this.description;
+        if (oldValue.equals(description)) return;
         this.description = description;
         propertyChangeSupport.firePropertyChange(PropertyChangeEventKeys.REVIEW_DESCRIPTION, oldValue, this.description);
     }
