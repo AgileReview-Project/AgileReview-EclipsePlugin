@@ -14,9 +14,9 @@
 		<tycho-extras.version>0.20.0</tycho-extras.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<tycho-repo.url>https://oss.sonatype.org/content/groups/public/</tycho-repo.url>
-                <maven.compiler.source>1.7</maven.compiler.source>
-                <maven.compiler.target>1.7</maven.compiler.target>
-        </properties>
+    <maven.compiler.source>1.7</maven.compiler.source>
+    <maven.compiler.target>1.7</maven.compiler.target>
+  </properties>
 
 	<modules>
 		<module>org.agilereview.common</module>
@@ -216,7 +216,7 @@
 						<compilerArguments>
 							<inlineJSR />
 							<enableJavadoc />
-							<encoding>ISO-8859-1</encoding>
+							<encoding>${project.build.sourceEncoding}</encoding>
 						</compilerArguments>
 					</configuration>
 				</plugin>
