@@ -195,9 +195,12 @@ public class Comment implements PropertyChangeListener {
      */
     public void setRecipient(String recipient) {
         String oldValue = this.recipient;
-        this.recipient = recipient;
-        resetModificationDate();
-        propertyChangeSupport.firePropertyChange(PropertyChangeEventKeys.COMMENT_RECIPIENT, oldValue, this.recipient);
+        // Check whether there was a real change
+        if (!oldValue.equals(recipient)) {
+            this.recipient = recipient;
+            resetModificationDate();
+            propertyChangeSupport.firePropertyChange(PropertyChangeEventKeys.COMMENT_RECIPIENT, oldValue, this.recipient);
+        }
     }
     
     /**
@@ -212,9 +215,12 @@ public class Comment implements PropertyChangeListener {
      */
     public void setStatus(int status) {
         int oldValue = this.status;
-        this.status = status;
-        resetModificationDate();
-        propertyChangeSupport.firePropertyChange(PropertyChangeEventKeys.COMMENT_STATUS, oldValue, this.status);
+        // Check whether there was a real change
+        if (oldValue != status) {
+            this.status = status;
+            resetModificationDate();
+            propertyChangeSupport.firePropertyChange(PropertyChangeEventKeys.COMMENT_STATUS, oldValue, this.status);
+        }
     }
     
     /**
@@ -229,9 +235,12 @@ public class Comment implements PropertyChangeListener {
      */
     public void setPriority(int priority) {
         int oldValue = this.priority;
-        this.priority = priority;
-        resetModificationDate();
-        propertyChangeSupport.firePropertyChange(PropertyChangeEventKeys.COMMENT_PRIORITY, oldValue, this.priority);
+        // Check whether there was a real change
+        if (oldValue != priority) {
+            this.priority = priority;
+            resetModificationDate();
+            propertyChangeSupport.firePropertyChange(PropertyChangeEventKeys.COMMENT_PRIORITY, oldValue, this.priority);
+        }
     }
     
     /**
@@ -246,9 +255,12 @@ public class Comment implements PropertyChangeListener {
      */
     public void setText(String text) {
         String oldValue = this.text;
-        this.text = text;
-        resetModificationDate();
-        propertyChangeSupport.firePropertyChange(PropertyChangeEventKeys.COMMENT_TEXT, oldValue, this.text);
+        // Check whether there was a real change
+        if (!oldValue.equals(text)) {
+            this.text = text;
+            resetModificationDate();
+            propertyChangeSupport.firePropertyChange(PropertyChangeEventKeys.COMMENT_TEXT, oldValue, this.text);
+        }
     }
     
     /**

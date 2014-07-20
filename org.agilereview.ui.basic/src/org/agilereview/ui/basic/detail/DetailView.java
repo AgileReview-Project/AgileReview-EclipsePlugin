@@ -51,7 +51,7 @@ public class DetailView extends AbstractReviewDataView {
     protected void buildUI(Composite parent, Object initalInput) {
         if (initalInput instanceof Comment) {
             commentDetail = new CommentDetail(parent, parent.getStyle());
-            commentDetail.fillContents((Comment) initalInput);
+            commentDetail.setDetailObject((Comment) initalInput);
         } else if (initalInput instanceof Review) {
             reviewDetail = new ReviewDetail(parent, parent.getStyle());
             reviewDetail.fillContents((Review) initalInput);
@@ -78,7 +78,7 @@ public class DetailView extends AbstractReviewDataView {
                     commentDetail = new CommentDetail(this.parent, this.parent.getStyle());
                     parent.layout(true);
                 }
-                commentDetail.fillContents((Comment) reviewData);
+                commentDetail.setDetailObject((Comment) reviewData);
             } else if (reviewData instanceof Review) {
                 if (commentDetail != null) {
                     commentDetail.dispose();

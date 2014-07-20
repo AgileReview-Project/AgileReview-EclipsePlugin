@@ -108,7 +108,7 @@ public class CommentSummaryView extends AbstractReviewDataView {
      */
     @Override
     protected void refreshInput(Object reviewData) {
-        if (reviewData != null && reviewData instanceof ReviewSet && this.viewer != null) {
+        if (reviewData != null && reviewData instanceof ReviewSet && this.viewer != null && !this.viewer.getControl().isDisposed()) {
             this.viewer.setInput(reviewData);
             if (this.filterController == null) {
                 this.filterController = new FilterController(this.toolBar);

@@ -9,7 +9,6 @@ package org.agilereview.ui.basic.detail;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.HashSet;
 import java.util.List;
 
 import org.agilereview.core.external.storage.Comment;
@@ -26,7 +25,6 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Sash;
@@ -35,7 +33,7 @@ import org.eclipse.swt.widgets.Text;
 /**
  * The CommentDetail class describes one detail representation of a Comment Object
  */
-public class CommentDetail extends Composite {
+public class CommentDetail extends AbstractDetail<Comment> {
     
     /**
      * Text to show the comment tag of the shown Comment
@@ -70,15 +68,10 @@ public class CommentDetail extends Composite {
      */
     private ScrolledComposite replyScrolledWrapper;
     
-    /**
-     * This set represents all components which should adapt the composite background color TODO: do this a better way?
-     */
-    private HashSet<Control> bgComponents = new HashSet<Control>();
-    
-    /**
-     * TODO: javadoc + mit Malte reden ob das so gut ist
-     */
-    private CommentProperties commentProperties = new CommentProperties();
+    //    /**
+    //     * This set represents all components which should adapt the composite background color TODO: do this a better way?
+    //     */
+    //    private HashSet<Control> bgComponents = new HashSet<Control>();
     
     /**
      * Creates the CommentDetail Composite and creates the initial UI
@@ -87,7 +80,6 @@ public class CommentDetail extends Composite {
      */
     protected CommentDetail(Composite parent, int style) {
         super(parent, style);
-        initUI();
     }
     
     /**
@@ -102,7 +94,7 @@ public class CommentDetail extends Composite {
         
         Label tagID = new Label(this, SWT.NONE);
         tagID.setText("Tag-ID: ");
-        bgComponents.add(tagID);
+        //        bgComponents.add(tagID);
         
         tagInstance = new Text(this, SWT.WRAP);
         GridData gridData = new GridData();
@@ -110,11 +102,11 @@ public class CommentDetail extends Composite {
         gridData.horizontalSpan = numColumns - 1;
         tagInstance.setEditable(false);
         tagInstance.setLayoutData(gridData);
-        bgComponents.add(tagInstance);
+        //        bgComponents.add(tagInstance);
         
         Label author = new Label(this, SWT.PUSH);
         author.setText("Author: ");
-        bgComponents.add(author);
+        //        bgComponents.add(author);
         
         authorInstance = new Text(this, SWT.WRAP);
         gridData = new GridData();
@@ -122,48 +114,42 @@ public class CommentDetail extends Composite {
         gridData.horizontalSpan = numColumns - 1;
         authorInstance.setEditable(false);
         authorInstance.setLayoutData(gridData);
-        bgComponents.add(authorInstance);
+        //        bgComponents.add(authorInstance);
         
         Label status = new Label(this, SWT.PUSH);
         status.setText("Status: ");
-        bgComponents.add(status);
+        //        bgComponents.add(status);
         
         statusDropDown = new Combo(this, SWT.DROP_DOWN | SWT.BORDER | SWT.PUSH);
         gridData = new GridData();
         gridData.horizontalAlignment = GridData.FILL;
         gridData.horizontalSpan = numColumns - 1;
         statusDropDown.setLayoutData(gridData);
-        // TODO Sourceprovider
-        //        statusDropDown.addFocusListener(this);
-        //        statusDropDown.addModifyListener(this);
-        bgComponents.add(statusDropDown);
+        statusDropDown.addFocusListener(this);
+        //        bgComponents.add(statusDropDown);
         
         Label priority = new Label(this, SWT.PUSH);
         priority.setText("Priority: ");
-        bgComponents.add(priority);
+        //        bgComponents.add(priority);
         
         priorityDropDown = new Combo(this, SWT.DROP_DOWN | SWT.BORDER | SWT.PUSH);
         gridData = new GridData();
         gridData.horizontalAlignment = GridData.FILL;
         gridData.horizontalSpan = numColumns - 1;
         priorityDropDown.setLayoutData(gridData);
-        // TODO Sourceprovider
-        //        priorityDropDown.addFocusListener(this);
-        //        priorityDropDown.addModifyListener(this);
-        bgComponents.add(priorityDropDown);
+        priorityDropDown.addFocusListener(this);
+        //        bgComponents.add(priorityDropDown);
         
         Label recipient = new Label(this, SWT.PUSH);
         recipient.setText("Recipient: ");
-        bgComponents.add(recipient);
+        //        bgComponents.add(recipient);
         
         recipientText = new Text(this, SWT.BORDER | SWT.SINGLE | SWT.WRAP);
         gridData = new GridData();
         gridData.horizontalAlignment = GridData.FILL;
         gridData.horizontalSpan = numColumns - 1;
         recipientText.setLayoutData(gridData);
-        // TODO Sourceprovider
-        //        recipientText.addFocusListener(this);
-        //        recipientText.addModifyListener(this);
+        recipientText.addFocusListener(this);
         
         Sash sash = new Sash(this, SWT.PUSH);
         sash.setVisible(false);
@@ -174,7 +160,7 @@ public class CommentDetail extends Composite {
         gridData.horizontalSpan = numColumns;
         caption.setLayoutData(gridData);
         caption.setText("Description / Replys:");
-        bgComponents.add(caption);
+        //        bgComponents.add(caption);
         
         SashForm sashArea = new SashForm(this, SWT.VERTICAL);
         gridData = new GridData();
@@ -185,16 +171,14 @@ public class CommentDetail extends Composite {
         gridData.grabExcessVerticalSpace = true;
         gridData.grabExcessHorizontalSpace = true;
         sashArea.setLayoutData(gridData);
-        bgComponents.add(sashArea);
+        //        bgComponents.add(sashArea);
         
         txt = new StyledText(sashArea, SWT.V_SCROLL | SWT.BORDER);
         txt.setVisible(true);
         txt.setWordWrap(true);
         txt.setEditable(true);
         txt.setEnabled(true);
-        // TODO Sourceprovider
-        //        txt.addFocusListener(this);
-        //        txt.addModifyListener(this);
+        txt.addFocusListener(this);
         
         replyScrolledWrapper = new ScrolledComposite(sashArea, SWT.V_SCROLL);
         replyScrolledWrapper.setExpandHorizontal(true);
@@ -316,17 +300,16 @@ public class CommentDetail extends Composite {
     //        }
     //    }
     
-    /**
-     * fills all contents of the given input into the detail view
-     * @param input which should be displayed
+    /*
+     * (non-Javadoc)
+     * @see org.agilereview.ui.basic.detail.AbstractDetail#fillContents()
+     * @author Thilo Rauch (20.07.2014)
      */
-    public void fillContents(Comment comment) {
-        //        if (editedObject != null && backupObject != null) {
-        //            saveChanges();
-        //        }
-        
+    @Override
+    protected void fillContents() {
+        Comment comment = this.getDetailObject();
         if (comment != null) {
-            tagInstance.setText(comment.getId());
+            
             tagInstance.setToolTipText(comment.getId());
             authorInstance.setText(comment.getAuthor());
             authorInstance.setToolTipText(comment.getAuthor());
@@ -360,12 +343,29 @@ public class CommentDetail extends Composite {
             priorityDropDown.select(comment.getPriority());
             statusDropDown.select(comment.getStatus());
         }
-        // TODO SourceProvider
-        //        //set revertable to false because it was set from the ModificationListener while inserting inital content
-        //        ISourceProviderService isps = (ISourceProviderService) PlatformUI.getWorkbench().getActiveWorkbenchWindow().getService(
-        //                ISourceProviderService.class);
-        //        SourceProvider sp = (SourceProvider) isps.getSourceProvider(SourceProvider.REVERTABLE);
-        //        sp.setVariable(SourceProvider.REVERTABLE, false);
+    }
+    
+    //    private Color determineBackgroundColor() {
+    //        //get the backupObject as changes should only have impact on the background when they are saved
+    //        // TODO: do this right
+    //        return null;
+    //        // return ColorManager.getColor(this.backupObject.getAuthor());
+    //    }
+    
+    /* (non-Javadoc)
+     * @see org.agilereview.ui.basic.detail.AbstractDetail#saveChanges()
+     * @author Thilo Rauch (20.07.2014)
+     */
+    @Override
+    protected void saveChanges() {
+        // Save status
+        this.getDetailObject().setStatus(this.statusDropDown.getSelectionIndex());
+        // Save priority
+        this.getDetailObject().setPriority(this.priorityDropDown.getSelectionIndex());
+        // Save recipient
+        this.getDetailObject().setRecipient(this.recipientText.getText());
+        // Save description
+        this.getDetailObject().setText(this.txt.getText());
     }
     
     /*
@@ -379,94 +379,4 @@ public class CommentDetail extends Composite {
         else
             return false;
     }
-    
-    //    /**
-    //     * checks whether changes on the current Comment are made and saves this changes
-    //     * @return true, if changes have been made<br> false, if no changes have been made
-    //     */
-    //    private boolean attributesChanged() {
-    //        boolean result = false;
-    //        
-    //        //extract replies beforehand
-    //        Pattern p = Pattern.compile("([^\\)]*)\\(([^\\)]*)\\):\\n(.*)", Pattern.DOTALL);
-    //        Matcher m;
-    //        ArrayList<String[]> shownReplies = new ArrayList<String[]>();
-    //        Control[] replys = this.replies.getChildren();
-    //        for (Control l : replys) {
-    //            if (l instanceof StyledText) {
-    //                m = p.matcher(((StyledText) l).getText());
-    //                if (m.find()) {
-    //                    shownReplies.add(new String[] { m.group(1).trim(), m.group(2).trim(), convertLineBreaks(m.group(3).trim()) });
-    //                }
-    //            }
-    //        }
-    //        
-    //        String newStr = "";
-    //        //XXX should be changed if someone can delete saved replies:
-    //        //delete and edit of replies not considered in this implementation
-    //        int savedRepliesSize = editedObject.getReplies().getReplyArray().length;
-    //        if (savedRepliesSize != shownReplies.size()) {
-    //            result = true;
-    //            for (int i = savedRepliesSize; i < shownReplies.size(); i++) {
-    //                Reply newReply = editedObject.getReplies().addNewReply();
-    //                newReply.setAuthor(shownReplies.get(i)[0]);
-    //                newReply.setCreationDate(Calendar.getInstance());
-    //                
-    //                XmlCursor cursor = newReply.newCursor();
-    //                cursor.setTextValue(shownReplies.get(i)[2]);
-    //                cursor.dispose();
-    //            }
-    //        }
-    //        
-    //        if (editedObject.getPriority() != this.priorityDropDown.getSelectionIndex()) {
-    //            editedObject.setPriority(this.priorityDropDown.getSelectionIndex());
-    //            PropertiesManager.getPreferences().setValue(PropertiesManager.EXTERNAL_KEYS.LAST_PRIORITY,
-    //                    String.valueOf(this.priorityDropDown.getSelectionIndex()));
-    //            result = true;
-    //        }
-    //        if (editedObject.getStatus() != this.statusDropDown.getSelectionIndex()) {
-    //            editedObject.setStatus(this.statusDropDown.getSelectionIndex());
-    //            result = true;
-    //        }
-    //        if (!(newStr = this.recipientText.getText().trim()).equals(editedObject.getRecipient())) {
-    //            editedObject.setRecipient(this.recipientText.getText().trim());
-    //            PropertiesManager.getPreferences().setValue(PropertiesManager.EXTERNAL_KEYS.LAST_RECIPIENT, recipientText.getText().trim());
-    //            result = true;
-    //        }
-    //        if (!(newStr = super.convertLineBreaks(this.txt.getText().trim())).equals(editedObject.getText())) {
-    //            editedObject.setText(newStr);
-    //            result = true;
-    //        }
-    //        
-    //        return result;
-    //    }
-    //    
-    //    
-    //    /**
-    //     * Generates the comment key for the given comment in the following scheme: reviewID|author|commendID
-    //     * @param comment which comment key should be generated
-    //     * @return comment key
-    //     */
-    //    private String generateCommentKey(Comment comment) {
-    //        String keySeparator = PropertiesManager.getInstance().getInternalProperty(PropertiesManager.INTERNAL_KEYS.KEY_SEPARATOR);
-    //        String commentTag = comment.getReviewID() + keySeparator + comment.getAuthor() + keySeparator + comment.getId();
-    //        return commentTag;
-    //    }
-    
-    //    private Color determineBackgroundColor() {
-    //        //get the backupObject as changes should only have impact on the background when they are saved
-    //        // TODO: do this right
-    //        return null;
-    //        // return ColorManager.getColor(this.backupObject.getAuthor());
-    //    }
-    
-    /**
-     * Converts all line breaks either \n or \r to \r\n line breaks
-     * @param in the string which line breaks should be converted
-     * @return the converted string
-     */
-    private static String convertLineBreaks(String in) {
-        return in.replaceAll("\r\n|\r|\n", System.getProperty("line.separator"));
-    }
-    
 }
