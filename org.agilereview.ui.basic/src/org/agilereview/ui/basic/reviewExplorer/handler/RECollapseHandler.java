@@ -7,6 +7,7 @@
  */
 package org.agilereview.ui.basic.reviewExplorer.handler;
 
+import org.agilereview.common.ui.PlatformUITools;
 import org.agilereview.ui.basic.reviewExplorer.ReviewExplorerView;
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
@@ -14,32 +15,32 @@ import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ITreeSelection;
 import org.eclipse.jface.viewers.TreePath;
-import org.eclipse.ui.handlers.HandlerUtil;
 
 /**
- * This handler takes care of the command for selective collapse of all sub nodes
- * of a given node in the ReviewExplorer (CommandId: org.eclipse.ui.navigate.collapseAll)
+ * This handler takes care of the command for selective collapse of all sub nodes of a given node in the ReviewExplorer (CommandId:
+ * org.eclipse.ui.navigate.collapseAll)
  * @author Thilo Rauch (07.05.2012)
  */
 public class RECollapseHandler extends AbstractHandler {
-
+    
     /* (non-Javadoc)
      * @see org.eclipse.core.commands.IHandler#execute(org.eclipse.core.commands.ExecutionEvent)
      * @author Thilo Rauch (07.05.2012)
      */
     @Override
     public Object execute(ExecutionEvent event) throws ExecutionException {
-        // Evaluate selection
-        ISelection selection = HandlerUtil.getCurrentSelection(event);
-        if(selection != null) {
-            if(selection instanceof ITreeSelection) {
+        // ISelection sel = HandlerUtil.getCurrentSelection(event);
+        // Actually, the code above should be working. But as it sometimes gives the wrong selection in e4, use the line below
+        ISelection selection = PlatformUITools.getActiveWorkbenchPage().getSelection();
+        if (selection != null) {
+            if (selection instanceof ITreeSelection) {
                 // For each selected object, collapse all subnodes
-                for(TreePath p : ((ITreeSelection) selection).getPaths()) {
+                for (TreePath p : ((ITreeSelection) selection).getPaths()) {
                     ReviewExplorerView.getInstance().collapseAllSubNodes(p);
                 }
             }
         }
         return null;
     }
-
+    
 }
