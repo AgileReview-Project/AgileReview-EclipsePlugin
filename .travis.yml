@@ -1,7 +1,7 @@
 language: java
-before_install:
-  - git clone --depth=50 --branch=master https://github.com/AgileReview-Project/AgileReview-CoreLib.git AgileReview-Project/AgileReview-CoreLib
-  - cd AgileReview-Project/AgileReview-CoreLib
-  - mvn install -DskipTests=true
-  - cd ..
-  - cd ..
+install: true
+script: mvn clean install -P uploadSnapshot -s .m2/settings.xml
+env:
+  global:
+  - secure: e3AwTCx5o1PVQv4mlPFW19qeGsWjUNNouxI2mZphG20XAPQ3Pi6kWgtHp8zZsPuJUPZ0uJjVYLsMO8u4c15XB7xOErTrQtivJ/ehNao0TFaGdSr+fVTcZITf0cvP+ZfdOakphoNONoC/q/rtJat1nBNTkyY8d6CIydP5XLULMpE=
+  - secure: VdPactnxx4juU4ZhcoFg4N0egMDK6peckEh5sarcy6jdDLiOSGJ2E2YZoYlhEiz31tFSVphNdlfnx03/HtLbfcNCVU91OiKfRydynlagC3ZOhPyEnnm97bAgpLJ8Esb4VtqNiXVNNkLsmRxeE6Z3PJpaLn8zYLjDZqptUP1DPVc=
