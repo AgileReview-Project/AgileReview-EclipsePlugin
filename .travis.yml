@@ -1,7 +1,11 @@
 language: java
 install: true
-script: mvn clean install -P uploadSnapshot -s .m2/settings.xml
+script:
+    - mvn clean install -P uploadSnapshot -s .m2/settings.xml
+after_success:
+    - ./scripts/build_dependent_projects.sh
 env:
   global:
   - secure: e3AwTCx5o1PVQv4mlPFW19qeGsWjUNNouxI2mZphG20XAPQ3Pi6kWgtHp8zZsPuJUPZ0uJjVYLsMO8u4c15XB7xOErTrQtivJ/ehNao0TFaGdSr+fVTcZITf0cvP+ZfdOakphoNONoC/q/rtJat1nBNTkyY8d6CIydP5XLULMpE=
   - secure: VdPactnxx4juU4ZhcoFg4N0egMDK6peckEh5sarcy6jdDLiOSGJ2E2YZoYlhEiz31tFSVphNdlfnx03/HtLbfcNCVU91OiKfRydynlagC3ZOhPyEnnm97bAgpLJ8Esb4VtqNiXVNNkLsmRxeE6Z3PJpaLn8zYLjDZqptUP1DPVc=
+  - secure: MaPs86/yjrtwIoj7W0TC6tY1TGtFMGX26VoJD7lKFjod9raxafWn+hWdwR/S4x/syAsKBSfOZ8o7BFchbnTL4NbM0mLw/Pdl69290tZ6g/3BdZK6iqHPAy+M4dWMoeWwXdhZHWFIyORYUGNkOFJ8/HiJvKlNjsdMCwQzaR1jtOM=
