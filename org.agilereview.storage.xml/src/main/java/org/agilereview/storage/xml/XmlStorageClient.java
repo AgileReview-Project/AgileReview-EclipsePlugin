@@ -9,7 +9,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 
 import org.agilereview.common.exception.ExceptionHandler;
 import org.agilereview.core.external.definition.IStorageClient;
@@ -175,15 +174,68 @@ public class XmlStorageClient implements IStorageClient, IPreferenceChangeListen
     
     @Override
     public String getNewReplyId(Object parent) {
-        String id = UUID.randomUUID().toString();
-        // TODO: add correct ID based on parent
-        //        String id = "";
-        //        if (parent instanceof Comment) {
-        //            
-        //        } else { // parent is reply
-        //        
-        //        }
-        return id;
+        String newId = "";
+        if (parent instanceof Comment) {
+            newId = getNewReplyId((Comment) parent);
+        } else { // parent is reply
+            newId = getNewReplyId((Reply) parent);
+        }
+        return newId;
+    }
+    
+    /**
+     * Get new reply ID if parent of new reply is a comment
+     * @param parent the comment
+     * @return the new ID
+     * @author Peter Reuter (15.02.2015)
+     */
+    private String getNewReplyId(Comment parent) {
+        List<Reply> replies = parent.getReplies();
+        Collections.sort(replies, new Comparator<Reply>() {
+            
+            @Override
+            public int compare(Reply o1, Reply o2) {
+                return o1.getId().compareTo(o2.getId());
+            }
+        });
+        int id = 0;
+        for (Reply r : replies) {
+            int currId = Integer.parseInt(r.getId().substring(1, r.getId().length()));
+            if (id < currId) {
+                break;
+            } else {
+                id = currId + 1;
+            }
+        }
+        return "r" + id;
+    }
+    
+    /**
+     * Get new reply ID if parent of new reply is a reply as well.
+     * @param parent the parent reply
+     * @return the new ID
+     * @author Peter Reuter (15.02.2015)
+     */
+    private String getNewReplyId(Reply parent) {
+        List<Reply> replies = parent.getReplies();
+        Collections.sort(replies, new Comparator<Reply>() {
+            
+            @Override
+            public int compare(Reply o1, Reply o2) {
+                return o1.getId().compareTo(o2.getId());
+            }
+        });
+        int id = 0;
+        for (Reply r : replies) {
+            int currId = Integer.parseInt(r.getId().substring(1, r.getId().length()));
+            if (id < currId) {
+                break;
+            } else {
+                id = currId + 1;
+            }
+        }
+        String result = parent.getId() + "r" + id;
+        return result;
     }
     
     //////////////////////////////////////////////////////
