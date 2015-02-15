@@ -3,6 +3,8 @@ package org.agilereview.storage.xml;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -22,7 +24,6 @@ import org.agilereview.storage.xml.persistence.SourceFolderManager;
 import org.agilereview.storage.xml.persistence.XmlLoader;
 import org.agilereview.storage.xml.persistence.XmlPersister;
 import org.agilereview.storage.xml.wizards.noreviewsource.NoReviewSourceProjectWizard;
-import org.eclipse.core.internal.preferences.EclipsePreferences;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
@@ -39,28 +40,30 @@ import org.osgi.service.prefs.BackingStoreException;
  */
 public class XmlStorageClient implements IStorageClient, IPreferenceChangeListener, PropertyChangeListener {
     
+    private static final String SEPARATOR = "@";
+    
     //TODO compatibility to old xml format?
     
     /**
      * Map of {@link Review} IDs to {@link Review} objects.
      */
-    private Map<String, Review> idReviewMap = new HashMap<String, Review>();
+    private final Map<String, Review> idReviewMap = new HashMap<String, Review>();
     /**
      * The set of all loaded {@link Review}s.
      */
-    private ReviewSet reviewSet = new ReviewSet();
+    private final ReviewSet reviewSet = new ReviewSet();
     /**
      * Map of {@link Comment} IDs to {@link Comment} objects.
      */
-    private Map<String, Comment> idCommentMap = new HashMap<String, Comment>();
+    private final Map<String, Comment> idCommentMap = new HashMap<String, Comment>();
     /**
      * Map of {@link Reply} IDs to {@link Reply} objects.
      */
-    private Map<String, Reply> idReplyMap = new HashMap<String, Reply>();
+    private final Map<String, Reply> idReplyMap = new HashMap<String, Reply>();
     /**
      * Preferences for the XMLStorage plugin
      */
-    private IEclipsePreferences preferencesNode = InstanceScope.INSTANCE.getNode(Activator.PLUGIN_ID);
+    private final IEclipsePreferences preferencesNode = InstanceScope.INSTANCE.getNode(Activator.PLUGIN_ID);
     /**
      * Indicates whether the user was notified that no Review Source Project is available.
      */
@@ -75,13 +78,13 @@ public class XmlStorageClient implements IStorageClient, IPreferenceChangeListen
      * @author Peter Reuter (04.04.2012)
      */
     public XmlStorageClient() {
-        preferencesNode.addPreferenceChangeListener(this);
+        this.preferencesNode.addPreferenceChangeListener(this);
         initialize();
     }
     
     @Override
     protected void finalize() throws Throwable {
-        preferencesNode.removePreferenceChangeListener(this);
+        this.preferencesNode.removePreferenceChangeListener(this);
         super.finalize();
     }
     
@@ -92,7 +95,7 @@ public class XmlStorageClient implements IStorageClient, IPreferenceChangeListen
     private void initialize() {
         
         // disable propertychangelistener
-        reviewSet.removePropertyChangeListener(this);
+        this.reviewSet.removePropertyChangeListener(this);
         
         // clean up internal data structure (maps etc.)
         unloadReviews(this.reviewSet);
@@ -109,20 +112,10 @@ public class XmlStorageClient implements IStorageClient, IPreferenceChangeListen
             }
         } else {
             // no source folder available
-            userNotified = false;
+            this.userNotified = false;
         }
         // reenable propertychangelistener
-        reviewSet.addPropertyChangeListener(this);
-    }
-    
-    /**
-     * Generates a unique ID for {@link Review}, {@link Comment} and {@link Reply} objects.
-     * @return a random and unique ID.
-     * @author Peter Reuter (04.04.2012)
-     */
-    private String getNewId() {
-        // TODO change this method... more sophisticated/short IDs are required!
-        return UUID.randomUUID().toString();
+        this.reviewSet.addPropertyChangeListener(this);
     }
     
     ////////////////////////////////
@@ -136,17 +129,61 @@ public class XmlStorageClient implements IStorageClient, IPreferenceChangeListen
     
     @Override
     public String getNewReviewId() {
-        return getNewId();
+        int id = 0;
+        List<Review> reviews = new ArrayList<>(this.reviewSet);
+        Collections.sort(reviews, new Comparator<Review>() {
+            
+            @Override
+            public int compare(Review o1, Review o2) {
+                return o1.getId().compareTo(o2.getId());
+            }
+        });
+        for (Review r : reviews) {
+            int currId = Integer.parseInt(r.getId().substring(1, r.getId().length()));
+            if (id < currId) {
+                break;
+            } else {
+                id = currId + 1;
+            }
+        }
+        return "r" + id;
     }
     
     @Override
     public String getNewCommentId(String author, Review review) {
-        return getNewId();
+        int id = 0;
+        List<Comment> comments = review.getComments();
+        Collections.sort(comments, new Comparator<Comment>() {
+            
+            @Override
+            public int compare(Comment o1, Comment o2) {
+                return o1.getId().compareTo(o2.getId());
+            }
+        });
+        for (Comment c : review.getComments()) {
+            if (c.getAuthor().equals(author)) {
+                int currId = Integer.parseInt(c.getId().substring(1, c.getId().indexOf(SEPARATOR)));
+                if (id < currId) {
+                    break;
+                } else {
+                    id = currId + 1;
+                }
+            }
+        }
+        return "c" + id + SEPARATOR + author + SEPARATOR + review.getId();
     }
     
     @Override
     public String getNewReplyId(Object parent) {
-        return getNewId();
+        String id = UUID.randomUUID().toString();
+        // TODO: add correct ID based on parent
+        //        String id = "";
+        //        if (parent instanceof Comment) {
+        //            
+        //        } else { // parent is reply
+        //        
+        //        }
+        return id;
     }
     
     //////////////////////////////////////////////////////
@@ -162,7 +199,7 @@ public class XmlStorageClient implements IStorageClient, IPreferenceChangeListen
         for (Review review : reviews) {
             this.idReviewMap.put(review.getId(), review);
         }
-        this.reviewSet.addAll(idReviewMap.values());
+        this.reviewSet.addAll(this.idReviewMap.values());
     }
     
     /**
@@ -362,9 +399,9 @@ public class XmlStorageClient implements IStorageClient, IPreferenceChangeListen
     
     @Override
     public void propertyChange(java.beans.PropertyChangeEvent evt) {
-        if (SourceFolderManager.getCurrentReviewSourceProject() == null && !userNotified) {
+        if (SourceFolderManager.getCurrentReviewSourceProject() == null && !this.userNotified) {
             
-            userNotified = true;
+            this.userNotified = true;
             
             String message = "No Review Source Project available. All changes will be discarded when Eclipse shuts down or a Review Source Project is created and/or activated. Please create and/or activate a Review Source Folder to persistently store Review data.";
             ExceptionHandler.logAndNotifyUser(new Exception(message), Activator.PLUGIN_ID);
