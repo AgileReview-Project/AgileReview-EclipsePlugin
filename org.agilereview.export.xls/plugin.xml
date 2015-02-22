@@ -23,11 +23,15 @@
    <extension
          point="org.eclipse.ui.commands">
       <command
-            categoryId="org.agilereview.commands"
+            categoryId="org.agilereview.export.xls.commands"
             description="Export selected reviews in Review Explorer"
             id="org.agilereview.eclipse.export.reviews"
             name="Export reviews">
       </command>
+      <category
+            id="org.agilereview.export.xls.commands"
+            name="org.agilereview.export.xls.commands">
+      </category>
    </extension>
    <extension
          point="org.eclipse.ui.handlers">
