@@ -38,11 +38,9 @@ import org.osgi.service.prefs.BackingStoreException;
  * @author Peter Reuter (04.04.2012)
  */
 public class XmlStorageClient implements IStorageClient, IPreferenceChangeListener, PropertyChangeListener {
-    
+
     private static final String SEPARATOR = "@";
-    
-    //TODO compatibility to old xml format?
-    
+
     /**
      * Map of {@link Review} IDs to {@link Review} objects.
      */
@@ -67,11 +65,11 @@ public class XmlStorageClient implements IStorageClient, IPreferenceChangeListen
      * Indicates whether the user was notified that no Review Source Project is available.
      */
     private boolean userNotified = false;
-    
+
     ///////////////////////////////////////////////////////
     // additional methods needed by the XmlStorageClient //
     ///////////////////////////////////////////////////////
-    
+
     /**
      * Constructor for the XmlStorageClient which initializes the local review data base
      * @author Peter Reuter (04.04.2012)
@@ -80,22 +78,22 @@ public class XmlStorageClient implements IStorageClient, IPreferenceChangeListen
         this.preferencesNode.addPreferenceChangeListener(this);
         initialize();
     }
-    
+
     @Override
     protected void finalize() throws Throwable {
         this.preferencesNode.removePreferenceChangeListener(this);
         super.finalize();
     }
-    
+
     /**
      * Initially loads all {@link Review} objects on startup
      * @author Peter Reuter (04.04.2012)
      */
     private void initialize() {
-        
+
         // disable propertychangelistener
         this.reviewSet.removePropertyChangeListener(this);
-        
+
         // clean up internal data structure (maps etc.)
         unloadReviews(this.reviewSet);
         // clear pojos
@@ -116,22 +114,22 @@ public class XmlStorageClient implements IStorageClient, IPreferenceChangeListen
         // reenable propertychangelistener
         this.reviewSet.addPropertyChangeListener(this);
     }
-    
+
     ////////////////////////////////
     // methods of IStorageClients //
     ////////////////////////////////
-    
+
     @Override
     public ReviewSet getAllReviews() {
         return this.reviewSet;
     }
-    
+
     @Override
     public String getNewReviewId() {
         int id = 0;
         List<Review> reviews = new ArrayList<>(this.reviewSet);
         Collections.sort(reviews, new Comparator<Review>() {
-            
+
             @Override
             public int compare(Review o1, Review o2) {
                 return o1.getId().compareTo(o2.getId());
@@ -147,13 +145,13 @@ public class XmlStorageClient implements IStorageClient, IPreferenceChangeListen
         }
         return "r" + id;
     }
-    
+
     @Override
     public String getNewCommentId(String author, Review review) {
         int id = 0;
         List<Comment> comments = review.getComments();
         Collections.sort(comments, new Comparator<Comment>() {
-            
+
             @Override
             public int compare(Comment o1, Comment o2) {
                 return o1.getId().compareTo(o2.getId());
@@ -171,7 +169,7 @@ public class XmlStorageClient implements IStorageClient, IPreferenceChangeListen
         }
         return "c" + id + SEPARATOR + author + SEPARATOR + review.getId();
     }
-    
+
     @Override
     public String getNewReplyId(Object parent) {
         String newId = "";
@@ -182,7 +180,7 @@ public class XmlStorageClient implements IStorageClient, IPreferenceChangeListen
         }
         return newId;
     }
-    
+
     /**
      * Get new reply ID if parent of new reply is a comment
      * @param parent the comment
@@ -192,7 +190,7 @@ public class XmlStorageClient implements IStorageClient, IPreferenceChangeListen
     private String getNewReplyId(Comment parent) {
         List<Reply> replies = parent.getReplies();
         Collections.sort(replies, new Comparator<Reply>() {
-            
+
             @Override
             public int compare(Reply o1, Reply o2) {
                 return o1.getId().compareTo(o2.getId());
@@ -209,7 +207,7 @@ public class XmlStorageClient implements IStorageClient, IPreferenceChangeListen
         }
         return "r" + id;
     }
-    
+
     /**
      * Get new reply ID if parent of new reply is a reply as well.
      * @param parent the parent reply
@@ -219,7 +217,7 @@ public class XmlStorageClient implements IStorageClient, IPreferenceChangeListen
     private String getNewReplyId(Reply parent) {
         List<Reply> replies = parent.getReplies();
         Collections.sort(replies, new Comparator<Reply>() {
-            
+
             @Override
             public int compare(Reply o1, Reply o2) {
                 return o1.getId().compareTo(o2.getId());
@@ -237,11 +235,11 @@ public class XmlStorageClient implements IStorageClient, IPreferenceChangeListen
         String result = parent.getId() + "r" + id;
         return result;
     }
-    
+
     //////////////////////////////////////////////////////
     // methods for loading POJO data from xmlbeans data //
     //////////////////////////////////////////////////////
-    
+
     /**
      * Loads all {@link Review} objects and adds a {@link PropertyChangeListener} to each of them.
      * @author Peter Reuter (04.04.2012)
@@ -253,7 +251,7 @@ public class XmlStorageClient implements IStorageClient, IPreferenceChangeListen
         }
         this.reviewSet.addAll(this.idReviewMap.values());
     }
-    
+
     /**
      * Loads all {@link Comment} objects of the {@link Review} given by its ID.
      * @param reviewId The ID of the {@link Review}.
@@ -269,7 +267,7 @@ public class XmlStorageClient implements IStorageClient, IPreferenceChangeListen
             }
         }
     }
-    
+
     /**
      * Loads all {@link Comment} objects of the {@link Review}s given by their ID.
      * @param reviewIds
@@ -280,11 +278,11 @@ public class XmlStorageClient implements IStorageClient, IPreferenceChangeListen
             loadComments(reviewId);
         }
     }
-    
+
     /////////////////////////////////////
     // methods for unloading POJO data //
     /////////////////////////////////////
-    
+
     /**
      * Unload all reviews
      * @param reviews
@@ -297,7 +295,7 @@ public class XmlStorageClient implements IStorageClient, IPreferenceChangeListen
         this.reviewSet.clear();
         this.idReviewMap.clear();
     }
-    
+
     /**
      * Unload all comments
      * @param comments
@@ -310,7 +308,7 @@ public class XmlStorageClient implements IStorageClient, IPreferenceChangeListen
         }
         comments.clear();
     }
-    
+
     /**
      * Unload all replies
      * @param replies
@@ -322,11 +320,11 @@ public class XmlStorageClient implements IStorageClient, IPreferenceChangeListen
             this.idReplyMap.remove(r);
         }
     }
-    
+
     ///////////////////////////////////////////////
     // helper methods for PropertyChangeListener //
     ///////////////////////////////////////////////
-    
+
     /**
      * A {@link Comment} or {@link Reply} was changed
      * @param evt
@@ -339,7 +337,7 @@ public class XmlStorageClient implements IStorageClient, IPreferenceChangeListen
         }
         XmlPersister.store((Comment) source);
     }
-    
+
     /**
      * A {@link Review} changed
      * @param evt
@@ -389,7 +387,7 @@ public class XmlStorageClient implements IStorageClient, IPreferenceChangeListen
             XmlPersister.store((Review) evt.getSource());
         }
     }
-    
+
     /**
      * A {@link ReviewSet} changed.
      * @param evt
@@ -429,7 +427,7 @@ public class XmlStorageClient implements IStorageClient, IPreferenceChangeListen
             // nothing to do here
         }
     }
-    
+
     /**
      * @param evt
      * @author Peter Reuter (04.12.2012)
@@ -444,24 +442,24 @@ public class XmlStorageClient implements IStorageClient, IPreferenceChangeListen
             propertyChangeOfCommentOrReply(evt);
         }
     }
-    
+
     //////////////////////////////////////
     // method of PropertyChangeListener //
     //////////////////////////////////////
-    
+
     @Override
     public void propertyChange(java.beans.PropertyChangeEvent evt) {
         if (SourceFolderManager.getCurrentReviewSourceProject() == null && !this.userNotified) {
-            
+
             this.userNotified = true;
-            
+
             String message = "No Review Source Project available. All changes will be discarded when Eclipse shuts down or a Review Source Project is created and/or activated. Please create and/or activate a Review Source Folder to persistently store Review data.";
             ExceptionHandler.logAndNotifyUser(new Exception(message), Activator.PLUGIN_ID);
-            
+
             // backup data that was inserted until now
             ReviewSet backup = new ReviewSet();
             backup.addAll(this.reviewSet);
-            
+
             // allow user to create and/or activate Review Source Project
             Display.getCurrent().syncExec(new Runnable() {
                 @Override
@@ -472,21 +470,21 @@ public class XmlStorageClient implements IStorageClient, IPreferenceChangeListen
                     wDialog.open();
                 }
             });
-            
+
             // add backup data to ReviewSet and thereby to new Review Source Project
             if (SourceFolderManager.getCurrentReviewSourceProject() != null) {
                 this.reviewSet.addAll(backup);
             }
-            
+
         } else {
             processPropertyChange(evt);
         }
     }
-    
+
     ///////////////////////////////////////
     // method of IPropertyChangeListener //
     ///////////////////////////////////////
-    
+
     @Override
     public void preferenceChange(PreferenceChangeEvent event) {
         if (event.getKey().equals(SourceFolderManager.SOURCEFOLDER_PROPERTYNAME)) {
@@ -503,11 +501,11 @@ public class XmlStorageClient implements IStorageClient, IPreferenceChangeListen
             initialize();
         }
     }
-    
+
     //////////////////////////
     // other helper methods //
     //////////////////////////
-    
+
     /**
      * Adds the {@link List} of {@link Reply} objects recursively to the idReplyMap.
      * @param replies
@@ -519,5 +517,5 @@ public class XmlStorageClient implements IStorageClient, IPreferenceChangeListen
             addReplies(reply.getReplies());
         }
     }
-    
+
 }
